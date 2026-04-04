@@ -7,3 +7,19 @@ opencode.json
 
 .claude/
 .mcp.json
+
+# Next.js
+.next/
+out/
+
+# Node
+node_modules/
+
+# Build
+tsconfig.tsbuildinfo
+*.log
+
+# Deployment
+deployment.log
+deploy.sh
+DEPLOYMENT_UPDATE.md
