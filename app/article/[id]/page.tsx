@@ -8,12 +8,16 @@ import { NewsletterWidget } from '@/components/newsletter/NewsletterWidget';
 import { ShareToolbar } from '@/components/sharing/ShareToolbar';
 import { TableOfContents } from '@/components/TableOfContents';
 import { TrustedFilterSection } from '@/components/trusted-filter/TrustedFilterSection';
+import { DepthBar } from '@/components/reading/DepthBar';
 import { useReadingPosition } from '@/lib/hooks/useReadingPosition';
 import { useShareToolbar } from '@/lib/hooks/useShareToolbar';
 import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
 import { useChallengeStatus } from '@/lib/hooks/useChallengeStatus';
 import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
 import { TrustedFilterData } from '@/types/trusted-filter';
+import { RelatedPosts } from '@/components/content/RelatedPosts';
+import { findRelatedArticles } from '@/lib/content/ContentTagger';
+import { getAllArticles } from '@/lib/content/articleData';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -127,20 +131,8 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
         onClose={closeShareToolbar}
       />
 
-      {/* Progress indicator */}
-      {progress > 0 && (
-        <div className="fixed top-0 left-0 right-0 h-1 bg-gray-800 z-50">
-          <div
-            className="h-full bg-primary transition-all duration-300 ease-out"
-            style={{ width: `${progress}%` }}
-            role="progressbar"
-            aria-label={`Reading progress: ${progress}%`}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progress}
-          />
-        </div>
-      )}
+      {/* Depth Bar - Minimal, opinionated reading progress indicator */}
+      <DepthBar articleId={params.id} />
 
       <article className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -239,7 +231,18 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
             <ChallengeList articleId={params.id} />
 
-            {/* TODO: Add related articles section */}
+            {/* Related Articles - Intelligent Content Discovery */}
+            <RelatedPosts
+              articles={findRelatedArticles(
+                {
+                  id: params.id,
+                  title: ARTICLE_TITLE,
+                  content: ARTICLE_SECTIONS.map(s => s.title).join(' '),
+                },
+                getAllArticles()
+              ).map(r => r.article)}
+              currentArticleId={params.id}
+            />
           </div>
 
           {/* Sidebar - 1/3 width */}
