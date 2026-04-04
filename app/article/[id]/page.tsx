@@ -20,6 +20,8 @@ import { TrustedFilterData } from '@/types/trusted-filter';
 import { RelatedPosts } from '@/components/content/RelatedPosts';
 import { findRelatedArticles } from '@/lib/content/ContentTagger';
 import { getAllArticles } from '@/lib/content/articleData';
+import { ExportNotesButton } from '@/components/notes/ExportNotesButton';
+import { NotesProvider } from '@/components/notes/NotesProvider';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -110,7 +112,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   }, [hasStoredPosition]);
 
   return (
-    <>
+    <NotesProvider postId={params.id}>
       {/* Continue reading banner */}
       {showContinueBanner && (
         <ContinueReadingBanner
@@ -141,18 +143,28 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           {/* Main content area - 2/3 width */}
           <div className="lg:col-span-2">
             <header className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-4xl font-bold text-primary">
-                  The Art of Challenging Ideas
-                </h1>
-                {hasSubmittedChallenge && (
-                  <span
-                    className="px-3 py-1 bg-green-600 text-white text-xs font-medium rounded-full flex items-center gap-1"
-                    title="You've submitted a challenge to this article"
-                  >
-                    ✓
-                  </span>
-                )}
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-4xl font-bold text-primary">
+                    The Art of Challenging Ideas
+                  </h1>
+                  {hasSubmittedChallenge && (
+                    <span
+                      className="px-3 py-1 bg-green-600 text-white text-xs font-medium rounded-full flex items-center gap-1"
+                      title="You've submitted a challenge to this article"
+                    >
+                      ✓
+                    </span>
+                  )}
+                </div>
+
+                {/* Export Notes Button - Only shows when notes exist */}
+                <ExportNotesButton
+                  postId={params.id}
+                  articleTitle={ARTICLE_TITLE}
+                  articleUrl={articleUrl}
+                  articleDate="2026-04-04"
+                />
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span>By Author Name • April 4, 2026</span>
@@ -267,7 +279,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           </aside>
         </div>
       </article>
-    </>
+    </NotesProvider>
   );
 }
 
