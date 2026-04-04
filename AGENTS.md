@@ -10,6 +10,7 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 `lib/` - Database layer, business logic, custom hooks
 `lib/content/` - Content analysis and curation logic
 `lib/sharing/` - Text sharing and clipboard utilities
+`lib/utils/scrollUtils.ts` - Smooth scroll animations and position calculations
 `lib/insights.ts` - Insight Capture & Share CRUD operations
 `lib/resonances.ts` - Resonance-First Bookmarking System service layer
 
@@ -20,5 +21,7 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 - Insight Capture & Share (Foundation: DB schema, types, CRUD operations)
 - Silent Highlights (Anonymous text highlighting)
 - Reading Memory (Personal reading history)
+- Reading Progress & Position Tracking (DepthBar, useScrollDepth, useReadingPosition)
+- Quick Position Navigation (JumpToPositionButton for instant position restoration)
 - Thoughtful Conversations (Comments with upvoting)
 - Progressive Content Revelation (Session-based unlocks)

@@ -27,6 +27,7 @@ import { NotesProvider } from '@/components/notes/NotesProvider';
 import { QuickStats } from '@/components/content/QuickStats';
 import { ReadingCount } from '@/components/reading/ReadingCount';
 import { BookmarkButton } from '@/components/reading/BookmarkButton';
+import { JumpToPositionButton } from '@/components/reading/JumpToPositionButton';
 import { CommentForm } from '@/components/CommentForm';
 import { CommentList } from '@/components/CommentList';
 import { ThisDayInHistory } from '@/components/ThisDayInHistory';
@@ -248,6 +249,19 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
       {/* Depth Bar - Minimal, opinionated reading progress indicator */}
       <DepthBar articleId={params.id} />
+
+      {/* Jump to Position Button - Quick navigation to saved position */}
+      {hasStoredPosition && (
+        <JumpToPositionButton
+          articleId={params.id}
+          storedProgress={progress}
+          isVisible={hasStoredPosition}
+          onJump={() => {
+            // Optional: Hide the continue reading banner after jumping
+            setShowContinueBanner(false);
+          }}
+        />
+      )}
 
       <article className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">

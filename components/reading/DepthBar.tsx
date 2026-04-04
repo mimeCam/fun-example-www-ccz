@@ -16,6 +16,13 @@ import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
  * Based on team recommendations:
  * - Michael Koch: Performance-first, Intersection Observer API
  * - Tanya Donskaia: Minimal tasteful design, calm technology
+ *
+ * TODO: Add milestone messages for delightful micro-interactions
+ * - Show subtle messages at 25%, 50%, 75%, 90% progress
+ * - Only display if user is engaged (reading > 30 seconds)
+ * - Examples: "👀 Just getting started...", "🔥 Halfway there!", etc.
+ * - Should be non-intrusive and fade out automatically
+ * - Reference: Michael Koch's "Reading Progress & Smart Bookmarks" spec
  */
 export function DepthBar({ articleId }: { articleId: string }) {
   const { depth, isReading, isFinished } = useScrollDepth({ articleId });
