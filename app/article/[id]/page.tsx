@@ -9,11 +9,13 @@ import { ShareButton } from '@/components/sharing/ShareButton';
 import { TableOfContents } from '@/components/TableOfContents';
 import { TrustedFilterSection } from '@/components/trusted-filter/TrustedFilterSection';
 import { DepthBar } from '@/components/reading/DepthBar';
+import { MilestoneToast } from '@/components/reading/MilestoneToast';
 import { useReadingPosition } from '@/lib/hooks/useReadingPosition';
 import { useShareButton } from '@/lib/hooks/useShareButton';
 import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
 import { useChallengeStatus } from '@/lib/hooks/useChallengeStatus';
 import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
+import { useMilestones } from '@/lib/hooks/useMilestones';
 // TODO: Import useCompletionDetection when implementing celebration UI
 // import { useCompletionDetection } from '@/lib/hooks/useCompletionDetection';
 import { TrustedFilterData } from '@/types/trusted-filter';
@@ -167,6 +169,11 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     estimatedReadTime: ARTICLE_READING_MINUTES, // Use calculated reading time
   });
 
+  // Track reading milestones (50%, 100%)
+  const { milestoneState, dismissMilestone } = useMilestones({
+    articleId: params.id,
+  });
+
   // Simplified share button functionality
   const articleUrl = typeof window !== 'undefined' ? window.location.href : '';
   const {
@@ -249,6 +256,15 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
       {/* Depth Bar - Minimal, opinionated reading progress indicator */}
       <DepthBar articleId={params.id} />
+
+      {/* Milestone Toast - Reading milestone notifications */}
+      <MilestoneToast
+        milestone={milestoneState.currentMilestone}
+        message={milestoneState.message}
+        description={milestoneState.description}
+        isVisible={milestoneState.isVisible}
+        onDismiss={dismissMilestone}
+      />
 
       {/* Jump to Position Button - Quick navigation to saved position */}
       {hasStoredPosition && (

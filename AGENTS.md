@@ -9,19 +9,6 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 `components/` - React components
 `lib/` - Database layer, business logic, custom hooks
 `lib/content/` - Content analysis and curation logic
-`lib/sharing/` - Text sharing and clipboard utilities
-`lib/utils/scrollUtils.ts` - Smooth scroll animations and position calculations
-`lib/insights.ts` - Insight Capture & Share CRUD operations
-`lib/resonances.ts` - Resonance-First Bookmarking System service layer
-
-## Core Features
-- Search & Discovery (Client-side article search with API backend, snippet generation)
-- Journey Context System (Article depth, DNA tags, outcome promises)
-- Resonance-First Bookmarking (DB schema, types, CRUD operations, API routes, server actions, UI components)
-- Insight Capture & Share (Foundation: DB schema, types, CRUD operations)
-- Silent Highlights (Anonymous text highlighting)
-- Reading Memory (Personal reading history)
-- Reading Progress & Position Tracking (DepthBar, useScrollDepth, useReadingPosition)
-- Quick Position Navigation (JumpToPositionButton for instant position restoration)
-- Thoughtful Conversations (Comments with upvoting)
-- Progressive Content Revelation (Session-based unlocks)
+`lib/utils/milestoneUtils.ts` - Reading milestone tracking utilities
+`lib/hooks/useMilestones.ts` - Milestone tracking hook
+`lib/hooks/useScrollDepth.ts` - Scroll depth tracking with Intersection Observer
