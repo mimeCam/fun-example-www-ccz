@@ -133,6 +133,32 @@ function initializeSchema(database: Database.Database): void {
     ON comment_upvotes(commentId, userEmail)
   `);
 
+  // Create reading_memory table for personal reading history
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS reading_memory (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      emailFingerprint TEXT NOT NULL,
+      articleId TEXT NOT NULL,
+      firstReadAt INTEGER NOT NULL,
+      lastReadAt INTEGER NOT NULL,
+      readCount INTEGER NOT NULL DEFAULT 1,
+      totalReadingTime INTEGER NOT NULL DEFAULT 0,
+      completionRate REAL NOT NULL DEFAULT 0.0,
+      UNIQUE(emailFingerprint, articleId)
+    )
+  `);
+
+  // Create indexes for reading memory queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_reading_memory_user
+    ON reading_memory(emailFingerprint, lastReadAt DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_reading_memory_articles
+    ON reading_memory(articleId)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }
