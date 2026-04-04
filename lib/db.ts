@@ -239,6 +239,44 @@ function initializeSchema(database: Database.Database): void {
     ON insights(isPublic, captureCount DESC)
   `);
 
+  // Create categories table for content organization
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL UNIQUE,
+      slug TEXT NOT NULL UNIQUE,
+      description TEXT,
+      color TEXT,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Create article_categories junction table (many-to-many)
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS article_categories (
+      articleId TEXT NOT NULL,
+      categoryId INTEGER NOT NULL,
+      PRIMARY KEY (articleId, categoryId),
+      FOREIGN KEY (categoryId) REFERENCES categories(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create indexes for category queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_categories_slug
+    ON categories(slug)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_article_categories_category
+    ON article_categories(categoryId)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_article_categories_article
+    ON article_categories(articleId)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }

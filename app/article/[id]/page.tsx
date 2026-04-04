@@ -32,6 +32,9 @@ import { CommentList } from '@/components/CommentList';
 import { ThisDayInHistory } from '@/components/ThisDayInHistory';
 import { ArticleMeta } from '@/components/ArticleMeta';
 import { getReadingTimeDisplay } from '@/lib/utils/reading-time';
+import { CategoryBadges } from '@/components/content/CategoryBadges';
+import { MoreInCategory } from '@/components/content/MoreInCategory';
+import { Category } from '@/types/category';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -143,6 +146,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentKey, setCommentKey] = useState(0);
   const [relatedPosts, setRelatedPosts] = useState<RelatedPostWithSource[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -194,6 +198,22 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       }
     }
     loadRelatedPosts();
+  }, [params.id]);
+
+  // Fetch article categories
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch(`/api/articles/${params.id}/categories`);
+        if (response.ok) {
+          const data = await response.json();
+          setCategories(data);
+        }
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    }
+    loadCategories();
   }, [params.id]);
 
   return (
@@ -278,6 +298,14 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                 </div>
                 <ReadingCount articleId={params.id} />
               </div>
+
+              {/* Category Badges */}
+              {categories.length > 0 && (
+                <div className="mt-4">
+                  <CategoryBadges categories={categories} size="md" />
+                </div>
+              )}
+
               {isFirstVisit && (
                 <p className="text-sm text-gray-500 mt-2">
                   Welcome! This article takes about {ARTICLE_READING_MINUTES} minutes.
@@ -387,6 +415,17 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                 <CommentList key={commentKey} articleId={params.id} />
               </div>
             </div>
+
+            {/* More in Category - Category-based discovery */}
+            {categories.length > 0 && categories.map((category) => (
+              <div key={category.id} className="mt-12">
+                <MoreInCategory
+                  currentArticleId={params.id}
+                  category={category}
+                  maxArticles={3}
+                />
+              </div>
+            ))}
 
             {/* Context-Aware "Next Read" - ONE intelligent recommendation */}
             {relatedPosts.length > 0 && (() => {
