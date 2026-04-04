@@ -1,5 +1,9 @@
 'use client';
 
+// TODO: This component is created but not yet integrated into the article page
+// It should be used to filter articles based on reader criteria
+// Consider integrating this with the home page or article listing
+
 import { useState } from 'react';
 import type { FilterCriteria } from '@/types/filter';
 
