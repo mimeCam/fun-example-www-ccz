@@ -1,5 +1,10 @@
 'use client';
 
+// TODO: This hook is created but not yet used anywhere in the application
+// It's intended for tracking filter analytics but the filter system
+// (FilterBanner, FilterModal) is not yet integrated
+// This should be connected when the filter feature is fully implemented
+
 import { useEffect, useState } from 'react';
 import type { FilterAnalytics } from '@/types/filter';
 
