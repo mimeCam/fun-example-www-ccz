@@ -7,6 +7,14 @@ Server Actions, Zod validation
 
 ## Key Paths
 `app/` - Next.js pages and layouts
-`components/` - React components (ChallengeModal, NewsletterWidget)
-`lib/` - Database, validation, business logic
+`components/` - React components (ChallengeModal, ChallengeList, NewsletterWidget, MarginNotes, ShareToolbar)
+`lib/` - Database, validation, business logic, custom hooks
 `types/` - TypeScript definitions
+
+## Core Features
+- Article system with reading position tracking and progress metrics
+- Challenge mechanism for critical discourse
+- Newsletter signup with filtering by topic
+- Contextual progress tracking (time investment, section-aware TOC, challenge badges)
+- Margin notes with private text highlighting (localStorage)
+- Social sharing with URL highlights
