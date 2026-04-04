@@ -12,7 +12,7 @@ import { getRelatedPosts } from '@/lib/content/related-posts';
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = request.nextUrl;
     const articleId = searchParams.get('articleId');
 
     if (!articleId) {

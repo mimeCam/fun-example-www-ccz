@@ -16,6 +16,7 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 `lib/db/editor-picks.ts` - Author-curated recommendations CRUD
 
 ## Core Features
+- **Timeless Score Engine**: Measures article longevity vs viral trends through engagement quality, sustained interest, and depth signals
 - **Editor's Picks**: Author-curated related posts with context, prioritized over algorithmic recommendations
 - **Content Discovery**: Jaccard similarity algorithm + manual curation
 - **Reading Engagement**: Depth tracking, completion detection, notes system, comments
