@@ -43,6 +43,7 @@ import { Category } from '@/types/category';
 import { JourneyContextBar } from '@/components/journey/JourneyContextBadge';
 import { calculateJourneyContext } from '@/lib/content/JourneyContext';
 import type { JourneyContext } from '@/types/journey-context';
+import { AudioButton } from '@/components/audio/AudioButton';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -317,6 +318,13 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3">
+                  {/* Audio Button - Listen to article */}
+                  <AudioButton
+                    articleId={params.id}
+                    articleTitle={ARTICLE_TITLE}
+                    articleContent={articleContent}
+                  />
+
                   {/* Bookmark Button - One-Click "Read Later" */}
                   <BookmarkButton
                     articleId={params.id}
