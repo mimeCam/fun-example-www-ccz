@@ -5,6 +5,12 @@
  * This creates foundation for time-based features (pacing, scheduling, progress).
  *
  * Based on average reading speed of 200-250 words per minute.
+ *
+ * Features:
+ * - Auto-calculate reading time from content
+ * - Support custom reading time messages
+ * - Format display for UI components
+ *
  * // TODO: Add support for markdown content
  * // TODO: Add configurable reading speed (for different languages/audiences)
  * // TODO: Add image/media time consideration
@@ -99,4 +105,99 @@ export function getReadingStats(
   const formatted = formatReadingTime(minutes);
 
   return { wordCount, minutes, formatted };
+}
+
+/**
+ * Get reading time display with custom message support
+ *
+ * This function provides the complete reading time display logic:
+ * - Uses custom message if provided
+ * - Falls back to auto-calculated reading time if not
+ * - Returns both the display text and the calculated minutes
+ *
+ * @param content - Text or HTML content
+ * @param customReadingTime - Optional custom reading time message
+ * @param wordsPerMinute - Reading speed for auto-calculation (default: 225 WPM)
+ * @returns Object with display text, minutes, and whether it's custom
+ *
+ * @example
+ * // With custom message
+ * getReadingTimeDisplay(content, "8 min to transform your workflow ⚡")
+ * // => { display: "8 min to transform your workflow ⚡", minutes: 8, isCustom: true }
+ *
+ * @example
+ * // Without custom message (auto-calculated)
+ * getReadingTimeDisplay(content)
+ * // => { display: "5 min read", minutes: 5, isCustom: false }
+ *
+ * // TODO: Add validation for custom message format
+ * // TODO: Add support for time range (e.g., "5-8 min")
+ */
+export function getReadingTimeDisplay(
+  content: string,
+  customReadingTime?: string,
+  wordsPerMinute: number = 225
+): {
+  display: string;
+  minutes: number;
+  isCustom: boolean;
+} {
+  // If custom reading time is provided, use it
+  if (customReadingTime && customReadingTime.trim().length > 0) {
+    // Try to extract minutes from custom message for tracking
+    const minutesMatch = customReadingTime.match(/(\d+)\s*(min|minute)/i);
+    const customMinutes = minutesMatch ? parseInt(minutesMatch[1], 10) : 0;
+
+    return {
+      display: customReadingTime.trim(),
+      minutes: customMinutes > 0 ? customMinutes : calculateReadingTime(content, wordsPerMinute),
+      isCustom: true,
+    };
+  }
+
+  // Otherwise, auto-calculate reading time
+  const minutes = calculateReadingTime(content, wordsPerMinute);
+  const display = formatReadingTime(minutes);
+
+  return {
+    display,
+    minutes,
+    isCustom: false,
+  };
+}
+
+/**
+ * Calculate reading time at build time for caching
+ *
+ * This function is designed to be called during the build process to pre-calculate
+ * reading times for all posts, improving performance at runtime.
+ *
+ * @param content - Text or HTML content
+ * @param customReadingTime - Optional custom reading time message
+ * @param wordsPerMinute - Reading speed for auto-calculation (default: 225 WPM)
+ * @returns Object with all reading time data for caching
+ *
+ * // TODO: Add batch processing for multiple posts
+ * // TODO: Add cache invalidation strategy
+ */
+export function calculateReadingTimeForCache(
+  content: string,
+  customReadingTime?: string,
+  wordsPerMinute: number = 225
+): {
+  display: string;
+  minutes: number;
+  isCustom: boolean;
+  wordCount: number;
+  calculatedAt: number; // timestamp
+} {
+  const plainText = content.includes('<') ? stripHtml(content) : content;
+  const wordCount = countWords(plainText);
+  const timeData = getReadingTimeDisplay(content, customReadingTime, wordsPerMinute);
+
+  return {
+    ...timeData,
+    wordCount,
+    calculatedAt: Date.now(),
+  };
 }

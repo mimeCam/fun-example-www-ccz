@@ -30,6 +30,8 @@ import { BookmarkButton } from '@/components/reading/BookmarkButton';
 import { CommentForm } from '@/components/CommentForm';
 import { CommentList } from '@/components/CommentList';
 import { ThisDayInHistory } from '@/components/ThisDayInHistory';
+import { ArticleMeta } from '@/components/ArticleMeta';
+import { getReadingTimeDisplay } from '@/lib/utils/reading-time';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -38,6 +40,62 @@ const ARTICLE_POST_TYPE: 'technical' | 'design' | 'personal' | 'business' | 'gen
 // TODO: Get article metadata from database
 const ARTICLE_TITLE = 'The Art of Challenging Ideas';
 const AUTHOR_NAME = 'Author Name';
+
+// TODO: Get custom reading time from article metadata
+// Example of custom reading time: "8 min to transform your workflow ⚡"
+const ARTICLE_CUSTOM_READING_TIME: string | undefined = undefined;
+
+/**
+ * Get article content as text for reading time calculation
+ * In production, this would come from the article body
+ */
+function getArticleContent(): string {
+  return `
+    The ability to challenge ideas is fundamental to intellectual growth.
+    When we encounter ideas that resonate with us, we should also be willing to question them.
+    This is how we strengthen our understanding and avoid falling into echo chambers.
+    Challenging ideas effectively requires more than just disagreement.
+    It involves understanding the context, asking thoughtful questions,
+    and providing evidence or alternative perspectives.
+    In our increasingly distracted world, the ability to perform deep work
+    is becoming both rare and valuable. Deep work is the ability to focus without
+    distraction on a cognitively demanding task. It's a skill that allows you to
+    quickly master complicated information and produce better results in less time.
+    To cultivate deep work, you must eliminate distractions and create routines
+    that support sustained attention.
+    Systems thinking is a holistic approach to analysis that focuses on
+    the way that a system's constituent parts interrelate and how systems work
+    over time and within the context of larger systems. Rather than breaking
+    problems down into smaller parts, systems thinking looks at problems as
+    interconnected wholes. This approach helps us understand complex issues
+    and find leverage points for meaningful change.
+    Technical excellence alone is not enough for leadership success.
+    Effective communication is the bridge between technical expertise and
+    organizational impact. Great technical leaders communicate complex ideas
+    clearly, listen actively to diverse perspectives, and adapt their message
+    to their audience. They understand that communication is not just about
+    transmitting information, but about building understanding and trust.
+    The most successful people are lifelong learners. They cultivate
+    curiosity and embrace continuous growth. Effective learning strategies include
+    deliberate practice, spaced repetition, interleaving topics, and teaching
+    others what you've learned. The key is to move beyond passive consumption
+    to active engagement with new knowledge. Learning is not a destination but
+    a journey of constant discovery and refinement.
+    Great developer tools share common design principles: they respect
+    the user's intelligence, provide clear feedback, and minimize cognitive load.
+    Good design disappears, allowing developers to focus on their work rather
+    than the tool itself. The best tools are opinionated about their domain but
+    flexible in their application. They understand that developers are not just
+    users but collaborators in the tool's evolution.
+  `;
+}
+
+// Calculate reading time at build time (ideal) or runtime (fallback)
+const articleContent = getArticleContent();
+const readingTimeData = getReadingTimeDisplay(articleContent, ARTICLE_CUSTOM_READING_TIME);
+const ARTICLE_READING_TIME = readingTimeData.display;
+const ARTICLE_IS_CUSTOM_READING_TIME = readingTimeData.isCustom;
+const ARTICLE_READING_MINUTES = readingTimeData.minutes;
 
 // TODO: Get sections from article frontmatter or database
 const ARTICLE_SECTIONS = [
@@ -52,7 +110,7 @@ const ARTICLE_TRUSTED_FILTER: TrustedFilterData = {
   context: {
     targetAudience: 'Developers and technical leaders who want to improve their critical thinking skills',
     valuePromise: 'A practical framework for challenging ideas constructively and fostering intellectual growth in teams',
-    timeCommitment: '5 min read',
+    timeCommitment: ARTICLE_READING_TIME,
   },
   perspectives: [
     {
@@ -95,7 +153,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   // Track time investment
   const { formattedTime, estimatedReadTime, isFirstVisit, isOverEstimate } = useTimeInvestment({
     articleId: params.id,
-    estimatedReadTime: 5, // TODO: Get from article metadata
+    estimatedReadTime: ARTICLE_READING_MINUTES, // Use calculated reading time
   });
 
   // Share toolbar functionality
@@ -203,20 +261,26 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                 </div>
               </div>
               <div className="space-y-2">
+                {/* Article Metadata with Reading Time */}
+                <ArticleMeta
+                  author={AUTHOR_NAME}
+                  publishedAt="2026-04-04"
+                  readingTime={ARTICLE_READING_TIME}
+                  isCustomReadingTime={ARTICLE_IS_CUSTOM_READING_TIME}
+                  challengeCount={challengeCount}
+                />
+
+                {/* Time Investment Display */}
                 <div className="flex items-center gap-4 text-sm text-gray-400">
-                  <span>By Author Name • April 4, 2026</span>
-                  {challengeCount > 0 && (
-                    <span>• {challengeCount} challenge{challengeCount > 1 ? 's' : ''}</span>
-                  )}
                   <span className={isOverEstimate ? 'text-primary font-medium' : ''}>
-                    {formattedTime} spent · Est. {estimatedReadTime} min read
+                    {formattedTime} spent · Est. {ARTICLE_READING_MINUTES} min read
                   </span>
                 </div>
                 <ReadingCount articleId={params.id} />
               </div>
               {isFirstVisit && (
                 <p className="text-sm text-gray-500 mt-2">
-                  Welcome! This article takes about {estimatedReadTime} minutes.
+                  Welcome! This article takes about {ARTICLE_READING_MINUTES} minutes.
                 </p>
               )}
             </header>
@@ -362,7 +426,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             <QuickStats
               articleId={params.id}
               timeInvested={formattedTime}
-              estimatedTime={estimatedReadTime}
+              estimatedTime={ARTICLE_READING_MINUTES}
               hasChallenged={hasSubmittedChallenge}
               challengeCount={challengeCount}
             />

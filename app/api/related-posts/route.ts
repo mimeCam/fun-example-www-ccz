@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRelatedPosts } from '@/lib/content/related-posts';
 
+// Force dynamic rendering because this route requires searchParams at request time
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/related-posts?articleId={id}
  * Get related posts for an article
