@@ -5,12 +5,12 @@ import { ChallengeModal } from '@/components/ChallengeModal';
 import { ChallengeList } from '@/components/ChallengeList';
 import { ContinueReadingBanner } from '@/components/ContinueReadingBanner';
 import { NewsletterWidget } from '@/components/newsletter/NewsletterWidget';
-import { ShareToolbar } from '@/components/sharing/ShareToolbar';
+import { ShareButton } from '@/components/sharing/ShareButton';
 import { TableOfContents } from '@/components/TableOfContents';
 import { TrustedFilterSection } from '@/components/trusted-filter/TrustedFilterSection';
 import { DepthBar } from '@/components/reading/DepthBar';
 import { useReadingPosition } from '@/lib/hooks/useReadingPosition';
-import { useShareToolbar } from '@/lib/hooks/useShareToolbar';
+import { useShareButton } from '@/lib/hooks/useShareButton';
 import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
 import { useChallengeStatus } from '@/lib/hooks/useChallengeStatus';
 import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
@@ -156,14 +156,14 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     estimatedReadTime: ARTICLE_READING_MINUTES, // Use calculated reading time
   });
 
-  // Share toolbar functionality
+  // Simplified share button functionality
   const articleUrl = typeof window !== 'undefined' ? window.location.href : '';
   const {
-    isShareToolbarVisible,
-    shareToolbarPosition,
+    isShareButtonVisible,
+    shareButtonPosition,
     selectedTextForShare,
-    closeShareToolbar,
-  } = useShareToolbar({
+    closeShareButton,
+  } = useShareButton({
     articleId: params.id,
     articleTitle: ARTICLE_TITLE,
     articleUrl,
@@ -209,15 +209,15 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
         />
       )}
 
-      {/* Share toolbar */}
-      <ShareToolbar
-        isVisible={isShareToolbarVisible}
-        position={shareToolbarPosition}
+      {/* Simplified share button - floating icon */}
+      <ShareButton
+        isVisible={isShareButtonVisible}
+        position={shareButtonPosition}
         selectedText={selectedTextForShare}
         articleTitle={ARTICLE_TITLE}
         articleUrl={articleUrl}
         authorName={AUTHOR_NAME}
-        onClose={closeShareToolbar}
+        onClose={closeShareButton}
       />
 
       {/* Depth Bar - Minimal, opinionated reading progress indicator */}

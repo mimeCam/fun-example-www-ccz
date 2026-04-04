@@ -9,3 +9,4 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 `components/` - React components
 `lib/` - Database layer, business logic, custom hooks
 `lib/content/` - Content analysis and curation logic
+`lib/sharing/` - Text sharing and clipboard utilities
