@@ -51,3 +51,30 @@ export const createCommentUpvoteSchema = z.object({
 // Type exports
 export type CreateCommentInput = z.infer<typeof createCommentSchema>;
 export type CreateCommentUpvoteInput = z.infer<typeof createCommentUpvoteSchema>;
+
+// Resonance validation schemas for Resonance-First Bookmarking System
+// Mandatory resonance note (280 char max), optional quote capture
+export const createResonanceSchema = z.object({
+  articleId: z.string().min(1, 'Article ID is required'),
+  email: z.string().email('Invalid email address'),
+  resonanceNote: z.string()
+    .min(1, 'Resonance note is required - why does this resonate with you?')
+    .max(280, 'Resonance note must be 280 characters or less'),
+  quote: z.string().max(500, 'Quote must be 500 characters or less').optional(),
+});
+
+export const updateResonanceSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  resonanceNote: z.string().max(280, 'Resonance note must be 280 characters or less').optional(),
+  quote: z.string().max(500, 'Quote must be 500 characters or less').optional(),
+  status: z.enum(['active', 'archived', 'considered']).optional(),
+});
+
+export const recordVisitSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+// Type exports
+export type CreateResonanceInput = z.infer<typeof createResonanceSchema>;
+export type UpdateResonanceInput = z.infer<typeof updateResonanceSchema>;
+export type RecordVisitInput = z.infer<typeof recordVisitSchema>;

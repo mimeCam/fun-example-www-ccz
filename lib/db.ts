@@ -277,6 +277,40 @@ function initializeSchema(database: Database.Database): void {
     ON article_categories(articleId)
   `);
 
+  // Create resonances table for Resonance-First Bookmarking System
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS resonances (
+      id TEXT PRIMARY KEY,
+      userId TEXT NOT NULL,
+      articleId TEXT NOT NULL,
+      resonanceNote TEXT NOT NULL,
+      quote TEXT,
+      vitality INTEGER NOT NULL DEFAULT 30,
+      status TEXT NOT NULL DEFAULT 'active' CHECK(status IN ('active', 'archived', 'considered')),
+      visitCount INTEGER NOT NULL DEFAULT 0,
+      lastVisitedAt INTEGER,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+      updatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(userId, articleId)
+    )
+  `);
+
+  // Create indexes for resonances queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_resonances_user
+    ON resonances(userId, status, vitality)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_resonances_articles
+    ON resonances(articleId)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_resonances_vitality
+    ON resonances(vitality, status)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }
