@@ -19,3 +19,4 @@ Server Actions, Zod validation
 - Margin notes with private text highlighting (localStorage)
 - Social sharing with URL highlights
 - Progressive Content Revelation - Unlock bonus content based on reading time
+- Reading Progress System - Time investment tracking with real-time progress display
