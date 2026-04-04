@@ -7,11 +7,13 @@ import { ContinueReadingBanner } from '@/components/ContinueReadingBanner';
 import { NewsletterWidget } from '@/components/newsletter/NewsletterWidget';
 import { ShareToolbar } from '@/components/sharing/ShareToolbar';
 import { TableOfContents } from '@/components/TableOfContents';
+import { TrustedFilterSection } from '@/components/trusted-filter/TrustedFilterSection';
 import { useReadingPosition } from '@/lib/hooks/useReadingPosition';
 import { useShareToolbar } from '@/lib/hooks/useShareToolbar';
 import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
 import { useChallengeStatus } from '@/lib/hooks/useChallengeStatus';
 import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
+import { TrustedFilterData } from '@/types/trusted-filter';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -28,6 +30,38 @@ const ARTICLE_SECTIONS = [
   { id: 'how-to-challenge', title: 'How to Challenge Effectively' },
   { id: 'conclusion', title: 'Conclusion' },
 ];
+
+// TODO: Get trusted filter data from article metadata
+const ARTICLE_TRUSTED_FILTER: TrustedFilterData = {
+  context: {
+    targetAudience: 'Developers and technical leaders who want to improve their critical thinking skills',
+    valuePromise: 'A practical framework for challenging ideas constructively and fostering intellectual growth in teams',
+    timeCommitment: '5 min read',
+  },
+  perspectives: [
+    {
+      url: 'https://www.paulgraham.com/essay.html',
+      title: 'How to Do Great Work',
+      description: 'Paul Graham explores how curiosity and questioning assumptions lead to breakthrough discoveries.',
+      author: 'Paul Graham',
+      type: 'foundational',
+    },
+    {
+      url: 'https://m.signalvnoise.com/strengthen-your-soft-skills/',
+      title: 'Strengthen Your Soft Skills',
+      description: 'Jason Fried discusses why communication and empathy are crucial for technical excellence.',
+      author: 'Jason Fried',
+      type: 'complementary',
+    },
+    {
+      url: 'https://www.cs.princeton.edu/~watson/',
+      title: 'The Value of Contrarian Thinking',
+      description: 'David Watson argues why unpopular opinions often drive innovation and progress.',
+      author: 'David Watson',
+      type: 'contrarian',
+    },
+  ],
+};
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   const [isChallengeModalOpen, setIsChallengeModalOpen] = useState(false);
@@ -181,6 +215,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
               {/* TODO: Add full article content */}
             </div>
+
+            {/* Trusted Filter Section */}
+            <TrustedFilterSection data={ARTICLE_TRUSTED_FILTER} />
 
             <ChallengeModal
               articleId={params.id}
