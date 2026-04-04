@@ -35,6 +35,9 @@ import { getReadingTimeDisplay } from '@/lib/utils/reading-time';
 import { CategoryBadges } from '@/components/content/CategoryBadges';
 import { MoreInCategory } from '@/components/content/MoreInCategory';
 import { Category } from '@/types/category';
+import { JourneyContextBar } from '@/components/journey/JourneyContextBadge';
+import { calculateJourneyContext } from '@/lib/content/JourneyContext';
+import type { JourneyContext } from '@/types/journey-context';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -99,6 +102,9 @@ const readingTimeData = getReadingTimeDisplay(articleContent, ARTICLE_CUSTOM_REA
 const ARTICLE_READING_TIME = readingTimeData.display;
 const ARTICLE_IS_CUSTOM_READING_TIME = readingTimeData.isCustom;
 const ARTICLE_READING_MINUTES = readingTimeData.minutes;
+
+// Calculate journey context from article content
+const ARTICLE_JOURNEY_CONTEXT: JourneyContext = calculateJourneyContext(articleContent);
 
 // TODO: Get sections from article frontmatter or database
 const ARTICLE_SECTIONS = [
@@ -248,6 +254,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           {/* Main content area - 2/3 width */}
           <div className="lg:col-span-2">
             <header className="mb-8">
+              {/* Journey Context Bar - Ambient metadata above title */}
+              <JourneyContextBar context={ARTICLE_JOURNEY_CONTEXT} />
+
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="flex items-center gap-3">
                   <h1 className="text-4xl font-bold text-primary">

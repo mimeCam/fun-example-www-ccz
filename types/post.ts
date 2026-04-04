@@ -6,6 +6,8 @@
  * be auto-calculated from content.
  */
 
+import type { JourneyContext } from './journey-context';
+
 /**
  * Post metadata including optional custom reading time
  *
@@ -30,6 +32,9 @@ export interface PostMetadata {
 
   /** Estimated read time in minutes (auto-calculated if not provided) */
   estimatedReadTime?: number;
+
+  /** Journey context - Article depth, DNA tags, and outcome promise */
+  journeyContext?: JourneyContext;
 }
 
 /**
