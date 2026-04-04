@@ -159,6 +159,30 @@ function initializeSchema(database: Database.Database): void {
     ON reading_memory(articleId)
   `);
 
+  // Create editor_picks table for author-curated related posts
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS editor_picks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      source_article_id TEXT NOT NULL,
+      target_article_id TEXT NOT NULL,
+      position INTEGER NOT NULL,
+      reason TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(source_article_id, position)
+    )
+  `);
+
+  // Create indexes for editor_picks queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_editor_picks_source
+    ON editor_picks(source_article_id, position)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_editor_picks_target
+    ON editor_picks(target_article_id)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }

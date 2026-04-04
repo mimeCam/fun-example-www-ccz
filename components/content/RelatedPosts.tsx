@@ -2,6 +2,7 @@
  * RelatedPosts - Content discovery component
  * Design philosophy: Subtle, helpful, zero friction
  * Follows Tanya's recommendation: clean card, no popups
+ * Now includes Editor's Picks - author-curated recommendations
  */
 
 'use client';
@@ -9,18 +10,19 @@
 import { Article } from '@/lib/content/ContentTagger';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import Link from 'next/link';
+import { RelatedPostWithSource } from '@/lib/content/related-posts';
 
 interface RelatedPostsProps {
-  articles: Article[];
+  relatedPosts: RelatedPostWithSource[];
   currentArticleId: string;
 }
 
 /**
  * Related posts card component
- * Displays related articles based on content similarity
+ * Displays related articles with editor picks distinguished
  */
-export function RelatedPosts({ articles, currentArticleId }: RelatedPostsProps) {
-  if (articles.length === 0) {
+export function RelatedPosts({ relatedPosts, currentArticleId }: RelatedPostsProps) {
+  if (relatedPosts.length === 0) {
     return null;
   }
 
@@ -34,10 +36,12 @@ export function RelatedPosts({ articles, currentArticleId }: RelatedPostsProps) 
       </p>
 
       <div className="space-y-4">
-        {articles.map((article) => (
+        {relatedPosts.map((relatedPost) => (
           <RelatedPostCard
-            key={article.id}
-            article={article}
+            key={relatedPost.article.id}
+            article={relatedPost.article}
+            isEditorPick={relatedPost.source === 'editor'}
+            reason={relatedPost.reason}
           />
         ))}
       </div>
@@ -47,12 +51,15 @@ export function RelatedPosts({ articles, currentArticleId }: RelatedPostsProps) 
 
 interface RelatedPostCardProps {
   article: Article;
+  isEditorPick?: boolean;
+  reason?: string;
 }
 
 /**
  * Individual related post card
+ * Shows editor pick badge when applicable
  */
-function RelatedPostCard({ article }: RelatedPostCardProps) {
+function RelatedPostCard({ article, isEditorPick, reason }: RelatedPostCardProps) {
   const readTime = estimateReadingTime(article.content);
 
   return (
@@ -60,9 +67,25 @@ function RelatedPostCard({ article }: RelatedPostCardProps) {
       href={`/article/${article.id}`}
       className="block p-4 bg-gray-800 rounded border border-gray-700 hover:border-primary transition-colors"
     >
-      <h4 className="text-lg font-medium text-white mb-2 hover:text-primary transition-colors">
-        {article.title}
-      </h4>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h4 className="text-lg font-medium text-white hover:text-primary transition-colors">
+          {article.title}
+        </h4>
+
+        {/* Editor's Pick Badge */}
+        {isEditorPick && (
+          <span className="flex-shrink-0 px-2 py-1 bg-primary/20 text-primary text-xs font-medium rounded border border-primary/30">
+            Editor's Pick
+          </span>
+        )}
+      </div>
+
+      {/* Author's reason for editor picks */}
+      {reason && (
+        <p className="text-sm text-gray-400 mb-3 italic">
+          "{reason}"
+        </p>
+      )}
 
       <p className="text-sm text-gray-400 mb-3 line-clamp-2">
         {article.content.slice(0, 150)}...

@@ -20,6 +20,8 @@ import { TrustedFilterData } from '@/types/trusted-filter';
 import { findRelatedArticles } from '@/lib/content/ContentTagger';
 import { getAllArticles } from '@/lib/content/articleData';
 import { NextRead, generateRecommendationContext } from '@/components/reading/NextRead';
+import { RelatedPosts } from '@/components/content/RelatedPosts';
+import { RelatedPostWithSource } from '@/lib/content/related-posts';
 import { ExportNotesButton } from '@/components/notes/ExportNotesButton';
 import { NotesProvider } from '@/components/notes/NotesProvider';
 import { QuickStats } from '@/components/content/QuickStats';
@@ -82,6 +84,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   const [showContinueBanner, setShowContinueBanner] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentKey, setCommentKey] = useState(0);
+  const [relatedPosts, setRelatedPosts] = useState<RelatedPostWithSource[]>([]);
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -118,6 +121,22 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       setShowContinueBanner(true);
     }
   }, [hasStoredPosition]);
+
+  // Fetch related posts (includes editor picks)
+  useEffect(() => {
+    async function loadRelatedPosts() {
+      try {
+        const response = await fetch(`/api/related-posts?articleId=${params.id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setRelatedPosts(data);
+        }
+      } catch (error) {
+        console.error('Error loading related posts:', error);
+      }
+    }
+    loadRelatedPosts();
+  }, [params.id]);
 
   return (
     <NotesProvider postId={params.id}>
@@ -306,27 +325,36 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             </div>
 
             {/* Context-Aware "Next Read" - ONE intelligent recommendation */}
-            {(() => {
+            {relatedPosts.length > 0 && (() => {
               const currentArticle = {
                 id: params.id,
                 title: ARTICLE_TITLE,
                 content: ARTICLE_SECTIONS.map(s => s.title).join(' '),
                 tags: ['critical-thinking', 'innovation'], // TODO: Get from article metadata
               };
-              const relatedArticles = findRelatedArticles(currentArticle, getAllArticles());
-              const topRecommendation = relatedArticles[0]?.article;
+
+              const topRecommendation = relatedPosts[0];
 
               if (!topRecommendation) return null;
 
-              const context = generateRecommendationContext(currentArticle, topRecommendation);
+              const context = topRecommendation.reason ||
+                generateRecommendationContext(currentArticle, topRecommendation.article);
 
               return (
                 <NextRead
-                  article={topRecommendation}
+                  article={topRecommendation.article}
                   context={context}
                 />
               );
             })()}
+
+            {/* Related Posts - More recommendations (includes editor picks) */}
+            {relatedPosts.length > 0 && (
+              <RelatedPosts
+                relatedPosts={relatedPosts}
+                currentArticleId={params.id}
+              />
+            )}
           </div>
 
           {/* Sidebar - 1/3 width */}

@@ -1,0 +1,35 @@
+/**
+ * API for Related Posts
+ * GET: Get related posts for an article (includes editor picks + algorithmic)
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { getRelatedPosts } from '@/lib/content/related-posts';
+
+/**
+ * GET /api/related-posts?articleId={id}
+ * Get related posts for an article
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const articleId = searchParams.get('articleId');
+
+    if (!articleId) {
+      return NextResponse.json(
+        { error: 'Missing articleId parameter' },
+        { status: 400 }
+      );
+    }
+
+    const relatedPosts = getRelatedPosts(articleId, 3);
+
+    return NextResponse.json(relatedPosts);
+  } catch (error) {
+    console.error('Error getting related posts:', error);
+    return NextResponse.json(
+      { error: 'Failed to get related posts' },
+      { status: 500 }
+    );
+  }
+}
