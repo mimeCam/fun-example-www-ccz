@@ -27,6 +27,7 @@ import { ReadingCount } from '@/components/reading/ReadingCount';
 import { BookmarkButton } from '@/components/reading/BookmarkButton';
 import { CommentForm } from '@/components/CommentForm';
 import { CommentList } from '@/components/CommentList';
+import { ThisDayInHistory } from '@/components/ThisDayInHistory';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -339,6 +340,11 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             />
             <NewsletterWidget postType={ARTICLE_POST_TYPE} />
             <TableOfContents sections={ARTICLE_SECTIONS} />
+
+            {/* This Day in History - Historical posts widget */}
+            <div className="mb-8">
+              <ThisDayInHistory />
+            </div>
 
             {/* TODO: Add more sidebar widgets */}
             {/* TODO: Author bio */}

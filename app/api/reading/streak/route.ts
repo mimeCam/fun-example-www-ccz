@@ -8,6 +8,10 @@ import {
  * GET /api/reading/streak
  * Returns user's reading streak data
  */
+
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const email = request.headers.get('x-user-email') ||

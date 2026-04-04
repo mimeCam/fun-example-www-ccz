@@ -16,6 +16,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     It involves understanding the context, asking thoughtful questions,
     and providing evidence or alternative perspectives.`,
     tags: ['critical-thinking', 'intellectual-growth', 'innovation'],
+    publishedAt: '2021-04-04T10:00:00Z',
   },
   {
     id: 'deep-work',
@@ -27,6 +28,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     To cultivate deep work, you must eliminate distractions and create routines
     that support sustained attention.`,
     tags: ['productivity', 'focus', 'professional-development'],
+    publishedAt: '2022-08-15T14:30:00Z',
   },
   {
     id: 'systems-thinking',
@@ -38,6 +40,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     interconnected wholes. This approach helps us understand complex issues
     and find leverage points for meaningful change.`,
     tags: ['systems-thinking', 'problem-solving', 'strategy'],
+    publishedAt: '2023-11-22T09:15:00Z',
   },
   {
     id: 'effective-communication',
@@ -49,6 +52,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     to their audience. They understand that communication is not just about
     transmitting information, but about building understanding and trust.`,
     tags: ['leadership', 'communication', 'soft-skills'],
+    publishedAt: '2024-01-10T16:45:00Z',
   },
   {
     id: 'learning-strategies',
@@ -60,6 +64,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     to active engagement with new knowledge. Learning is not a destination but
     a journey of constant discovery and refinement.`,
     tags: ['learning', 'personal-development', 'growth-mindset'],
+    publishedAt: '2024-02-28T11:20:00Z',
   },
   {
     id: 'design-principles',
@@ -71,6 +76,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     flexible in their application. They understand that developers are not just
     users but collaborators in the tool's evolution.`,
     tags: ['design', 'developer-experience', 'product-design'],
+    publishedAt: '2024-04-04T08:00:00Z',
   },
 ];
 

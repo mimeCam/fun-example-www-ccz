@@ -9,6 +9,10 @@ import { getArticleById } from '@/lib/content/articleData';
  * GET /api/reading/topics
  * Returns breakdown of topics user has read about
  */
+
+// Mark as dynamic to prevent static generation
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const email = request.headers.get('x-user-email') ||

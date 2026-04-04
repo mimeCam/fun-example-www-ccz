@@ -8,6 +8,7 @@ export interface Article {
   title: string;
   content: string;
   tags?: string[];
+  publishedAt?: string; // ISO date string when article was published
 }
 
 export interface TaggedArticle extends Article {

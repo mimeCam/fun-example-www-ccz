@@ -1,4 +1,4 @@
-Deployment started at: Sat Apr  4 12:36:08 PM CEST 2026
+Deployment started at: Sat Apr  4 12:52:12 PM CEST 2026
 🛑 Stopping existing container (if running)...
 Removing existing container: persona-blog-z
 🧹 Cleaning up old image (if exists)...
@@ -27,6 +27,7 @@ Volume persona-blog-db already exists
   - Reading Streak Tracking (consecutive days with activity)
   - Topic Analysis (breakdown of topics user has read about)
   - Email Fingerprinting (privacy-preserving user identification)
+  - This Day in History (nostalgic 'on this day' historical articles)
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
@@ -34,7 +35,7 @@ Volume persona-blog-db already exists
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/node:20-alpine
-#2 DONE 0.6s
+#2 DONE 0.7s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 572B done
@@ -44,31 +45,31 @@ Volume persona-blog-db already exists
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 36.87kB 0.0s done
+#5 transferring context: 44.02kB 0.0s done
 #5 DONE 0.0s
 
-#6 [ 5/16] RUN npm ci && npm cache clean --force
+#6 [ 4/16] COPY package*.json ./
 #6 CACHED
 
-#7 [ 7/16] COPY tsconfig.json ./
+#7 [ 6/16] COPY next.config.js ./
 #7 CACHED
 
-#8 [ 3/16] RUN apk add --no-cache python3 make g++
+#8 [ 2/16] WORKDIR /app
 #8 CACHED
 
-#9 [ 6/16] COPY next.config.js ./
+#9 [ 3/16] RUN apk add --no-cache python3 make g++
 #9 CACHED
 
-#10 [ 2/16] WORKDIR /app
+#10 [ 5/16] RUN npm ci && npm cache clean --force
 #10 CACHED
 
-#11 [ 8/16] COPY tailwind.config.ts ./
+#11 [ 9/16] COPY postcss.config.js ./
 #11 CACHED
 
-#12 [ 9/16] COPY postcss.config.js ./
+#12 [ 7/16] COPY tsconfig.json ./
 #12 CACHED
 
-#13 [ 4/16] COPY package*.json ./
+#13 [ 8/16] COPY tailwind.config.ts ./
 #13 CACHED
 
 #14 [10/16] COPY next-env.d.ts ./
@@ -90,89 +91,62 @@ Volume persona-blog-db already exists
 #19 DONE 0.0s
 
 #20 [16/16] RUN npm run build
-#20 0.296 
-#20 0.296 > persona-blog@0.1.0 build
-#20 0.296 > next build
-#20 0.296 
-#20 0.973 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#20 0.975 This information is used to shape Next.js' roadmap and prioritize features.
-#20 0.975 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#20 0.975 https://nextjs.org/telemetry
-#20 0.975 
-#20 1.050   ▲ Next.js 14.2.3
-#20 1.050 
-#20 1.127    Creating an optimized production build ...
-#20 16.80  ✓ Compiled successfully
-#20 16.80    Linting and checking validity of types ...
-#20 23.70    Collecting page data ...
-#20 25.11    Generating static pages (0/11) ...
-#20 25.59    Generating static pages (2/11) 
-#20 25.75    Generating static pages (5/11) 
-#20 25.80 Failed to get streak data: q [Error]: Dynamic server usage: Route /api/reading/streak couldn't be rendered statically because it accessed `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-#20 25.80     at Object.get (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:37835)
-#20 25.80     at s (/app/.next/server/app/api/reading/streak/route.js:1:604)
-#20 25.80     at /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:34672
-#20 25.80     at /app/node_modules/next/dist/server/lib/trace/tracer.js:140:36
-#20 25.80     at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
-#20 25.80     at ContextAPI.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
-#20 25.80     at NoopTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
-#20 25.80     at ProxyTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
-#20 25.80     at /app/node_modules/next/dist/server/lib/trace/tracer.js:122:103
-#20 25.80     at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062) {
-#20 25.80   description: "Route /api/reading/streak couldn't be rendered statically because it accessed `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-#20 25.80   digest: 'DYNAMIC_SERVER_USAGE'
-#20 25.80 }
-#20 25.88 Failed to get topic breakdown: q [Error]: Dynamic server usage: Route /api/reading/topics couldn't be rendered statically because it accessed `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
-#20 25.88     at Object.get (/app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:37835)
-#20 25.88     at T (/app/.next/server/app/api/reading/topics/route.js:31:145)
-#20 25.88     at /app/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:34672
-#20 25.88     at /app/node_modules/next/dist/server/lib/trace/tracer.js:140:36
-#20 25.88     at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062)
-#20 25.88     at ContextAPI.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:518)
-#20 25.88     at NoopTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18093)
-#20 25.88     at ProxyTracer.startActiveSpan (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:18854)
-#20 25.88     at /app/node_modules/next/dist/server/lib/trace/tracer.js:122:103
-#20 25.88     at NoopContextManager.with (/app/node_modules/next/dist/compiled/@opentelemetry/api/index.js:1:7062) {
-#20 25.88   description: "Route /api/reading/topics couldn't be rendered statically because it accessed `request.headers`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
-#20 25.88   digest: 'DYNAMIC_SERVER_USAGE'
-#20 25.88 }
-#20 26.03    Generating static pages (8/11) 
-#20 26.28  ✓ Generating static pages (11/11)
-#20 26.91    Finalizing page optimization ...
-#20 26.91    Collecting build traces ...
-#20 32.10 
-#20 32.12 Route (app)                              Size     First Load JS
-#20 32.12 ┌ ○ /                                    172 B            94 kB
-#20 32.12 ├ ○ /_not-found                          871 B          87.9 kB
-#20 32.12 ├ ƒ /api/challenge                       0 B                0 B
-#20 32.12 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
-#20 32.12 ├ ƒ /api/comments                        0 B                0 B
-#20 32.12 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
-#20 32.12 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
-#20 32.12 ├ ƒ /api/reading/memory                  0 B                0 B
-#20 32.12 ├ ƒ /api/reading/streak                  0 B                0 B
-#20 32.12 ├ ƒ /api/reading/topics                  0 B                0 B
-#20 32.12 ├ ƒ /article/[id]                        17.6 kB         111 kB
-#20 32.12 ├ ○ /journey                             2.25 kB        96.1 kB
-#20 32.12 └ ○ /saved                               1.34 kB        95.1 kB
-#20 32.12 + First Load JS shared by all            87 kB
-#20 32.12   ├ chunks/23-09c1681a6fcee955.js        31.5 kB
-#20 32.12   ├ chunks/fd9d1056-117580c3832721da.js  53.6 kB
-#20 32.12   └ other shared chunks (total)          1.93 kB
-#20 32.12 
-#20 32.12 
-#20 32.12 ○  (Static)   prerendered as static content
-#20 32.12 ƒ  (Dynamic)  server-rendered on demand
-#20 32.12 
-#20 DONE 32.2s
+#20 0.300 
+#20 0.300 > persona-blog@0.1.0 build
+#20 0.300 > next build
+#20 0.300 
+#20 1.000 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#20 1.000 This information is used to shape Next.js' roadmap and prioritize features.
+#20 1.000 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#20 1.003 https://nextjs.org/telemetry
+#20 1.003 
+#20 1.134   ▲ Next.js 14.2.3
+#20 1.136 
+#20 1.172    Creating an optimized production build ...
+#20 16.87  ✓ Compiled successfully
+#20 16.88    Linting and checking validity of types ...
+#20 23.97    Collecting page data ...
+#20 25.40    Generating static pages (0/10) ...
+#20 25.84    Generating static pages (2/10) 
+#20 26.00    Generating static pages (4/10) 
+#20 26.20    Generating static pages (7/10) 
+#20 26.30  ✓ Generating static pages (10/10)
+#20 26.92    Finalizing page optimization ...
+#20 26.92    Collecting build traces ...
+#20 32.31 
+#20 32.32 Route (app)                              Size     First Load JS
+#20 32.32 ┌ ○ /                                    172 B            94 kB
+#20 32.32 ├ ○ /_not-found                          871 B          87.9 kB
+#20 32.32 ├ ƒ /api/challenge                       0 B                0 B
+#20 32.32 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
+#20 32.32 ├ ƒ /api/comments                        0 B                0 B
+#20 32.32 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
+#20 32.32 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
+#20 32.32 ├ ○ /api/history/today                   0 B                0 B
+#20 32.32 ├ ƒ /api/reading/memory                  0 B                0 B
+#20 32.32 ├ ƒ /api/reading/streak                  0 B                0 B
+#20 32.32 ├ ƒ /api/reading/topics                  0 B                0 B
+#20 32.32 ├ ƒ /article/[id]                        18.3 kB         112 kB
+#20 32.32 ├ ○ /journey                             2.25 kB        96.1 kB
+#20 32.32 └ ○ /saved                               1.34 kB        95.1 kB
+#20 32.32 + First Load JS shared by all            87 kB
+#20 32.32   ├ chunks/23-09c1681a6fcee955.js        31.5 kB
+#20 32.32   ├ chunks/fd9d1056-117580c3832721da.js  53.6 kB
+#20 32.32   └ other shared chunks (total)          1.93 kB
+#20 32.32 
+#20 32.32 
+#20 32.32 ○  (Static)   prerendered as static content
+#20 32.32 ƒ  (Dynamic)  server-rendered on demand
+#20 32.32 
+#20 DONE 32.4s
 
 #21 exporting to image
 #21 exporting layers 0.1s done
-#21 writing image sha256:696fb0e4dd706dbfb4f20182c6add0858310b1252bd56e9a570d0d1597052cb0 done
+#21 writing image sha256:3c02700aef597bab3227474ba48c44a23280652642b819d0c6ed7b1adacc25b7 done
 #21 naming to docker.io/library/persona-blog-image:latest done
 #21 DONE 0.1s
 🎯 Starting container on port 7200...
-72a9fd2b8dbfe873a7459c34ff16c164cf16b88bfba078a698a28f558c83187c
+b9443b465aee2cf13de5f8845a10b2aff4aff8aa5addcdb04215914f3de321d1
 ⏳ Waiting for container to start...
 ✅ Container is running
 🏥 Checking container health...
@@ -191,8 +165,8 @@ Volume persona-blog-db already exists
   Restart:         docker restart persona-blog-z
   View deployment: cat deployment.log
 
-Deployment completed at: Sat Apr  4 12:36:48 PM CEST 2026
-Deployment completed at: Sat Apr  4 12:36:48 PM CEST 2026
+Deployment completed at: Sat Apr  4 12:52:51 PM CEST 2026
+Deployment completed at: Sat Apr  4 12:52:51 PM CEST 2026
 🧹 Cleaning up dangling images...
 Removed dangling images
 ✨ Deployment complete!
