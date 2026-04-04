@@ -207,6 +207,38 @@ function initializeSchema(database: Database.Database): void {
     ON highlights(textHash)
   `);
 
+  // Create insights table for Insight Capture & Share system
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS insights (
+      id TEXT PRIMARY KEY,
+      userId TEXT NOT NULL,
+      articleId TEXT NOT NULL,
+      text TEXT NOT NULL,
+      note TEXT,
+      position TEXT NOT NULL,
+      isPublic INTEGER NOT NULL DEFAULT 0,
+      captureCount INTEGER NOT NULL DEFAULT 1,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+      updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Create indexes for insights queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_insights_user
+    ON insights(userId, createdAt DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_insights_article
+    ON insights(articleId, captureCount DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_insights_public
+    ON insights(isPublic, captureCount DESC)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }
