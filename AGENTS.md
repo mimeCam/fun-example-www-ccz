@@ -7,7 +7,7 @@ Server Actions, Zod validation
 
 ## Key Paths
 `app/` - Next.js pages and layouts
-`components/` - React components (ChallengeModal, ChallengeList, NewsletterWidget, MarginNotes, ShareToolbar)
+`components/` - React components (ChallengeModal, ChallengeList, NewsletterWidget, MarginNotes, ShareToolbar, DepthLayers)
 `lib/` - Database, validation, business logic, custom hooks
 `types/` - TypeScript definitions
 
@@ -18,3 +18,4 @@ Server Actions, Zod validation
 - Contextual progress tracking (time investment, section-aware TOC, challenge badges)
 - Margin notes with private text highlighting (localStorage)
 - Social sharing with URL highlights
+- Progressive Content Revelation - Unlock bonus content based on reading time

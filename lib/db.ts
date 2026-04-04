@@ -42,10 +42,49 @@ function initializeSchema(database: Database.Database): void {
     )
   `);
 
+  // Create engagement sessions table for progressive content revelation
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS engagement_sessions (
+      id TEXT PRIMARY KEY,
+      articleId TEXT NOT NULL,
+      startTime INTEGER NOT NULL,
+      endTime INTEGER,
+      duration INTEGER NOT NULL,
+      unlocks INTEGER NOT NULL DEFAULT 0,
+      deviceType TEXT,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Create layer unlock events table for analytics
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS layer_unlocks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sessionId TEXT NOT NULL,
+      articleId TEXT NOT NULL,
+      layerId TEXT NOT NULL,
+      thresholdMinutes INTEGER NOT NULL,
+      unlockedAt INTEGER NOT NULL,
+      timeToUnlock INTEGER NOT NULL,
+      FOREIGN KEY (sessionId) REFERENCES engagement_sessions(id)
+    )
+  `);
+
   // Create index on email for faster lookups
   database.exec(`
     CREATE INDEX IF NOT EXISTS idx_newsletter_email
     ON newsletter_subscribers(email)
+  `);
+
+  // Create indexes for engagement queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_engagement_articles
+    ON engagement_sessions(articleId)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_layer_unlocks_articles
+    ON layer_unlocks(articleId, layerId)
   `);
 
   // TODO: Add indexes for better query performance on challenges table
