@@ -78,3 +78,15 @@ export const recordVisitSchema = z.object({
 export type CreateResonanceInput = z.infer<typeof createResonanceSchema>;
 export type UpdateResonanceInput = z.infer<typeof updateResonanceSchema>;
 export type RecordVisitInput = z.infer<typeof recordVisitSchema>;
+
+// Feedback validation schemas for Exit-Intent Feedback System
+export const createFeedbackSchema = z.object({
+  postId: z.string().min(1, 'Post ID is required'),
+  reason: z.string().min(1, 'Reason is required'),
+  comment: z.string().max(500, 'Comment must not exceed 500 characters').optional(),
+  timeOnPage: z.number().min(0, 'Time on page must be positive').optional(),
+  scrollDepth: z.number().min(0).max(100, 'Scroll depth must be between 0 and 100').optional(),
+});
+
+// Type exports
+export type CreateFeedbackInput = z.infer<typeof createFeedbackSchema>;

@@ -311,6 +311,32 @@ function initializeSchema(database: Database.Database): void {
     ON resonances(vitality, status)
   `);
 
+  // Create feedback table for Exit-Intent Feedback System
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS feedback (
+      id TEXT PRIMARY KEY,
+      postId TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      reason TEXT NOT NULL,
+      comment TEXT,
+      timeOnPage INTEGER,
+      scrollDepth REAL,
+      userAgent TEXT,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Create indexes for feedback queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_feedback_post
+    ON feedback(postId, timestamp DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_feedback_reason
+    ON feedback(reason, timestamp DESC)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }

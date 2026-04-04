@@ -16,6 +16,8 @@ import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
 import { useChallengeStatus } from '@/lib/hooks/useChallengeStatus';
 import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
 import { useMilestones } from '@/lib/hooks/useMilestones';
+import { useExitIntent } from '@/lib/hooks/useExitIntent';
+import { ExitFeedbackModal } from '@/components/feedback/ExitFeedbackModal';
 // TODO: Import useCompletionDetection when implementing celebration UI
 // import { useCompletionDetection } from '@/lib/hooks/useCompletionDetection';
 import { TrustedFilterData } from '@/types/trusted-filter';
@@ -172,6 +174,17 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   // Track reading milestones (50%, 100%)
   const { milestoneState, dismissMilestone } = useMilestones({
     articleId: params.id,
+  });
+
+  // Exit-intent feedback system
+  const {
+    shouldShowFeedback,
+    dismissFeedback,
+    metrics: feedbackMetrics,
+  } = useExitIntent({
+    storageKey: `exit-intent-${params.id}`,
+    minTimeOnPage: 10000, // 10 seconds
+    minScrollDepth: 10, // 10%
   });
 
   // Simplified share button functionality
@@ -521,6 +534,15 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           </aside>
         </div>
       </article>
+
+      {/* Exit-Intent Feedback Modal */}
+      <ExitFeedbackModal
+        postId={params.id}
+        timeOnPage={feedbackMetrics.timeOnPage}
+        scrollDepth={feedbackMetrics.scrollDepth}
+        isOpen={shouldShowFeedback}
+        onClose={dismissFeedback}
+      />
     </NotesProvider>
   );
 }
