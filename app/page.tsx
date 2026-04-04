@@ -1,5 +1,9 @@
 import { FILTER_TEMPLATES } from '@/types/filter';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Client-side only SearchBar to avoid hydration issues
+const SearchBar = dynamic(() => import('@/components/SearchBar'), { ssr: false });
 
 export default function Home() {
   const filters = Object.entries(FILTER_TEMPLATES).map(([key, value]) => ({
@@ -19,9 +23,14 @@ export default function Home() {
             A blog that tries to talk most people out of reading it —
             <span className="text-accent font-semibold"> so the right people can&apos;t stop</span>
           </p>
-          <p className="text-gray-400 max-w-2xl mx-auto">
+          <p className="text-gray-400 max-w-2xl mx-auto mb-8">
             Challenging ideas for those who question assumptions. Choose your perspective below.
           </p>
+
+          {/* Search Bar */}
+          <div className="mt-8">
+            <SearchBar />
+          </div>
         </div>
 
         {/* Worldview selection cards */}

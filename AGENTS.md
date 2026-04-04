@@ -14,6 +14,7 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 `lib/resonances.ts` - Resonance-First Bookmarking System service layer
 
 ## Core Features
+- Search & Discovery (Client-side article search with API backend, snippet generation)
 - Journey Context System (Article depth, DNA tags, outcome promises)
 - Resonance-First Bookmarking (DB schema, types, CRUD operations, API routes, server actions, UI components)
 - Insight Capture & Share (Foundation: DB schema, types, CRUD operations)
