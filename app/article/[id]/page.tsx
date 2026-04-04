@@ -14,6 +14,8 @@ import { useShareToolbar } from '@/lib/hooks/useShareToolbar';
 import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
 import { useChallengeStatus } from '@/lib/hooks/useChallengeStatus';
 import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
+// TODO: Import useCompletionDetection when implementing celebration UI
+// import { useCompletionDetection } from '@/lib/hooks/useCompletionDetection';
 import { TrustedFilterData } from '@/types/trusted-filter';
 import { RelatedPosts } from '@/components/content/RelatedPosts';
 import { findRelatedArticles } from '@/lib/content/ContentTagger';
@@ -207,6 +209,16 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
               {/* TODO: Add full article content */}
             </div>
+
+            {/* TODO: THE SUBTLE NOD - Celebration UI for genuine readers */}
+            {/* When useCompletionDetection detects genuine reading completion:
+                - Show subtle celebration animation (confetti, pulse, etc.)
+                - Display "Thank you for reading this thoughtfully" message
+                - Optional: Writer's personalized message
+                - Should be non-intrusive and respectful
+                - Only show once per session (use localStorage)
+                - Integrate useCompletionDetection hook here
+            */}
 
             {/* Trusted Filter Section */}
             <TrustedFilterSection data={ARTICLE_TRUSTED_FILTER} />

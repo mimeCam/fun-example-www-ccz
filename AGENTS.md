@@ -20,3 +20,4 @@ Server Actions, Zod validation
 - Social sharing with URL highlights
 - Progressive Content Revelation - Unlock bonus content based on reading time
 - Reading Progress System - Time investment tracking with real-time progress display
+- The Subtle Nod - Smart detection engine that distinguishes genuine reading from skimming (foundation implemented)
