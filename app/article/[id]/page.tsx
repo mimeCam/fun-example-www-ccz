@@ -22,6 +22,7 @@ import { findRelatedArticles } from '@/lib/content/ContentTagger';
 import { getAllArticles } from '@/lib/content/articleData';
 import { ExportNotesButton } from '@/components/notes/ExportNotesButton';
 import { NotesProvider } from '@/components/notes/NotesProvider';
+import { QuickStats } from '@/components/content/QuickStats';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -271,6 +272,13 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
           {/* Sidebar - 1/3 width */}
           <aside className="lg:col-span-1">
+            <QuickStats
+              articleId={params.id}
+              timeInvested={formattedTime}
+              estimatedTime={estimatedReadTime}
+              hasChallenged={hasSubmittedChallenge}
+              challengeCount={challengeCount}
+            />
             <NewsletterWidget postType={ARTICLE_POST_TYPE} />
             <TableOfContents sections={ARTICLE_SECTIONS} />
 
