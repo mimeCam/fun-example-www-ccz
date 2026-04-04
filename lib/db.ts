@@ -183,6 +183,30 @@ function initializeSchema(database: Database.Database): void {
     ON editor_picks(target_article_id)
   `);
 
+  // Create highlights table for silent highlighting feature
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS highlights (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      articleId TEXT NOT NULL,
+      text TEXT NOT NULL,
+      textHash TEXT NOT NULL,
+      ipAddress TEXT,
+      userAgent TEXT,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  // Create indexes for highlights queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_highlights_article
+    ON highlights(articleId, createdAt DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_highlights_hash
+    ON highlights(textHash)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }
