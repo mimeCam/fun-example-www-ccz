@@ -1,4 +1,4 @@
-Deployment started at: Sat Apr  4 11:49:19 AM CEST 2026
+Deployment started at: Sat Apr  4 12:01:42 PM CEST 2026
 🛑 Stopping existing container (if running)...
 Removing existing container: persona-blog-z
 🧹 Cleaning up old image (if exists)...
@@ -17,6 +17,9 @@ Volume persona-blog-db already exists
   - Content Discovery System (intelligent related posts)
   - The Subtle Nod (smart reading completion detection)
   - QuickStats (user progress dashboard with engagement insights)
+  - Bookmark/Save Articles (localStorage-based 'Read Later' feature)
+  - Reading Count (social proof with view tracking)
+  - Next Read (context-aware article recommendations)
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
@@ -24,7 +27,7 @@ Volume persona-blog-db already exists
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/node:20-alpine
-#2 DONE 0.6s
+#2 DONE 0.7s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 572B done
@@ -34,35 +37,35 @@ Volume persona-blog-db already exists
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 19.94kB 0.0s done
+#5 transferring context: 35.08kB 0.0s done
 #5 DONE 0.0s
 
 #6 [ 6/16] COPY next.config.js ./
 #6 CACHED
 
-#7 [ 4/16] COPY package*.json ./
+#7 [ 2/16] WORKDIR /app
 #7 CACHED
 
-#8 [ 5/16] RUN npm ci && npm cache clean --force
+#8 [ 3/16] RUN apk add --no-cache python3 make g++
 #8 CACHED
 
-#9 [ 2/16] WORKDIR /app
+#9 [ 4/16] COPY package*.json ./
 #9 CACHED
 
-#10 [ 8/16] COPY tailwind.config.ts ./
+#10 [ 5/16] RUN npm ci && npm cache clean --force
 #10 CACHED
 
 #11 [ 7/16] COPY tsconfig.json ./
 #11 CACHED
 
-#12 [ 3/16] RUN apk add --no-cache python3 make g++
-#12 CACHED
+#12 [ 8/16] COPY tailwind.config.ts ./
+#12 DONE 0.1s
 
 #13 [ 9/16] COPY postcss.config.js ./
-#13 CACHED
+#13 DONE 0.0s
 
 #14 [10/16] COPY next-env.d.ts ./
-#14 CACHED
+#14 DONE 0.0s
 
 #15 [11/16] COPY app ./app
 #15 DONE 0.0s
@@ -80,54 +83,55 @@ Volume persona-blog-db already exists
 #19 DONE 0.0s
 
 #20 [16/16] RUN npm run build
-#20 0.310 
-#20 0.310 > persona-blog@0.1.0 build
-#20 0.310 > next build
-#20 0.310 
-#20 0.982 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#20 0.983 This information is used to shape Next.js' roadmap and prioritize features.
-#20 0.983 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#20 0.983 https://nextjs.org/telemetry
-#20 0.983 
-#20 1.118   ▲ Next.js 14.2.3
-#20 1.122 
-#20 1.156    Creating an optimized production build ...
-#20 16.04  ✓ Compiled successfully
-#20 16.04    Linting and checking validity of types ...
-#20 22.35    Collecting page data ...
-#20 23.51    Generating static pages (0/5) ...
-#20 23.92    Generating static pages (1/5) 
-#20 24.16    Generating static pages (2/5) 
-#20 24.25    Generating static pages (3/5) 
-#20 24.36  ✓ Generating static pages (5/5)
-#20 24.56    Finalizing page optimization ...
-#20 24.56    Collecting build traces ...
-#20 30.30 
-#20 30.32 Route (app)                              Size     First Load JS
-#20 30.32 ┌ ○ /                                    172 B            94 kB
-#20 30.32 ├ ○ /_not-found                          871 B          87.9 kB
-#20 30.32 ├ ƒ /api/challenge                       0 B                0 B
-#20 30.32 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
-#20 30.32 └ ƒ /article/[id]                        14.6 kB         108 kB
-#20 30.32 + First Load JS shared by all            87 kB
-#20 30.32   ├ chunks/23-a5adc4d0ab88731a.js        31.5 kB
-#20 30.32   ├ chunks/fd9d1056-117580c3832721da.js  53.6 kB
-#20 30.32   └ other shared chunks (total)          1.93 kB
-#20 30.32 
-#20 30.32 
-#20 30.32 ○  (Static)   prerendered as static content
-#20 30.32 ƒ  (Dynamic)  server-rendered on demand
-#20 30.32 
-#20 DONE 30.4s
+#20 0.384 
+#20 0.384 > persona-blog@0.1.0 build
+#20 0.384 > next build
+#20 0.384 
+#20 1.030 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#20 1.032 This information is used to shape Next.js' roadmap and prioritize features.
+#20 1.032 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#20 1.032 https://nextjs.org/telemetry
+#20 1.032 
+#20 1.108   ▲ Next.js 14.2.3
+#20 1.109 
+#20 1.182    Creating an optimized production build ...
+#20 17.19  ✓ Compiled successfully
+#20 17.20    Linting and checking validity of types ...
+#20 23.69    Collecting page data ...
+#20 24.93    Generating static pages (0/6) ...
+#20 25.38    Generating static pages (1/6) 
+#20 25.39    Generating static pages (2/6) 
+#20 25.56    Generating static pages (4/6) 
+#20 25.71  ✓ Generating static pages (6/6)
+#20 25.99    Finalizing page optimization ...
+#20 25.99    Collecting build traces ...
+#20 31.67 
+#20 31.68 Route (app)                              Size     First Load JS
+#20 31.68 ┌ ○ /                                    172 B            94 kB
+#20 31.68 ├ ○ /_not-found                          871 B          87.9 kB
+#20 31.68 ├ ƒ /api/challenge                       0 B                0 B
+#20 31.68 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
+#20 31.68 ├ ƒ /article/[id]                        15.7 kB         109 kB
+#20 31.68 └ ○ /saved                               1.34 kB        95.1 kB
+#20 31.68 + First Load JS shared by all            87 kB
+#20 31.68   ├ chunks/23-09c1681a6fcee955.js        31.5 kB
+#20 31.68   ├ chunks/fd9d1056-117580c3832721da.js  53.6 kB
+#20 31.68   └ other shared chunks (total)          1.93 kB
+#20 31.68 
+#20 31.68 
+#20 31.68 ○  (Static)   prerendered as static content
+#20 31.68 ƒ  (Dynamic)  server-rendered on demand
+#20 31.68 
+#20 DONE 31.8s
 
 #21 exporting to image
-#21 exporting layers 0.1s done
-#21 writing image sha256:ec3a09c3f8bcf35182e4f080fbf262c911b7fb869349b07374fe0268e380992c
-#21 writing image sha256:ec3a09c3f8bcf35182e4f080fbf262c911b7fb869349b07374fe0268e380992c done
+#21 exporting layers
+#21 exporting layers 0.2s done
+#21 writing image sha256:a65a4a4ac314434c54824f0b35f5d94ee9a8155b93168d871170dfa1b91962d6 done
 #21 naming to docker.io/library/persona-blog-image:latest done
-#21 DONE 0.1s
+#21 DONE 0.2s
 🎯 Starting container on port 7200...
-fb47e8fff0bb528b166449a38e61f598359ccb979661f18665861e66d975ae98
+973f229c3f1dee38281752946ce02bfc38a24b92bf2683f9463b7c353f29d309
 ⏳ Waiting for container to start...
 ✅ Container is running
 🏥 Checking container health...
@@ -146,8 +150,8 @@ fb47e8fff0bb528b166449a38e61f598359ccb979661f18665861e66d975ae98
   Restart:         docker restart persona-blog-z
   View deployment: cat deployment.log
 
-Deployment completed at: Sat Apr  4 11:49:56 AM CEST 2026
-Deployment completed at: Sat Apr  4 11:49:56 AM CEST 2026
+Deployment completed at: Sat Apr  4 12:02:22 PM CEST 2026
+Deployment completed at: Sat Apr  4 12:02:22 PM CEST 2026
 🧹 Cleaning up dangling images...
 Removed dangling images
 ✨ Deployment complete!

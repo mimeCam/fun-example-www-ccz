@@ -17,12 +17,14 @@ import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
 // TODO: Import useCompletionDetection when implementing celebration UI
 // import { useCompletionDetection } from '@/lib/hooks/useCompletionDetection';
 import { TrustedFilterData } from '@/types/trusted-filter';
-import { RelatedPosts } from '@/components/content/RelatedPosts';
 import { findRelatedArticles } from '@/lib/content/ContentTagger';
 import { getAllArticles } from '@/lib/content/articleData';
+import { NextRead, generateRecommendationContext } from '@/components/reading/NextRead';
 import { ExportNotesButton } from '@/components/notes/ExportNotesButton';
 import { NotesProvider } from '@/components/notes/NotesProvider';
 import { QuickStats } from '@/components/content/QuickStats';
+import { ReadingCount } from '@/components/reading/ReadingCount';
+import { BookmarkButton } from '@/components/reading/BookmarkButton';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -159,22 +161,34 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                   )}
                 </div>
 
-                {/* Export Notes Button - Only shows when notes exist */}
-                <ExportNotesButton
-                  postId={params.id}
-                  articleTitle={ARTICLE_TITLE}
-                  articleUrl={articleUrl}
-                  articleDate="2026-04-04"
-                />
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3">
+                  {/* Bookmark Button - One-Click "Read Later" */}
+                  <BookmarkButton
+                    articleId={params.id}
+                    articleTitle={ARTICLE_TITLE}
+                  />
+
+                  {/* Export Notes Button - Only shows when notes exist */}
+                  <ExportNotesButton
+                    postId={params.id}
+                    articleTitle={ARTICLE_TITLE}
+                    articleUrl={articleUrl}
+                    articleDate="2026-04-04"
+                  />
+                </div>
               </div>
-              <div className="flex items-center gap-4 text-sm text-gray-400">
-                <span>By Author Name • April 4, 2026</span>
-                {challengeCount > 0 && (
-                  <span>• {challengeCount} challenge{challengeCount > 1 ? 's' : ''}</span>
-                )}
-                <span className={isOverEstimate ? 'text-primary font-medium' : ''}>
-                  {formattedTime} spent · Est. {estimatedReadTime} min read
-                </span>
+              <div className="space-y-2">
+                <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <span>By Author Name • April 4, 2026</span>
+                  {challengeCount > 0 && (
+                    <span>• {challengeCount} challenge{challengeCount > 1 ? 's' : ''}</span>
+                  )}
+                  <span className={isOverEstimate ? 'text-primary font-medium' : ''}>
+                    {formattedTime} spent · Est. {estimatedReadTime} min read
+                  </span>
+                </div>
+                <ReadingCount articleId={params.id} />
               </div>
               {isFirstVisit && (
                 <p className="text-sm text-gray-500 mt-2">
@@ -256,18 +270,28 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
             <ChallengeList articleId={params.id} />
 
-            {/* Related Articles - Intelligent Content Discovery */}
-            <RelatedPosts
-              articles={findRelatedArticles(
-                {
-                  id: params.id,
-                  title: ARTICLE_TITLE,
-                  content: ARTICLE_SECTIONS.map(s => s.title).join(' '),
-                },
-                getAllArticles()
-              ).map(r => r.article)}
-              currentArticleId={params.id}
-            />
+            {/* Context-Aware "Next Read" - ONE intelligent recommendation */}
+            {(() => {
+              const currentArticle = {
+                id: params.id,
+                title: ARTICLE_TITLE,
+                content: ARTICLE_SECTIONS.map(s => s.title).join(' '),
+                tags: ['critical-thinking', 'innovation'], // TODO: Get from article metadata
+              };
+              const relatedArticles = findRelatedArticles(currentArticle, getAllArticles());
+              const topRecommendation = relatedArticles[0]?.article;
+
+              if (!topRecommendation) return null;
+
+              const context = generateRecommendationContext(currentArticle, topRecommendation);
+
+              return (
+                <NextRead
+                  article={topRecommendation}
+                  context={context}
+                />
+              );
+            })()}
           </div>
 
           {/* Sidebar - 1/3 width */}
