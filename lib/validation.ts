@@ -16,3 +16,38 @@ export const challengeIdSchema = z.object({
 
 // Type exports
 export type CreateChallengeInput = z.infer<typeof createChallengeSchema>;
+
+// Comment validation schemas for Thoughtful Conversations
+// Minimum 100 words, maximum 2000 characters
+export const createCommentSchema = z.object({
+  articleId: z.string().min(1, 'Article ID is required'),
+  authorName: z.string().min(2, 'Name must be at least 2 characters').max(100),
+  authorEmail: z.string().email('Invalid email address'),
+  content: z.string()
+    .min(100, 'Comment must be at least 100 words to ensure thoughtful discussion')
+    .max(5000, 'Comment must not exceed 5000 characters')
+    .refine(
+      (text) => {
+        const wordCount = text.trim().split(/\s+/).filter(word => word.length > 0).length;
+        return wordCount >= 100;
+      },
+      'Comment must be at least 100 words to ensure thoughtful discussion'
+    ),
+  parentId: z.number().optional(),
+});
+
+export const commentIdSchema = z.object({
+  id: z.string().regex(/^\d+$/, 'Invalid comment ID').transform(Number),
+});
+
+export const createCommentUpvoteSchema = z.object({
+  commentId: z.number().int().positive('Invalid comment ID'),
+  userEmail: z.string().email('Invalid email address'),
+  voteType: z.enum(['up', 'down'], {
+    errorMap: () => ({ message: 'Vote type must be either up or down' }),
+  }),
+});
+
+// Type exports
+export type CreateCommentInput = z.infer<typeof createCommentSchema>;
+export type CreateCommentUpvoteInput = z.infer<typeof createCommentUpvoteSchema>;

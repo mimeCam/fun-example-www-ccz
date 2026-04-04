@@ -25,6 +25,8 @@ import { NotesProvider } from '@/components/notes/NotesProvider';
 import { QuickStats } from '@/components/content/QuickStats';
 import { ReadingCount } from '@/components/reading/ReadingCount';
 import { BookmarkButton } from '@/components/reading/BookmarkButton';
+import { CommentForm } from '@/components/CommentForm';
+import { CommentList } from '@/components/CommentList';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -77,6 +79,8 @@ const ARTICLE_TRUSTED_FILTER: TrustedFilterData = {
 export default function ArticlePage({ params }: { params: { id: string } }) {
   const [isChallengeModalOpen, setIsChallengeModalOpen] = useState(false);
   const [showContinueBanner, setShowContinueBanner] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [commentKey, setCommentKey] = useState(0);
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -269,6 +273,36 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             </div>
 
             <ChallengeList articleId={params.id} />
+
+            {/* Thoughtful Conversations - Comments Section */}
+            <div className="mt-12 pt-8 border-t border-gray-700">
+              <h2 className="text-3xl font-bold mb-6 text-primary">Thoughtful Conversations</h2>
+              <p className="text-gray-400 mb-6">
+                Join the discussion. Share your perspective (minimum 100 words).
+              </p>
+
+              {!showCommentForm ? (
+                <button
+                  onClick={() => setShowCommentForm(true)}
+                  className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-opacity-90 transition-opacity font-medium"
+                >
+                  Write a Comment
+                </button>
+              ) : (
+                <CommentForm
+                  articleId={params.id}
+                  onSubmitSuccess={() => {
+                    setShowCommentForm(false);
+                    setCommentKey(prev => prev + 1); // Force refresh of comment list
+                  }}
+                  onCancel={() => setShowCommentForm(false)}
+                />
+              )}
+
+              <div className="mt-8">
+                <CommentList key={commentKey} articleId={params.id} />
+              </div>
+            </div>
 
             {/* Context-Aware "Next Read" - ONE intelligent recommendation */}
             {(() => {

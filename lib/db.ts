@@ -87,6 +87,52 @@ function initializeSchema(database: Database.Database): void {
     ON layer_unlocks(articleId, layerId)
   `);
 
+  // Create comments table for Thoughtful Conversations
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS comments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      articleId TEXT NOT NULL,
+      authorName TEXT NOT NULL,
+      authorEmail TEXT NOT NULL,
+      content TEXT NOT NULL,
+      parentId INTEGER,
+      upvotes INTEGER NOT NULL DEFAULT 0,
+      downvotes INTEGER NOT NULL DEFAULT 0,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+      updatedAt TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY (parentId) REFERENCES comments(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create comment_upvotes table for tracking votes
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS comment_upvotes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      commentId INTEGER NOT NULL,
+      userEmail TEXT NOT NULL,
+      voteType TEXT NOT NULL CHECK(voteType IN ('up', 'down')),
+      createdAt TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(commentId, userEmail),
+      FOREIGN KEY (commentId) REFERENCES comments(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create indexes for comment queries
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_comments_article
+    ON comments(articleId, createdAt DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_comments_parent
+    ON comments(parentId)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_comment_upvotes_comment
+    ON comment_upvotes(commentId, userEmail)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }
