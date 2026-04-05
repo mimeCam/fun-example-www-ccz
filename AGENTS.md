@@ -11,3 +11,10 @@ SQLite with better-sqlite3, Server Actions, Zod validation
 `lib/content/` - Content analysis and curation logic
 `lib/quote-cards/` - Smart quote card generation with Canvas API
 `lib/hooks/` - Custom hooks for milestones, scroll depth, etc.
+
+## Core Features
+- Challenge system with community voting
+- Notes and highlights system
+- Reading progress tracking and milestones
+- Content discovery (related posts, editor's picks)
+- **Curiosity Trail** - Author-curated semantic paths for deeper content exploration

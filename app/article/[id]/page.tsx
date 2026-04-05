@@ -45,6 +45,7 @@ import { JourneyContextBar } from '@/components/journey/JourneyContextBadge';
 import { calculateJourneyContext } from '@/lib/content/JourneyContext';
 import type { JourneyContext } from '@/types/journey-context';
 import { AudioButton } from '@/components/audio/AudioButton';
+import { CuriosityTrail } from '@/components/CuriosityTrail';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -172,6 +173,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   const [commentKey, setCommentKey] = useState(0);
   const [relatedPosts, setRelatedPosts] = useState<RelatedPostWithSource[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [trail, setTrail] = useState<any>(null);
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -255,6 +257,22 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       }
     }
     loadCategories();
+  }, [params.id]);
+
+  // Fetch curiosity trail data
+  useEffect(() => {
+    async function loadTrail() {
+      try {
+        // TODO: Create proper API endpoint for trails
+        // For now, using import from sample data
+        const { getTrailForArticle } = await import('@/lib/content/trail-data');
+        const articleTrail = getTrailForArticle(params.id);
+        setTrail(articleTrail);
+      } catch (error) {
+        console.error('Error loading trail:', error);
+      }
+    }
+    loadTrail();
   }, [params.id]);
 
   return (
@@ -448,6 +466,18 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                 - Only show once per session (use localStorage)
                 - Integrate useCompletionDetection hook here
             */}
+
+            {/* Curiosity Trail - Author-curated semantic paths */}
+            {trail && (
+              <CuriosityTrail
+                currentArticleId={params.id}
+                trail={trail}
+                onNavigate={(articleId) => {
+                  // TODO: Implement navigation to next article in trail
+                  console.log('Navigate to:', articleId);
+                }}
+              />
+            )}
 
             {/* Trusted Filter Section */}
             <TrustedFilterSection data={ARTICLE_TRUSTED_FILTER} />
