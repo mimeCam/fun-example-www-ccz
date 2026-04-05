@@ -10,6 +10,7 @@ import { TableOfContents } from '@/components/TableOfContents';
 import { TrustedFilterSection } from '@/components/trusted-filter/TrustedFilterSection';
 import { DepthBar } from '@/components/reading/DepthBar';
 import { MilestoneToast } from '@/components/reading/MilestoneToast';
+import { ReadingCommitmentSystem } from '@/components/reading/ReadingCommitmentSystem';
 import { useReadingPosition } from '@/lib/hooks/useReadingPosition';
 import { useShareButton } from '@/lib/hooks/useShareButton';
 import { useSharedHighlight } from '@/lib/hooks/useSharedHighlight';
@@ -56,6 +57,18 @@ const AUTHOR_NAME = 'Author Name';
 // TODO: Get custom reading time from article metadata
 // Example of custom reading time: "8 min to transform your workflow ⚡"
 const ARTICLE_CUSTOM_READING_TIME: string | undefined = undefined;
+
+// TODO: Get takeaways from article metadata
+// These would be author-provided or AI-generated during build
+const ARTICLE_TAKEAWAYS = [
+  'Why challenging ideas strengthens critical thinking',
+  'How to question assumptions constructively',
+  'Practical frameworks for intellectual discourse',
+  'Building teams that embrace thoughtful disagreement',
+];
+
+// TODO: Get key concepts from article metadata
+const ARTICLE_KEY_CONCEPTS = ['Critical Thinking', 'Team Dynamics', 'Intellectual Growth'];
 
 /**
  * Get article content as text for reading time calculation
@@ -278,6 +291,19 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
         description={milestoneState.description}
         isVisible={milestoneState.isVisible}
         onDismiss={dismissMilestone}
+      />
+
+      {/* Reading Commitment System - Enhanced reading engagement */}
+      <ReadingCommitmentSystem
+        articleId={params.id}
+        articleTitle={ARTICLE_TITLE}
+        readingTime={ARTICLE_READING_MINUTES}
+        takeaways={ARTICLE_TAKEAWAYS}
+        keyConcepts={ARTICLE_KEY_CONCEPTS}
+        showInsightPreview={true}
+        showEnhancedProgress={true}
+        showMilestoneCard={true}
+        showNudges={true}
       />
 
       {/* Jump to Position Button - Quick navigation to saved position */}

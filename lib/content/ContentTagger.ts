@@ -9,6 +9,7 @@ export interface Article {
   content: string;
   tags?: string[];
   publishedAt?: string; // ISO date string when article was published
+  questions?: string[]; // Provocative questions for content discovery
 }
 
 export interface TaggedArticle extends Article {
