@@ -8,15 +8,15 @@ SQLite with better-sqlite3, Server Actions, Zod validation, Fuse.js
 `app/` — Pages and API routes
 `components/` — React components
 `lib/search/` — Fuse.js fuzzy search engine
-`lib/hooks/` — Custom hooks (milestones, scroll, completion detection)
+`lib/hooks/` — Custom hooks (milestones, scroll, mirror, completion detection)
 `lib/detection/` — Reading behavior analysis
-`lib/mirror/` — Reading Mirror synthesis engine **[WIP]**
+`lib/mirror/` — Reading Mirror synthesis engine
 
-## Reading Mirror [WIP]
-Core killer-feature: synthesizes reader data into a reader identity.
+## Reading Mirror
+Core killer-feature: synthesizes reader data into a reader archetype card.
 `GET /api/mirror` → archetype, whisper, topic DNA, scores, resonance themes.
-Done: types, synthesizer, API endpoint, useMirror hook (`lib/hooks/useMirror.ts`).
-TODO: AmbientMirror UI strip (article pages), DeepMirror UI (journey page).
+Done: types, synthesizer, API endpoint, useMirror hook, `/mirror` page with cinematic reveal card.
+WIP: Share/export PNG card (needs html2canvas), resonance themes display, AmbientMirror strip on article pages.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

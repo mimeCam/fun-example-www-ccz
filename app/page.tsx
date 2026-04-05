@@ -90,6 +90,9 @@ export default function Home() {
             <Link href="/journey" className="hover:text-primary transition-colors">
               Your Journey
             </Link>
+            <Link href="/mirror" className="hover:text-primary transition-colors">
+              Your Mirror
+            </Link>
           </div>
         </div>
       </div>

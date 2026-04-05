@@ -99,4 +99,26 @@ body {
   animation: fadeOut 0.3s ease-out;
 }
 
-/* TODO: Add more global styles as needed */
+/* Mirror reveal animations */
+@keyframes mirrorGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(123, 44, 191, 0.3); }
+  50% { box-shadow: 0 0 50px rgba(199, 125, 255, 0.5); }
+}
+
+.mirror-shimmer {
+  animation: mirrorGlow 0.8s ease-in-out infinite;
+}
+
+@keyframes chromaticShift {
+  0%, 100% { text-shadow: -1px 0 rgba(255,0,0,0.4), 1px 0 rgba(0,255,0,0.4); }
+  33% { text-shadow: 2px 0 rgba(255,0,0,0.6), -2px 0 rgba(0,255,0,0.6); }
+  66% { text-shadow: -2px 0 rgba(255,0,0,0.6), 2px 0 rgba(0,255,0,0.6); }
+}
+
+.mirror-chromatic h2 {
+  animation: chromaticShift 0.4s ease-in-out infinite;
+}
+
+.mirror-pulse {
+  animation: mirrorGlow 1.5s ease-in-out infinite;
+}
