@@ -17,6 +17,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     and providing evidence or alternative perspectives.`,
     tags: ['critical-thinking', 'intellectual-growth', 'innovation'],
     publishedAt: '2021-04-04T10:00:00Z',
+    worldview: 'philosophical',
     questions: [
       'What ideas do you defend without evidence?',
       'When was the last time you changed your mind?',
@@ -34,6 +35,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     that support sustained attention.`,
     tags: ['productivity', 'focus', 'professional-development'],
     publishedAt: '2022-08-15T14:30:00Z',
+    worldview: 'practical',
     questions: [
       'What could you achieve with 4 hours of uninterrupted focus?',
       'Why is deep work becoming so rare?',
@@ -51,6 +53,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     and find leverage points for meaningful change.`,
     tags: ['systems-thinking', 'problem-solving', 'strategy'],
     publishedAt: '2023-11-22T09:15:00Z',
+    worldview: 'philosophical',
     questions: [
       'What are you optimizing at the expense of the whole?',
       'Where can you find leverage in complex systems?',
@@ -68,6 +71,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     transmitting information, but about building understanding and trust.`,
     tags: ['leadership', 'communication', 'soft-skills'],
     publishedAt: '2024-01-10T16:45:00Z',
+    worldview: 'practical',
     questions: [
       'Does your expertise bridge or divide?',
       'When you speak, do you inform or impress?',
@@ -85,6 +89,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     a journey of constant discovery and refinement.`,
     tags: ['learning', 'personal-development', 'growth-mindset'],
     publishedAt: '2024-02-28T11:20:00Z',
+    worldview: 'practical',
     questions: [
       'What did you learn this week?',
       'Are you consuming or creating knowledge?',
@@ -102,6 +107,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     users but collaborators in the tool's evolution.`,
     tags: ['design', 'developer-experience', 'product-design'],
     publishedAt: '2024-04-04T08:00:00Z',
+    worldview: 'technical',
     questions: [
       'Does your tool respect the user?',
       'What cognitive load are you imposing?',

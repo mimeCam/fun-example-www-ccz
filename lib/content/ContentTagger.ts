@@ -3,6 +3,8 @@
  * Follows Sid's philosophy: functions under 10 lines, pure and testable
  */
 
+import { FilterType } from '@/types/filter';
+
 export interface Article {
   id: string;
   title: string;
@@ -10,6 +12,7 @@ export interface Article {
   tags?: string[];
   publishedAt?: string; // ISO date string when article was published
   questions?: string[]; // Provocative questions for content discovery
+  worldview?: FilterType; // Primary worldview category for filtering
 }
 
 export interface TaggedArticle extends Article {

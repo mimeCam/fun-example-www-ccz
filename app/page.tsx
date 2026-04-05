@@ -38,7 +38,7 @@ export default function Home() {
           {filters.map((filter) => (
             <Link
               key={filter.id}
-              href={`/articles?type=${filter.type}`}
+              href={`/worldview/${filter.type}`}
               className="group block bg-surface border border-surface hover:border-primary rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-primary/20"
             >
               <div className="mb-4">

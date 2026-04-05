@@ -1,4 +1,4 @@
-Deployment started at: Sun Apr  5 03:24:54 AM CEST 2026
+Deployment started at: Sun Apr  5 03:55:11 AM CEST 2026
 🛑 Stopping existing container (if running)...
 Removing existing container: persona-blog-z
 🧹 Cleaning up old image (if exists)...
@@ -39,7 +39,8 @@ Volume persona-blog-db already exists
   - Category-Based Discovery (content organization with colorful badges and browsing)
   - Resonance-First Bookmarking (WHY content resonates, vitality tracking, slot limits)
   - Journey Context System (article depth, DNA tags, outcome promises)
-  - Article Search & Discovery (full-text search API + real-time SearchBar UI)
+  - Enhanced Search Engine (Fuse.js fuzzy matching, relevance ranking, build-time indexing)
+  - Worldview Content Feeds (filter by perspective: technical, philosophical, practical, contrarian)
   - Jump to Position Button (smooth scroll to saved reading position)
   - Reading Milestone Tracker (50% & 100% celebration toasts with persistent tracking)
   - Exit-Intent Feedback System (capture user feedback, understand abandonment reasons)
@@ -55,7 +56,7 @@ Volume persona-blog-db already exists
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/node:20-alpine
-#2 DONE 0.6s
+#2 DONE 0.4s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 572B done
@@ -65,133 +66,61 @@ Volume persona-blog-db already exists
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 55.77kB 0.0s done
+#5 transferring context: 11.51kB 0.0s done
 #5 DONE 0.0s
 
-#6 [ 9/16] COPY postcss.config.js ./
+#6 [13/16] COPY lib ./lib
 #6 CACHED
 
-#7 [ 3/16] RUN apk add --no-cache python3 make g++
+#7 [ 9/16] COPY postcss.config.js ./
 #7 CACHED
 
-#8 [ 8/16] COPY tailwind.config.ts ./
+#8 [ 4/16] COPY package*.json ./
 #8 CACHED
 
-#9 [ 7/16] COPY tsconfig.json ./
+#9 [11/16] COPY app ./app
 #9 CACHED
 
-#10 [ 2/16] WORKDIR /app
+#10 [12/16] COPY components ./components
 #10 CACHED
 
-#11 [ 4/16] COPY package*.json ./
+#11 [14/16] COPY types ./types
 #11 CACHED
 
-#12 [ 5/16] RUN npm ci && npm cache clean --force
+#12 [15/16] COPY public ./public
 #12 CACHED
 
 #13 [ 6/16] COPY next.config.js ./
 #13 CACHED
 
-#14 [10/16] COPY next-env.d.ts ./
+#14 [ 8/16] COPY tailwind.config.ts ./
 #14 CACHED
 
-#15 [11/16] COPY app ./app
-#15 DONE 0.0s
+#15 [ 7/16] COPY tsconfig.json ./
+#15 CACHED
 
-#16 [12/16] COPY components ./components
-#16 DONE 0.0s
+#16 [10/16] COPY next-env.d.ts ./
+#16 CACHED
 
-#17 [13/16] COPY lib ./lib
-#17 DONE 0.0s
+#17 [ 5/16] RUN npm ci && npm cache clean --force
+#17 CACHED
 
-#18 [14/16] COPY types ./types
-#18 DONE 0.0s
+#18 [ 2/16] WORKDIR /app
+#18 CACHED
 
-#19 [15/16] COPY public ./public
-#19 DONE 0.0s
-
-#20 [16/16] RUN npm run build
-#20 0.323 
-#20 0.323 > persona-blog@0.1.0 build
-#20 0.323 > next build
-#20 0.323 
-#20 1.082 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#20 1.084 This information is used to shape Next.js' roadmap and prioritize features.
-#20 1.084 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#20 1.084 https://nextjs.org/telemetry
-#20 1.084 
-#20 1.156   ▲ Next.js 14.2.3
-#20 1.158 
-#20 1.239    Creating an optimized production build ...
-#20 ...
-
-#10 [ 2/16] WORKDIR /app
-#10 CACHED
+#19 [ 3/16] RUN apk add --no-cache python3 make g++
+#19 CACHED
 
 #20 [16/16] RUN npm run build
-#20 21.38  ✓ Compiled successfully
-#20 21.39    Linting and checking validity of types ...
-#20 39.18    Collecting page data ...
-#20 42.67    Generating static pages (0/19) ...
-#20 43.98    Generating static pages (4/19) 
-#20 44.46    Generating static pages (9/19) 
-#20 45.25    Generating static pages (14/19) 
-#20 46.12  ✓ Generating static pages (19/19)
-#20 46.60    Finalizing page optimization ...
-#20 46.60    Collecting build traces ...
-#20 54.96 
-#20 54.98 Route (app)                              Size     First Load JS
-#20 54.98 ┌ ○ /                                    1.42 kB        95.3 kB
-#20 54.98 ├ ○ /_not-found                          871 B          87.9 kB
-#20 54.98 ├ ○ /admin/categories                    1.99 kB          89 kB
-#20 54.98 ├ ○ /admin/editor-picks                  3.68 kB        90.7 kB
-#20 54.98 ├ ƒ /api/admin/editor-picks              0 B                0 B
-#20 54.98 ├ ƒ /api/articles                        0 B                0 B
-#20 54.98 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#20 54.98 ├ ƒ /api/categories                      0 B                0 B
-#20 54.98 ├ ƒ /api/categories/[slug]               0 B                0 B
-#20 54.98 ├ ƒ /api/challenge                       0 B                0 B
-#20 54.98 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
-#20 54.98 ├ ƒ /api/comments                        0 B                0 B
-#20 54.98 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
-#20 54.98 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
-#20 54.98 ├ ƒ /api/feedback                        0 B                0 B
-#20 54.98 ├ ƒ /api/highlights                      0 B                0 B
-#20 54.98 ├ ○ /api/history/today                   0 B                0 B
-#20 54.98 ├ ƒ /api/questions                       0 B                0 B
-#20 54.98 ├ ƒ /api/reading/memory                  0 B                0 B
-#20 54.98 ├ ƒ /api/reading/streak                  0 B                0 B
-#20 54.98 ├ ƒ /api/reading/topics                  0 B                0 B
-#20 54.98 ├ ƒ /api/related-posts                   0 B                0 B
-#20 54.98 ├ ƒ /api/resonances                      0 B                0 B
-#20 54.98 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#20 54.98 ├ ƒ /article/[id]                        31.4 kB         125 kB
-#20 54.98 ├ ○ /categories                          963 B          94.8 kB
-#20 54.98 ├ ƒ /categories/[slug]                   1.05 kB        94.9 kB
-#20 54.98 ├ ○ /journey                             3.96 kB        97.8 kB
-#20 54.98 ├ ƒ /journey/[journeyId]/player          4.88 kB        91.9 kB
-#20 54.98 ├ ○ /questions                           1.01 kB        94.8 kB
-#20 54.98 └ ○ /saved                               1.34 kB        95.2 kB
-#20 54.98 + First Load JS shared by all            87.1 kB
-#20 54.98   ├ chunks/23-e77d1544b91a0ac4.js        31.5 kB
-#20 54.98   ├ chunks/fd9d1056-9da93194ae4e5df5.js  53.6 kB
-#20 54.98   └ other shared chunks (total)          1.96 kB
-#20 54.98 
-#20 54.98 
-#20 54.98 ○  (Static)   prerendered as static content
-#20 54.98 ƒ  (Dynamic)  server-rendered on demand
-#20 54.98 
-#20 DONE 55.1s
+#20 CACHED
 
 #21 exporting to image
-#21 exporting layers
-#21 exporting layers 0.2s done
-#21 writing image sha256:292b1466272b83ebad44bd37971607eabd3cb5ef11cff9b0d9895ff1df71acc9
-#21 writing image sha256:292b1466272b83ebad44bd37971607eabd3cb5ef11cff9b0d9895ff1df71acc9 done
+#21 exporting layers done
+#21 writing image sha256:3782f39514dcc83f765f7ec929ba6e87ab8ab33b492ee60ffadfeae782a85f1c done
 #21 naming to docker.io/library/persona-blog-image:latest done
-#21 DONE 0.2s
+#21 DONE 0.0s
 🎯 Starting container on port 7200...
-29ff568a894d221f9cc3b8ab219afe3f68474c59d69fdbe36534244060cb2c00
+e50d51dda53e143489cc9b39aacad0f3dfffd505330f8e40ccbe970b6f2aaaa1
 ⏳ Waiting for container to start...
 ✅ Container is running
 🏥 Checking container health...
@@ -210,8 +139,8 @@ Volume persona-blog-db already exists
   Restart:         docker restart persona-blog-z
   View deployment: cat deployment.log
 
-Deployment completed at: Sun Apr  5 03:25:57 AM CEST 2026
-Deployment completed at: Sun Apr  5 03:25:57 AM CEST 2026
+Deployment completed at: Sun Apr  5 03:55:18 AM CEST 2026
+Deployment completed at: Sun Apr  5 03:55:18 AM CEST 2026
 🧹 Cleaning up dangling images...
 Removed dangling images
 ✨ Deployment complete!
