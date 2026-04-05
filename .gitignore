@@ -23,3 +23,6 @@ tsconfig.tsbuildinfo
 deployment.log
 deploy.sh
 DEPLOYMENT_UPDATE.md
+
+# Reports
+_reports/

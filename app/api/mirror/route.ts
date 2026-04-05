@@ -1,6 +1,6 @@
 /**
  * GET /api/mirror — Reading Mirror synthesis endpoint
- * Gathers all reader data and returns a synthesized reader identity.
+ * Gathers reader data, synthesizes identity, snapshots state, detects evolution.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -13,6 +13,8 @@ import { getUserResonances } from '@/lib/resonances';
 import { getUserInsights } from '@/lib/insights';
 import { getArticleById } from '@/lib/content/articleData';
 import { synthesize } from '@/lib/mirror/synthesizer';
+import { createSnapshot, getHistory, getMeta } from '@/lib/mirror/snapshot-manager';
+import { detectEvolution } from '@/lib/mirror/evolution-engine';
 import type { MirrorInput } from '@/types/mirror';
 
 export const dynamic = 'force-dynamic';
@@ -28,15 +30,6 @@ function extractTopics(
   return Array.from(map.entries()).map(([topic, count]) => ({ topic, count }));
 }
 
-function gatherRawData(fp: string) {
-  return {
-    history: getReadingHistory(fp),
-    stats: getReadingStats(fp),
-    resonances: getUserResonances(fp),
-    insights: getUserInsights(fp),
-  };
-}
-
 function avgCompletion(history: { completionRate: number }[]): number {
   return history.length > 0
     ? history.reduce((s, h) => s + h.completionRate, 0) / history.length
@@ -44,7 +37,10 @@ function avgCompletion(history: { completionRate: number }[]): number {
 }
 
 function buildInput(fp: string): MirrorInput {
-  const { history, stats, resonances, insights } = gatherRawData(fp);
+  const history = getReadingHistory(fp);
+  const stats = getReadingStats(fp);
+  const resonances = getUserResonances(fp);
+  const insights = getUserInsights(fp);
   const topics = extractTopics(history);
   return {
     totalArticles: stats.totalArticles,
@@ -67,7 +63,18 @@ export async function GET(req: NextRequest) {
     if (!email) {
       return NextResponse.json({ error: 'Email required' }, { status: 400 });
     }
-    return NextResponse.json(synthesize(buildInput(createEmailFingerprint(email))));
+
+    const fp = createEmailFingerprint(email);
+    const mirror = synthesize(buildInput(fp));
+
+    createSnapshot(fp, mirror.archetype, mirror.scores, mirror.topicDNA);
+    const history = getHistory(fp);
+    const snapshot = getMeta(fp);
+
+    mirror.evolution = detectEvolution(mirror, history);
+    mirror.snapshot = snapshot;
+
+    return NextResponse.json(mirror);
   } catch (e) {
     console.error('Mirror synthesis failed:', e);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

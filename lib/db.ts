@@ -337,6 +337,23 @@ function initializeSchema(database: Database.Database): void {
     ON feedback(reason, timestamp DESC)
   `);
 
+  // Create mirror_snapshots table for Mirror Progression System
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS mirror_snapshots (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      emailFingerprint TEXT NOT NULL,
+      archetype TEXT NOT NULL,
+      scores TEXT NOT NULL,
+      topicDNA TEXT NOT NULL,
+      createdAt TEXT NOT NULL DEFAULT (datetime('now'))
+    )
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_mirror_snapshots_user
+    ON mirror_snapshots(emailFingerprint, createdAt DESC)
+  `);
+
   // TODO: Add indexes for better query performance on challenges table
   // TODO: Add articles table when needed
 }

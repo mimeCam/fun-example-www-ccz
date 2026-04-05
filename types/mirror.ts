@@ -9,6 +9,9 @@ export interface ReaderMirror {
   topicDNA: { topic: string; weight: number }[];
   scores: { depth: number; breadth: number; consistency: number };
   resonanceThemes: string[];
+  evolution?: MirrorEvolution;
+  challenges?: ReadingChallenge[];
+  snapshot?: SnapshotMeta;
 }
 
 export interface MirrorInput {
@@ -22,4 +25,39 @@ export interface MirrorInput {
   insightCount: number;
   resonanceNotes: string[];
   topics: { topic: string; count: number }[];
+}
+
+export interface MirrorSnapshot {
+  id: number;
+  emailFingerprint: string;
+  archetype: string;
+  scores: { depth: number; breadth: number; consistency: number };
+  topicDNA: { topic: string; weight: number }[];
+  createdAt: string;
+}
+
+export interface MirrorEvolution {
+  previousArchetype: string | null;
+  hasShifted: boolean;
+  shifts: EvolutionShift[];
+  trajectory: 'rising' | 'stable' | 'declining';
+}
+
+export interface EvolutionShift {
+  dimension: string;
+  delta: number;
+  direction: 'up' | 'down';
+}
+
+export interface ReadingChallenge {
+  target: string;
+  description: string;
+  progress: number;
+  max: number;
+}
+
+export interface SnapshotMeta {
+  visitCount: number;
+  firstVisitAt: string | null;
+  previousVisitAt: string | null;
 }
