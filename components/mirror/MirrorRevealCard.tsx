@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { ReaderMirror } from '@/types/mirror';
+import MirrorExportButton from './MirrorExportButton';
 
 interface Props { mirror: ReaderMirror; }
 
@@ -79,7 +80,7 @@ export default function MirrorRevealCard({ mirror }: Props) {
           </div>
         )}
 
-        {/* TODO: Add share/export button for PNG card download via html2canvas */}
+        {phase === 'done' && <MirrorExportButton mirror={mirror} />}
       </div>
     </div>
   );

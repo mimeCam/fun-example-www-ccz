@@ -46,6 +46,7 @@ import { calculateJourneyContext } from '@/lib/content/JourneyContext';
 import type { JourneyContext } from '@/types/journey-context';
 import { AudioButton } from '@/components/audio/AudioButton';
 import { CuriosityTrail } from '@/components/CuriosityTrail';
+import AmbientMirror from '@/components/mirror/AmbientMirror';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -592,7 +593,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
               <ThisDayInHistory />
             </div>
 
-            {/* TODO: Add more sidebar widgets */}
+            {/* Ambient Mirror — reader archetype strip */}
+            <AmbientMirror />
+
             {/* TODO: Author bio */}
           </aside>
         </div>
