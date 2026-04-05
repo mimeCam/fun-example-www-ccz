@@ -10,6 +10,7 @@ interface ShareModalProps {
   onClose: () => void;
   content: ShareContent;
   position?: { x: number; y: number };
+  onCreateQuoteCard?: () => void;
 }
 
 /**
@@ -70,7 +71,7 @@ const PLATFORMS = [
  * - Character count preview
  * - Chromatic aberration accent on hover
  */
-export function ShareModal({ isOpen, onClose, content, position }: ShareModalProps) {
+export function ShareModal({ isOpen, onClose, content, position, onCreateQuoteCard }: ShareModalProps) {
   const [sharingPlatform, setSharingPlatform] = useState<SharePlatform | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
 
@@ -177,6 +178,33 @@ export function ShareModal({ isOpen, onClose, content, position }: ShareModalPro
               <span className="text-xs text-gray-300 relative z-10">{platform.name}</span>
             </button>
           ))}
+
+          {/* Create Quote Card Button */}
+          {onCreateQuoteCard && (
+            <button
+              onClick={onCreateQuoteCard}
+              disabled={sharingPlatform !== null}
+              className={`
+                flex flex-col items-center gap-2 p-3 rounded-lg
+                border-2 border-primary transition-all
+                hover:scale-105 hover:shadow-lg
+                disabled:opacity-50 disabled:cursor-not-allowed
+                group relative overflow-hidden
+                bg-primary/10
+              `}
+            >
+              {/* Gradient effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-primary/20 to-primary/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+              {/* Icon */}
+              <span className="text-2xl relative z-10">🎨</span>
+
+              {/* Name */}
+              <span className="text-xs text-primary relative z-10 font-medium">
+                Quote Card
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Footer with character count */}

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { cleanText } from '@/lib/sharing/text-utils';
 import { ShareModal } from './ShareModal';
+import { QuoteCardModal } from './QuoteCardModal';
 import { ShareContent } from '@/lib/sharing/platform-formatters';
 
 interface ShareButtonProps {
@@ -33,6 +34,7 @@ export function ShareButton({
 }: ShareButtonProps) {
   const buttonRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isQuoteCardModalOpen, setIsQuoteCardModalOpen] = useState(false);
   const autoDismissRef = useRef<NodeJS.Timeout>();
 
   // Auto-dismiss after 3 seconds (if modal not open)
@@ -76,6 +78,12 @@ export function ShareButton({
   // Open share modal
   const handleShareClick = () => {
     setIsModalOpen(true);
+  };
+
+  // Open quote card modal
+  const handleQuoteCardClick = () => {
+    setIsQuoteCardModalOpen(true);
+    setIsModalOpen(false);
   };
 
   // Prepare share content
@@ -129,6 +137,20 @@ export function ShareButton({
         }}
         content={shareContent}
         position={position}
+        onCreateQuoteCard={handleQuoteCardClick}
+      />
+
+      {/* Quote Card Modal */}
+      <QuoteCardModal
+        isOpen={isQuoteCardModalOpen}
+        onClose={() => {
+          setIsQuoteCardModalOpen(false);
+          onClose();
+        }}
+        quote={cleanText(selectedText)}
+        author={authorName}
+        articleTitle={articleTitle}
+        url={articleUrl}
       />
     </>
   );
