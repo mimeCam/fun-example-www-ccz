@@ -19,8 +19,8 @@ import { useTimeInvestment } from '@/lib/hooks/useTimeInvestment';
 import { useMilestones } from '@/lib/hooks/useMilestones';
 import { useExitIntent } from '@/lib/hooks/useExitIntent';
 import { ExitFeedbackModal } from '@/components/feedback/ExitFeedbackModal';
-// TODO: Import useCompletionDetection when implementing celebration UI
-// import { useCompletionDetection } from '@/lib/hooks/useCompletionDetection';
+import { useCompletionDetection } from '@/lib/hooks/useCompletionDetection';
+import { SubtleNod } from '@/components/reading/SubtleNod';
 import { TrustedFilterData } from '@/types/trusted-filter';
 import { findRelatedArticles } from '@/lib/content/ContentTagger';
 import { getAllArticles } from '@/lib/content/articleData';
@@ -201,6 +201,12 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     storageKey: `exit-intent-${params.id}`,
     minTimeOnPage: 10000, // 10 seconds
     minScrollDepth: 10, // 10%
+  });
+
+  // The Subtle Nod - detect genuine reading completion
+  const { result: completionResult } = useCompletionDetection({
+    articleId: params.id,
+    estimatedReadTime: ARTICLE_READING_MINUTES,
   });
 
   // Simplified share button functionality
@@ -457,15 +463,8 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
               {/* TODO: Add full article content */}
             </div>
 
-            {/* TODO: THE SUBTLE NOD - Celebration UI for genuine readers */}
-            {/* When useCompletionDetection detects genuine reading completion:
-                - Show subtle celebration animation (confetti, pulse, etc.)
-                - Display "Thank you for reading this thoughtfully" message
-                - Optional: Writer's personalized message
-                - Should be non-intrusive and respectful
-                - Only show once per session (use localStorage)
-                - Integrate useCompletionDetection hook here
-            */}
+            {/* The Subtle Nod - Honest celebration for genuine readers */}
+            <SubtleNod articleId={params.id} result={completionResult} />
 
             {/* Curiosity Trail - Author-curated semantic paths */}
             {trail && (

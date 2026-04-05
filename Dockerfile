@@ -22,6 +22,7 @@ COPY tsconfig.json ./
 COPY tailwind.config.ts ./
 COPY postcss.config.js ./
 COPY next-env.d.ts ./
+COPY middleware.ts ./
 
 # Copy source code
 COPY app ./app
