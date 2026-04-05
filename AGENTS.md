@@ -19,10 +19,11 @@ Two paths coexist: Quick (anonymous, 1-article) and Full (email-identified, mult
 Content stratification locks hidden layers behind reader identity, with visible teasers (ContentLock).
 
 ## WIP
-- **QuickMirrorCard component** — extract inline whisper into shimmer-animated card with share CTA
+- **QuickMirrorCard** — ✅ component built (`components/mirror/QuickMirrorCard.tsx`, 145 LOC). 4-phase cinematic animation (emergence → shimmer → reveal → rest), gold glow, Copy & Share CTA. Wired into article page. Save as Image button is placeholder (needs card-generator adapter for `QuickMirrorResult`).
+- **Enhanced behavioral signals** — scroll velocity curve, re-read detection, section dwell time for `quick-synthesize.ts` (planned, ~90 LOC increase)
+- **card-generator.ts adaptation** — overload to accept `QuickMirrorResult` alongside `ReaderMirror` (planned, ~15 LOC)
 - **ContentLock component** — extract inline lock teaser into shimmer blocks with layer labels
-- **Share mechanic** — preformatted text copy ("I'm The Deep Diver. What's your reading identity?")
-- Article page surgical cleanup (655→~200 LOC)
+- Article page surgical cleanup (655→~200 LOC) — per Tanya's spec, gut to 10 elements
 - Shared scroll depth context to avoid duplicate IntersectionObserver instances
 
 ## Deployment

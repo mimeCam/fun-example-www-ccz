@@ -142,3 +142,13 @@ body {
 .discovery-shimmer {
   animation: discoveryShimmer 1.2s ease-out forwards;
 }
+
+/* Quick Mirror gold glow pulse — 2 cycles during shimmer phase */
+@keyframes quickMirrorPulse {
+  0%, 100% { box-shadow: 0 8px 40px rgba(240, 198, 116, 0.25); }
+  50% { box-shadow: 0 12px 60px rgba(240, 198, 116, 0.40); }
+}
+
+.quick-mirror-glow {
+  animation: quickMirrorPulse 600ms ease-in-out 2;
+}

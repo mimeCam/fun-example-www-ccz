@@ -47,6 +47,7 @@ import type { JourneyContext } from '@/types/journey-context';
 import { AudioButton } from '@/components/audio/AudioButton';
 import { CuriosityTrail } from '@/components/CuriosityTrail';
 import AmbientMirror from '@/components/mirror/AmbientMirror';
+import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { getLayeredContent } from '@/lib/content/articleData';
@@ -500,14 +501,12 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
               {/* TODO: Add full article content for remaining articles */}
             </div>
 
-            {/* Quick Mirror Whisper — lightweight archetype reveal after 70% scroll */}
+            {/* Quick Mirror — cinematic archetype reveal after 70% scroll */}
             {quickMirror.triggered && quickMirror.result && (
-              <div className="mb-8 p-6 rounded-xl bg-gradient-to-r from-indigo-950/80 to-purple-950/60 border border-indigo-500/20 animate-[fadeIn_0.8s_ease-out]">
-                <p className="text-sm text-indigo-300 mb-1">Based on how you just read that&hellip;</p>
-                <p className="text-xl font-bold text-white">{quickMirror.result.archetypeLabel}</p>
-                <p className="text-sm text-gray-300 italic mt-1">&ldquo;{quickMirror.result.whisper}&rdquo;</p>
-                {/* TODO: Extract to QuickMirrorCard component with shimmer animation, share CTA, image export */}
-              </div>
+              <QuickMirrorCard
+                result={quickMirror.result}
+                articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+              />
             )}
 
             {/* Content Lock — teaser for hidden layers the reader hasn't unlocked */}
