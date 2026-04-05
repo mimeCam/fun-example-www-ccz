@@ -51,6 +51,9 @@ import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { getLayeredContent } from '@/lib/content/articleData';
 import { useMirror } from '@/lib/hooks/useMirror';
+import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
+import { resolveLockedLayers } from '@/lib/content/content-layers';
+import type { ArchetypeKey } from '@/types/content';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -187,6 +190,19 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}')).length
     : 0;
   const stratifiedBlocks = useStratifiedContent(params.id, layeredContent, (mirror?.archetype as any) ?? null, readCount);
+
+  // Quick Mirror — lightweight archetype from single article read
+  const quickMirror = useQuickMirror(
+    params.id,
+    ARTICLE_READING_MINUTES,
+    ARTICLE_KEY_CONCEPTS,
+    70 // triggerDepth — configurable for A/B testing
+  );
+
+  // Content Lock — show readers what hidden layers they haven't unlocked
+  const lockedLayers = layeredContent
+    ? resolveLockedLayers(layeredContent, (mirror?.archetype as ArchetypeKey) ?? null, readCount)
+    : [];
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -483,6 +499,27 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
               )}
               {/* TODO: Add full article content for remaining articles */}
             </div>
+
+            {/* Quick Mirror Whisper — lightweight archetype reveal after 70% scroll */}
+            {quickMirror.triggered && quickMirror.result && (
+              <div className="mb-8 p-6 rounded-xl bg-gradient-to-r from-indigo-950/80 to-purple-950/60 border border-indigo-500/20 animate-[fadeIn_0.8s_ease-out]">
+                <p className="text-sm text-indigo-300 mb-1">Based on how you just read that&hellip;</p>
+                <p className="text-xl font-bold text-white">{quickMirror.result.archetypeLabel}</p>
+                <p className="text-sm text-gray-300 italic mt-1">&ldquo;{quickMirror.result.whisper}&rdquo;</p>
+                {/* TODO: Extract to QuickMirrorCard component with shimmer animation, share CTA, image export */}
+              </div>
+            )}
+
+            {/* Content Lock — teaser for hidden layers the reader hasn't unlocked */}
+            {lockedLayers.length > 0 && (
+              <div className="mb-8 p-4 rounded-lg border border-dashed border-indigo-500/20 bg-indigo-950/20">
+                <p className="text-sm text-indigo-400/70">
+                  This article has <span className="text-indigo-300 font-medium">{lockedLayers.length}</span> hidden
+                  layer{lockedLayers.length > 1 ? 's' : ''}. Your reading identity determines what you see.
+                </p>
+                {/* TODO: Extract to ContentLock component with shimmer blocks + resolveLockedLayers labels */}
+              </div>
+            )}
 
             {/* The Subtle Nod - Honest celebration for genuine readers */}
             <SubtleNod articleId={params.id} result={completionResult} />

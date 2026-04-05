@@ -105,6 +105,25 @@ export function resolveVisibleContent(
   return { blocks };
 }
 
+/** Returns layers that exist in content but the reader cannot yet see */
+export function resolveLockedLayers(
+  content: LayeredArticleContent,
+  archetype: ArchetypeKey | null,
+  readCount: number
+): VisibleLayer[] {
+  const visible = resolveVisibleLayers(archetype, readCount);
+  const locked: VisibleLayer[] = [];
+
+  if (content.marginalia && !visible.includes('marginalia')) {
+    locked.push('marginalia');
+  }
+
+  const keys = Object.keys(content.extensions) as ArchetypeKey[];
+  keys.forEach(key => { if (!visible.includes(key)) locked.push(key); });
+
+  return locked;
+}
+
 /** A resolved content block ready for rendering */
 export interface ContentBlock {
   layer: VisibleLayer;
