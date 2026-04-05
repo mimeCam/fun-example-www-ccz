@@ -15,8 +15,8 @@ SQLite with better-sqlite3, Server Actions, Zod validation, Fuse.js
 ## Reading Mirror
 Core killer-feature: synthesizes reader data into a reader archetype card.
 `GET /api/mirror` → archetype, whisper, topic DNA, scores, resonance themes.
-Done: types, synthesizer, API endpoint, useMirror hook, `/mirror` page with cinematic reveal card.
-WIP: Share/export PNG card (needs html2canvas), resonance themes display, AmbientMirror strip on article pages.
+Done: types, synthesizer, API endpoint, useMirror hook, `/mirror` page with cinematic reveal card, resonance themes display.
+WIP: Share/export PNG card (needs html2canvas), AmbientMirror strip on article pages.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -69,8 +69,17 @@ export default function MirrorRevealCard({ mirror }: Props) {
           ))}
         </div>
 
+        {mirror.resonanceThemes.length > 0 && (
+          <div className={`mt-5 transition-all duration-500
+            ${showTags ? 'opacity-100' : 'opacity-0'}`}>
+            <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-2">What moves you</p>
+            <p className="text-sm text-gray-300 leading-relaxed">
+              {mirror.resonanceThemes.join(' · ')}
+            </p>
+          </div>
+        )}
+
         {/* TODO: Add share/export button for PNG card download via html2canvas */}
-        {/* TODO: Add resonance themes display */}
       </div>
     </div>
   );
