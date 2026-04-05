@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getAllArticles } from '@/lib/content/articleData';
 import { FILTER_TEMPLATES, FilterType } from '@/types/filter';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
+import { logError, logInfo, logWarn } from '@/lib/logger';
 
 interface WorldviewPageProps {
   params: {
@@ -13,8 +14,18 @@ interface WorldviewPageProps {
 export default function WorldviewPage({ params }: WorldviewPageProps) {
   const worldviewType = params.type as FilterType;
 
+  // Log worldview page access
+  logInfo('Worldview page accessed', {
+    worldviewType,
+    isValid: !!FILTER_TEMPLATES[worldviewType],
+  });
+
   // Validate worldview type
   if (!FILTER_TEMPLATES[worldviewType]) {
+    logError('Invalid worldview type accessed', undefined, {
+      worldviewType,
+      validTypes: Object.keys(FILTER_TEMPLATES),
+    });
     notFound();
   }
 
@@ -25,6 +36,13 @@ export default function WorldviewPage({ params }: WorldviewPageProps) {
   const worldviewArticles = allArticles.filter(
     article => article.worldview === worldviewType
   );
+
+  // Log article count
+  logInfo('Worldview articles found', {
+    worldviewType,
+    articleCount: worldviewArticles.length,
+    articles: worldviewArticles.map(a => a.id),
+  });
 
   return (
     <main className="min-h-screen p-8">

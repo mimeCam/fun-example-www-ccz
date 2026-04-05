@@ -4,6 +4,9 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
+# Create logs directory for error logging
+RUN mkdir -p /app/logs
+
 # Install build dependencies for native modules (better-sqlite3)
 RUN apk add --no-cache python3 make g++
 

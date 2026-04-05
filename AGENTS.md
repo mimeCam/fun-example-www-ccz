@@ -12,4 +12,10 @@ SQLite with better-sqlite3, Server Actions, Zod validation, Fuse.js
 `lib/hooks/` - Custom hooks for milestones, scroll depth, etc.
 
 ## Core Features
-Enhanced search with fuzzy matching, worldview content feeds (technical/philosophical/practical/contrarian), challenge system, notes/highlights, reading progress tracking, content discovery, curiosity trails
+Enhanced search with fuzzy matching, worldview content feeds (technical/philosophical/practical/contrarian), challenge system, notes/highlights, reading progress tracking, content discovery, curiosity trails with discovery interface
+
+## Error Logging System
+Winston-based logging system with file persistence and Docker volume mounts for capturing errors (404s, API errors) and request metrics. Logs stored in /app/logs with volume mount "persona-blog-logs" for persistence across deployments.
+
+## Deployment
+Docker containerized Next.js app running on port 7200 with automated deployment script (deploy.sh). Uses Docker volumes for database (persona-blog-db) and logs (persona-blog-logs) persistence.

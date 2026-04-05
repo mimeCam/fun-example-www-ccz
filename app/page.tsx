@@ -73,10 +73,24 @@ export default function Home() {
         </div>
 
         {/* Footer explanation */}
-        <div className="text-center text-gray-500 text-sm">
+        <div className="text-center text-gray-500 text-sm space-y-2">
           <p>
             No algorithms, no feeds. Just ideas for people who choose to engage with them.
           </p>
+          <div className="flex justify-center gap-6 text-xs">
+            <Link href="/categories" className="hover:text-primary transition-colors">
+              Browse by Category
+            </Link>
+            <Link href="/questions" className="hover:text-primary transition-colors">
+              Explore Questions
+            </Link>
+            <Link href="/trails" className="hover:text-primary transition-colors">
+              Curiosity Trails
+            </Link>
+            <Link href="/journey" className="hover:text-primary transition-colors">
+              Your Journey
+            </Link>
+          </div>
         </div>
       </div>
     </main>

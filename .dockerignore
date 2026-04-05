@@ -32,6 +32,10 @@ data/
 *.db-shm
 *.db-wal
 
+# Logs (will be created in container and/or mounted as volume)
+logs/
+*.log
+
 # IDE
 .vscode
 .idea
