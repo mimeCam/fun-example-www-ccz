@@ -47,6 +47,10 @@ import type { JourneyContext } from '@/types/journey-context';
 import { AudioButton } from '@/components/audio/AudioButton';
 import { CuriosityTrail } from '@/components/CuriosityTrail';
 import AmbientMirror from '@/components/mirror/AmbientMirror';
+import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
+import { resolveVisibleContent } from '@/lib/content/content-layers';
+import { getLayeredContent } from '@/lib/content/articleData';
+import { useMirror } from '@/lib/hooks/useMirror';
 
 // TODO: Fetch article data from database or CMS
 // For now, using a static postType. In production, this would come from article frontmatter
@@ -175,6 +179,16 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   const [relatedPosts, setRelatedPosts] = useState<RelatedPostWithSource[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [trail, setTrail] = useState<any>(null);
+
+  // Stratified content: resolve visible layers from Mirror archetype
+  const { mirror } = useMirror();
+  const layeredContent = getLayeredContent(params.id);
+  const readCount = typeof window !== 'undefined'
+    ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}')).length
+    : 0;
+  const stratified = layeredContent
+    ? resolveVisibleContent(layeredContent, (mirror?.archetype as any) ?? null, readCount)
+    : null;
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -425,6 +439,13 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             </header>
 
             <div className="prose prose-invert max-w-none mb-12">
+              {stratified ? (
+                <StratifiedRenderer
+                  blocks={stratified.blocks}
+                  archetype={(mirror?.archetype as any) ?? null}
+                />
+              ) : (
+                <>
               <section id="introduction" className="mb-8">
                 <h2 className="text-2xl font-bold mb-4 text-primary">Introduction</h2>
                 <p className="text-lg leading-relaxed mb-6">
@@ -460,8 +481,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                   and curiosity.
                 </p>
               </section>
-
-              {/* TODO: Add full article content */}
+                </>
+              )}
+              {/* TODO: Add full article content for remaining articles */}
             </div>
 
             {/* The Subtle Nod - Honest celebration for genuine readers */}

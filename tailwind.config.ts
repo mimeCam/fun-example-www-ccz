@@ -32,6 +32,10 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(4px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'shimmerReveal': {
+          '0%': { borderColor: '#f0c674', boxShadow: '0 0 12px rgba(240,198,116,0.3)' },
+          '100%': { borderColor: 'inherit', boxShadow: 'none' },
+        },
       },
     },
   },

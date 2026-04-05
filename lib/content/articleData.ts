@@ -1,9 +1,10 @@
 /**
- * Sample article data for content discovery
- * In production, this would come from a database or CMS
+ * Article data — static article store with stratified content support.
+ * In production, this would come from a database or CMS.
  */
 
 import { Article } from './ContentTagger';
+import type { LayeredArticleContent } from '@/types/content';
 
 export const SAMPLE_ARTICLES: Article[] = [
   {
@@ -115,6 +116,37 @@ export const SAMPLE_ARTICLES: Article[] = [
     ]
   },
 ];
+
+// ─── Stratified Content Layers ───────────────────────────────
+// Keyed by article ID. Each article can have layered content.
+
+const LAYERED_CONTENT: Record<string, LayeredArticleContent> = {
+  'art-of-challenging': {
+    core: `The ability to challenge ideas is fundamental to intellectual growth. When we encounter ideas that resonate with us, we should also be willing to question them. This is how we strengthen our understanding and avoid falling into echo chambers.
+
+Challenging ideas effectively requires more than just disagreement. It involves understanding the context, asking thoughtful questions, and providing evidence or alternative perspectives. The goal is not to win an argument but to arrive at a deeper truth.
+
+Every great breakthrough in science and philosophy began with someone willing to question the prevailing wisdom. The courage to challenge is the engine of progress.`,
+
+    marginalia: `You've been here before — which means you care enough to return. That matters more than you think. The ideas below are ones I saved for readers who dig deeper than the surface.`,
+
+    extensions: {
+      'deep-diver': `The cognitive science behind challenging ideas reveals a paradox: the more expertise we develop in a domain, the harder it becomes to see its flaws. This is the "expertise trap" — our mental models become rigid frameworks that filter out contradictory evidence. Research by Philip Tetlock shows that experts are worse than dart-throwing chimpanzees at predicting outcomes in their own fields. The antidote is structured disagreement: forcing yourself to articulate the strongest version of an opposing argument before rejecting it.`,
+      'explorer': `This connects to several threads across the corpus: "Systems Thinking" explores how feedback loops entrench beliefs; "Deep Work" examines how focused attention creates space for genuine reflection; and "Learning Strategies" touches on how deliberate practice requires constantly operating at the edge of your competence — where disagreement lives.`,
+    },
+  },
+  // TODO: Add layered content for 'deep-work'
+  // TODO: Add layered content for 'systems-thinking'
+  // TODO: Add layered content for remaining articles
+};
+
+/**
+ * Get the layered content for an article, if available.
+ * Returns null if the article has no stratified layers yet.
+ */
+export function getLayeredContent(id: string): LayeredArticleContent | null {
+  return LAYERED_CONTENT[id] ?? null;
+}
 
 /**
  * Get all articles (in production, this would query a database)

@@ -3,9 +3,34 @@
  *
  * These types define the shape of articles with unlockable bonus content.
  * Depth layers reveal additional insights based on reader engagement time.
+ *
+ * Stratified Content: archetype-based content visibility layering.
+ * The same URL shows different paragraphs depending on reader identity.
  */
 
 import type { Session } from '@/lib/session/SessionManager';
+
+// ─── Stratified Content Types ────────────────────────────────
+
+/** The 5 Mirror archetypes that drive content layer visibility */
+export type ArchetypeKey =
+  | 'deep-diver'
+  | 'explorer'
+  | 'faithful'
+  | 'resonator'
+  | 'collector';
+
+/** Layered article content — replaces flat `content: string` */
+export interface LayeredArticleContent {
+  core: string;         // Always visible — must be a complete, satisfying article
+  marginalia?: string;  // Returning readers — side-notes, "since you were here" callouts
+  extensions: Partial<Record<ArchetypeKey, string>>; // Archetype-gated bonus paragraphs
+}
+
+/** Which layers a reader is allowed to see */
+export type VisibleLayer = 'core' | 'marginalia' | ArchetypeKey;
+
+// ─── Time-Based Depth Types (existing) ───────────────────────
 
 /**
  * A depth layer represents bonus content that unlocks after a threshold
