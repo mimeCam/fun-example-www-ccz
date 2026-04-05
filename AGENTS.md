@@ -15,8 +15,8 @@ SQLite with better-sqlite3, Server Actions, Zod validation, Fuse.js
 ## Reading Mirror [WIP]
 Core killer-feature: synthesizes reader data into a reader identity.
 `GET /api/mirror` → archetype, whisper, topic DNA, scores, resonance themes.
-Done: types (`types/mirror.ts`), synthesizer (`lib/mirror/`), API endpoint.
-TODO: AmbientMirror UI strip, DeepMirror UI (journey page), useMirror hook.
+Done: types, synthesizer, API endpoint, useMirror hook (`lib/hooks/useMirror.ts`).
+TODO: AmbientMirror UI strip (article pages), DeepMirror UI (journey page).
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.
