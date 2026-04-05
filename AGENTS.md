@@ -7,22 +7,18 @@ SQLite (better-sqlite3), Zod, Fuse.js
 ## Key Paths
 - `app/` — Pages & API routes
 - `components/` — React components
+- `lib/content/` — Content resolution & article store
+- `lib/hooks/` — React hooks (`useMirror`, `useStratifiedContent`)
 - `lib/mirror/` — Mirror synthesis engine, snapshot manager, evolution engine
-- `lib/content/content-layers.ts` — Stratified content resolution (brain)
-- `lib/content/articleData.ts` — Article store + `getLayeredContent()`
-- `components/content/StratifiedRenderer.tsx` — Renders visible content layers
 - `types/content.ts` — `LayeredArticleContent`, `ArchetypeKey`, `VisibleLayer`
 
-## Core Feature: Stratified Content (the killer feature)
+## Core Feature: Stratified Content
 Same URL, different content. Articles render in layers based on Mirror archetype.
 Anonymous → core only. Returning → +marginalia. Archetype → +extension block.
-Wired into `/article/[id]` — activates when `getLayeredContent(id)` returns data.
-Currently: only "art-of-challenging" has layered content.
+All 6 articles have layered content. Discovery tracking via localStorage + gold shimmer on first reveal.
 
-## WIP TODO
-- Add layered content for remaining 5 articles (articleData.ts)
-- `useStratifiedContent` hook with localStorage seen-state tracking
-- `NewContentBadge` component (gold shimmer on first discovery)
+## WIP
+- Article page surgical cleanup (639→~200 LOC)
 - `content_views` DB table for cross-device persistence
 - Refactor DepthEngine to add `resolveArchetypeLayers()` alongside time-based path
 

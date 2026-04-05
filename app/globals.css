@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #1a1a1a;
-  --foreground: #ffffff;
+  --background: #1a1a2e;
+  --foreground: #f0f0f5;
 }
 
 body {
@@ -121,4 +121,24 @@ body {
 
 .mirror-pulse {
   animation: mirrorGlow 1.5s ease-in-out infinite;
+}
+
+/* Discovery shimmer — one-shot gold pulse when new content is revealed */
+@keyframes discoveryShimmer {
+  0% {
+    border-left-color: #f0c674;
+    box-shadow: -4px 0 16px rgba(240, 198, 116, 0.25);
+  }
+  60% {
+    border-left-color: #f0c674;
+    box-shadow: -4px 0 8px rgba(240, 198, 116, 0.1);
+  }
+  100% {
+    border-left-color: #4ecdc4;
+    box-shadow: none;
+  }
+}
+
+.discovery-shimmer {
+  animation: discoveryShimmer 1.2s ease-out forwards;
 }

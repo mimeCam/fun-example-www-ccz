@@ -48,7 +48,7 @@ import { AudioButton } from '@/components/audio/AudioButton';
 import { CuriosityTrail } from '@/components/CuriosityTrail';
 import AmbientMirror from '@/components/mirror/AmbientMirror';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
-import { resolveVisibleContent } from '@/lib/content/content-layers';
+import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { getLayeredContent } from '@/lib/content/articleData';
 import { useMirror } from '@/lib/hooks/useMirror';
 
@@ -186,9 +186,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
   const readCount = typeof window !== 'undefined'
     ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}')).length
     : 0;
-  const stratified = layeredContent
-    ? resolveVisibleContent(layeredContent, (mirror?.archetype as any) ?? null, readCount)
-    : null;
+  const stratifiedBlocks = useStratifiedContent(params.id, layeredContent, (mirror?.archetype as any) ?? null, readCount);
 
   // Track reading position
   const { progress, hasStoredPosition, clearPosition } = useReadingPosition(params.id);
@@ -439,9 +437,9 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             </header>
 
             <div className="prose prose-invert max-w-none mb-12">
-              {stratified ? (
+              {stratifiedBlocks.length > 0 ? (
                 <StratifiedRenderer
-                  blocks={stratified.blocks}
+                  blocks={stratifiedBlocks}
                   archetype={(mirror?.archetype as any) ?? null}
                 />
               ) : (

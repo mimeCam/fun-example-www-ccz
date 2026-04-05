@@ -98,7 +98,7 @@ export function resolveVisibleContent(
     blocks.push({
       layer: archetype,
       paragraphs: splitParagraphs(content.extensions[archetype]!),
-      isNew: true, // TODO: compare against content_views tracking
+      isNew: false,
     });
   }
 

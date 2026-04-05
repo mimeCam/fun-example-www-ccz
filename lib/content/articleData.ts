@@ -135,9 +135,70 @@ Every great breakthrough in science and philosophy began with someone willing to
       'explorer': `This connects to several threads across the corpus: "Systems Thinking" explores how feedback loops entrench beliefs; "Deep Work" examines how focused attention creates space for genuine reflection; and "Learning Strategies" touches on how deliberate practice requires constantly operating at the edge of your competence — where disagreement lives.`,
     },
   },
-  // TODO: Add layered content for 'deep-work'
-  // TODO: Add layered content for 'systems-thinking'
-  // TODO: Add layered content for remaining articles
+  'deep-work': {
+    core: `In our increasingly distracted world, the ability to perform deep work is becoming both rare and valuable. Deep work is the ability to focus without distraction on a cognitively demanding task. It's a skill that allows you to quickly master complicated information and produce better results in less time.
+
+To cultivate deep work, you must eliminate distractions and create routines that support sustained attention. The most productive people don't work longer hours — they protect specific windows of uninterrupted focus and defend them fiercely.
+
+Every notification you silence, every tab you close, every meeting you decline is a vote for the kind of thinker you want to become.`,
+    marginalia: `You came back to this. That tells me you've been thinking about focus — not just reading about it. The passage below is what I wish someone had told me when I first started guarding my attention.`,
+    extensions: {
+      'deep-diver': `Cal Newport's research shows that the absolute minimum for deep work is 90 uninterrupted minutes. Below that threshold, your brain never fully disengages from the "attention residue" of prior tasks. The neuroscience is clear: context-switching doesn't just cost time — it costs depth. Each switch fragments your working memory, and full recovery takes 23 minutes on average.`,
+      'explorer': `This connects directly to "Systems Thinking" — your attention is a system, and most people optimize for throughput (many tasks) at the expense of resonance (meaningful work). "Design Principles" also explores this: tools that minimize cognitive load enable deeper states, which is why great developer tools disappear during use.`,
+    },
+  },
+
+  'systems-thinking': {
+    core: `Systems thinking is a holistic approach to analysis that focuses on the way that a system's constituent parts interrelate and how systems work over time and within the context of larger systems. Rather than breaking problems down into smaller parts, systems thinking looks at problems as interconnected wholes.
+
+This approach helps us understand complex issues and find leverage points for meaningful change. The most powerful interventions are rarely obvious — they emerge from understanding feedback loops, delays, and the unintended consequences of well-meaning actions.
+
+The best systems thinkers learn to see the invisible structures that produce visible behavior.`,
+    marginalia: `Welcome back. I saved something for you — a perspective on systems that only makes sense after you've spent time thinking about how things connect rather than just what things are.`,
+    extensions: {
+      'deep-diver': `Donella Meadows identified twelve leverage points for intervention in complex systems, ranked by effectiveness. Counter-intuitively, the most powerful leverage point is the paradigm out of which the system arises. Changing the goals of a system is more impactful than changing its parameters. Most organizations spend 90% of their effort on the weakest leverage points — adjusting numbers, buffers, and constants — while ignoring the mental models that created the system.`,
+      'explorer': `Systems thinking weaves through everything in this corpus: "Deep Work" is really about optimizing your personal attention system; "Design Principles" is about creating systems that respect human cognition; and "Learning Strategies" treats learning as a feedback loop where teaching others accelerates your own understanding.`,
+    },
+  },
+
+  'effective-communication': {
+    core: `Technical excellence alone is not enough for leadership success. Effective communication is the bridge between technical expertise and organizational impact. Great technical leaders communicate complex ideas clearly, listen actively to diverse perspectives, and adapt their message to their audience.
+
+They understand that communication is not just about transmitting information, but about building understanding and trust. The best communicators don't simplify — they clarify. They find the precise words that carry the full weight of an idea without unnecessary abstraction.
+
+Communication is the one skill that amplifies every other skill you possess.`,
+    marginalia: `The fact that you returned to this article tells me you're not just reading — you're reflecting. That's rare. Here's something I think about communication that I don't usually share in the main text.`,
+    extensions: {
+      'deep-diver': `Research on engineering leadership shows that communication ability predicts team performance more strongly than technical skill. A study of 1,200 tech leads found that teams led by strong communicators shipped 40% faster and had half the defect rate. The mechanism is psychological safety: when leaders communicate clearly and listen actively, team members surface problems earlier — and early problem detection is the highest-leverage intervention in any complex system.`,
+      'explorer': `Communication threads through every article here: "Challenging Ideas" is really about communicating disagreement constructively; "Design Principles" explores how tool design is a form of communication with users; and "Learning Strategies" shows that teaching others — the ultimate form of communication — is the fastest path to mastery.`,
+    },
+  },
+
+  'learning-strategies': {
+    core: `The most successful people are lifelong learners. They cultivate curiosity and embrace continuous growth. Effective learning strategies include deliberate practice, spaced repetition, interleaving topics, and teaching others what you've learned.
+
+The key is to move beyond passive consumption to active engagement with new knowledge. Learning is not a destination but a journey of constant discovery and refinement. The difference between someone who reads a hundred books and someone who transforms from reading one is how they process what they encounter.
+
+The best learners don't just accumulate knowledge — they build mental models that connect disparate ideas into coherent frameworks.`,
+    marginalia: `You're here again, which means the learning strategies are working — or at least intriguing enough to revisit. I'll let you in on a secret: the most powerful learning strategy isn't in the main text.`,
+    extensions: {
+      'deep-diver': `The spacing effect, first documented by Hermann Ebbinghaus in 1885, remains one of the most robust findings in cognitive science. Reviewing material at increasing intervals (1 day, 3 days, 7 days, 14 days) produces 200% better long-term retention than massed practice. Yet most learners still cram. The reason: spacing feels less effective in the moment. Metacognition misleads us — fluency during review is not the same as durable learning.`,
+      'explorer': `Learning is the connective tissue of this entire corpus: "Deep Work" creates the conditions for learning; "Systems Thinking" provides the frameworks to organize what you learn; "Communication" gives you the tool to solidify learning through teaching; and "Design Principles" shows that good design is a form of applied learning about your users.`,
+    },
+  },
+
+  'design-principles': {
+    core: `Great developer tools share common design principles: they respect the user's intelligence, provide clear feedback, and minimize cognitive load. Good design disappears, allowing developers to focus on their work rather than the tool itself.
+
+The best tools are opinionated about their domain but flexible in their application. They understand that developers are not just users but collaborators in the tool's evolution. A well-designed tool makes the right thing easy and the wrong thing hard — not through restrictions, but through affordances.
+
+Design is not decoration. It is the architecture of understanding.`,
+    marginalia: `You returned to read about design principles. That's telling — most people only think about design when it breaks. The note below is for people who care enough to see design as a practice, not an afterthought.`,
+    extensions: {
+      'deep-diver': `Bret Victor's "Inventing on Principle" argues that the most impactful developer tools follow a principle of immediate feedback: creators should see the effect of every change in real-time. This principle explains why hot-reloading transformed frontend development and why REPLs remain popular after 50 years. The cognitive cost of a context switch between "editing" and "observing" is the single biggest barrier to creative flow in technical work.`,
+      'explorer': `Design principles echo throughout this corpus: "Deep Work" is fundamentally about designing your environment for focus; "Communication" is about designing your message for your audience; and "Systems Thinking" is about designing interventions at the right leverage points rather than treating symptoms.`,
+    },
+  },
 };
 
 /**
