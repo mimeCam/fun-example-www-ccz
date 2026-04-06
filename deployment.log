@@ -1,4 +1,4 @@
-Deployment started at: Mon Apr  6 01:26:22 PM CEST 2026
+Deployment started at: Mon Apr  6 05:56:47 PM CEST 2026
 🛑 Stopping existing container (if running)...
 Removing existing container: persona-blog-z
 🧹 Cleaning up old image (if exists)...
@@ -67,7 +67,9 @@ Volume persona-blog-logs already exists
       quick-mirror-card-generator.ts — 1080×1080 branded PNG via Canvas API, DPR-aware, zero deps
   - Enhanced Behavioral Signals (useBehavioralSignals 5-signal pipeline: depth, velocity, re-reads,
       dwell, pace; enhancedScoring() pure function wired into quickSynthesize(), backward-compatible)
-  - Content Lock (resolveLockedLayers — hidden layer teasers based on reader identity)
+  - ContentLock Component (CSS-only breathing shimmer blocks with per-layer labels)
+  - Article Page Cleanup (673→115 LOC, 19→3 hooks, 30+→5 components, single column)
+  - Design Token Expansion (fog/mist/gold/cyan/void colors, void/rise/float/gold shadows)
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
@@ -84,97 +86,30 @@ Volume persona-blog-logs already exists
 #4 [ 1/18] FROM docker.io/library/node:20-alpine@sha256:f598378b5240225e6beab68fa9f356db1fb8efe55173e6d4d8153113bb8f333c
 #4 DONE 0.0s
 
-#5 [ 2/18] WORKDIR /app
-#5 CACHED
+#5 [internal] load build context
+#5 transferring context: 22.30kB 0.0s done
+#5 DONE 0.0s
 
-#6 [internal] load build context
-#6 transferring context: 1.15MB 0.1s done
-#6 DONE 0.1s
+#6 [ 4/18] RUN apk add --no-cache python3 make g++
+#6 CACHED
 
-#7 [ 3/18] RUN mkdir -p /app/logs
-#7 DONE 0.3s
+#7 [ 2/18] WORKDIR /app
+#7 CACHED
 
-#8 [ 4/18] RUN apk add --no-cache python3 make g++
-#8 0.552 ( 1/29) Installing libstdc++-dev (15.2.0-r2)
-#8 0.711 ( 2/29) Installing jansson (2.14.1-r0)
-#8 0.719 ( 3/29) Installing zstd-libs (1.5.7-r2)
-#8 0.738 ( 4/29) Installing binutils (2.45.1-r0)
-#8 0.818 ( 5/29) Installing libgomp (15.2.0-r2)
-#8 0.828 ( 6/29) Installing libatomic (15.2.0-r2)
-#8 0.836 ( 7/29) Installing gmp (6.3.0-r4)
-#8 0.846 ( 8/29) Installing isl26 (0.26-r1)
-#8 0.872 ( 9/29) Installing mpfr4 (4.2.2-r0)
-#8 0.885 (10/29) Installing mpc1 (1.3.1-r1)
-#8 0.892 (11/29) Installing gcc (15.2.0-r2)
-#8 2.034 (12/29) Installing musl-dev (1.2.5-r21)
-#8 2.113 (13/29) Installing g++ (15.2.0-r2)
-#8 2.440 (14/29) Installing make (4.4.1-r3)
-#8 2.448 (15/29) Installing libbz2 (1.0.8-r6)
-#8 2.455 (16/29) Installing libexpat (2.7.5-r0)
-#8 2.463 (17/29) Installing libffi (3.5.2-r0)
-#8 2.469 (18/29) Installing gdbm (1.26-r0)
-#8 2.476 (19/29) Installing xz-libs (5.8.2-r0)
-#8 2.485 (20/29) Installing mpdecimal (4.0.1-r0)
-#8 2.493 (21/29) Installing ncurses-terminfo-base (6.5_p20251123-r0)
-#8 2.503 (22/29) Installing libncursesw (6.5_p20251123-r0)
-#8 2.512 (23/29) Installing libpanelw (6.5_p20251123-r0)
-#8 2.518 (24/29) Installing readline (8.3.1-r0)
-#8 2.527 (25/29) Installing sqlite-libs (3.51.2-r0)
-#8 2.550 (26/29) Installing python3 (3.12.12-r0)
-#8 2.754 (27/29) Installing python3-pycache-pyc0 (3.12.12-r0)
-#8 2.883 (28/29) Installing pyc (3.12.12-r0)
-#8 2.883 (29/29) Installing python3-pyc (3.12.12-r0)
-#8 2.883 Executing busybox-1.37.0-r30.trigger
-#8 2.895 OK: 301.2 MiB in 47 packages
-#8 DONE 3.2s
+#8 [ 3/18] RUN mkdir -p /app/logs
+#8 CACHED
 
 #9 [ 5/18] COPY package*.json ./
-#9 DONE 0.0s
+#9 CACHED
 
-#10 [ 6/18] RUN npm ci && npm cache clean --force
-#10 3.819 npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
-#10 3.848 npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
-#10 4.512 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-#10 5.612 npm warn deprecated @types/winston@2.4.4: This is a stub types definition. winston provides its own type definitions, so you do not need this installed.
-#10 6.011 npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
-#10 6.061 npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
-#10 6.707 npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 6.809 npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.206 npm warn deprecated glob@10.3.10: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.424 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.424 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.485 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.493 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 8.223 npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
-#10 50.94 npm warn deprecated next@14.2.3: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
-#10 51.77 
-#10 51.77 added 677 packages, and audited 678 packages in 51s
-#10 51.77 
-#10 51.77 181 packages are looking for funding
-#10 51.77   run `npm fund` for details
-#10 52.01 
-#10 52.01 7 vulnerabilities (6 high, 1 critical)
-#10 52.01 
-#10 52.01 To address issues that do not require attention, run:
-#10 52.01   npm audit fix
-#10 52.01 
-#10 52.01 To address all issues (including breaking changes), run:
-#10 52.01   npm audit fix --force
-#10 52.01 
-#10 52.01 Run `npm audit` for details.
-#10 52.02 npm notice
-#10 52.02 npm notice New major version of npm available! 10.8.2 -> 11.12.1
-#10 52.02 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1
-#10 52.02 npm notice To update run: npm install -g npm@11.12.1
-#10 52.02 npm notice
-#10 52.19 npm warn using --force Recommended protections disabled.
-#10 DONE 53.2s
+#10 [ 7/18] COPY next.config.js ./
+#10 CACHED
 
-#11 [ 7/18] COPY next.config.js ./
-#11 DONE 0.0s
+#11 [ 6/18] RUN npm ci && npm cache clean --force
+#11 CACHED
 
 #12 [ 8/18] COPY tsconfig.json ./
-#12 DONE 0.0s
+#12 CACHED
 
 #13 [ 9/18] COPY tailwind.config.ts ./
 #13 DONE 0.0s
@@ -195,7 +130,7 @@ Volume persona-blog-logs already exists
 #18 DONE 0.0s
 
 #19 [15/18] COPY lib ./lib
-#19 DONE 0.0s
+#19 DONE 0.1s
 
 #20 [16/18] COPY types ./types
 #20 DONE 0.0s
@@ -204,94 +139,101 @@ Volume persona-blog-logs already exists
 #21 DONE 0.0s
 
 #22 [18/18] RUN npm run build
-#22 0.314 
-#22 0.314 > persona-blog@0.1.0 build
-#22 0.314 > next build
-#22 0.314 
-#22 1.038 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#22 1.038 This information is used to shape Next.js' roadmap and prioritize features.
-#22 1.038 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#22 1.038 https://nextjs.org/telemetry
-#22 1.038 
-#22 1.107   ▲ Next.js 14.2.3
-#22 1.107 
-#22 1.204    Creating an optimized production build ...
-#22 23.85  ✓ Compiled successfully
-#22 23.85    Linting and checking validity of types ...
-#22 34.47    Collecting page data ...
-#22 36.26    Generating static pages (0/25) ...
-#22 37.22    Generating static pages (6/25) 
-#22 37.64    Generating static pages (12/25) 
-#22 38.34    Generating static pages (18/25) 
-#22 38.73  ✓ Generating static pages (25/25)
-#22 39.04    Finalizing page optimization ...
-#22 39.04    Collecting build traces ...
-#22 43.89 
-#22 43.91 Route (app)                              Size     First Load JS
-#22 43.91 ┌ ○ /                                    1.77 kB        95.6 kB
-#22 43.91 ├ ○ /_not-found                          871 B          87.9 kB
-#22 43.91 ├ ○ /admin/categories                    1.99 kB          89 kB
-#22 43.91 ├ ○ /admin/editor-picks                  6.88 kB        93.9 kB
-#22 43.91 ├ ƒ /api/admin/editor-picks              0 B                0 B
-#22 43.91 ├ ƒ /api/articles                        0 B                0 B
-#22 43.91 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#22 43.91 ├ ƒ /api/categories                      0 B                0 B
-#22 43.91 ├ ƒ /api/categories/[slug]               0 B                0 B
-#22 43.91 ├ ƒ /api/challenge                       0 B                0 B
-#22 43.91 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
-#22 43.91 ├ ƒ /api/comments                        0 B                0 B
-#22 43.91 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
-#22 43.91 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
-#22 43.91 ├ ƒ /api/feedback                        0 B                0 B
-#22 43.91 ├ ƒ /api/highlights                      0 B                0 B
-#22 43.91 ├ ○ /api/history/today                   0 B                0 B
-#22 43.91 ├ ƒ /api/mirror                          0 B                0 B
-#22 43.91 ├ ƒ /api/questions                       0 B                0 B
-#22 43.91 ├ ƒ /api/reading/memory                  0 B                0 B
-#22 43.91 ├ ƒ /api/reading/streak                  0 B                0 B
-#22 43.91 ├ ƒ /api/reading/topics                  0 B                0 B
-#22 43.91 ├ ƒ /api/related-posts                   0 B                0 B
-#22 43.91 ├ ƒ /api/resonances                      0 B                0 B
-#22 43.91 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#22 43.91 ├ ƒ /api/trails                          0 B                0 B
-#22 43.91 ├ ƒ /article/[id]                        40.6 kB         134 kB
-#22 43.91 ├ ○ /categories                          963 B          94.8 kB
-#22 43.91 ├ ƒ /categories/[slug]                   1.05 kB        94.9 kB
-#22 43.91 ├ ○ /journey                             3.96 kB        97.8 kB
-#22 43.91 ├ ƒ /journey/[journeyId]/player          4.88 kB        91.9 kB
-#22 43.91 ├ ○ /mirror                              3.73 kB        97.6 kB
-#22 43.91 ├ ○ /questions                           1.01 kB        94.8 kB
-#22 43.91 ├ ○ /saved                               1.34 kB        95.2 kB
-#22 43.91 ├ ○ /trails                              1.41 kB        95.2 kB
-#22 43.91 ├ ƒ /trails/[id]                         1.69 kB        95.5 kB
-#22 43.91 └ ● /worldview/[type]                    172 B            94 kB
-#22 43.91     ├ /worldview/technical
-#22 43.91     ├ /worldview/philosophical
-#22 43.91     ├ /worldview/practical
-#22 43.91     └ /worldview/contrarian
-#22 43.91 + First Load JS shared by all            87.1 kB
-#22 43.91   ├ chunks/23-e77d1544b91a0ac4.js        31.5 kB
-#22 43.91   ├ chunks/fd9d1056-9da93194ae4e5df5.js  53.6 kB
-#22 43.91   └ other shared chunks (total)          1.96 kB
-#22 43.91 
-#22 43.91 
-#22 43.91 ƒ Middleware                             27.4 kB
-#22 43.91 
-#22 43.91 ○  (Static)   prerendered as static content
-#22 43.91 ●  (SSG)      prerendered as static HTML (uses getStaticProps)
-#22 43.91 ƒ  (Dynamic)  server-rendered on demand
-#22 43.91 
-#22 DONE 44.1s
+#22 0.316 
+#22 0.316 > persona-blog@0.1.0 build
+#22 0.316 > next build
+#22 0.316 
+#22 1.155 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#22 1.156 This information is used to shape Next.js' roadmap and prioritize features.
+#22 1.157 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#22 1.157 https://nextjs.org/telemetry
+#22 1.157 
+#22 1.227   ▲ Next.js 14.2.3
+#22 1.227 
+#22 1.325    Creating an optimized production build ...
+#22 5.598 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2 failed, reason: 
+#22 5.598 
+#22 5.598 Retrying 1/3...
+#22 5.601 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2 failed, reason: 
+#22 5.601 
+#22 5.601 Retrying 1/3...
+#22 22.88  ✓ Compiled successfully
+#22 22.88    Linting and checking validity of types ...
+#22 34.41    Collecting page data ...
+#22 36.91    Generating static pages (0/25) ...
+#22 38.29    Generating static pages (6/25) 
+#22 38.68    Generating static pages (12/25) 
+#22 39.47    Generating static pages (18/25) 
+#22 40.23  ✓ Generating static pages (25/25)
+#22 40.81    Finalizing page optimization ...
+#22 40.81    Collecting build traces ...
+#22 48.56 
+#22 48.60 Route (app)                              Size     First Load JS
+#22 48.60 ┌ ○ /                                    1.77 kB        95.5 kB
+#22 48.60 ├ ○ /_not-found                          871 B          87.9 kB
+#22 48.60 ├ ○ /admin/categories                    1.99 kB          89 kB
+#22 48.60 ├ ○ /admin/editor-picks                  6.91 kB        93.9 kB
+#22 48.60 ├ ƒ /api/admin/editor-picks              0 B                0 B
+#22 48.60 ├ ƒ /api/articles                        0 B                0 B
+#22 48.60 ├ ƒ /api/articles/[id]/categories        0 B                0 B
+#22 48.60 ├ ƒ /api/categories                      0 B                0 B
+#22 48.60 ├ ƒ /api/categories/[slug]               0 B                0 B
+#22 48.60 ├ ƒ /api/challenge                       0 B                0 B
+#22 48.60 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
+#22 48.60 ├ ƒ /api/comments                        0 B                0 B
+#22 48.60 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
+#22 48.60 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
+#22 48.60 ├ ƒ /api/feedback                        0 B                0 B
+#22 48.60 ├ ƒ /api/highlights                      0 B                0 B
+#22 48.60 ├ ○ /api/history/today                   0 B                0 B
+#22 48.60 ├ ƒ /api/mirror                          0 B                0 B
+#22 48.60 ├ ƒ /api/questions                       0 B                0 B
+#22 48.60 ├ ƒ /api/reading/memory                  0 B                0 B
+#22 48.60 ├ ƒ /api/reading/streak                  0 B                0 B
+#22 48.60 ├ ƒ /api/reading/topics                  0 B                0 B
+#22 48.60 ├ ƒ /api/related-posts                   0 B                0 B
+#22 48.60 ├ ƒ /api/resonances                      0 B                0 B
+#22 48.60 ├ ƒ /api/resonances/[id]                 0 B                0 B
+#22 48.60 ├ ƒ /api/trails                          0 B                0 B
+#22 48.60 ├ ƒ /article/[id]                        13.5 kB         107 kB
+#22 48.60 ├ ○ /categories                          963 B          94.7 kB
+#22 48.60 ├ ƒ /categories/[slug]                   1.05 kB        94.8 kB
+#22 48.60 ├ ○ /journey                             3.96 kB        97.7 kB
+#22 48.60 ├ ƒ /journey/[journeyId]/player          4.82 kB        91.8 kB
+#22 48.60 ├ ○ /mirror                              3.72 kB        97.5 kB
+#22 48.60 ├ ○ /questions                           1.01 kB        94.8 kB
+#22 48.60 ├ ○ /saved                               1.34 kB        95.1 kB
+#22 48.60 ├ ○ /trails                              1.41 kB        95.2 kB
+#22 48.60 ├ ƒ /trails/[id]                         1.69 kB        95.5 kB
+#22 48.60 └ ● /worldview/[type]                    172 B          93.9 kB
+#22 48.60     ├ /worldview/technical
+#22 48.60     ├ /worldview/philosophical
+#22 48.60     ├ /worldview/practical
+#22 48.60     └ /worldview/contrarian
+#22 48.60 + First Load JS shared by all            87 kB
+#22 48.60   ├ chunks/23-689eda8e83791f79.js        31.5 kB
+#22 48.60   ├ chunks/fd9d1056-23bdddb1df3a91c8.js  53.6 kB
+#22 48.60   └ other shared chunks (total)          1.89 kB
+#22 48.60 
+#22 48.60 
+#22 48.60 ƒ Middleware                             27.4 kB
+#22 48.60 
+#22 48.60 ○  (Static)   prerendered as static content
+#22 48.60 ●  (SSG)      prerendered as static HTML (uses getStaticProps)
+#22 48.60 ƒ  (Dynamic)  server-rendered on demand
+#22 48.60 
+#22 DONE 48.8s
 
 #23 exporting to image
 #23 exporting layers
-#23 exporting layers 2.7s done
-#23 writing image sha256:eca69919ad777902785c92094c46747f9d98a27487f9fa70939978b4062c66e1 done
+#23 exporting layers 0.2s done
+#23 writing image sha256:cfcb60d011a34245b974e99afbe049e2adc6226cf14024937f399381ceb20f3c
+#23 writing image sha256:cfcb60d011a34245b974e99afbe049e2adc6226cf14024937f399381ceb20f3c 0.0s done
 #23 naming to docker.io/library/persona-blog-image:latest done
-#23 DONE 2.8s
+#23 DONE 1.0s
 🎯 Starting container on port 7200...
 📊 Logging level: info
-aa068b2f659a22a10f4b3197626994739389b61d8a688e9807dc546cc2a8812f
+c05adf601a867cd3a858c86d780ae5bfa5d61213f7ab61ce7cf7215c3e2aeecb
 ⏳ Waiting for container to start...
 ✅ Container is running
 🏥 Checking container health...
@@ -330,8 +272,8 @@ aa068b2f659a22a10f4b3197626994739389b61d8a688e9807dc546cc2a8812f
 
 To change log level: export LOG_LEVEL=debug; ./deploy.sh
 
-Deployment completed at: Mon Apr  6 01:28:14 PM CEST 2026
-Deployment completed at: Mon Apr  6 01:28:14 PM CEST 2026
+Deployment completed at: Mon Apr  6 05:57:44 PM CEST 2026
+Deployment completed at: Mon Apr  6 05:57:44 PM CEST 2026
 🧹 Cleaning up dangling images...
 Removed dangling images
 ✨ Deployment complete!
