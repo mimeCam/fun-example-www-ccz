@@ -7,8 +7,10 @@
  */
 
 import type { ArchetypeKey } from '@/types/content';
+import type { ParagraphEngagementMap } from '@/types/content';
 import type { BehavioralSignalBag } from '@/lib/hooks/useBehavioralSignals';
 import { enhancedScoring } from './enhanced-scoring';
+import { synthesizeWhisper } from './whisper-engine';
 
 export interface QuickMirrorInput {
   scrollDepth: number;       // 0–100
@@ -16,6 +18,7 @@ export interface QuickMirrorInput {
   estimatedReadTime: number; // minutes
   articleTopics: string[];   // categories/tags
   signalBag?: BehavioralSignalBag; // enriched signals (optional, backward-compat)
+  paragraphMap?: ParagraphEngagementMap; // per-paragraph data for whisper engine
 }
 
 export interface QuickMirrorResult {
@@ -86,6 +89,14 @@ function fallback(i: QuickMirrorInput): QuickMirrorResult {
   };
 }
 
+/** Build a behavior-specific whisper, falling back to static if no paragraph data. */
+function resolveWhisper(archetype: ArchetypeKey, input: QuickMirrorInput): string {
+  if (input.signalBag && input.paragraphMap) {
+    return synthesizeWhisper(archetype, input.signalBag, input.paragraphMap);
+  }
+  return WHISPERS[archetype];
+}
+
 /** The core synthesis — one call, pure function, no surprises. */
 export function quickSynthesize(input: QuickMirrorInput): QuickMirrorResult {
   if (input.signalBag) return synthesizeWithSignals(input);
@@ -96,7 +107,7 @@ export function quickSynthesize(input: QuickMirrorInput): QuickMirrorResult {
   return {
     archetype,
     archetypeLabel: LABELS[archetype],
-    whisper: WHISPERS[archetype],
+    whisper: resolveWhisper(archetype, input),
     confidence: conf,
     scores: buildScores(input),
   };
@@ -109,7 +120,7 @@ function synthesizeWithSignals(input: QuickMirrorInput): QuickMirrorResult {
   return {
     archetype,
     archetypeLabel: LABELS[archetype],
-    whisper: WHISPERS[archetype],
+    whisper: resolveWhisper(archetype, input),
     confidence: Math.min(100, Math.round(confidence * 1.5)),
     scores: buildScores(input),
   };

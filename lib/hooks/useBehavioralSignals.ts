@@ -10,7 +10,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useScrollDepth } from './useScrollDepth';
 import { useParagraphEngagement } from './useParagraphEngagement';
 
@@ -42,9 +42,11 @@ interface Props {
 
 export function useBehavioralSignals({ articleId, estimatedReadTime }: Props) {
   const { depth, maxDepth } = useScrollDepth();
-  const { getSummary } = useParagraphEngagement();
+  const { getSummary, getEngagementMap } = useParagraphEngagement();
   const paragraphSummaryRef = useRef(getSummary);
   paragraphSummaryRef.current = getSummary;
+  const engagementMapRef = useRef(getEngagementMap);
+  engagementMapRef.current = getEngagementMap;
 
   const t0 = useRef(Date.now());
   const prevDepth = useRef(0);
@@ -79,5 +81,8 @@ export function useBehavioralSignals({ articleId, estimatedReadTime }: Props) {
     });
   }, [depth, estimatedReadTime, maxDepth]);
 
-  return bag;
+  /** Snapshot of current paragraph engagement map for whisper engine. */
+  const getParagraphMap = useCallback(() => engagementMapRef.current(), []);
+
+  return { bag, getParagraphMap };
 }

@@ -72,7 +72,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
 
       {/* Whisper quote */}
       <p
-        className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[320px] mx-auto leading-relaxed ${contentFade(showContent)}`}
+        className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[340px] mx-auto leading-relaxed ${contentFade(showContent)}`}
         style={{ transitionDelay: phase === 'reveal' ? '400ms' : undefined }}
       >
         &ldquo;{result.whisper}&rdquo;

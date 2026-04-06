@@ -39,7 +39,7 @@ export function useQuickMirror(
   articleTopics: string[],
   triggerDepth: number = DEFAULT_TRIGGER
 ) {
-  const bag = useBehavioralSignals({ articleId, estimatedReadTime });
+  const { bag, getParagraphMap } = useBehavioralSignals({ articleId, estimatedReadTime });
   const startTime = useRef(Date.now());
   const [triggered, setTriggered] = useState(false);
   const [result, setResult] = useState<QuickMirrorResult | null>(loadCached);
@@ -53,6 +53,7 @@ export function useQuickMirror(
       estimatedReadTime,
       articleTopics,
       signalBag: bag,
+      paragraphMap: getParagraphMap(),
     };
 
     const synthesized = quickSynthesize(input);
