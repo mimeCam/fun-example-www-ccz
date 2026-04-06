@@ -72,7 +72,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
 
       {/* Whisper quote */}
       <p
-        className={`mt-3 text-sm text-gray-300 italic max-w-[320px] mx-auto leading-relaxed ${contentFade(showContent)}`}
+        className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[320px] mx-auto leading-relaxed ${contentFade(showContent)}`}
         style={{ transitionDelay: phase === 'reveal' ? '400ms' : undefined }}
       >
         &ldquo;{result.whisper}&rdquo;
@@ -92,7 +92,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
         <button onClick={handleCopy} className={shareBtnClass(copied)}>
           {copied ? '✓ Copied!' : 'Copy & Share →'}
         </button>
-        <button onClick={handleSaveImage} className="px-6 py-2 rounded-lg text-gray-500 hover:text-gray-300 text-sm transition-colors duration-200">
+        <button onClick={handleSaveImage} className="px-6 py-2 rounded-lg text-mist hover:text-[#f0f0f5]/80 text-sm transition-colors duration-200">
           Save as Image
         </button>
       </div>
@@ -116,14 +116,14 @@ function phaseClass(p: Phase): string {
     hidden:    'opacity-0 translate-y-4 border-transparent',
     emergence: 'opacity-100 translate-y-0 border-[rgba(240,198,116,0.15)]',
     shimmer:   'opacity-100 translate-y-0 border-[rgba(240,198,116,0.25)] quick-mirror-glow',
-    reveal:    'opacity-100 translate-y-0 border-[rgba(240,198,116,0.25)] shadow-[0_8px_40px_rgba(240,198,116,0.25)]',
-    rest:      'opacity-100 translate-y-0 border-[rgba(240,198,116,0.2)] shadow-[0_4px_20px_rgba(240,198,116,0.12)]',
+    reveal:    'opacity-100 translate-y-0 border-[rgba(240,198,116,0.25)] shadow-gold',
+    rest:      'opacity-100 translate-y-0 border-[rgba(240,198,116,0.2)] shadow-gold',
   };
   return map[p];
 }
 
 function contentFade(visible: boolean): string {
-  const base = 'text-xs uppercase tracking-widest text-gray-500 transition-all duration-500';
+  const base = 'text-xs uppercase tracking-widest text-mist transition-all duration-500';
   return visible ? `${base} opacity-100 translate-y-0` : `${base} opacity-0 translate-y-2`;
 }
 

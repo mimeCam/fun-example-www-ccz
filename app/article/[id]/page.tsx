@@ -2,6 +2,7 @@
 
 import { DepthBar } from '@/components/reading/DepthBar';
 import { BookmarkButton } from '@/components/reading/BookmarkButton';
+import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { ContentLock } from '@/components/content/ContentLock';
@@ -71,7 +72,10 @@ function ArticleContent({ params }: { params: { id: string } }) {
             <a href="/" className="text-mist text-sm hover:text-primary transition-colors">
               &larr; Back
             </a>
-            <BookmarkButton articleId={params.id} articleTitle={article?.title ?? ''} />
+            <div className="flex items-center gap-1">
+              <BookmarkButton articleId={params.id} articleTitle={article?.title ?? ''} />
+              <ResonanceButton articleId={params.id} articleTitle={article?.title ?? ''} />
+            </div>
           </div>
 
           {/* Title + metadata */}
