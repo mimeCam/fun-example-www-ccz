@@ -20,7 +20,7 @@ Content stratification locks hidden layers behind reader identity, with visible 
 
 ## WIP
 - **QuickMirrorCard** — ✅ Save as Image wired via `quick-mirror-card-generator.ts` (1080×1080 Canvas PNG)
-- **Enhanced behavioral signals** — scroll velocity, re-read detection, section dwell (planned)
+- **Enhanced behavioral signals** — ✅ `useBehavioralSignals` hook + `enhancedScoring` pure function wired into `quickSynthesize()` (5-signal pipeline: depth, velocity, re-reads, dwell, pace)
 - **ContentLock component** — extract inline lock teaser into shimmer blocks with layer labels
 - Article page surgical cleanup (655→~200 LOC) — per Tanya's spec, gut to 10 elements
 - Shared scroll depth context to avoid duplicate IntersectionObserver instances

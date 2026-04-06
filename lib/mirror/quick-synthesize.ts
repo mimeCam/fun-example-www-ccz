@@ -7,12 +7,15 @@
  */
 
 import type { ArchetypeKey } from '@/types/content';
+import type { BehavioralSignalBag } from '@/lib/hooks/useBehavioralSignals';
+import { enhancedScoring } from './enhanced-scoring';
 
 export interface QuickMirrorInput {
   scrollDepth: number;       // 0–100
   timeOnPage: number;        // seconds
   estimatedReadTime: number; // minutes
   articleTopics: string[];   // categories/tags
+  signalBag?: BehavioralSignalBag; // enriched signals (optional, backward-compat)
 }
 
 export interface QuickMirrorResult {
@@ -85,6 +88,7 @@ function fallback(i: QuickMirrorInput): QuickMirrorResult {
 
 /** The core synthesis — one call, pure function, no surprises. */
 export function quickSynthesize(input: QuickMirrorInput): QuickMirrorResult {
+  if (input.signalBag) return synthesizeWithSignals(input);
   const scores = scoreArchetypes(input);
   const archetype = pickTop(scores);
   const conf = calcConfidence(scores[archetype], scores);
@@ -94,6 +98,19 @@ export function quickSynthesize(input: QuickMirrorInput): QuickMirrorResult {
     archetypeLabel: LABELS[archetype],
     whisper: WHISPERS[archetype],
     confidence: conf,
+    scores: buildScores(input),
+  };
+}
+
+function synthesizeWithSignals(input: QuickMirrorInput): QuickMirrorResult {
+  const { scores, confidence } = enhancedScoring(input.signalBag!);
+  const archetype = pickTop(scores);
+  if (confidence < 20) return fallback(input);
+  return {
+    archetype,
+    archetypeLabel: LABELS[archetype],
+    whisper: WHISPERS[archetype],
+    confidence: Math.min(100, Math.round(confidence * 1.5)),
     scores: buildScores(input),
   };
 }

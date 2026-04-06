@@ -1,17 +1,15 @@
 /**
  * useQuickMirror — triggers lightweight archetype synthesis at scroll threshold.
  *
- * Watches scroll depth via useScrollDepth. At 70% (configurable), runs
- * quickSynthesize() and persists the result to localStorage.
+ * Watches behavioral signals via useBehavioralSignals. At 70% (configurable),
+ * runs quickSynthesize() with enriched signal bag and persists to localStorage.
  * No API call, no DB — pure client-side.
- *
- * // TODO: Extract scroll depth to a shared context to avoid duplicate observers
  */
 
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useScrollDepth } from './useScrollDepth';
+import { useBehavioralSignals } from './useBehavioralSignals';
 import {
   quickSynthesize,
   type QuickMirrorInput,
@@ -40,26 +38,27 @@ export function useQuickMirror(
   articleTopics: string[],
   triggerDepth: number = DEFAULT_TRIGGER
 ) {
-  const { depth } = useScrollDepth({ articleId });
+  const bag = useBehavioralSignals({ articleId, estimatedReadTime });
   const startTime = useRef(Date.now());
   const [triggered, setTriggered] = useState(false);
   const [result, setResult] = useState<QuickMirrorResult | null>(loadCached);
 
   useEffect(() => {
-    if (triggered || depth < triggerDepth) return;
+    if (triggered || bag.depth < triggerDepth) return;
 
     const input: QuickMirrorInput = {
-      scrollDepth: depth,
+      scrollDepth: bag.depth,
       timeOnPage: (Date.now() - startTime.current) / 1000,
       estimatedReadTime,
       articleTopics,
+      signalBag: bag,
     };
 
     const synthesized = quickSynthesize(input);
     setResult(synthesized);
     setTriggered(true);
     persist(synthesized);
-  }, [depth, triggered, triggerDepth, estimatedReadTime, articleTopics]);
+  }, [bag, triggered, triggerDepth, estimatedReadTime, articleTopics]);
 
   const dismiss = () => setTriggered(false);
 
