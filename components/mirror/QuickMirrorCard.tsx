@@ -104,7 +104,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
 
 function cardBase(): string {
   return [
-    'my-16 mx-auto max-w-[400px] p-8 text-center',
+    'my-20 mx-auto max-w-[400px] p-8 text-center',
     'rounded-3xl border',
     'bg-gradient-to-b from-[#16213e] to-[#1a1a2e]',
     'transition-all duration-700 ease-out',

@@ -152,3 +152,38 @@ body {
 .quick-mirror-glow {
   animation: quickMirrorPulse 600ms ease-in-out 2;
 }
+
+/* Evolution Card — phased fade-in */
+@keyframes evolutionFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.evolution-card {
+  animation: evolutionFadeIn 300ms ease-out forwards;
+}
+
+.evolution-side {
+  animation: evolutionFadeIn 300ms ease-out both;
+}
+
+/* Golden thread: scales from center outward */
+@keyframes threadScale {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.evolution-thread {
+  transform-origin: center;
+  animation: threadScale 400ms ease-out 300ms both;
+}
+
+/* Stats row: delayed fade-in */
+@keyframes statsFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.evolution-stats {
+  animation: statsFade 300ms ease-out 500ms both;
+}

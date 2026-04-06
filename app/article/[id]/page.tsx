@@ -10,6 +10,8 @@ import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
+import { useEvolution } from '@/lib/hooks/useEvolution';
+import EvolutionCard from '@/components/mirror/EvolutionCard';
 import { getLayeredContent } from '@/lib/content/articleData';
 import { resolveLockedLayers } from '@/lib/content/content-layers';
 import { getArticleById, getAllArticles } from '@/lib/content/articleData';
@@ -39,6 +41,9 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
   // Quick Mirror — archetype synthesis at 70% scroll
   const quickMirror = useQuickMirror(params.id, 5, ['critical-thinking'], 70);
+
+  // Evolution — shows "Then → Now" card for returning readers whose archetype shifted
+  const evolution = useEvolution();
 
   // Content Lock — hidden layers the reader hasn't unlocked
   const lockedLayers = layeredContent
@@ -94,12 +99,22 @@ function ArticleContent({ params }: { params: { id: string } }) {
           {/* ContentLock — shimmer blocks for hidden layers */}
           <ContentLock lockedLayers={lockedLayers} />
 
-          {/* Quick Mirror — cinematic archetype reveal */}
+          {/* Mirror reveal: Evolution Card (returning reader) OR QuickMirror (first time) */}
           {quickMirror.triggered && quickMirror.result && (
-            <QuickMirrorCard
-              result={quickMirror.result}
-              articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
-            />
+            evolution ? (
+              <div className="my-20">
+                <QuickMirrorCard
+                  result={quickMirror.result}
+                  articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+                />
+                <EvolutionCard data={evolution} />
+              </div>
+            ) : (
+              <QuickMirrorCard
+                result={quickMirror.result}
+                articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+              />
+            )
           )}
 
           {/* Divider */}

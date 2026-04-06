@@ -15,6 +15,7 @@ import {
   type QuickMirrorInput,
   type QuickMirrorResult,
 } from '@/lib/mirror/quick-synthesize';
+import { appendSnapshot } from './useEvolution';
 
 const STORAGE_KEY = 'quick-mirror-result';
 const DEFAULT_TRIGGER = 70;
@@ -58,6 +59,16 @@ export function useQuickMirror(
     setResult(synthesized);
     setTriggered(true);
     persist(synthesized);
+    // Persist snapshot for Evolution Card (anonymous, localStorage)
+    appendSnapshot({
+      archetype: synthesized.archetype,
+      archetypeLabel: synthesized.archetypeLabel,
+      whisper: synthesized.whisper,
+      confidence: synthesized.confidence,
+      scores: synthesized.scores,
+      timestamp: Date.now(),
+      articleId,
+    });
   }, [bag, triggered, triggerDepth, estimatedReadTime, articleTopics]);
 
   const dismiss = () => setTriggered(false);
