@@ -9,7 +9,7 @@ SQLite (better-sqlite3), Zod, Fuse.js
 - `components/` — React components
 - `lib/content/` — Content resolution & article store
 - `lib/hooks/` — React hooks (`useMirror`, `useQuickMirror`, `useStratifiedContent`)
-- `lib/mirror/` — Mirror synthesis engine (`synthesizer.ts`, `quick-synthesize.ts`), snapshot manager, evolution engine
+- `lib/mirror/` — Mirror synthesis engine, snapshot manager, evolution engine, card generators
 - `types/content.ts` — `LayeredArticleContent`, `ArchetypeKey`, `VisibleLayer`
 
 ## Core Feature: Accelerated Mirror
@@ -19,9 +19,8 @@ Two paths coexist: Quick (anonymous, 1-article) and Full (email-identified, mult
 Content stratification locks hidden layers behind reader identity, with visible teasers (ContentLock).
 
 ## WIP
-- **QuickMirrorCard** — ✅ component built (`components/mirror/QuickMirrorCard.tsx`, 145 LOC). 4-phase cinematic animation (emergence → shimmer → reveal → rest), gold glow, Copy & Share CTA. Wired into article page. Save as Image button is placeholder (needs card-generator adapter for `QuickMirrorResult`).
-- **Enhanced behavioral signals** — scroll velocity curve, re-read detection, section dwell time for `quick-synthesize.ts` (planned, ~90 LOC increase)
-- **card-generator.ts adaptation** — overload to accept `QuickMirrorResult` alongside `ReaderMirror` (planned, ~15 LOC)
+- **QuickMirrorCard** — ✅ Save as Image wired via `quick-mirror-card-generator.ts` (1080×1080 Canvas PNG)
+- **Enhanced behavioral signals** — scroll velocity, re-read detection, section dwell (planned)
 - **ContentLock component** — extract inline lock teaser into shimmer blocks with layer labels
 - Article page surgical cleanup (655→~200 LOC) — per Tanya's spec, gut to 10 elements
 - Shared scroll depth context to avoid duplicate IntersectionObserver instances

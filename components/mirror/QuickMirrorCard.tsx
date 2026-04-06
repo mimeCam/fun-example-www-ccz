@@ -2,6 +2,7 @@
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
+import { generateQuickMirrorCard } from '@/lib/mirror/quick-mirror-card-generator';
 
 // ── Phase timing (ms) ──
 const T_EMERGE  = 0;
@@ -41,6 +42,13 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
   }, [phase]);
 
   const handleCopy = useCopyShareText(result.archetypeLabel, articleUrl, setCopied);
+  const handleSaveImage = useCallback(() => {
+    const dataUrl = generateQuickMirrorCard(result);
+    const a = document.createElement('a');
+    a.download = `reading-identity-${result.archetype}.png`;
+    a.href = dataUrl;
+    a.click();
+  }, [result]);
   const showContent = phase === 'reveal' || phase === 'rest';
   const showActions = phase === 'rest';
 
@@ -84,7 +92,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
         <button onClick={handleCopy} className={shareBtnClass(copied)}>
           {copied ? '✓ Copied!' : 'Copy & Share →'}
         </button>
-        <button className="px-6 py-2 rounded-lg text-gray-500 hover:text-gray-300 text-sm transition-colors duration-200">
+        <button onClick={handleSaveImage} className="px-6 py-2 rounded-lg text-gray-500 hover:text-gray-300 text-sm transition-colors duration-200">
           Save as Image
         </button>
       </div>
