@@ -7,26 +7,21 @@ SQLite (better-sqlite3), Zod, Fuse.js
 ## Key Paths
 - `app/` — Pages & API routes
 - `components/` — React components
+- `lib/hooks/` — `useMirror`, `useQuickMirror`, `useBehavioralSignals`, `useParagraphEngagement`
+- `lib/mirror/` — Scoring engine, snapshot manager, evolution engine, card generators
 - `lib/content/` — Content resolution & article store
-- `lib/hooks/` — React hooks (`useMirror`, `useQuickMirror`, `useStratifiedContent`, `useEvolution`)
-- `lib/mirror/` — Mirror synthesis engine, snapshot manager, evolution engine, card generators
-- `types/content.ts` — `LayeredArticleContent`, `ArchetypeKey`, `VisibleLayer`
+- `types/content.ts` — Core types (`LayeredArticleContent`, `ArchetypeKey`, `ParagraphEngagement`)
 
 ## Core Feature: Accelerated Mirror
 "The blog that reads you back." After ONE article at 70% scroll, the reader gets an archetype whisper.
 No email, no account, no warmup — pure client-side synthesis via `quickSynthesize()`.
-Two paths coexist: Quick (anonymous, 1-article) and Full (email-identified, multi-session).
 
-## Evolution Card
-"Then → Now" card for returning readers whose archetype shifted. localStorage ring buffer (`mirror_snapshots`, max 10, 1/day throttle).
-`useEvolution` hook + `EvolutionCard` component, mounted below QuickMirrorCard.
+## WIP: Paragraph-Level Engagement Tracking
+Types + scoring + `useParagraphEngagement` hook done (21 tests).
+**TODO:** Wire hook into `useBehavioralSignals`, add `data-paragraph-id` to StratifiedRenderer, integrate in article page.
 
-## Content Stratification
-All 5 archetype extensions written for all 6 articles. Returning readers see: core → marginalia → archetype-matched extension.
-
-## Scoring Engine
-`enhancedScoring()` pure function: `BehavioralSignalBag → { scores, confidence }`.
-Tuned formulas for all 5 archetypes with reduced overlap.
+## BUGs
+- tapping on 1 of 4 cards on home page leads to 404
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

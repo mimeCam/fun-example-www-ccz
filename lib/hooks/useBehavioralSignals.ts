@@ -20,6 +20,11 @@ export interface BehavioralSignalBag {
   dwellSecs: number;   // seconds since mount
   pace: number;        // dwellSecs / (estimatedReadTime × 60)
   maxDepth: number;    // peak depth reached
+  // Paragraph-level signals (optional — enriched when paragraph tracking active)
+  deepReadRatio?: number;      // 0-1: fraction of paragraphs deeply read
+  engagementVariance?: number; // 0-1: normalized dwell variance across paragraphs
+  peakParagraphCount?: number; // count of paragraphs with dwell > 2× avg
+  skipRatio?: number;          // 0-1: fraction of paragraphs skipped
 }
 
 function emptyBag(): BehavioralSignalBag {

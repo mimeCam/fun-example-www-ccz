@@ -30,6 +30,28 @@ export interface LayeredArticleContent {
 /** Which layers a reader is allowed to see */
 export type VisibleLayer = 'core' | 'marginalia' | ArchetypeKey;
 
+// ─── Paragraph Engagement Types ────────────────────────────
+
+/** Per-paragraph engagement data from IntersectionObserver tracking */
+export interface ParagraphEngagement {
+  paragraphId: string;
+  dwellMs: number;     // total ms spent in this paragraph
+  visits: number;      // number of times reader entered
+  isDeepRead: boolean; // dwell exceeds deep-read threshold
+  skipped: boolean;    // paragraph was never entered or dwell < skip threshold
+}
+
+/** Map from paragraph ID to engagement data */
+export type ParagraphEngagementMap = Record<string, ParagraphEngagement>;
+
+/** Derived summary of paragraph engagement — fed into scoring engine */
+export interface ParagraphEngagementSummary {
+  deepReadRatio: number;      // 0-1: fraction of visited paragraphs with deep reads
+  engagementVariance: number; // 0-1: normalized variance of dwell times
+  peakParagraphCount: number; // paragraphs with dwell > 2× average
+  skipRatio: number;          // 0-1: fraction of paragraphs skipped
+}
+
 // ─── Time-Based Depth Types (existing) ───────────────────────
 
 /**

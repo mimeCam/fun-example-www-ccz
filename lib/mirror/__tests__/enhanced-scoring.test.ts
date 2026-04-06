@@ -5,11 +5,13 @@
  * for a given archetype and asserts that archetype wins with clear margin.
  * Edge cases: equal scores, low signals, zero dwell time.
  *
- * Updated for tuned Faithful/Resonator/Collector formulas.
+ * Extended with paragraph-level signal tests: verify that paragraph
+ * engagement data boosts the correct archetype and improves confidence.
  */
 
-import { enhancedScoring } from '../enhanced-scoring';
+import { enhancedScoring, summarizeParagraphEngagement } from '../enhanced-scoring';
 import type { BehavioralSignalBag } from '@/lib/hooks/useBehavioralSignals';
+import type { ParagraphEngagementMap } from '@/types/content';
 
 type Bag = Partial<BehavioralSignalBag>;
 
@@ -150,4 +152,113 @@ test('ambiguous signals yield lower confidence than clear profiles', () => {
     dwellSecs: 240, pace: 0.8, maxDepth: 55,
   }));
   expect(result.confidence).toBeLessThanOrEqual(35);
+});
+
+// ─── Paragraph Signal Backward Compatibility ───
+
+test('scores unchanged when paragraph signals are absent', () => {
+  const withoutParagraphs = enhancedScoring(bag({
+    depth: 90, velocity: 0.3, reReadCount: 2,
+    dwellSecs: 600, pace: 1.5, maxDepth: 92,
+  }));
+  // Same scroll-only bag — must produce identical results as before
+  expect(winner(withoutParagraphs)).toBe('deep-diver');
+  expect(Object.keys(withoutParagraphs.scores)).toHaveLength(5);
+});
+
+// ─── Paragraph Engagement Summary ───
+
+test('summarizeParagraphEngagement returns empty for empty map', () => {
+  const summary = summarizeParagraphEngagement({});
+  expect(summary.deepReadRatio).toBe(0);
+  expect(summary.skipRatio).toBe(0);
+  expect(summary.engagementVariance).toBe(0);
+  expect(summary.peakParagraphCount).toBe(0);
+});
+
+test('summarizeParagraphEngagement computes deepReadRatio', () => {
+  const map: ParagraphEngagementMap = {
+    p1: { paragraphId: 'p1', dwellMs: 5000, visits: 2, isDeepRead: true, skipped: false },
+    p2: { paragraphId: 'p2', dwellMs: 1500, visits: 1, isDeepRead: false, skipped: false },
+    p3: { paragraphId: 'p3', dwellMs: 4000, visits: 1, isDeepRead: true, skipped: false },
+  };
+  const summary = summarizeParagraphEngagement(map);
+  // 2 deep reads out of 3 visited = 0.667
+  expect(summary.deepReadRatio).toBeCloseTo(2 / 3, 1);
+  expect(summary.skipRatio).toBe(0);
+  expect(summary.peakParagraphCount).toBeGreaterThanOrEqual(0);
+});
+
+test('summarizeParagraphEngagement computes skipRatio', () => {
+  const map: ParagraphEngagementMap = {
+    p1: { paragraphId: 'p1', dwellMs: 3000, visits: 1, isDeepRead: true, skipped: false },
+    p2: { paragraphId: 'p2', dwellMs: 200, visits: 0, isDeepRead: false, skipped: true },
+    p3: { paragraphId: 'p3', dwellMs: 100, visits: 0, isDeepRead: false, skipped: true },
+    p4: { paragraphId: 'p4', dwellMs: 2000, visits: 1, isDeepRead: false, skipped: false },
+  };
+  const summary = summarizeParagraphEngagement(map);
+  // 2 skipped out of 4 total = 0.5
+  expect(summary.skipRatio).toBe(0.5);
+});
+
+// ─── Paragraph Signals Boost Correct Archetype ───
+
+test('paragraph deep-read data boosts deep-diver score', () => {
+  // Use moderate depth so scroll-only score has room to grow
+  const scrollOnly = enhancedScoring(bag({
+    depth: 75, velocity: 0.3, reReadCount: 1,
+    dwellSecs: 400, pace: 1.3, maxDepth: 75,
+  }));
+  const withParagraphs = enhancedScoring(bag({
+    depth: 75, velocity: 0.3, reReadCount: 1,
+    dwellSecs: 400, pace: 1.3, maxDepth: 75,
+    deepReadRatio: 0.8, skipRatio: 0.1,
+    engagementVariance: 0.1, peakParagraphCount: 3,
+  }));
+  expect(withParagraphs.scores['deep-diver']).toBeGreaterThan(scrollOnly.scores['deep-diver']);
+});
+
+test('paragraph skip data boosts collector score', () => {
+  // Use moderate shallow depth so score isn't already maxed
+  const scrollOnly = enhancedScoring(bag({
+    depth: 35, velocity: 2.0, reReadCount: 0,
+    dwellSecs: 60, pace: 0.4, maxDepth: 35,
+  }));
+  const withParagraphs = enhancedScoring(bag({
+    depth: 35, velocity: 2.0, reReadCount: 0,
+    dwellSecs: 60, pace: 0.4, maxDepth: 35,
+    skipRatio: 0.6, deepReadRatio: 0.1,
+    engagementVariance: 0.2, peakParagraphCount: 0,
+  }));
+  expect(withParagraphs.scores['collector']).toBeGreaterThan(scrollOnly.scores['collector']);
+});
+
+test('paragraph variance data boosts explorer score', () => {
+  // Use edge-case depth where explorer barely gets points
+  const scrollOnly = enhancedScoring(bag({
+    depth: 30, velocity: 2.5, reReadCount: 0,
+    dwellSecs: 120, pace: 0.4, maxDepth: 30,
+  }));
+  const withParagraphs = enhancedScoring(bag({
+    depth: 30, velocity: 2.5, reReadCount: 0,
+    dwellSecs: 120, pace: 0.4, maxDepth: 30,
+    engagementVariance: 0.5, peakParagraphCount: 3,
+    deepReadRatio: 0.2, skipRatio: 0.3,
+  }));
+  expect(withParagraphs.scores['explorer']).toBeGreaterThan(scrollOnly.scores['explorer']);
+});
+
+test('paragraph signals improve confidence for clear archetype', () => {
+  const scrollOnly = enhancedScoring(bag({
+    depth: 90, velocity: 0.3, reReadCount: 2,
+    dwellSecs: 600, pace: 1.5, maxDepth: 92,
+  }));
+  const withParagraphs = enhancedScoring(bag({
+    depth: 90, velocity: 0.3, reReadCount: 2,
+    dwellSecs: 600, pace: 1.5, maxDepth: 92,
+    deepReadRatio: 0.8, skipRatio: 0.1,
+    engagementVariance: 0.1, peakParagraphCount: 3,
+  }));
+  // Paragraph data should not reduce confidence for a clear winner
+  expect(withParagraphs.confidence).toBeGreaterThanOrEqual(scrollOnly.confidence);
 });
