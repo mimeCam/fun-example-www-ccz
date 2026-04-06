@@ -3,7 +3,7 @@
  *
  * Reads depth from ScrollDepthProvider (shared context).
  * Adds velocity tracking, re-read detection, dwell time, and pace ratio.
- * No new observers — pure derivation from the single shared scroll source.
+ * Pipes in paragraph-level engagement from useParagraphEngagement.
  *
  * Returns BehavioralSignalBag for the enhanced scoring engine.
  */
@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useScrollDepth } from './useScrollDepth';
+import { useParagraphEngagement } from './useParagraphEngagement';
 
 export interface BehavioralSignalBag {
   depth: number;       // 0–100 from shared context
@@ -20,7 +21,7 @@ export interface BehavioralSignalBag {
   dwellSecs: number;   // seconds since mount
   pace: number;        // dwellSecs / (estimatedReadTime × 60)
   maxDepth: number;    // peak depth reached
-  // Paragraph-level signals (optional — enriched when paragraph tracking active)
+  // Paragraph-level signals (populated from useParagraphEngagement)
   deepReadRatio?: number;      // 0-1: fraction of paragraphs deeply read
   engagementVariance?: number; // 0-1: normalized dwell variance across paragraphs
   peakParagraphCount?: number; // count of paragraphs with dwell > 2× avg
@@ -41,6 +42,10 @@ interface Props {
 
 export function useBehavioralSignals({ articleId, estimatedReadTime }: Props) {
   const { depth, maxDepth } = useScrollDepth();
+  const { getSummary } = useParagraphEngagement();
+  const paragraphSummaryRef = useRef(getSummary);
+  paragraphSummaryRef.current = getSummary;
+
   const t0 = useRef(Date.now());
   const prevDepth = useRef(0);
   const prevTime = useRef(Date.now());
@@ -62,7 +67,16 @@ export function useBehavioralSignals({ articleId, estimatedReadTime }: Props) {
     const dwellSecs = (now - t0.current) / 1000;
     const pace = estimatedReadTime > 0 ? dwellSecs / (estimatedReadTime * 60) : 1;
 
-    setBag({ depth, velocity: vel.current, reReadCount: reReads.current, dwellSecs, pace, maxDepth });
+    const paragraph = paragraphSummaryRef.current();
+
+    setBag({
+      depth, velocity: vel.current, reReadCount: reReads.current,
+      dwellSecs, pace, maxDepth,
+      deepReadRatio: paragraph.deepReadRatio,
+      engagementVariance: paragraph.engagementVariance,
+      peakParagraphCount: paragraph.peakParagraphCount,
+      skipRatio: paragraph.skipRatio,
+    });
   }, [depth, estimatedReadTime, maxDepth]);
 
   return bag;

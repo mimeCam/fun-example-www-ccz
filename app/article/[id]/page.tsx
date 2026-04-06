@@ -90,7 +90,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
           {/* Article body — stratified content or fallback */}
           <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-[#f0f0f5]">
             {stratifiedBlocks.length > 0 ? (
-              <StratifiedRenderer blocks={stratifiedBlocks} archetype={archetype} />
+              <StratifiedRenderer blocks={stratifiedBlocks} archetype={archetype} articleId={params.id} />
             ) : (
               <p className="text-mist">Article content not available.</p>
             )}

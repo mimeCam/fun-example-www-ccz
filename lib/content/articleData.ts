@@ -18,7 +18,7 @@ export const SAMPLE_ARTICLES: Article[] = [
     and providing evidence or alternative perspectives.`,
     tags: ['critical-thinking', 'intellectual-growth', 'innovation'],
     publishedAt: '2021-04-04T10:00:00Z',
-    worldview: 'philosophical',
+    worldview: 'contrarian',
     questions: [
       'What ideas do you defend without evidence?',
       'When was the last time you changed your mind?',

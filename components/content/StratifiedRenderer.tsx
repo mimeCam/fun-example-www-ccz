@@ -4,10 +4,13 @@
  * Core is always shown. Marginalia appears for returning readers.
  * Archetype extensions fade in with a gold shimmer on first discovery.
  * NewContentBadge marks first-time reveals with a ✦ icon.
+ *
+ * Core paragraphs carry data-paragraph-id for the engagement tracking pipeline.
  */
 
 'use client';
 
+import { Fragment } from 'react';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import {
@@ -19,27 +22,31 @@ import { NewContentBadge } from './NewContentBadge';
 interface StratifiedRendererProps {
   blocks: ContentBlock[];
   archetype: ArchetypeKey | null;
+  articleId: string;
 }
 
-/** Render a single content block with its visual treatment */
-function ContentBlockView({ block }: { block: ContentBlock }) {
-  if (block.layer === 'core') return <CoreBlock paragraphs={block.paragraphs} />;
-  if (block.layer === 'marginalia') return <MarginaliaBlock block={block} />;
-  return <ExtensionBlock block={block} />;
-}
-
-/** Core paragraphs — plain body text, the article foundation */
-function CoreBlock({ paragraphs }: { paragraphs: string[] }) {
+/** Core paragraphs — plain body text with paragraph tracking IDs */
+function CoreBlock({ paragraphs, prefix, offset }: {
+  paragraphs: string[];
+  prefix: string;
+  offset: number;
+}) {
   return (
     <div className="space-y-6 leading-[1.75]">
       {paragraphs.map((p, i) => (
-        <p key={i} className="text-[#f0f0f5] max-w-[65ch]">{p.trim()}</p>
+        <p
+          key={i}
+          data-paragraph-id={`${prefix}-p${offset + i}`}
+          className="text-[#f0f0f5] max-w-[65ch]"
+        >
+          {p.trim()}
+        </p>
       ))}
     </div>
   );
 }
 
-/** Marginalia — returning-reader side notes with cyan border + gold shimmer on first view */
+/** Marginalia — returning-reader side notes with cyan border + shimmer */
 function MarginaliaBlock({ block }: { block: ContentBlock }) {
   return (
     <aside
@@ -56,7 +63,7 @@ function MarginaliaBlock({ block }: { block: ContentBlock }) {
   );
 }
 
-/** Archetype extension — varies by archetype, gold shimmer on first discovery */
+/** Archetype extension — gold border, label, shimmer on first discovery */
 function ExtensionBlock({ block }: { block: ContentBlock }) {
   const key = block.layer as ArchetypeKey;
   const borderColor = getExtensionBorderColor(key);
@@ -86,15 +93,29 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
   );
 }
 
-/** Main renderer — iterates blocks in order */
-export function StratifiedRenderer({ blocks, archetype }: StratifiedRendererProps) {
+/** Main renderer — iterates blocks, tracks core paragraph offset for IDs */
+export function StratifiedRenderer({ blocks, articleId }: StratifiedRendererProps) {
   if (!blocks.length) return null;
+
+  let coreOffset = 0;
 
   return (
     <article className="stratified-content">
-      {blocks.map((block, i) => (
-        <ContentBlockView key={`${block.layer}-${i}`} block={block} />
-      ))}
+      {blocks.map((block, i) => {
+        if (block.layer === 'core') {
+          const el = (
+            <Fragment key={`core-${i}`}>
+              <CoreBlock paragraphs={block.paragraphs} prefix={articleId} offset={coreOffset} />
+            </Fragment>
+          );
+          coreOffset += block.paragraphs.length;
+          return el;
+        }
+        if (block.layer === 'marginalia') {
+          return <MarginaliaBlock key={`margin-${i}`} block={block} />;
+        }
+        return <ExtensionBlock key={`ext-${i}`} block={block} />;
+      })}
     </article>
   );
 }
