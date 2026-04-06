@@ -43,7 +43,7 @@ interface MilestoneState {
 }
 
 export function useMilestones({ articleId, onMilestoneReached }: UseMilestonesProps) {
-  const { depth } = useScrollDepth({ articleId });
+  const { depth } = useScrollDepth();
   const [milestoneState, setMilestoneState] = useState<MilestoneState>({
     currentMilestone: null,
     message: '',

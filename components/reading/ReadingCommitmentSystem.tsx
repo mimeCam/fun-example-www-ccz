@@ -55,7 +55,7 @@ export function ReadingCommitmentSystem({
   showMilestoneCard = true,
   showNudges = true,
 }: ReadingCommitmentSystemProps) {
-  const { depth, isFinished } = useScrollDepth({ articleId });
+  const { depth, isFinished } = useScrollDepth();
   const [milestoneCardVisible, setMilestoneCardVisible] = useState(false);
   const [currentMilestone, setCurrentMilestone] = useState<50 | 100 | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0); // in seconds

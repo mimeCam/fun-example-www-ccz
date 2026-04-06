@@ -4,6 +4,8 @@
  * Each test constructs a BehavioralSignalBag representing an "ideal reader"
  * for a given archetype and asserts that archetype wins with clear margin.
  * Edge cases: equal scores, low signals, zero dwell time.
+ *
+ * Updated for tuned Faithful/Resonator/Collector formulas.
  */
 
 import { enhancedScoring } from '../enhanced-scoring';
@@ -38,7 +40,7 @@ test('deep-diver wins for slow deep reader', () => {
 
 test('deep-diver scores above 60 for ideal profile', () => {
   const result = enhancedScoring(bag({
-    depth: 95, velocity: 0.2, reReadCount: 3,
+    depth: 95, velocity: 0.2, reReadCount: 2,
     dwellSecs: 900, pace: 2.0, maxDepth: 97,
   }));
   expect(result.scores['deep-diver']).toBeGreaterThanOrEqual(60);
@@ -55,7 +57,7 @@ test('explorer wins for fast skimmer with variable depth', () => {
   expect(result.confidence).toBeGreaterThanOrEqual(20);
 });
 
-// ─── Faithful: steady, complete, on pace ───
+// ─── Faithful: steady, complete, on-pace ───
 
 test('faithful wins for steady complete reader', () => {
   const result = enhancedScoring(bag({
@@ -74,15 +76,24 @@ test('faithful scores high for on-pace reader who finishes', () => {
   expect(result.scores['faithful']).toBeGreaterThanOrEqual(70);
 });
 
-// ─── Resonator: lingers, re-reads, emotional ───
+// ─── Resonator: lingers, re-reads heavily, emotional ───
 
-test('resonator wins for slow re-reader with high dwell', () => {
+test('resonator wins for heavy re-reader with high dwell', () => {
   const result = enhancedScoring(bag({
-    depth: 75, velocity: 0.4, reReadCount: 4,
+    depth: 75, velocity: 0.4, reReadCount: 5,
     dwellSecs: 900, pace: 2.0, maxDepth: 80,
   }));
   expect(winner(result)).toBe('resonator');
   expect(result.confidence).toBeGreaterThanOrEqual(20);
+});
+
+test('resonator separates from deep-diver (low re-reads go to deep-diver)', () => {
+  const result = enhancedScoring(bag({
+    depth: 90, velocity: 0.3, reReadCount: 1,
+    dwellSecs: 600, pace: 1.5, maxDepth: 92,
+  }));
+  // With only 1 re-read, deep-diver should win over resonator
+  expect(winner(result)).toBe('deep-diver');
 });
 
 // ─── Collector: shallow, quick, no re-reads ───
@@ -94,6 +105,15 @@ test('collector wins for shallow fast reader', () => {
   }));
   expect(winner(result)).toBe('collector');
   expect(result.confidence).toBeGreaterThanOrEqual(20);
+});
+
+test('collector separates from explorer (mid-depth goes to explorer)', () => {
+  const result = enhancedScoring(bag({
+    depth: 50, velocity: 2.5, reReadCount: 0,
+    dwellSecs: 120, pace: 0.4, maxDepth: 55,
+  }));
+  // Mid-depth + fast = explorer, not collector
+  expect(winner(result)).toBe('explorer');
 });
 
 // ─── Edge Cases ───

@@ -40,9 +40,7 @@ export function useCompletionDetection({
     estimatedReadTime,
   });
 
-  const { depth, isReading, isFinished } = useScrollDepth({
-    articleId,
-  });
+  const { depth, isReading, isFinished } = useScrollDepth();
 
   useEffect(() => {
     // Only detect when user finishes article

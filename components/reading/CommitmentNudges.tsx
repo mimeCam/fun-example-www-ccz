@@ -41,7 +41,7 @@ export function CommitmentNudges({
   articleId,
   readingTime,
 }: CommitmentNudgesProps) {
-  const { depth, isReading } = useScrollDepth({ articleId });
+  const { depth, isReading } = useScrollDepth();
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [currentNudge, setCurrentNudge] = useState<NudgeMessage | null>(null);
   const [isVisible, setIsVisible] = useState(false);

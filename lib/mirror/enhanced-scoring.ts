@@ -45,30 +45,35 @@ function scoreExplorer(b: BehavioralSignalBag): number {
   return clampScore(s);
 }
 
-// Faithful: steady pace, finishes, consistent
+// Faithful: steady pace, finishes, consistent — distinct from Deep Diver's slowness
 function scoreFaithful(b: BehavioralSignalBag): number {
   let s = 0;
-  if (b.maxDepth >= 90) s += 30; else if (b.maxDepth >= 70) s += 20;
+  if (b.maxDepth >= 90) s += 25; else if (b.maxDepth >= 70) s += 15;
   if (b.velocity >= 0.5 && b.velocity <= 1.5) s += 30;
   if (b.pace >= 0.85 && b.pace <= 1.15) s += 25;
-  if (b.reReadCount >= 1 && b.reReadCount <= 2) s += 15;
+  if (b.reReadCount >= 1 && b.reReadCount <= 2) s += 10;
+  // Completion bonus: finished the article at a comfortable (not glacial) pace
+  if (b.maxDepth >= 95 && b.velocity >= 0.6) s += 10;
   return clampScore(s);
 }
 
-// Resonator: lingers, re-reads, feels deeply
+// Resonator: lingers, re-reads heavily, feels deeply — distinct from Deep Diver
 function scoreResonator(b: BehavioralSignalBag): number {
   let s = 0;
-  if (b.pace > 1.5) s += 35; else if (b.pace > 1.2) s += 20;
-  if (b.reReadCount >= 3) s += 35; else if (b.reReadCount >= 2) s += 20;
+  if (b.pace > 1.5) s += 20; else if (b.pace > 1.2) s += 10;
+  // Re-reading is THE primary signal — weight it highest
+  if (b.reReadCount >= 4) s += 40; else if (b.reReadCount >= 3) s += 30; else if (b.reReadCount >= 2) s += 15;
   if (b.velocity < 1.0) s += 15;
   if (b.maxDepth >= 60) s += 15;
+  // Lingering bonus: spent much longer than expected without blazing through
+  if (b.pace > 1.0 && b.velocity < 0.8) s += 10;
   return clampScore(s);
 }
 
-// Collector: skims, grabs, moves on — surface-level
+// Collector: skims, grabs, moves on — surface-level — distinct from Explorer
 function scoreCollector(b: BehavioralSignalBag): number {
   let s = 0;
-  if (b.maxDepth < 35) s += 35; else if (b.maxDepth < 45) s += 15;
+  if (b.maxDepth < 30) s += 35; else if (b.maxDepth < 40) s += 15;
   if (b.pace < 0.5) s += 30; else if (b.pace < 0.7) s += 15;
   if (b.reReadCount === 0) s += 20;
   if (b.velocity > 1.5) s += 15;

@@ -34,7 +34,7 @@ export function EnhancedProgressBar({
   articleId,
   totalReadingTime,
 }: EnhancedProgressBarProps) {
-  const { depth, isReading, isFinished } = useScrollDepth({ articleId });
+  const { depth, isReading, isFinished } = useScrollDepth();
   const [timeElapsed, setTimeElapsed] = useState(0); // in seconds
   const [isVisible, setIsVisible] = useState(false);
 

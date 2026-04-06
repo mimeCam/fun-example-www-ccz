@@ -6,6 +6,7 @@ import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { ContentLock } from '@/components/content/ContentLock';
 import { NextRead, generateRecommendationContext } from '@/components/reading/NextRead';
+import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
@@ -15,6 +16,14 @@ import { getArticleById, getAllArticles } from '@/lib/content/articleData';
 import type { ArchetypeKey } from '@/types/content';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
+  return (
+    <ScrollDepthProvider>
+      <ArticleContent params={params} />
+    </ScrollDepthProvider>
+  );
+}
+
+function ArticleContent({ params }: { params: { id: string } }) {
   const article = getArticleById(params.id);
   const layeredContent = getLayeredContent(params.id);
 
@@ -48,7 +57,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <DepthBar articleId={params.id} />
+      <DepthBar />
 
       <article className="min-h-screen">
         <div className="max-w-[38rem] mx-auto px-6">
