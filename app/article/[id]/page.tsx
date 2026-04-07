@@ -1,22 +1,19 @@
 'use client';
 
+import { useMemo } from 'react';
 import { DepthBar } from '@/components/reading/DepthBar';
-import { BookmarkButton } from '@/components/reading/BookmarkButton';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
-import { ContentLock } from '@/components/content/ContentLock';
 import { NextRead, generateRecommendationContext } from '@/components/reading/NextRead';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
-import { useEvolution } from '@/lib/hooks/useEvolution';
-import EvolutionCard from '@/components/mirror/EvolutionCard';
-import { getLayeredContent } from '@/lib/content/articleData';
-import { resolveLockedLayers } from '@/lib/content/content-layers';
-import { getArticleById, getAllArticles } from '@/lib/content/articleData';
+import { useResonanceMarginalia, extractCoreParagraphs } from '@/lib/hooks/useResonanceMarginalia';
+import { getLayeredContent, getArticleById, getAllArticles } from '@/lib/content/articleData';
 import type { ArchetypeKey } from '@/types/content';
+import type { ContentBlock } from '@/lib/content/content-layers';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -30,7 +27,6 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const article = getArticleById(params.id);
   const layeredContent = getLayeredContent(params.id);
 
-  // Mirror archetype — drives stratified content visibility
   const { mirror } = useMirror();
   const archetype = (mirror?.archetype as ArchetypeKey) ?? null;
   const readCount = typeof window !== 'undefined'
@@ -40,18 +36,23 @@ function ArticleContent({ params }: { params: { id: string } }) {
   // Stratified content: resolve visible layers
   const stratifiedBlocks = useStratifiedContent(params.id, layeredContent, archetype, readCount);
 
+  // Resonance marginalia: fetch reader's resonances for this article
+  const coreParagraphs = useMemo(
+    () => extractCoreParagraphs(stratifiedBlocks),
+    [stratifiedBlocks]
+  );
+  const resonanceBlocks = useResonanceMarginalia(params.id, coreParagraphs);
+
+  // Merge resonance blocks into stratified content
+  const mergedBlocks = useMemo(() => {
+    if (!resonanceBlocks.length) return stratifiedBlocks;
+    return insertResonanceBlocks(stratifiedBlocks, resonanceBlocks, coreParagraphs);
+  }, [stratifiedBlocks, resonanceBlocks, coreParagraphs]);
+
   // Quick Mirror — archetype synthesis at 70% scroll
   const quickMirror = useQuickMirror(params.id, 5, ['critical-thinking'], 70);
 
-  // Evolution — shows "Then → Now" card for returning readers whose archetype shifted
-  const evolution = useEvolution();
-
-  // Content Lock — hidden layers the reader hasn't unlocked
-  const lockedLayers = layeredContent
-    ? resolveLockedLayers(layeredContent, archetype, readCount)
-    : [];
-
-  // Next read recommendation — single article
+  // Next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
   const nextArticle = allArticles[0];
   const nextContext = nextArticle
@@ -64,72 +65,32 @@ function ArticleContent({ params }: { params: { id: string } }) {
   return (
     <>
       <DepthBar />
-
       <article className="min-h-screen">
         <div className="max-w-[38rem] mx-auto px-6">
-          {/* Minimal top bar */}
-          <div className="flex items-center justify-between pt-8 pb-4">
-            <a href="/" className="text-mist text-sm hover:text-primary transition-colors">
-              &larr; Back
-            </a>
-            <div className="flex items-center gap-1">
-              <BookmarkButton articleId={params.id} articleTitle={article?.title ?? ''} />
-              <ResonanceButton articleId={params.id} articleTitle={article?.title ?? ''} />
-            </div>
-          </div>
-
-          {/* Title + metadata */}
-          <header className="mb-8 text-center">
-            <h1 className="font-display text-[2.25rem] font-bold text-[#f0f0f5] leading-tight tracking-tight">
-              {article?.title ?? 'Article'}
-            </h1>
-            <p className="text-mist text-sm mt-3">
-              Author &middot; 5 min read
-            </p>
-          </header>
-
-          {/* Divider */}
+          <TopBar articleId={params.id} title={article?.title ?? ''} />
+          <ArticleHeader title={article?.title ?? 'Article'} />
           <hr className="border-fog mb-8" />
 
-          {/* Article body — stratified content or fallback */}
           <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-[#f0f0f5]">
-            {stratifiedBlocks.length > 0 ? (
-              <StratifiedRenderer blocks={stratifiedBlocks} archetype={archetype} articleId={params.id} />
+            {mergedBlocks.length > 0 ? (
+              <StratifiedRenderer blocks={mergedBlocks} archetype={archetype} articleId={params.id} />
             ) : (
               <p className="text-mist">Article content not available.</p>
             )}
           </div>
 
-          {/* ContentLock — shimmer blocks for hidden layers */}
-          <ContentLock lockedLayers={lockedLayers} />
-
-          {/* Mirror reveal: Evolution Card (returning reader) OR QuickMirror (first time) */}
           {quickMirror.triggered && quickMirror.result && (
-            evolution ? (
-              <div className="my-20">
-                <QuickMirrorCard
-                  result={quickMirror.result}
-                  articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
-                />
-                <EvolutionCard data={evolution} />
-              </div>
-            ) : (
+            <div className="my-16">
               <QuickMirrorCard
                 result={quickMirror.result}
                 articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
               />
-            )
+            </div>
           )}
 
-          {/* Divider */}
           <hr className="border-fog my-12" />
+          {nextArticle && <NextRead article={nextArticle} context={nextContext} />}
 
-          {/* Next Read — single recommendation */}
-          {nextArticle && (
-            <NextRead article={nextArticle} context={nextContext} />
-          )}
-
-          {/* Footer */}
           <footer className="text-center py-12 text-mist text-sm">
             <p className="mb-2">No algorithms. No feeds.</p>
             <div className="flex justify-center gap-6">
@@ -141,4 +102,61 @@ function ArticleContent({ params }: { params: { id: string } }) {
       </article>
     </>
   );
+}
+
+function TopBar({ articleId, title }: { articleId: string; title: string }) {
+  return (
+    <div className="flex items-center justify-between pt-8 pb-4">
+      <a href="/" className="text-mist text-sm hover:text-primary transition-colors">
+        &larr; Back
+      </a>
+      <ResonanceButton articleId={articleId} articleTitle={title} />
+    </div>
+  );
+}
+
+function ArticleHeader({ title }: { title: string }) {
+  return (
+    <header className="mb-8 text-center">
+      <h1 className="font-display text-[2.25rem] font-bold text-[#f0f0f5] leading-tight tracking-tight">
+        {title}
+      </h1>
+      <p className="text-mist text-sm mt-3">Author &middot; 5 min read</p>
+    </header>
+  );
+}
+
+/** Insert resonance marginalia blocks after the matching core paragraph */
+function insertResonanceBlocks(
+  base: ContentBlock[],
+  resonance: ContentBlock[],
+  paragraphs: string[]
+): ContentBlock[] {
+  const result: ContentBlock[] = [];
+  let pIdx = 0;
+
+  for (const block of base) {
+    result.push(block);
+    if (block.layer !== 'core') continue;
+
+    for (let i = 0; i < block.paragraphs.length; i++) {
+      for (const rb of resonance) {
+        if (rb.resonance && paragraphs[pIdx + i]?.includes(rb.resonance.quote)) {
+          result.push({ ...rb, isNew: true });
+        }
+      }
+    }
+    pIdx += block.paragraphs.length;
+  }
+
+  // Fallback: if no paragraph matched, append at the end
+  const inserted = result.filter(b => b.layer === 'resonance-marginalia');
+  if (inserted.length < resonance.length) {
+    const unmatched = resonance.filter(
+      rb => !inserted.some(ib => ib.resonance?.id === rb.resonance?.id)
+    );
+    result.push(...unmatched);
+  }
+
+  return result;
 }

@@ -169,3 +169,32 @@ export async function recordResonanceVisitAction(
 
 // TODO: Add server action for deleting resonances
 // TODO: Add server action for batch operations
+
+/**
+ * Get active resonances for a specific user + article pair.
+ * Used by useResonanceMarginalia to render return-visit marginalia.
+ */
+export async function getResonancesForArticleAction(
+  identifier: string,
+  articleId: string
+): Promise<{
+  success: boolean;
+  resonances?: { id: string; quote: string; resonanceNote: string; createdAt: string }[];
+  error?: string;
+}> {
+  try {
+    const userId = createEmailFingerprint(identifier);
+    const all = getUserResonances(userId);
+    const filtered = all
+      .filter(r => r.articleId === articleId && r.quote)
+      .map(r => ({
+        id: r.id,
+        quote: r.quote!,
+        resonanceNote: r.resonanceNote,
+        createdAt: r.createdAt,
+      }));
+    return { success: true, resonances: filtered };
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to fetch resonances' };
+  }
+}

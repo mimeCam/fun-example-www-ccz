@@ -18,6 +18,7 @@ const config: Config = {
         mist: "#9494b8",       // Mist — secondary text, metadata
         gold: "#f0c674",       // Gold — mirror reveal, discovery
         cyan: "#4ecdc4",       // Cyan — marginalia, unlocked markers
+        rose: "#e88fa7",       // Rose — reader-authored marginalia, "your voice"
         void: "#0d0d1a",       // Void deep — code blocks, pressed surfaces
       },
       fontFamily: {
@@ -30,11 +31,13 @@ const config: Config = {
         'float': '0 8px 32px rgba(0,0,0,0.5)',
         'gold': '0 8px 40px rgba(240,198,116,0.25)',
         'gold-intense': '0 12px 60px rgba(240,198,116,0.40)',
+        'rose-glow': '0 6px 32px rgba(232,143,167,0.20)',
       },
       animation: {
         'bounce-subtle': 'bounce-subtle 0.3s ease-in-out',
         'fade-in': 'fade-in 0.2s ease-out',
         'content-lock-breath': 'contentLockBreath 3s ease-in-out infinite',
+        'resonance-remembered': 'resonanceRemembered 1s ease-out',
       },
       keyframes: {
         'bounce-subtle': {
@@ -52,6 +55,12 @@ const config: Config = {
         'contentLockBreath': {
           '0%, 100%': { borderColor: '#222244' },
           '50%': { borderColor: 'rgba(240, 198, 116, 0.2)' },
+        },
+        'resonanceRemembered': {
+          '0%': { opacity: '0', transform: 'translateY(6px)', borderLeftColor: 'transparent' },
+          '40%': { opacity: '1', transform: 'translateY(0)' },
+          '70%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px rgba(232,143,167,0.25)' },
+          '100%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px rgba(232,143,167,0.12)' },
         },
       },
     },

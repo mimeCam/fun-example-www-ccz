@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { createResonanceAction } from '@/app/actions/resonances';
+import { useTextSelection } from '@/lib/hooks/useTextSelection';
 
 interface ResonanceButtonProps {
   articleId: string;
@@ -23,8 +24,7 @@ function getAnonId(): string {
   return id;
 }
 
-/** Track used slots locally (synced on each create) */
-function loadUsedSlots(articleId: string): number {
+function loadUsedSlots(): number {
   if (typeof window === 'undefined') return 0;
   try {
     const cache = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
@@ -52,7 +52,6 @@ function SlotIndicator({ used, total }: { used: number; total: number }) {
   );
 }
 
-/** SVG gem icon — used for button and empty state */
 function GemIcon({ className = '' }: { className?: string }) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
@@ -66,40 +65,57 @@ function GemIcon({ className = '' }: { className?: string }) {
 }
 
 /**
- * ResonanceButton — Resonance-First Bookmarking
+ * ResonanceButton — Resonance-First Bookmarking with quote capture.
  *
- * No email required. No accounts. Client-side anonymous ID.
- * 5-slot scarcity with diamond indicator. 30-day vitality.
+ * Wires useTextSelection so the highlighted passage is saved as
+ * the `quote` field alongside the reader's resonance note.
  */
 export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [note, setNote] = useState('');
+  const [quote, setQuote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [usedSlots, setUsedSlots] = useState(0);
 
-  // Load slot count on mount
-  useEffect(() => {
-    setUsedSlots(loadUsedSlots(articleId));
-  }, [articleId]);
+  const { selection, clearSelection } = useTextSelection();
+
+  useEffect(() => { setUsedSlots(loadUsedSlots()); }, []);
+
+  const openModal = useCallback(() => {
+    const selectedQuote = selection?.text ?? '';
+    setQuote(selectedQuote);
+    setIsOpen(true);
+  }, [selection]);
+
+  const closeModal = useCallback(() => {
+    setIsOpen(false);
+    setNote('');
+    setQuote('');
+    setError(null);
+    setSuccess(false);
+  }, []);
 
   const handleSubmit = useCallback(async () => {
-    if (!note.trim()) { setError('Please explain why this resonates with you'); return; }
-    if (note.length > 280) { setError('Resonance note must be 280 characters or less'); return; }
-
+    if (!note.trim()) {
+      setError('Please explain why this resonates with you');
+      return;
+    }
     setIsLoading(true);
     setError(null);
 
     try {
-      const identifier = getAnonId();
-      const result = await createResonanceAction(identifier, articleId, note.trim());
-
+      const id = getAnonId();
+      const result = await createResonanceAction(
+        id, articleId, note.trim(), quote || undefined
+      );
       if (result.success) {
-        const newCount = usedSlots + 1;
-        setUsedSlots(newCount);
-        saveUsedSlots(newCount);
+        const next = usedSlots + 1;
+        setUsedSlots(next);
+        saveUsedSlots(next);
         setSuccess(true);
+        clearSelection();
         setTimeout(closeModal, 2000);
       } else {
         setError(result.error || 'Failed to save resonance');
@@ -109,23 +125,14 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
     } finally {
       setIsLoading(false);
     }
-  }, [note, articleId, usedSlots]);
-
-  const closeModal = useCallback(() => {
-    setIsOpen(false);
-    setNote('');
-    setError(null);
-    setSuccess(false);
-  }, []);
+  }, [note, quote, articleId, usedSlots, clearSelection, closeModal]);
 
   const slotsAvailable = usedSlots < SLOT_COUNT;
-  const charCount = note.length;
 
   return (
     <>
-      {/* Trigger button */}
       <button
-        onClick={() => slotsAvailable ? setIsOpen(true) : null}
+        onClick={() => slotsAvailable ? openModal() : null}
         className={`p-2 rounded-xl transition-colors ${
           slotsAvailable
             ? 'text-mist hover:text-primary hover:bg-surface'
@@ -135,7 +142,6 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
         title={!slotsAvailable ? 'Resonance slots full' : 'Save resonance'}
       >
         <GemIcon />
-        {/* Mini slot badge */}
         {slotsAvailable && (
           <span className="absolute -top-0.5 -right-0.5 text-[9px] text-gold/70 font-mono">
             {usedSlots}/{SLOT_COUNT}
@@ -143,33 +149,25 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
         )}
       </button>
 
-      {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={closeModal} />
-
           <div className="relative bg-surface border border-fog/40 rounded-2xl max-w-lg w-full p-6 shadow-float animate-fade-in">
-            {/* Close */}
             <button onClick={closeModal}
               className="absolute top-4 right-4 text-mist hover:text-white transition-colors"
               aria-label="Close">
               <CloseIcon />
             </button>
-
-            {/* Header */}
             <h3 className="text-xl font-semibold text-white mb-1">Save Resonance</h3>
             <p className="text-mist text-sm mb-5">Why does this matter to you?</p>
-
-            {/* Slot indicator */}
             <SlotIndicator used={usedSlots} total={SLOT_COUNT} />
-
             {success ? (
               <SuccessMessage />
             ) : (
               <ResonanceForm
                 note={note}
                 setNote={setNote}
-                charCount={charCount}
+                quote={quote}
                 error={error}
                 isLoading={isLoading}
                 onSubmit={handleSubmit}
@@ -183,7 +181,7 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
   );
 }
 
-/* ─── Sub-components (kept short) ──────────────────── */
+/* ─── Sub-components ─────────────────────────────── */
 
 function CloseIcon() {
   return (
@@ -203,7 +201,7 @@ function SuccessMessage() {
       </div>
       <p className="text-gold text-lg font-medium">Saved.</p>
       <p className="text-mist text-sm mt-2 italic">
-        It&apos;s alive for 30 days. Visit it to keep it breathing.
+        It&apos;s alive for 30 days. Come back to keep it breathing.
       </p>
     </div>
   );
@@ -212,20 +210,23 @@ function SuccessMessage() {
 interface FormProps {
   note: string;
   setNote: (v: string) => void;
-  charCount: number;
+  quote: string;
   error: string | null;
   isLoading: boolean;
   onSubmit: () => void;
   onCancel: () => void;
 }
 
-function ResonanceForm({ note, setNote, charCount, error, isLoading, onSubmit, onCancel }: FormProps) {
+function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCancel }: FormProps) {
+  const charCount = note.length;
   const charColor = charCount > 250 ? 'text-gold' : 'text-mist';
 
   return (
     <>
+      {quote && <QuotePreview quote={quote} />}
       <div className="mb-4">
-        <label htmlFor="resonanceNote" className="block text-sm font-medium text-[#f0f0f5]/80 mb-2">
+        <label htmlFor="resonanceNote"
+          className="block text-sm font-medium text-[#f0f0f5]/80 mb-2">
           Your resonance note <span className="text-primary">*</span>
         </label>
         <textarea
@@ -240,14 +241,9 @@ function ResonanceForm({ note, setNote, charCount, error, isLoading, onSubmit, o
         />
         <div className="flex justify-between mt-1">
           <span className={`text-xs ${charColor}`}>{charCount}/280</span>
-          {charCount < 10 && note.length > 0 && (
-            <span className="text-xs text-gold">Too short</span>
-          )}
         </div>
       </div>
-
       {error && <ErrorBanner message={error} />}
-
       <div className="flex gap-3">
         <button onClick={onCancel} disabled={isLoading}
           className="flex-1 px-4 py-2.5 bg-void text-mist rounded-xl hover:bg-fog transition-colors disabled:opacity-50">
@@ -256,10 +252,20 @@ function ResonanceForm({ note, setNote, charCount, error, isLoading, onSubmit, o
         <button onClick={onSubmit}
           disabled={isLoading || !note.trim()}
           className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium">
-          {isLoading ? 'Saving...' : 'Save'}
+          {isLoading ? 'Saving...' : 'Save Resonance'}
         </button>
       </div>
     </>
+  );
+}
+
+function QuotePreview({ quote }: { quote: string }) {
+  return (
+    <div className="mb-4 bg-void/60 border-l-2 border-rose/40 rounded-xl p-3">
+      <p className="text-[#f0f0f5]/70 italic text-sm leading-relaxed">
+        &ldquo;{quote}&rdquo;
+      </p>
+    </div>
   );
 }
 
@@ -270,8 +276,3 @@ function ErrorBanner({ message }: { message: string }) {
     </div>
   );
 }
-
-// TODO: Wire quote capture from text selection into modal
-// TODO: Show "View Resonance" instead of "Save" when article already has one
-// TODO: Progressive unlock messaging when slots are full
-// TODO: Add resonance deck page at /resonances

@@ -28,7 +28,7 @@ export interface LayeredArticleContent {
 }
 
 /** Which layers a reader is allowed to see */
-export type VisibleLayer = 'core' | 'marginalia' | ArchetypeKey;
+export type VisibleLayer = 'core' | 'marginalia' | 'resonance-marginalia' | ArchetypeKey;
 
 // ─── Paragraph Engagement Types ────────────────────────────
 

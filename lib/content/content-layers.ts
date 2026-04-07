@@ -128,5 +128,12 @@ export function resolveLockedLayers(
 export interface ContentBlock {
   layer: VisibleLayer;
   paragraphs: string[];
-  isNew?: boolean; // True if this layer was recently unlocked for the reader
+  isNew?: boolean;
+  /** Resonance data — only present when layer === 'resonance-marginalia' */
+  resonance?: {
+    id: string;
+    quote: string;
+    note: string;
+    createdAt: string;
+  };
 }

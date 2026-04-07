@@ -114,8 +114,42 @@ export function StratifiedRenderer({ blocks, articleId }: StratifiedRendererProp
         if (block.layer === 'marginalia') {
           return <MarginaliaBlock key={`margin-${i}`} block={block} />;
         }
+        if (block.layer === 'resonance-marginalia') {
+          return <ResonanceMarginaliaBlock key={`res-${i}`} block={block} />;
+        }
         return <ExtensionBlock key={`ext-${i}`} block={block} />;
       })}
     </article>
+  );
+}
+
+/**
+ * ResonanceMarginaliaBlock — the killer feature.
+ * Renders the reader's own captured quote + note as warm-rose
+ * marginalia woven into the article body on return visits.
+ */
+function ResonanceMarginaliaBlock({ block }: { block: ContentBlock }) {
+  const data = block.resonance;
+  if (!data) return null;
+
+  return (
+    <aside
+      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-3xl shadow-rose-glow
+        ${block.isNew ? 'animate-resonance-remembered' : ''}`}
+    >
+      <p className="text-xs uppercase tracking-widest text-rose/70 mb-3">
+        Your resonance
+      </p>
+      <p className="text-[0.9375rem] text-[#f0f0f5]/70 italic leading-[1.7]">
+        &ldquo;{data.quote}&rdquo;
+      </p>
+      <div className="h-px bg-gold/30 max-w-[120px] my-3" />
+      <p className="text-[0.9375rem] text-rose italic leading-[1.7]">
+        {data.note}
+      </p>
+      <p className="text-xs text-mist/50 mt-3">
+        Saved {data.createdAt}
+      </p>
+    </aside>
   );
 }
