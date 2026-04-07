@@ -4,6 +4,8 @@
  */
 
 import { getDb } from '@/lib/db';
+import { getArticleById } from '@/lib/content/articleData';
+import type { ResonanceWithArticle } from '@/types/resonance-display';
 import type {
   Resonance,
   CreateResonanceInput,
@@ -13,6 +15,11 @@ import type {
   ResonanceStatus
 } from '@/types/resonance';
 import { randomUUID } from 'crypto';
+
+/**
+ * Vitality threshold: above this = "carrying" (alive), below = "shaped" (faded)
+ */
+const VITALITY_CARRYING_THRESHOLD = 10;
 
 const INITIAL_VITALITY_DAYS = 30;
 const INITIAL_SLOT_LIMIT = 5;
@@ -351,7 +358,23 @@ function mapRowToResonance(row: any): Resonance {
   };
 }
 
-// TODO: Add resonance search functionality
-// TODO: Add resonance export (Markdown, JSON)
+/**
+ * Classify a resonance's vitality state for display.
+ */
+export { getVitalityLabel } from '@/types/resonance-display';
+export type { ResonanceWithArticle } from '@/types/resonance-display';
+
+/**
+ * Get all active resonances for a user, joined with article titles.
+ * Filters out resonances for articles that no longer exist.
+ */
+export function getResonancesWithArticles(userId: string): ResonanceWithArticle[] {
+  const resonances = getUserResonances(userId);
+  return resonances.reduce<ResonanceWithArticle[]>((acc, r) => {
+    const article = getArticleById(r.articleId);
+    if (article) acc.push({ ...r, articleTitle: article.title });
+    return acc;
+  }, []);
+}
+
 // TODO: Implement progressive unlock logic in getUserSlotLimit
-// TODO: Add caching layer for frequently accessed resonances

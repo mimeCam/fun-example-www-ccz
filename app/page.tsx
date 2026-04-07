@@ -78,14 +78,11 @@ export default function Home() {
             No algorithms, no feeds. Just ideas for people who choose to engage with them.
           </p>
           <div className="flex justify-center gap-6 text-xs">
-            <Link href="/categories" className="text-mist hover:text-primary transition-colors">
-              Browse by Category
-            </Link>
-            <Link href="/trails" className="text-mist hover:text-primary transition-colors">
-              Curiosity Trails
-            </Link>
             <Link href="/mirror" className="text-[#f0c674]/60 hover:text-[#f0c674] transition-colors">
               Your Mirror
+            </Link>
+            <Link href="/resonances" className="text-rose/60 hover:text-rose transition-colors">
+              Your Resonances
             </Link>
           </div>
         </div>

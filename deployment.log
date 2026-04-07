@@ -1,4 +1,4 @@
-Deployment started at: Tue Apr  7 02:23:24 AM CEST 2026
+Deployment started at: Tue Apr  7 03:31:51 AM CEST 2026
 🛑 Stopping existing container (if running)...
 Removing existing container: persona-blog-z
 🧹 Cleaning up old image (if exists)...
@@ -43,6 +43,9 @@ Volume persona-blog-logs already exists
       quote + note as warm-rose marginalia, useResonanceMarginalia hook,
       ResonanceMarginaliaBlock, insertResonanceBlocks merge,
       rose color token, rose-glow shadow, resonance-remembered animation)
+  - Resonances Page / The Book of You (/resonances — vitality visualization,
+      carrying vs shaped states, evolution whispers, slot indicator,
+      Canvas PNG export, /saved redirect)
   - Journey Context System (article depth, DNA tags, outcome promises)
   - Enhanced Search Engine (Fuse.js fuzzy matching, relevance ranking, build-time indexing)
   - Worldview Content Feeds (filter by perspective: technical, philosophical, practical, contrarian)
@@ -91,50 +94,50 @@ Volume persona-blog-logs already exists
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 53.64kB 0.0s done
+#5 transferring context: 52.11kB 0.0s done
 #5 DONE 0.0s
 
-#6 [ 6/18] RUN npm ci && npm cache clean --force
+#6 [ 8/18] COPY tsconfig.json ./
 #6 CACHED
 
-#7 [ 4/18] RUN apk add --no-cache python3 make g++
+#7 [ 7/18] COPY next.config.js ./
 #7 CACHED
 
-#8 [ 5/18] COPY package*.json ./
+#8 [10/18] COPY postcss.config.js ./
 #8 CACHED
 
-#9 [ 7/18] COPY next.config.js ./
+#9 [ 6/18] RUN npm ci && npm cache clean --force
 #9 CACHED
 
-#10 [ 2/18] WORKDIR /app
+#10 [ 9/18] COPY tailwind.config.ts ./
 #10 CACHED
 
-#11 [ 3/18] RUN mkdir -p /app/logs
+#11 [ 2/18] WORKDIR /app
 #11 CACHED
 
-#12 [ 8/18] COPY tsconfig.json ./
+#12 [ 4/18] RUN apk add --no-cache python3 make g++
 #12 CACHED
 
-#13 [ 9/18] COPY tailwind.config.ts ./
-#13 DONE 0.0s
+#13 [11/18] COPY next-env.d.ts ./
+#13 CACHED
 
-#14 [10/18] COPY postcss.config.js ./
-#14 DONE 0.0s
+#14 [ 3/18] RUN mkdir -p /app/logs
+#14 CACHED
 
-#15 [11/18] COPY next-env.d.ts ./
-#15 DONE 0.0s
+#15 [ 5/18] COPY package*.json ./
+#15 CACHED
 
 #16 [12/18] COPY middleware.ts ./
-#16 DONE 0.0s
+#16 CACHED
 
 #17 [13/18] COPY app ./app
-#17 DONE 0.0s
+#17 DONE 0.1s
 
 #18 [14/18] COPY components ./components
 #18 DONE 0.0s
 
 #19 [15/18] COPY lib ./lib
-#19 DONE 0.1s
+#19 DONE 0.0s
 
 #20 [16/18] COPY types ./types
 #20 DONE 0.0s
@@ -143,103 +146,116 @@ Volume persona-blog-logs already exists
 #21 DONE 0.0s
 
 #22 [18/18] RUN npm run build
-#22 0.343 
-#22 0.343 > persona-blog@0.1.0 build
-#22 0.343 > next build
-#22 0.343 
-#22 1.140 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#22 1.143 This information is used to shape Next.js' roadmap and prioritize features.
-#22 1.143 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#22 1.143 https://nextjs.org/telemetry
-#22 1.143 
-#22 1.211   ▲ Next.js 14.2.3
-#22 1.212 
-#22 1.317    Creating an optimized production build ...
-#22 17.31 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap failed, reason: 
-#22 17.31 
-#22 17.31 Retrying 1/3...
-#22 17.31 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
-#22 17.31 
-#22 17.31 Retrying 1/3...
-#22 18.38 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
-#22 18.38 
-#22 18.38 Retrying 2/3...
-#22 23.87  ✓ Compiled successfully
-#22 23.87    Linting and checking validity of types ...
-#22 34.12    Collecting page data ...
-#22 35.74    Generating static pages (0/25) ...
-#22 36.57    Generating static pages (6/25) 
-#22 37.03    Generating static pages (12/25) 
-#22 37.64    Generating static pages (18/25) 
-#22 38.04  ✓ Generating static pages (25/25)
-#22 38.38    Finalizing page optimization ...
-#22 38.38    Collecting build traces ...
-#22 43.19 
-#22 43.21 Route (app)                              Size     First Load JS
-#22 43.21 ┌ ○ /                                    1.77 kB        95.5 kB
-#22 43.21 ├ ○ /_not-found                          871 B          87.9 kB
-#22 43.21 ├ ○ /admin/categories                    1.99 kB          89 kB
-#22 43.21 ├ ○ /admin/editor-picks                  1.72 kB        97.1 kB
-#22 43.21 ├ ƒ /api/admin/editor-picks              0 B                0 B
-#22 43.21 ├ ƒ /api/articles                        0 B                0 B
-#22 43.21 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#22 43.21 ├ ƒ /api/categories                      0 B                0 B
-#22 43.21 ├ ƒ /api/categories/[slug]               0 B                0 B
-#22 43.21 ├ ƒ /api/challenge                       0 B                0 B
-#22 43.21 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
-#22 43.21 ├ ƒ /api/comments                        0 B                0 B
-#22 43.21 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
-#22 43.21 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
-#22 43.21 ├ ƒ /api/feedback                        0 B                0 B
-#22 43.21 ├ ƒ /api/highlights                      0 B                0 B
-#22 43.21 ├ ○ /api/history/today                   0 B                0 B
-#22 43.21 ├ ƒ /api/mirror                          0 B                0 B
-#22 43.21 ├ ƒ /api/questions                       0 B                0 B
-#22 43.21 ├ ƒ /api/reading/memory                  0 B                0 B
-#22 43.21 ├ ƒ /api/reading/streak                  0 B                0 B
-#22 43.21 ├ ƒ /api/reading/topics                  0 B                0 B
-#22 43.21 ├ ƒ /api/related-posts                   0 B                0 B
-#22 43.21 ├ ƒ /api/resonances                      0 B                0 B
-#22 43.21 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#22 43.21 ├ ƒ /api/trails                          0 B                0 B
-#22 43.21 ├ ƒ /article/[id]                        12.6 kB         115 kB
-#22 43.21 ├ ○ /categories                          963 B          94.7 kB
-#22 43.21 ├ ƒ /categories/[slug]                   1.05 kB        94.8 kB
-#22 43.21 ├ ○ /journey                             3.96 kB        97.7 kB
-#22 43.21 ├ ƒ /journey/[journeyId]/player          4.82 kB        91.8 kB
-#22 43.21 ├ ○ /mirror                              3.82 kB        97.6 kB
-#22 43.21 ├ ○ /questions                           1.01 kB        94.8 kB
-#22 43.21 ├ ○ /saved                               1.34 kB        95.1 kB
-#22 43.21 ├ ○ /trails                              1.41 kB        95.2 kB
-#22 43.21 ├ ƒ /trails/[id]                         1.69 kB        95.5 kB
-#22 43.21 └ ● /worldview/[type]                    172 B          93.9 kB
-#22 43.21     ├ /worldview/technical
-#22 43.21     ├ /worldview/philosophical
-#22 43.21     ├ /worldview/practical
-#22 43.21     └ /worldview/contrarian
-#22 43.21 + First Load JS shared by all            87 kB
-#22 43.21   ├ chunks/23-836e7376a143f2d1.js        31.5 kB
-#22 43.21   ├ chunks/fd9d1056-4e929951a7bb2095.js  53.6 kB
-#22 43.21   └ other shared chunks (total)          1.89 kB
-#22 43.21 
-#22 43.21 
-#22 43.21 ƒ Middleware                             27.4 kB
-#22 43.21 
-#22 43.21 ○  (Static)   prerendered as static content
-#22 43.21 ●  (SSG)      prerendered as static HTML (uses getStaticProps)
-#22 43.21 ƒ  (Dynamic)  server-rendered on demand
-#22 43.21 
-#22 DONE 43.4s
+#22 0.345 
+#22 0.345 > persona-blog@0.1.0 build
+#22 0.345 > next build
+#22 0.345 
+#22 1.237 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#22 1.239 This information is used to shape Next.js' roadmap and prioritize features.
+#22 1.239 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#22 1.239 https://nextjs.org/telemetry
+#22 1.239 
+#22 1.321   ▲ Next.js 14.2.3
+#22 1.322 
+#22 1.438    Creating an optimized production build ...
+#22 5.874 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7W0Q5n-wU.woff2 failed, reason: 
+#22 5.874 
+#22 5.874 Retrying 1/3...
+#22 5.878 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7W0Q5n-wU.woff2 failed, reason: 
+#22 5.878 
+#22 5.878 Retrying 1/3...
+#22 5.878 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7W0Q5n-wU.woff2 failed, reason: 
+#22 5.878 
+#22 5.878 Retrying 1/3...
+#22 5.878 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7W0Q5n-wU.woff2 failed, reason: 
+#22 5.878 
+#22 5.878 Retrying 1/3...
+#22 5.880 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7W0Q5n-wU.woff2 failed, reason: 
+#22 5.880 
+#22 5.880 Retrying 1/3...
+#22 5.880 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7W0Q5n-wU.woff2 failed, reason: 
+#22 5.880 
+#22 5.880 Retrying 1/3...
+#22 5.881 request to https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2 failed, reason: 
+#22 5.881 
+#22 5.881 Retrying 1/3...
+#22 24.45  ✓ Compiled successfully
+#22 24.45    Linting and checking validity of types ...
+#22 35.21    Collecting page data ...
+#22 37.15    Generating static pages (0/26) ...
+#22 38.01    Generating static pages (6/26) 
+#22 38.39    Generating static pages (12/26) 
+#22 39.09    Generating static pages (19/26) 
+#22 39.48  ✓ Generating static pages (26/26)
+#22 39.80    Finalizing page optimization ...
+#22 39.80    Collecting build traces ...
+#22 44.78 
+#22 44.80 Route (app)                              Size     First Load JS
+#22 44.80 ┌ ○ /                                    1.77 kB        95.5 kB
+#22 44.80 ├ ○ /_not-found                          871 B          87.9 kB
+#22 44.80 ├ ○ /admin/categories                    1.99 kB          89 kB
+#22 44.80 ├ ○ /admin/editor-picks                  1.72 kB        97.1 kB
+#22 44.80 ├ ƒ /api/admin/editor-picks              0 B                0 B
+#22 44.80 ├ ƒ /api/articles                        0 B                0 B
+#22 44.80 ├ ƒ /api/articles/[id]/categories        0 B                0 B
+#22 44.80 ├ ƒ /api/categories                      0 B                0 B
+#22 44.80 ├ ƒ /api/categories/[slug]               0 B                0 B
+#22 44.80 ├ ƒ /api/challenge                       0 B                0 B
+#22 44.80 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
+#22 44.80 ├ ƒ /api/comments                        0 B                0 B
+#22 44.80 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
+#22 44.80 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
+#22 44.80 ├ ƒ /api/feedback                        0 B                0 B
+#22 44.80 ├ ƒ /api/highlights                      0 B                0 B
+#22 44.80 ├ ○ /api/history/today                   0 B                0 B
+#22 44.80 ├ ƒ /api/mirror                          0 B                0 B
+#22 44.80 ├ ƒ /api/questions                       0 B                0 B
+#22 44.80 ├ ƒ /api/reading/memory                  0 B                0 B
+#22 44.80 ├ ƒ /api/reading/streak                  0 B                0 B
+#22 44.80 ├ ƒ /api/reading/topics                  0 B                0 B
+#22 44.80 ├ ƒ /api/related-posts                   0 B                0 B
+#22 44.80 ├ ƒ /api/resonances                      0 B                0 B
+#22 44.80 ├ ƒ /api/resonances/[id]                 0 B                0 B
+#22 44.80 ├ ƒ /api/trails                          0 B                0 B
+#22 44.80 ├ ƒ /article/[id]                        12.7 kB         115 kB
+#22 44.80 ├ ○ /categories                          963 B          94.7 kB
+#22 44.80 ├ ƒ /categories/[slug]                   1.05 kB        94.8 kB
+#22 44.80 ├ ○ /journey                             3.96 kB        97.7 kB
+#22 44.80 ├ ƒ /journey/[journeyId]/player          4.82 kB        91.8 kB
+#22 44.80 ├ ○ /mirror                              3.82 kB        97.6 kB
+#22 44.80 ├ ○ /questions                           1.01 kB        94.8 kB
+#22 44.80 ├ ○ /resonances                          4.05 kB        97.8 kB
+#22 44.80 ├ ○ /saved                               340 B          87.3 kB
+#22 44.80 ├ ○ /trails                              1.41 kB        95.2 kB
+#22 44.80 ├ ƒ /trails/[id]                         1.69 kB        95.5 kB
+#22 44.80 └ ● /worldview/[type]                    172 B          93.9 kB
+#22 44.80     ├ /worldview/technical
+#22 44.80     ├ /worldview/philosophical
+#22 44.80     ├ /worldview/practical
+#22 44.80     └ /worldview/contrarian
+#22 44.80 + First Load JS shared by all            87 kB
+#22 44.80   ├ chunks/23-836e7376a143f2d1.js        31.5 kB
+#22 44.80   ├ chunks/fd9d1056-4e929951a7bb2095.js  53.6 kB
+#22 44.80   └ other shared chunks (total)          1.89 kB
+#22 44.80 
+#22 44.80 
+#22 44.80 ƒ Middleware                             27.4 kB
+#22 44.80 
+#22 44.80 ○  (Static)   prerendered as static content
+#22 44.80 ●  (SSG)      prerendered as static HTML (uses getStaticProps)
+#22 44.80 ƒ  (Dynamic)  server-rendered on demand
+#22 44.80 
+#22 DONE 44.9s
 
 #23 exporting to image
 #23 exporting layers
 #23 exporting layers 0.2s done
-#23 writing image sha256:8c81f2c8d6c78dcd95b18491b0cf49b6510eb4718b5dfd64dafe74d22cab181b done
+#23 writing image sha256:65242a1b22513d8921511eb218b46e441349d216efb05d99985df1d7c2c7a072 done
 #23 naming to docker.io/library/persona-blog-image:latest done
 #23 DONE 0.2s
 🎯 Starting container on port 7200...
 📊 Logging level: info
-8264eb43dc67a08a3c055fc08c42d2a073c7eed3eb6e6ea870d66247ecd02801
+1f553c0cc7c1281a0547334104914fba7b94cebc9449a1ae5da61e6f98dbe019
 ⏳ Waiting for container to start...
 ✅ Container is running
 🏥 Checking container health...
@@ -278,8 +294,8 @@ Volume persona-blog-logs already exists
 
 To change log level: export LOG_LEVEL=debug; ./deploy.sh
 
-Deployment completed at: Tue Apr  7 02:24:14 AM CEST 2026
-Deployment completed at: Tue Apr  7 02:24:14 AM CEST 2026
+Deployment completed at: Tue Apr  7 03:32:43 AM CEST 2026
+Deployment completed at: Tue Apr  7 03:32:43 AM CEST 2026
 🧹 Cleaning up dangling images...
 Removed dangling images
 ✨ Deployment complete!

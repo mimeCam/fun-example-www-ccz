@@ -36,6 +36,10 @@ export default function AmbientMirror() {
           )}
         </div>
       </Link>
+      <Link href="/resonances"
+        className="block mt-2 text-[10px] text-rose/50 hover:text-rose transition-colors text-center">
+        Your Resonances →
+      </Link>
     </div>
   );
 }

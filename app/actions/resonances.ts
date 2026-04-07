@@ -13,7 +13,8 @@ import {
   updateResonance,
   archiveResonance,
   deleteResonance,
-  recordResonanceVisit
+  recordResonanceVisit,
+  getResonancesWithArticles
 } from '@/lib/resonances';
 import { createEmailFingerprint } from '@/lib/reading-memory';
 import type {
@@ -21,8 +22,9 @@ import type {
   UpdateResonanceInput,
   Resonance,
   DepthMetrics,
-  SlotLimits
+  SlotLimits,
 } from '@/types/resonance';
+import type { ResonanceWithArticle } from '@/types/resonance-display';
 
 /**
  * Create a new resonance (server action)
@@ -168,7 +170,23 @@ export async function recordResonanceVisitAction(
 }
 
 // TODO: Add server action for deleting resonances
-// TODO: Add server action for batch operations
+
+/**
+ * Get all active resonances for a user, enriched with article titles.
+ * Returns resonances sorted for display (lowest vitality first = most urgent).
+ */
+export async function getResonancesWithArticleAction(
+  email: string
+): Promise<{ success: boolean; resonances?: ResonanceWithArticle[]; error?: string }> {
+  try {
+    const userId = createEmailFingerprint(email);
+    const resonances = getResonancesWithArticles(userId);
+    return { success: true, resonances };
+  } catch (error: any) {
+    console.error('Error getting resonances with articles:', error);
+    return { success: false, error: error.message || 'Failed to get resonances' };
+  }
+}
 
 /**
  * Get active resonances for a specific user + article pair.
