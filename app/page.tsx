@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic';
 
 // Client-side only components to avoid hydration issues
 const SearchBar = dynamic(() => import('@/components/SearchBar'), { ssr: false });
-const ReturnVisitorGreeting = dynamic(
-  () => import('@/components/return/ReturnVisitorGreeting').then(m => ({ default: m.ReturnVisitorGreeting })),
+const ReturnLetter = dynamic(
+  () => import('@/components/return/ReturnLetter').then(m => ({ default: m.ReturnLetter })),
   { ssr: false }
 );
 
@@ -31,8 +31,8 @@ export default function Home() {
             Challenging ideas for those who question assumptions. Choose your perspective below.
           </p>
 
-          {/* Return-visit recognition — archetype-aware for returning readers */}
-          <ReturnVisitorGreeting />
+          {/* Return-visit letter — full letter for 3+ day absence, compact greeting otherwise */}
+          <ReturnLetter />
 
           {/* Search Bar */}
           <div className="mt-8">

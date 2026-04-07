@@ -55,3 +55,28 @@ export interface ChapterBoundary {
   daysGap: number;
   label: string;
 }
+
+// ─── Return Letter ───────────────────────────────────────
+
+export interface LetterContext {
+  archetype: ArchetypeKey;
+  archetypeLabel: string;
+  daysSinceLastVisit: number;
+  visitCount: number;
+  season: SeasonInfo;
+  resonanceCount: number;
+  recentTopics: string[];
+  hasEvolution: boolean;
+  evolutionTrajectory?: 'rising' | 'stable' | 'declining';
+  previousArchetype?: ArchetypeKey;
+}
+
+export interface Letter {
+  salutation: string;
+  opening: string;
+  body: string[];
+  closing: string;
+  signOff: string;
+  archetype: ArchetypeKey;
+  date: string;
+}
