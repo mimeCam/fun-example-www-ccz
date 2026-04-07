@@ -2,6 +2,9 @@
  * ResonancesClient — client shell for /resonances page.
  * Reads anon-reader-id from localStorage, fetches resonances + metrics + slots,
  * then renders sections: Carrying (alive), Shaped (faded), Evolution, Export.
+ *
+ * Now builds BookNarrationContext for data-driven EvolutionThread whispers
+ * and ClosingLineContext for shaped resonances.
  */
 'use client';
 
@@ -15,15 +18,32 @@ import {
 import { getVitalityLabel } from '@/types/resonance-display';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 import type { DepthMetrics, SlotLimits } from '@/types/resonance';
+import type { BookNarrationContext, ClosingLineContext } from '@/types/book-narration';
+import type { ArchetypeKey } from '@/types/content';
+import { getSeason } from '@/lib/mirror/season-engine';
+import { synthesizeClosingLine } from '@/lib/mirror/closing-line-engine';
+import { detectChapterBreak } from '@/lib/mirror/book-whisper-engine';
 import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import ResonanceExport from './ResonanceExport';
 
 const ANON_KEY = 'anon-reader-id';
+const MIRROR_KEY = 'quick-mirror-result';
 
 function getAnonId(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem(ANON_KEY);
+}
+
+/** Read archetype from localStorage mirror snapshot. */
+function readArchetype(): ArchetypeKey | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(MIRROR_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return (parsed?.archetype as ArchetypeKey) ?? null;
+  } catch { return null; }
 }
 
 /** Separate resonances into carrying (alive) and shaped (faded). */
@@ -40,6 +60,45 @@ function formatTimeAgo(dateStr: string): string {
   if (days === 0) return 'Saved today';
   if (days === 1) return 'Saved yesterday';
   return `Saved ${days} days ago`;
+}
+
+/** Build narration context for each gap between carrying resonances. */
+function buildNarrationContexts(
+  carrying: ResonanceWithArticle[],
+  archetype: ArchetypeKey | null,
+): BookNarrationContext[] {
+  return carrying.map((curr, i) => {
+    const prev = i > 0 ? carrying[i - 1] : null;
+    const gapDays = prev
+      ? Math.floor(
+          (new Date(curr.createdAt).getTime() -
+           new Date(prev.createdAt).getTime()) / 86400000,
+        )
+      : null;
+    return {
+      position: i,
+      total: carrying.length,
+      gapDays,
+      prev,
+      curr,
+      season: getSeason(new Date(curr.createdAt)),
+      archetype,
+    };
+  });
+}
+
+/** Build closing line context for a shaped resonance. */
+function buildClosingCtx(r: ResonanceWithArticle): ClosingLineContext {
+  const created = new Date(r.createdAt);
+  const now = new Date();
+  const daysLived = Math.floor(
+    (now.getTime() - created.getTime()) / 86400000,
+  );
+  return {
+    resonance: r,
+    daysLived,
+    season: getSeason(created),
+  };
 }
 
 /** Gem outline SVG — matches mirror page empty state icon. */
@@ -109,6 +168,8 @@ export default function ResonancesClient() {
 
   const { carrying, shaped } = splitByVitality(resonances);
   const isEmpty = resonances.length === 0;
+  const archetype = readArchetype();
+  const contexts = buildNarrationContexts(carrying, archetype);
 
   // Empty state — no resonances captured yet
   if (isEmpty) return (
@@ -140,21 +201,48 @@ export default function ResonancesClient() {
         </Link>
       </div>
 
+      {/* Page title */}
+      <div className="mb-10">
+        <h1 className="text-gold text-3xl font-display font-light lowercase">
+          the book of you
+        </h1>
+        <p className="text-mist text-md italic mt-1">What you&apos;re still carrying</p>
+      </div>
+
       {/* Carrying section — alive resonances */}
       {carrying.length > 0 && (
         <section className="mb-10">
-          <p className="text-xs uppercase tracking-widest text-mist mb-6">
-            What you&apos;re still carrying
-          </p>
-          {carrying.map((r, i) => (
-            <div key={r.id}>
-              <ResonanceEntry resonance={r} timeAgo={formatTimeAgo(r.createdAt)} />
-              {/* Whisper between entries */}
-              {i < carrying.length - 1 && (
-                <EvolutionThread position={i} total={carrying.length} />
-              )}
-            </div>
-          ))}
+          {carrying.map((r, i) => {
+            const ctx = contexts[i];
+            // Detect chapter break before this entry
+            const prev = i > 0 ? carrying[i - 1] : null;
+            const brk = prev
+              ? detectChapterBreak(
+                  new Date(prev.createdAt),
+                  new Date(r.createdAt),
+                )
+              : null;
+
+            return (
+              <div key={r.id}>
+                {/* Chapter break marker */}
+                {brk?.isBreak && (
+                  <div className="my-6 text-center">
+                    <div className="h-px bg-fog/40 max-w-[200px] mx-auto" />
+                    <p className="text-mist/50 text-xs italic mt-2">
+                      {brk.label}
+                    </p>
+                    <div className="h-px bg-fog/40 max-w-[200px] mx-auto mt-2" />
+                  </div>
+                )}
+                <ResonanceEntry resonance={r} timeAgo={formatTimeAgo(r.createdAt)} />
+                {/* Data-driven whisper between entries */}
+                {i < carrying.length - 1 && (
+                  <EvolutionThread context={contexts[i]} />
+                )}
+              </div>
+            );
+          })}
         </section>
       )}
 
@@ -163,15 +251,25 @@ export default function ResonancesClient() {
         <div className="h-px bg-fog my-10" />
       )}
 
-      {/* Shaped section — faded resonances */}
+      {/* Shaped section — faded resonances with closing lines */}
       {shaped.length > 0 && (
         <section className="mb-10">
           <p className="text-xs uppercase tracking-widest text-mist mb-6">
             What shaped you
           </p>
-          {shaped.map((r) => (
-            <ResonanceEntry key={r.id} resonance={r} timeAgo={formatTimeAgo(r.createdAt)} faded />
-          ))}
+          {shaped.map((r) => {
+            const closingCtx = buildClosingCtx(r);
+            const closing = synthesizeClosingLine(closingCtx);
+            return (
+              <ResonanceEntry
+                key={r.id}
+                resonance={r}
+                timeAgo={formatTimeAgo(r.createdAt)}
+                faded
+                closingLine={closing}
+              />
+            );
+          })}
         </section>
       )}
 

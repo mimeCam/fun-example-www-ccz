@@ -11,6 +11,7 @@ interface Props {
   resonance: ResonanceWithArticle;
   timeAgo: string;
   faded?: boolean;
+  closingLine?: string;
 }
 
 /** Small gem icon for the card label. */
@@ -42,7 +43,7 @@ function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean })
   );
 }
 
-export default function ResonanceEntry({ resonance, timeAgo, faded }: Props) {
+export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine }: Props) {
   const base = 'rounded-3xl p-6 my-8 transition-all duration-300';
   const alive = 'bg-surface/60 border-l-4 border-rose shadow-rose-glow';
   const dimmed = 'bg-surface/30 border-l-4 border-rose/30 opacity-60';
@@ -90,6 +91,13 @@ export default function ResonanceEntry({ resonance, timeAgo, faded }: Props) {
       <div className="mt-3">
         <VitalityBar vitality={resonance.vitality} faded={faded} />
       </div>
+
+      {/* Closing line — farewell for shaped resonances */}
+      {faded && closingLine && (
+        <p className="mt-4 text-gold/50 italic text-xs leading-relaxed">
+          {closingLine}
+        </p>
+      )}
     </div>
   );
 }

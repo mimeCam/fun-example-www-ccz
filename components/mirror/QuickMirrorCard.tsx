@@ -1,14 +1,21 @@
+/**
+ * QuickMirrorCard — inline archetype reveal after 70% scroll.
+ *
+ * Animation phases: hidden → emergence → shimmer → reveal → rest.
+ * Total animation: ~2.5s (compressed from 3.5s per UX spec).
+ * scrollIntoView removed — the reader's scroll position is sovereign.
+ */
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import { generateQuickMirrorCard } from '@/lib/mirror/quick-mirror-card-generator';
 
-// ── Phase timing (ms) ──
+// ── Phase timing (ms) — compressed to 2.5s total ──
 const T_EMERGE  = 0;
-const T_SHIMMER = 600;
-const T_REVEAL  = 1800;
-const T_REST    = 3500;
+const T_SHIMMER = 400;
+const T_REVEAL  = 1200;
+const T_REST    = 2500;
 
 type Phase = 'hidden' | 'emergence' | 'shimmer' | 'reveal' | 'rest';
 
@@ -22,6 +29,7 @@ interface Props {
 export default function QuickMirrorCard({ result, articleUrl }: Props) {
   const [phase, setPhase]     = useState<Phase>('hidden');
   const [copied, setCopied]   = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const cardRef               = useRef<HTMLDivElement>(null);
 
   // Drive the 4-phase animation sequence
@@ -35,12 +43,6 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
     return () => ids.forEach(clearTimeout);
   }, []);
 
-  // Scroll the card into view during shimmer so the reader sees the reveal
-  useEffect(() => {
-    if (phase === 'shimmer')
-      cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, [phase]);
-
   const handleCopy = useCopyShareText(result.archetypeLabel, articleUrl, setCopied);
   const handleSaveImage = useCallback(() => {
     const dataUrl = generateQuickMirrorCard(result);
@@ -49,11 +51,26 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
     a.href = dataUrl;
     a.click();
   }, [result]);
+
+  // Dismiss state: collapsed to thin gold line
+  if (dismissed) return (
+    <div className="my-12 mx-auto max-w-[200px] h-px bg-gold/30 rounded-full" />
+  );
+
   const showContent = phase === 'reveal' || phase === 'rest';
   const showActions = phase === 'rest';
 
   return (
     <div ref={cardRef} className={`${cardBase()} ${phaseClass(phase)}`}>
+      {/* Dismiss button */}
+      <button
+        onClick={() => setDismissed(true)}
+        className="absolute top-3 right-3 text-mist/40 hover:text-white/80
+          transition-colors duration-200 text-lg leading-none"
+        aria-label="Dismiss">
+        ×
+      </button>
+
       {/* Label */}
       <p
         className={contentFade(showContent)}
@@ -65,7 +82,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
       {/* Archetype name */}
       <h2
         className={`mt-3 text-3xl font-display font-bold text-white ${contentFade(showContent)}`}
-        style={{ transitionDelay: phase === 'reveal' ? '200ms' : undefined }}
+        style={{ transitionDelay: phase === 'reveal' ? '150ms' : undefined }}
       >
         {result.archetypeLabel}
       </h2>
@@ -73,7 +90,7 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
       {/* Whisper quote */}
       <p
         className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[340px] mx-auto leading-relaxed ${contentFade(showContent)}`}
-        style={{ transitionDelay: phase === 'reveal' ? '400ms' : undefined }}
+        style={{ transitionDelay: phase === 'reveal' ? '300ms' : undefined }}
       >
         &ldquo;{result.whisper}&rdquo;
       </p>
@@ -81,13 +98,13 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
       {/* Gold divider */}
       <div
         className={`my-6 h-px max-w-[200px] mx-auto bg-[#f0c674]/40 transition-transform duration-500 ${showContent ? 'scale-x-100' : 'scale-x-0'}`}
-        style={{ transitionDelay: phase === 'reveal' ? '600ms' : undefined }}
+        style={{ transitionDelay: phase === 'reveal' ? '450ms' : undefined }}
       />
 
       {/* Share actions */}
       <div
         className={`flex flex-col items-center gap-2 ${contentFade(showActions)}`}
-        style={{ transitionDelay: phase === 'reveal' ? '800ms' : undefined }}
+        style={{ transitionDelay: phase === 'reveal' ? '600ms' : undefined }}
       >
         <button onClick={handleCopy} className={shareBtnClass(copied)}>
           {copied ? '✓ Copied!' : 'Copy & Share →'}
@@ -104,8 +121,8 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
 
 function cardBase(): string {
   return [
-    'my-20 mx-auto max-w-[400px] p-8 text-center',
-    'rounded-3xl border',
+    'relative my-20 mx-auto max-w-[400px] p-8 text-center',
+    'rounded-2xl border',
     'bg-gradient-to-b from-[#16213e] to-[#1a1a2e]',
     'transition-all duration-700 ease-out',
   ].join(' ');
