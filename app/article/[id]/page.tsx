@@ -11,9 +11,11 @@ import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
 import { useResonanceMarginalia, extractCoreParagraphs } from '@/lib/hooks/useResonanceMarginalia';
+import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { getLayeredContent, getArticleById, getAllArticles } from '@/lib/content/articleData';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
+import { RecognitionWhisper } from '@/components/return/RecognitionWhisper';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -52,6 +54,9 @@ function ArticleContent({ params }: { params: { id: string } }) {
   // Quick Mirror — archetype synthesis at 70% scroll
   const quickMirror = useQuickMirror(params.id, 5, ['critical-thinking'], 70);
 
+  // Return recognition — ambient "I know you" for returning readers
+  const recognition = useReturnRecognition();
+
   // Next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
   const nextArticle = allArticles[0];
@@ -69,11 +74,12 @@ function ArticleContent({ params }: { params: { id: string } }) {
         <div className="max-w-[38rem] mx-auto px-6">
           <TopBar articleId={params.id} title={article?.title ?? ''} />
           <ArticleHeader title={article?.title ?? 'Article'} />
+          <RecognitionWhisper recognition={recognition} />
           <hr className="border-fog mb-8" />
 
           <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-[#f0f0f5]">
             {mergedBlocks.length > 0 ? (
-              <StratifiedRenderer blocks={mergedBlocks} archetype={archetype} articleId={params.id} />
+              <StratifiedRenderer blocks={mergedBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning} />
             ) : (
               <p className="text-mist">Article content not available.</p>
             )}

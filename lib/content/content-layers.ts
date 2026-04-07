@@ -13,6 +13,25 @@ export function isReturningReader(readCount: number): boolean {
   return readCount >= 2;
 }
 
+/** Resolve recognition tier from archetype, visit count, and snapshot history */
+export function resolveRecognitionTier(
+  archetype: ArchetypeKey | null,
+  visitCount: number,
+  hasSnapshots: boolean
+): 'stranger' | 'returning' | 'known' {
+  if (!archetype && visitCount === 0) return 'stranger';
+  if (archetype && hasSnapshots) return 'known';
+  if (visitCount >= 2) return 'returning';
+  return 'stranger';
+}
+
+/** Map recognition tier to a tonal register for content rendering */
+export function getTonalRegister(
+  tier: 'stranger' | 'returning' | 'known'
+): 'formal' | 'warm' {
+  return tier === 'stranger' ? 'formal' : 'warm';
+}
+
 /**
  * Resolve which content layers are visible to a given reader.
  *

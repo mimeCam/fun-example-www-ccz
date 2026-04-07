@@ -8,12 +8,13 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 - `app/` — Pages & API routes
 - `app/resonances/` — `/resonances` (Book of You)
 - `components/mirror/` — MirrorRevealCard, QuickMirrorCard
-- `lib/mirror/` — Scoring, snapshots, evolution, whisper engine, book-whisper-engine, season-engine, closing-line-engine, card generators
-- `lib/hooks/` — useMirror, useQuickMirror, useBehavioralSignals, useParagraphEngagement
-- `types/` — content.ts, resonance.ts, resonance-display.ts, book-narration.ts
+- `components/return/` — RecognitionWhisper, ReturnVisitorGreeting
+- `lib/mirror/` — Scoring, snapshots, evolution, whisper engines, season, card generators
+- `lib/hooks/` — useMirror, useQuickMirror, useReturnRecognition, useBehavioralSignals, useParagraphEngagement
+- `types/` — content.ts, resonance.ts, book-narration.ts
 
 ## Core Feature: Accelerated Mirror + Resonance Marginalia
-"The blog that reads you back." One article at 70% scroll → archetype whisper. No email, no account — pure client-side `quickSynthesize()`. Returning readers see captured quote + note as warm-rose marginalia.
+"The blog that reads you back." One article at 70% scroll → archetype whisper. No email, no account — pure client-side. Returning readers see captured quote + note as warm-rose marginalia, warmer on return visits.
 
 ## Design Tokens (tailwind.config.ts)
 Colors: background, primary, secondary, accent, surface, fog, mist, gold, cyan, rose, void.
@@ -21,7 +22,7 @@ Shadows: void, rise, float, gold, gold-intense, rose-glow. Never raw grays.
 
 ## WIP
 - Progressive slot unlock system (stranger → acquaintance → friend → confidant)
-- MirrorRevealCard: simplify to top-trait-only view, hide full scores behind expandable
+- MirrorRevealCard: simplify to top-trait-only view
 - `/explore` page: unified discovery replacing `/categories`, `/worldview`, `/questions`, `/trails`
 - Homepage redesign: single featured article experience
 

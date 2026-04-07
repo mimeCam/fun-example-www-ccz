@@ -23,6 +23,8 @@ interface StratifiedRendererProps {
   blocks: ContentBlock[];
   archetype: ArchetypeKey | null;
   articleId: string;
+  /** Warm mode: intensified marginalia for returning readers */
+  warmer?: boolean;
 }
 
 /** Core paragraphs — plain body text with paragraph tracking IDs */
@@ -47,15 +49,17 @@ function CoreBlock({ paragraphs, prefix, offset }: {
 }
 
 /** Marginalia — returning-reader side notes with cyan border + shimmer */
-function MarginaliaBlock({ block }: { block: ContentBlock }) {
+function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
+  const border = warmer ? 'border-l-[#6ec6ca]/70' : 'border-l-[#6ec6ca]/40';
+  const text = warmer ? 'text-[#b4b4d0]' : 'text-[#9494b8]';
   return (
     <aside
-      className={`my-8 pl-4 border-l-2 border-l-[#6ec6ca]/40 bg-[#242445]/30 rounded-r-md py-3 pr-4
+      className={`my-8 pl-4 border-l-2 ${border} bg-[#242445]/30 rounded-r-md py-3 pr-4
         ${block.isNew ? 'discovery-shimmer' : ''}`}
     >
       {block.isNew && <NewContentBadge />}
       {block.paragraphs.map((p, i) => (
-        <p key={i} className="text-[#9494b8] italic text-sm leading-relaxed">
+        <p key={i} className={`${text} italic text-sm leading-relaxed`}>
           {p.trim()}
         </p>
       ))}
@@ -94,7 +98,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
 }
 
 /** Main renderer — iterates blocks, tracks core paragraph offset for IDs */
-export function StratifiedRenderer({ blocks, articleId }: StratifiedRendererProps) {
+export function StratifiedRenderer({ blocks, articleId, warmer }: StratifiedRendererProps) {
   if (!blocks.length) return null;
 
   let coreOffset = 0;
@@ -112,10 +116,10 @@ export function StratifiedRenderer({ blocks, articleId }: StratifiedRendererProp
           return el;
         }
         if (block.layer === 'marginalia') {
-          return <MarginaliaBlock key={`margin-${i}`} block={block} />;
+          return <MarginaliaBlock key={`margin-${i}`} block={block} warmer={warmer} />;
         }
         if (block.layer === 'resonance-marginalia') {
-          return <ResonanceMarginaliaBlock key={`res-${i}`} block={block} />;
+          return <ResonanceMarginaliaBlock key={`res-${i}`} block={block} warmer={warmer} />;
         }
         return <ExtensionBlock key={`ext-${i}`} block={block} />;
       })}
@@ -128,13 +132,16 @@ export function StratifiedRenderer({ blocks, articleId }: StratifiedRendererProp
  * Renders the reader's own captured quote + note as warm-rose
  * marginalia woven into the article body on return visits.
  */
-function ResonanceMarginaliaBlock({ block }: { block: ContentBlock }) {
+function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
   const data = block.resonance;
   if (!data) return null;
 
+  const scale = warmer ? 'scale-[1.01]' : '';
+  const glow = warmer ? 'shadow-[0_0_25px_rgba(232,143,167,0.2)]' : '';
+
   return (
     <aside
-      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-3xl shadow-rose-glow
+      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-3xl shadow-rose-glow ${scale} ${glow}
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
       <p className="text-xs uppercase tracking-widest text-rose/70 mb-3">

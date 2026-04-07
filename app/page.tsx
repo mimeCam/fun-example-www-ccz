@@ -2,8 +2,12 @@ import { FILTER_TEMPLATES } from '@/types/filter';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 
-// Client-side only SearchBar to avoid hydration issues
+// Client-side only components to avoid hydration issues
 const SearchBar = dynamic(() => import('@/components/SearchBar'), { ssr: false });
+const ReturnVisitorGreeting = dynamic(
+  () => import('@/components/return/ReturnVisitorGreeting').then(m => ({ default: m.ReturnVisitorGreeting })),
+  { ssr: false }
+);
 
 export default function Home() {
   const filters = Object.entries(FILTER_TEMPLATES).map(([key, value]) => ({
@@ -26,6 +30,9 @@ export default function Home() {
           <p className="text-gray-400 max-w-2xl mx-auto mb-8">
             Challenging ideas for those who question assumptions. Choose your perspective below.
           </p>
+
+          {/* Return-visit recognition — archetype-aware for returning readers */}
+          <ReturnVisitorGreeting />
 
           {/* Search Bar */}
           <div className="mt-8">
