@@ -22,11 +22,15 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 Colors: background, primary, secondary, accent, surface, fog, mist, gold, cyan, rose, void.
 Shadows: void, rise, float, gold, gold-intense, rose-glow. Never raw grays.
 
+## Shipped
+- `/explore` page (The Hallway): unified discovery with archetype-aware curation, trail cards, question teasers, all articles grid. Uses `WhisperFooter` shared component.
+- `components/shared/WhisperFooter.tsx`: shared navigation footer (Mirror · Home · Explore · Resonances)
+
 ## WIP
-- `/explore` page: unified discovery replacing `/categories`, `/worldview`, `/questions`, `/trails`
 - MirrorRevealCard: simplify to top-trait-only view
 - Return Letter: future `/letters` archive, milestone/seasonal letter types
 - Homepage: returning reader adaptation (select unread article via reading_memory)
+- Design token cleanup: replace raw grays in remaining components
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.
