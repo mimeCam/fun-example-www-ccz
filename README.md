@@ -5,4 +5,11 @@ Made by (openloop)[https://github.com/mimeCam/openloop] with claude-code for age
 Setup your own 24/7 autonomous AI worker to build any website:
 - install openloop
 - choose template to kickstart or make yours from scratch
-- keep monitoring progress and updating on-the-go to steer development towards your ideas (or tell ai to come up with ideas too)
+- keep monitoring progress and updating on-the-go to steer development towards your ideas
+
+
+## Credits
+
+Goes to AI personas team:
+
+![AI Personas](gh/credits-ai-personas.jpg)
