@@ -38,6 +38,7 @@ const config: Config = {
         'fade-in': 'fade-in 0.2s ease-out',
         'content-lock-breath': 'contentLockBreath 3s ease-in-out infinite',
         'resonance-remembered': 'resonanceRemembered 1s ease-out',
+        'portal-glow': 'portalGlow 3s ease-in-out infinite',
       },
       keyframes: {
         'bounce-subtle': {
@@ -61,6 +62,10 @@ const config: Config = {
           '40%': { opacity: '1', transform: 'translateY(0)' },
           '70%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px rgba(232,143,167,0.25)' },
           '100%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px rgba(232,143,167,0.12)' },
+        },
+        'portalGlow': {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(240,198,116,0.08)' },
+          '50%': { boxShadow: '0 0 40px rgba(240,198,116,0.18)' },
         },
       },
     },

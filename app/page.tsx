@@ -1,99 +1,69 @@
-import { FILTER_TEMPLATES } from '@/types/filter';
+/**
+ * The Threshold — Homepage as a single-article immersive entry.
+ *
+ * Replaces the old worldview card grid with a cinematic doorway:
+ * one featured article, one "Begin Reading" CTA, zero decisions.
+ *
+ * The path to the magic moment is now:
+ *   Homepage → Click one button → Read to 70% → Archetype Reveal
+ *
+ * ReturnLetter renders client-side via dynamic import (reads localStorage).
+ * PortalHero + ReadingInvitation are server components (static article data).
+ */
+
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { getDefaultFeaturedArticle } from '@/lib/content/featured';
+import PortalHero from '@/components/home/PortalHero';
+import ReadingInvitation from '@/components/home/ReadingInvitation';
 
-// Client-side only components to avoid hydration issues
-const SearchBar = dynamic(() => import('@/components/SearchBar'), { ssr: false });
-const ReturnLetter = dynamic(
-  () => import('@/components/return/ReturnLetter').then(m => ({ default: m.ReturnLetter })),
+// Client-only: reads localStorage for return recognition
+const ReturningPortal = dynamic(
+  () => import('@/components/home/ReturningPortal'),
   { ssr: false }
 );
 
 export default function Home() {
-  const filters = Object.entries(FILTER_TEMPLATES).map(([key, value]) => ({
-    ...value,
-    id: key,
-  }));
+  const article = getDefaultFeaturedArticle();
 
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Hero section */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl md:text-6xl font-display font-bold mb-6 text-white">
-            The Anti-Blog
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-4 max-w-3xl mx-auto">
-            A blog that tries to talk most people out of reading it —
-            <span className="text-accent font-semibold"> so the right people can&apos;t stop</span>
-          </p>
-          <p className="text-gray-400 max-w-2xl mx-auto mb-8">
-            Challenging ideas for those who question assumptions. Choose your perspective below.
-          </p>
+    <main className="min-h-screen flex flex-col">
+      <div className="flex-1 flex flex-col justify-center max-w-3xl
+        mx-auto px-4 md:px-6 py-16 md:py-24">
 
-          {/* Return-visit letter — full letter for 3+ day absence, compact greeting otherwise */}
-          <ReturnLetter />
+        {/* Return recognition — invisible for strangers */}
+        <ReturningPortal />
 
-          {/* Search Bar */}
-          <div className="mt-8">
-            <SearchBar />
-          </div>
-        </div>
+        {/* The article doorway */}
+        <PortalHero article={article} />
 
-        {/* Worldview selection cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
-          {filters.map((filter) => (
-            <Link
-              key={filter.id}
-              href={`/worldview/${filter.type}`}
-              className="group block bg-surface border border-surface hover:border-primary rounded-xl p-6 transition-all hover:shadow-lg hover:shadow-primary/20"
-            >
-              <div className="mb-4">
-                <span className="text-xs uppercase tracking-wider text-accent font-semibold">
-                  {filter.type}
-                </span>
-                <h3 className="text-2xl font-display font-bold text-white mt-2 mb-3 group-hover:text-accent transition-colors">
-                  {filter.title}
-                </h3>
-                <p className="text-gray-400 mb-4">
-                  {filter.description}
-                </p>
-              </div>
+        {/* Single call-to-action */}
+        <ReadingInvitation articleId={article.id} />
 
-              <div className="border-t border-gray-700 pt-4">
-                <p className="text-sm text-gray-500 mb-2">If you believe...</p>
-                <ul className="space-y-1">
-                  {filter.beliefs.slice(0, 2).map((belief, index) => (
-                    <li key={index} className="text-sm text-gray-300 flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span>{belief}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="mt-4 text-primary font-medium group-hover:text-accent transition-colors">
-                Explore {filter.type} ideas →
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* Footer explanation */}
-        <div className="text-center text-mist text-sm space-y-2">
-          <p>
-            No algorithms, no feeds. Just ideas for people who choose to engage with them.
-          </p>
-          <div className="flex justify-center gap-6 text-xs">
-            <Link href="/mirror" className="text-[#f0c674]/60 hover:text-[#f0c674] transition-colors">
-              Your Mirror
-            </Link>
-            <Link href="/resonances" className="text-rose/60 hover:text-rose transition-colors">
-              Your Resonances
-            </Link>
-          </div>
-        </div>
       </div>
+
+      {/* Footer whisper — three words, muted, consistent */}
+      <footer className="text-center pb-8 space-y-2">
+        <p className="text-mist/40 text-sm">
+          No algorithms. No feeds.
+        </p>
+        <div className="flex justify-center gap-4 text-xs">
+          <Link href="/mirror"
+            className="text-gold/50 hover:text-gold transition-colors">
+            Mirror
+          </Link>
+          <span className="text-mist/20">&middot;</span>
+          <Link href="/categories"
+            className="text-mist/50 hover:text-mist transition-colors">
+            Explore
+          </Link>
+          <span className="text-mist/20">&middot;</span>
+          <Link href="/resonances"
+            className="text-rose/50 hover:text-rose transition-colors">
+            Resonances
+          </Link>
+        </div>
+      </footer>
     </main>
   );
 }
