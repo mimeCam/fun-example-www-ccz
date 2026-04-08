@@ -6,6 +6,7 @@
  */
 
 import type { QuickMirrorResult } from './quick-synthesize';
+import { initCanvas, wrapLines } from '@/lib/utils/canvas';
 
 const W = 1080;
 const H = 1080;
@@ -17,7 +18,7 @@ const MUTED = '#94a3b8';
 /* ─── Public API ─────────────────────────────────────────── */
 
 export function generateQuickMirrorCard(result: QuickMirrorResult): string {
-  const { ctx, canvas } = initCanvas();
+  const { ctx, canvas } = initCanvas(W, H);
   drawBackground(ctx);
   drawLabel(ctx);
   drawArchetype(ctx, result.archetypeLabel);
@@ -28,19 +29,6 @@ export function generateQuickMirrorCard(result: QuickMirrorResult): string {
   drawConfidence(ctx, result.confidence);
   drawBranding(ctx);
   return canvas.toDataURL('image/png');
-}
-
-/* ─── Canvas bootstrap ──────────────────────────────────── */
-
-function initCanvas(): { ctx: CanvasRenderingContext2D; canvas: HTMLCanvasElement } {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas not supported');
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  ctx.scale(dpr, dpr);
-  return { ctx, canvas };
 }
 
 /* ─── Drawing helpers (each ≤ 8 lines) ──────────────────── */
@@ -124,20 +112,7 @@ function drawBranding(ctx: CanvasRenderingContext2D): void {
   ctx.fillText('theanti.blog', W / 2, H - 40);
 }
 
-/* ─── Text utility (same pattern as card-generator.ts) ──── */
-
-function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number): string[] {
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let cur = '';
-  for (const w of words) {
-    const test = cur + (cur ? ' ' : '') + w;
-    if (ctx.measureText(test).width > max && cur) { lines.push(cur); cur = w; }
-    else cur = test;
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
+/* ─── Text utility ───────────────────────────────────────── */
 
 function cap(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);

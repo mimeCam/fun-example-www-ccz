@@ -5,6 +5,7 @@
  */
 
 import type { ReaderMirror } from '@/types/mirror';
+import { initCanvas, wrapLines } from '@/lib/utils/canvas';
 
 const W = 1080;
 const H = 1080;
@@ -16,14 +17,7 @@ const TEXT = '#f1f5f9';
 const MUTED = '#94a3b8';
 
 export function generateMirrorCard(mirror: ReaderMirror): string {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Canvas not supported');
-
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = W * dpr;
-  canvas.height = H * dpr;
-  ctx.scale(dpr, dpr);
+  const { ctx, canvas } = initCanvas(W, H);
 
   drawBg(ctx);
   drawArchetype(ctx, mirror.archetypeLabel);
@@ -114,15 +108,4 @@ function drawThemes(ctx: CanvasRenderingContext2D, themes: string[]): void {
   ctx.fillText(themes.join(' · '), W / 2, y + 30);
 }
 
-function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number): string[] {
-  const words = text.split(' ');
-  const lines: string[] = [];
-  let cur = '';
-  for (const w of words) {
-    const test = cur + (cur ? ' ' : '') + w;
-    if (ctx.measureText(test).width > max && cur) { lines.push(cur); cur = w; }
-    else cur = test;
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
+// wrapLines imported from @/lib/utils/canvas

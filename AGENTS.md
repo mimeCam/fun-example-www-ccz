@@ -6,30 +6,19 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 
 ## Key Paths
 - `app/` — Pages & API routes
-- `app/page.tsx` — **The Threshold**: single-article immersive homepage (Portal)
-- `components/home/` — PortalHero, ReadingInvitation, ReturningPortal
-- `components/mirror/` — MirrorRevealCard, QuickMirrorCard
-- `components/return/` — RecognitionWhisper, ReturnVisitorGreeting, ReturnLetter
-- `lib/content/featured.ts` — Pure featured article selector (seed + unread-aware)
-- `lib/mirror/` — Scoring, snapshots, whisper & season engines, card generators, letter-engine
-- `lib/hooks/` — useMirror, useQuickMirror, useReturnRecognition, useBehavioralSignals, useParagraphEngagement
-- `types/` — content.ts, resonance.ts, book-narration.ts
+- `components/home/` — PortalHero, ReadingInvitation, ReturningPortal, ViaWhisper
+- `components/mirror/` — MirrorRevealCard, QuickMirrorCard, ShareOverlay
+- `lib/mirror/` — Scoring, snapshots, whisper & season engines, card generators
+- `lib/sharing/` — Deep-link encoding, archetype share text & card export
+- `lib/utils/canvas.ts` — Shared canvas utilities (initCanvas, wrapLines)
 
-## Core Feature: The Portal + Archetype Reveal + Resonance Marginalia
-"The blog that reads you back." Homepage is a single-article doorway → read to 70% → archetype reveal. No email, no account — pure client-side. Returning readers see composed letter card. Resonances become rose marginalia on return visits.
-
-## Design Tokens (tailwind.config.ts)
-Colors: background, primary, secondary, accent, surface, fog, mist, gold, cyan, rose, void.
-Shadows: void, rise, float, gold, gold-intense, rose-glow. Never raw grays.
-
-## Shipped
-- `/explore` page (The Hallway): unified discovery with archetype-aware curation, trail cards, question teasers, all articles grid. Uses `WhisperFooter` shared component.
-- `components/shared/WhisperFooter.tsx`: shared navigation footer (Mirror · Home · Explore · Resonances)
+## Core Feature
+"The blog that reads you back." Single-article doorway → read to 70% → archetype reveal → share card → friend arrives via deep link → viral loop. No email, no account — pure client-side.
 
 ## WIP
 - MirrorRevealCard: simplify to top-trait-only view
-- Return Letter: future `/letters` archive, milestone/seasonal letter types
-- Homepage: returning reader adaptation (select unread article via reading_memory)
+- Return Letter: `/letters` archive, milestone/seasonal letter types
+- Homepage: returning reader adaptation (select unread via reading_memory)
 - Design token cleanup: replace raw grays in remaining components
 
 ## Deployment

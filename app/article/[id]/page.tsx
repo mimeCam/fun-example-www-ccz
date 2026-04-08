@@ -89,7 +89,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
             <div className="my-16">
               <QuickMirrorCard
                 result={quickMirror.result}
-                articleUrl={typeof window !== 'undefined' ? window.location.href : undefined}
+                articleId={params.id}
               />
             </div>
           )}

@@ -3,13 +3,13 @@
  *
  * Animation phases: hidden → emergence → shimmer → reveal → rest.
  * Total animation: ~2.5s (compressed from 3.5s per UX spec).
- * scrollIntoView removed — the reader's scroll position is sovereign.
+ * ShareOverlay appears at rest phase — the viral loop starts here.
  */
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
-import { generateQuickMirrorCard } from '@/lib/mirror/quick-mirror-card-generator';
+import ShareOverlay from './ShareOverlay';
 
 // ── Phase timing (ms) — compressed to 2.5s total ──
 const T_EMERGE  = 0;
@@ -21,18 +21,16 @@ type Phase = 'hidden' | 'emergence' | 'shimmer' | 'reveal' | 'rest';
 
 interface Props {
   result: QuickMirrorResult;
-  articleUrl?: string;
+  articleId?: string;
 }
 
 /* ─── Component ─────────────────────────────────────────── */
 
-export default function QuickMirrorCard({ result, articleUrl }: Props) {
+export default function QuickMirrorCard({ result, articleId }: Props) {
   const [phase, setPhase]     = useState<Phase>('hidden');
-  const [copied, setCopied]   = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const cardRef               = useRef<HTMLDivElement>(null);
 
-  // Drive the 4-phase animation sequence
   useEffect(() => {
     const ids = [
       setTimeout(() => setPhase('emergence'), T_EMERGE),
@@ -43,16 +41,6 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
     return () => ids.forEach(clearTimeout);
   }, []);
 
-  const handleCopy = useCopyShareText(result.archetypeLabel, articleUrl, setCopied);
-  const handleSaveImage = useCallback(() => {
-    const dataUrl = generateQuickMirrorCard(result);
-    const a = document.createElement('a');
-    a.download = `reading-identity-${result.archetype}.png`;
-    a.href = dataUrl;
-    a.click();
-  }, [result]);
-
-  // Dismiss state: collapsed to thin gold line
   if (dismissed) return (
     <div className="my-12 mx-auto max-w-[200px] h-px bg-gold/30 rounded-full" />
   );
@@ -62,70 +50,67 @@ export default function QuickMirrorCard({ result, articleUrl }: Props) {
 
   return (
     <div ref={cardRef} className={`${cardBase()} ${phaseClass(phase)}`}>
-      {/* Dismiss button */}
-      <button
-        onClick={() => setDismissed(true)}
-        className="absolute top-3 right-3 text-mist/40 hover:text-white/80
-          transition-colors duration-200 text-lg leading-none"
-        aria-label="Dismiss">
-        ×
-      </button>
-
-      {/* Label */}
-      <p
-        className={contentFade(showContent)}
-        style={{ transitionDelay: phase === 'reveal' ? '0ms' : undefined }}
-      >
-        Based on how you read…
-      </p>
-
-      {/* Archetype name */}
-      <h2
-        className={`mt-3 text-3xl font-display font-bold text-white ${contentFade(showContent)}`}
-        style={{ transitionDelay: phase === 'reveal' ? '150ms' : undefined }}
-      >
-        {result.archetypeLabel}
-      </h2>
-
-      {/* Whisper quote */}
-      <p
-        className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[340px] mx-auto leading-relaxed ${contentFade(showContent)}`}
-        style={{ transitionDelay: phase === 'reveal' ? '300ms' : undefined }}
-      >
-        &ldquo;{result.whisper}&rdquo;
-      </p>
-
-      {/* Gold divider */}
-      <div
-        className={`my-6 h-px max-w-[200px] mx-auto bg-[#f0c674]/40 transition-transform duration-500 ${showContent ? 'scale-x-100' : 'scale-x-0'}`}
-        style={{ transitionDelay: phase === 'reveal' ? '450ms' : undefined }}
-      />
-
-      {/* Share actions */}
-      <div
-        className={`flex flex-col items-center gap-2 ${contentFade(showActions)}`}
-        style={{ transitionDelay: phase === 'reveal' ? '600ms' : undefined }}
-      >
-        <button onClick={handleCopy} className={shareBtnClass(copied)}>
-          {copied ? '✓ Copied!' : 'Copy & Share →'}
-        </button>
-        <button onClick={handleSaveImage} className="px-6 py-2 rounded-lg text-mist hover:text-[#f0f0f5]/80 text-sm transition-colors duration-200">
-          Save as Image
-        </button>
-      </div>
+      <DismissBtn onDismiss={() => setDismissed(true)} />
+      <RevealLabel visible={showContent} />
+      <ArchetypeName label={result.archetypeLabel} visible={showContent} />
+      <WhisperQuote text={result.whisper} visible={showContent} />
+      <GoldDivider visible={showContent} />
+      {showActions && (
+        <ShareOverlay result={result} articleId={articleId} />
+      )}
     </div>
+  );
+}
+
+/* ─── Sub-components (each ≤ 8 lines) ──────────────────── */
+
+function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <button onClick={onDismiss}
+      className="absolute top-3 right-3 text-mist/40 hover:text-white/80
+        transition-colors duration-200 text-lg leading-none"
+      aria-label="Dismiss">×</button>
+  );
+}
+
+function RevealLabel({ visible }: { visible: boolean }) {
+  return (
+    <p className={contentFade(visible, 'text-xs uppercase tracking-widest text-mist')}>
+      Based on how you read…
+    </p>
+  );
+}
+
+function ArchetypeName({ label, visible }: { label: string; visible: boolean }) {
+  return (
+    <h2 className={`mt-3 text-3xl font-display font-bold text-white ${fade(visible, 150)}`}>
+      {label}
+    </h2>
+  );
+}
+
+function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
+  return (
+    <p className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[340px]
+      mx-auto leading-relaxed ${fade(visible, 300)}`}>
+      &ldquo;{text}&rdquo;
+    </p>
+  );
+}
+
+function GoldDivider({ visible }: { visible: boolean }) {
+  return (
+    <div className={`my-6 h-px max-w-[200px] mx-auto bg-[#f0c674]/40
+      transition-transform duration-500 ${visible ? 'scale-x-100' : 'scale-x-0'}`} />
   );
 }
 
 /* ─── Style helpers (pure, 1–5 lines each) ──────────────── */
 
 function cardBase(): string {
-  return [
-    'relative my-20 mx-auto max-w-[400px] p-8 text-center',
-    'rounded-2xl border',
-    'bg-gradient-to-b from-[#16213e] to-[#1a1a2e]',
-    'transition-all duration-700 ease-out',
-  ].join(' ');
+  return 'relative my-20 mx-auto max-w-[400px] p-8 text-center'
+    + ' rounded-2xl border bg-gradient-to-b from-[#16213e] to-[#1a1a2e]'
+    + ' transition-all duration-700 ease-out';
 }
 
 function phaseClass(p: Phase): string {
@@ -139,32 +124,12 @@ function phaseClass(p: Phase): string {
   return map[p];
 }
 
-function contentFade(visible: boolean): string {
-  const base = 'text-xs uppercase tracking-widest text-mist transition-all duration-500';
+function contentFade(visible: boolean, extra: string): string {
+  const base = `transition-all duration-500 ${extra}`;
   return visible ? `${base} opacity-100 translate-y-0` : `${base} opacity-0 translate-y-2`;
 }
 
-function shareBtnClass(copied: boolean): string {
-  const base = 'px-6 py-2 rounded-lg border text-sm transition-all duration-200';
-  if (copied) return `${base} border-[rgba(240,198,116,0.4)] bg-[rgba(240,198,116,0.1)] text-[#f0c674]`;
-  return `${base} border-[rgba(240,198,116,0.4)] bg-transparent text-[#f0c674] hover:bg-[rgba(240,198,116,0.08)]`;
-}
-
-/* ─── Clipboard hook ────────────────────────────────────── */
-
-function shareText(label: string, url?: string): string {
-  const base = `I'm ${label}. What's your reading identity?`;
-  return url ? `${base}\nFind out → ${url}` : base;
-}
-
-function useCopyShareText(
-  label: string,
-  url: string | undefined,
-  setCopied: (v: boolean) => void,
-) {
-  return useCallback(async () => {
-    await navigator.clipboard.writeText(shareText(label, url));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [label, url, setCopied]);
+function fade(visible: boolean, delay: number): string {
+  const d = `transition-all duration-500`;
+  return visible ? `${d} opacity-100 translate-y-0` : `${d} opacity-0 translate-y-2`;
 }

@@ -7,8 +7,9 @@
  * The path to the magic moment is now:
  *   Homepage → Click one button → Read to 70% → Archetype Reveal
  *
- * ReturnLetter renders client-side via dynamic import (reads localStorage).
- * PortalHero + ReadingInvitation are server components (static article data).
+ * Deep link support: ?via=ARCHETYPE&a=ARTICLE_ID
+ * When a friend clicks a shared link, ViaWhisper shows
+ * "A Deep Diver sent you here" before the article doorway.
  */
 
 import Link from 'next/link';
@@ -16,15 +17,26 @@ import dynamic from 'next/dynamic';
 import { getDefaultFeaturedArticle } from '@/lib/content/featured';
 import PortalHero from '@/components/home/PortalHero';
 import ReadingInvitation from '@/components/home/ReadingInvitation';
+import { decodeDeepLink } from '@/lib/sharing/deep-link';
 
-// Client-only: reads localStorage for return recognition
+// Client-only components (read localStorage / URL state)
 const ReturningPortal = dynamic(
   () => import('@/components/home/ReturningPortal'),
-  { ssr: false }
+  { ssr: false },
 );
 
-export default function Home() {
+const ViaWhisper = dynamic(
+  () => import('@/components/home/ViaWhisper'),
+  { ssr: false },
+);
+
+export default function Home({
+  searchParams,
+}: {
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
   const article = getDefaultFeaturedArticle();
+  const { via } = decodeDeepLink(searchParams);
 
   return (
     <main className="min-h-screen flex flex-col">
@@ -34,6 +46,9 @@ export default function Home() {
         {/* Return recognition — invisible for strangers */}
         <ReturningPortal />
 
+        {/* Friend whisper — "A Deep Diver sent you here" */}
+        {via && <ViaWhisper via={via} />}
+
         {/* The article doorway */}
         <PortalHero article={article} />
 
@@ -42,7 +57,7 @@ export default function Home() {
 
       </div>
 
-      {/* Footer whisper — three words, muted, consistent */}
+      {/* Footer whisper — consistent across pages */}
       <footer className="text-center pb-8 space-y-2">
         <p className="text-mist/40 text-sm">
           No algorithms. No feeds.
@@ -53,14 +68,9 @@ export default function Home() {
             Mirror
           </Link>
           <span className="text-mist/20">&middot;</span>
-          <Link href="/categories"
+          <Link href="/explore"
             className="text-mist/50 hover:text-mist transition-colors">
             Explore
-          </Link>
-          <span className="text-mist/20">&middot;</span>
-          <Link href="/resonances"
-            className="text-rose/50 hover:text-rose transition-colors">
-            Resonances
           </Link>
         </div>
       </footer>
