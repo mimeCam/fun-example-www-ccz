@@ -109,7 +109,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
             <p className="mb-2">No algorithms. No feeds.</p>
             <div className="flex justify-center gap-6">
               <a href="/mirror" className="text-primary hover:text-secondary transition-colors">Mirror</a>
-              <a href="/about" className="text-primary hover:text-secondary transition-colors">About</a>
+              <a href="/explore" className="text-primary hover:text-secondary transition-colors">Explore</a>
             </div>
           </footer>
         </div>

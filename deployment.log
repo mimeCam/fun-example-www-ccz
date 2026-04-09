@@ -1,113 +1,9 @@
-Deployment started at: Thu Apr  9 01:24:21 PM CEST 2026
-🛑 Stopping existing container (if running)...
-Removing existing container: persona-blog-z
-🧹 Cleaning up old image (if exists)...
-💾 Creating volume for database persistence...
-Volume persona-blog-db already exists
-📋 Creating volume for logs persistence...
-Volume persona-blog-logs already exists
-🔨 Building Docker image with latest code features...
-  - Challenge system (API routes + SQLite database)
-  - Time investment tracking
-  - Progressive Content Revelation (session tracking + bonus content)
-  - Depth Bar (Intersection Observer API + minimal progress indicator)
-  - Content Discovery System (intelligent related posts)
-  - The Subtle Nod (smart reading completion detection)
-  - QuickStats (user progress dashboard with engagement insights)
-  - Bookmark/Save Articles (localStorage-based 'Read Later' feature)
-  - Reading Count (social proof with view tracking)
-  - Next Read (context-aware article recommendations)
-  - Thoughtful Conversations (comment system with voting, 100-word minimum)
-  - Reading Memory System (personal reading history and analytics)
-  - Reading Journey Page (/journey) - Private dashboard for viewing growth
-  - Reading Dashboard (stats, streaks, topics, and timeline visualization)
-  - Reading Streak Tracking (consecutive days with activity)
-  - Topic Analysis (breakdown of topics user has read about)
-  - Email Fingerprinting (privacy-preserving user identification)
-  - This Day in History (nostalgic 'on this day' historical articles)
-  - Editor's Picks (author-curated related posts with context and reasoning)
-  - Timeless Score Engine (measures article longevity vs viral trends)
-  - Reading Time Display (custom messages + auto-calculation with caching)
-  - Article Metadata Component (ArticleMeta with reading time support)
-  - Silent Highlights (anonymous text highlighting with author impact reports)
-  - Insight Capture & Share (personal insight capture with sharing and social proof)
-  - Category-Based Discovery (content organization with colorful badges and browsing)
-  - Resonance-First Bookmarking (anonymous ID, no email, 5-slot scarcity,
-      diamond indicators, 30-day vitality, mandatory resonance notes,
-      quote capture via useTextSelection)
-  - Resonance Marginalia (return-visit inline rendering of reader's captured
-      quote + note as warm-rose marginalia, useResonanceMarginalia hook,
-      ResonanceMarginaliaBlock, insertResonanceBlocks merge,
-      rose color token, rose-glow shadow, resonance-remembered animation)
-  - Resonances Page / The Book of You (/resonances — vitality visualization,
-      carrying vs shaped states, evolution whispers, slot indicator,
-      Canvas PNG export)
-  - Journey Context System (article depth, DNA tags, outcome promises)
-  - Enhanced Search Engine (Fuse.js fuzzy matching, relevance ranking, build-time indexing)
-  - Worldview Content Feeds (filter by perspective: technical, philosophical, practical, contrarian)
-  - Jump to Position Button (smooth scroll to saved reading position)
-  - Questions Feature (provocative questions API, question discovery interface)
-  - Curiosity Trail (author-curated semantic trails with connection reasoning and progress tracking)
-  - Error Logging System (Winston-based logging, HTTP request tracking, 404 detection, configurable log levels)
-  - HTTP Request Middleware (Edge Runtime request logging for debugging and monitoring)
-  - Reading Mirror System (GET /api/mirror, archetype detection, topic DNA,
-      /mirror page — no email gate, client-side quick mirror, server MirrorRevealCard, empty state)
-  - Mirror Progression System (mirror_snapshots, Snapshot Manager, Evolution Engine,
-      archetype shift detection, trajectory classification)
-  - Stratified Content Rendering (archetype-based content layers, StratifiedRenderer,
-      content-layers resolver, shimmerReveal animation, resonance-marginalia layer)
-  - Stratified Paragraph Variants (per-paragraph archetype overrides in core content,
-      resolveStratifiedParagraphs pure function, gold left-border variant indicator,
-      ResolvedParagraph type, paragraphVariants in article data)
-  - Quick Mirror System (1-article archetype synthesis at 30% scroll, client-side only,
-      QuickMirrorCard 4-phase cinematic animation, design-token styled,
-      archetype cascade: QuickMirror → email mirror → null,
-      quick-mirror-card-generator.ts — 1080×1080 Canvas API card,
-      ShareOverlay — Download PNG / Copy Text / Share on X / deep link)
-  - Viral Sharing & Deep Link System (ShareOverlay, archetype-specific share text,
-      X/Twitter intent, PNG download, deep-link encode/decode, ?via=ARCHETYPE&a=ID,
-      ViaWhisper friend arrival whisper on homepage, pure client-side)
-  - Shared Canvas Utilities (initCanvas, wrapLines in lib/utils/canvas.ts)
-  - Whisper Engine (behavior-specific archetype whispers, pure-function template
-      matching via synthesizeWhisper, 5 archetype template banks, paragraph
-      engagement data from getParagraphMap, graceful static fallback)
-  - Enhanced Behavioral Signals (5-signal pipeline, enhancedScoring pure function,
-      getParagraphMap callback for whisper engine integration)
-  - Paragraph-Level Engagement Tracking (per-paragraph dwell/visits/skips, scoring engine signals)
-  - ContentLock Component (CSS-only breathing shimmer blocks with per-layer labels)
-  - Evolution Card System (EvolutionCard, useEvolution hook, localStorage snapshot ring buffer,
-      THEN → NOW two-column card, golden thread stats, archetype shift detection)
-  - Design Token System (fog/mist/gold/cyan/rose/void colors,
-      void/rise/float/gold/rose-glow shadows)
-  - ScrollDepthProvider (shared React Context, single IntersectionObserver for all consumers)
-  - Full Archetype Content Extensions (5-archetype stratified coverage)
-  - Book Whisper Engine (data-driven narrator whispers, inter-resonance signals,
-      time gaps, topic echoes, season mood, archetype alignment)
-  - Season Engine (astronomical season detection with mood tokens)
-  - Closing Line Engine (farewell text for shaped/faded resonances)
-  - Chapter Break Detection (14+ day gap markers in resonances)
-  - Enhanced Resonances Page (data-driven EvolutionThread, closing lines,
-      chapter breaks, page title)
-  - Book Narration Types (BookNarrationContext, ClosingLineContext, ChapterBoundary)
-  - MirrorRevealCard v2 (compressed 4.8s→2.5s, gold tokens, no chromatic aberration)
-  - QuickMirrorCard v2 (compressed 3.5s→2.5s, dismiss, no scroll hijack)
-  - Return-Visit Recognition (useReturnRecognition, RecognitionWhisper,
-      warmer marginalia, return-whisper-engine,
-      three tiers: stranger→returning→known, pure client-side)
-  - Return Letter (ReturnLetter component, composeLetter engine,
-      1080×1080 Canvas PNG card, letter-card-generator, 3+ day absence
-      trigger, archetype/season/resonance/evolution-aware, dismiss 7d,
-      compact greeting fallback)
-  - The Threshold Portal Homepage (single-article immersive entry,
-      PortalHero cinematic hero, ReadingInvitation CTA,
-      ReturningPortal return recognition wrapper,
-      deep link support with ViaWhisper friend arrival,
-      Featured Article Selector — seed + unread + random fallback,
-      portalGlow animation, viral loop: read → reveal → share → friend arrives)
-  - Featured Article (components/home/FeaturedArticle.tsx — homepage featured article component)
-  - Explore / The Hallway (/explore — unified discovery page,
-      archetype-aware curation, trail cards, question teasers,
-      all-articles grid, WhisperFooter shared navigation)
+Deployment started at: Thu Apr  9 03:07:23 PM CEST 2026
+Stopping existing container (if running)...
+  Removing container: persona-blog-z
+Removing old image...
+Ensuring persistence volumes...
+Building Docker image...
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile
@@ -125,44 +21,44 @@ Volume persona-blog-logs already exists
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 205.14kB 0.1s done
-#5 DONE 0.1s
+#5 transferring context: 124.53kB 0.0s done
+#5 DONE 0.0s
 
-#6 [ 6/18] RUN npm ci && npm cache clean --force
+#6 [ 2/18] WORKDIR /app
 #6 CACHED
 
-#7 [ 2/18] WORKDIR /app
+#7 [10/18] COPY postcss.config.js ./
 #7 CACHED
 
-#8 [ 7/18] COPY next.config.js ./
+#8 [ 9/18] COPY tailwind.config.ts ./
 #8 CACHED
 
-#9 [11/18] COPY next-env.d.ts ./
+#9 [ 8/18] COPY tsconfig.json ./
 #9 CACHED
 
-#10 [ 8/18] COPY tsconfig.json ./
+#10 [ 7/18] COPY next.config.js ./
 #10 CACHED
 
-#11 [10/18] COPY postcss.config.js ./
+#11 [ 4/18] RUN apk add --no-cache python3 make g++
 #11 CACHED
 
-#12 [ 5/18] COPY package*.json ./
+#12 [ 3/18] RUN mkdir -p /app/logs
 #12 CACHED
 
-#13 [ 3/18] RUN mkdir -p /app/logs
+#13 [ 6/18] RUN npm ci && npm cache clean --force
 #13 CACHED
 
-#14 [ 4/18] RUN apk add --no-cache python3 make g++
+#14 [ 5/18] COPY package*.json ./
 #14 CACHED
 
-#15 [ 9/18] COPY tailwind.config.ts ./
+#15 [11/18] COPY next-env.d.ts ./
 #15 CACHED
 
 #16 [12/18] COPY middleware.ts ./
-#16 CACHED
+#16 DONE 0.0s
 
 #17 [13/18] COPY app ./app
-#17 DONE 0.1s
+#17 DONE 0.0s
 
 #18 [14/18] COPY components ./components
 #18 DONE 0.0s
@@ -177,141 +73,105 @@ Volume persona-blog-logs already exists
 #21 DONE 0.0s
 
 #22 [18/18] RUN npm run build
-#22 0.329 
-#22 0.329 > persona-blog@0.1.0 build
-#22 0.329 > next build
-#22 0.329 
-#22 1.196 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#22 1.198 This information is used to shape Next.js' roadmap and prioritize features.
-#22 1.198 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#22 1.198 https://nextjs.org/telemetry
-#22 1.198 
-#22 1.263   ▲ Next.js 14.2.3
-#22 1.264 
-#22 1.356    Creating an optimized production build ...
-#22 17.27 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap failed, reason: 
-#22 17.27 
-#22 17.27 Retrying 1/3...
-#22 17.27 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
-#22 17.27 
-#22 17.27 Retrying 1/3...
-#22 22.89  ✓ Compiled successfully
-#22 22.89    Linting and checking validity of types ...
-#22 32.56    Collecting page data ...
-#22 34.41    Generating static pages (0/26) ...
-#22 35.02    Generating static pages (6/26) 
-#22 35.53    Generating static pages (12/26) 
-#22 36.12    Generating static pages (19/26) 
-#22 36.49  ✓ Generating static pages (26/26)
-#22 36.77    Finalizing page optimization ...
-#22 36.78    Collecting build traces ...
-#22 41.43 
-#22 41.45 Route (app)                              Size     First Load JS
-#22 41.45 ┌ ƒ /                                    2.56 kB         107 kB
-#22 41.45 ├ ○ /_not-found                          871 B          87.9 kB
-#22 41.45 ├ ○ /admin/categories                    1.99 kB          89 kB
-#22 41.45 ├ ○ /admin/editor-picks                  1.72 kB          99 kB
-#22 41.45 ├ ƒ /api/admin/editor-picks              0 B                0 B
-#22 41.45 ├ ƒ /api/articles                        0 B                0 B
-#22 41.45 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#22 41.45 ├ ƒ /api/categories                      0 B                0 B
-#22 41.45 ├ ƒ /api/categories/[slug]               0 B                0 B
-#22 41.45 ├ ƒ /api/challenge                       0 B                0 B
-#22 41.45 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
-#22 41.45 ├ ƒ /api/comments                        0 B                0 B
-#22 41.45 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
-#22 41.45 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
-#22 41.45 ├ ƒ /api/feedback                        0 B                0 B
-#22 41.45 ├ ƒ /api/highlights                      0 B                0 B
-#22 41.45 ├ ○ /api/history/today                   0 B                0 B
-#22 41.45 ├ ƒ /api/mirror                          0 B                0 B
-#22 41.45 ├ ƒ /api/questions                       0 B                0 B
-#22 41.45 ├ ƒ /api/reading/memory                  0 B                0 B
-#22 41.45 ├ ƒ /api/reading/streak                  0 B                0 B
-#22 41.45 ├ ƒ /api/reading/topics                  0 B                0 B
-#22 41.45 ├ ƒ /api/related-posts                   0 B                0 B
-#22 41.45 ├ ƒ /api/resonances                      0 B                0 B
-#22 41.45 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#22 41.45 ├ ƒ /api/trails                          0 B                0 B
-#22 41.45 ├ ƒ /article/[id]                        15.1 kB         119 kB
-#22 41.45 ├ ○ /categories                          963 B          94.8 kB
-#22 41.45 ├ ƒ /categories/[slug]                   1 kB           94.8 kB
-#22 41.45 ├ ○ /explore                             4.22 kB          98 kB
-#22 41.45 ├ ○ /journey                             3.96 kB        97.8 kB
-#22 41.45 ├ ƒ /journey/[journeyId]/player          174 B            94 kB
-#22 41.45 ├ ○ /mirror                              3.78 kB        97.6 kB
-#22 41.45 ├ ○ /questions                           1.01 kB        94.8 kB
-#22 41.45 ├ ○ /resonances                          5.69 kB        99.5 kB
-#22 41.45 ├ ○ /trails                              1.41 kB        95.2 kB
-#22 41.45 ├ ƒ /trails/[id]                         1.69 kB        95.5 kB
-#22 41.45 └ ● /worldview/[type]                    174 B            94 kB
-#22 41.45     ├ /worldview/technical
-#22 41.45     ├ /worldview/philosophical
-#22 41.45     ├ /worldview/practical
-#22 41.45     └ /worldview/contrarian
-#22 41.45 + First Load JS shared by all            87 kB
-#22 41.45   ├ chunks/23-836e7376a143f2d1.js        31.5 kB
-#22 41.45   ├ chunks/fd9d1056-4e929951a7bb2095.js  53.6 kB
-#22 41.45   └ other shared chunks (total)          1.93 kB
-#22 41.45 
-#22 41.45 
-#22 41.45 ƒ Middleware                             27.4 kB
-#22 41.45 
-#22 41.45 ○  (Static)   prerendered as static content
-#22 41.45 ●  (SSG)      prerendered as static HTML (uses getStaticProps)
-#22 41.45 ƒ  (Dynamic)  server-rendered on demand
-#22 41.45 
-#22 DONE 41.6s
+#22 0.293 
+#22 0.293 > persona-blog@0.1.0 build
+#22 0.293 > next build
+#22 0.293 
+#22 0.962 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#22 0.962 This information is used to shape Next.js' roadmap and prioritize features.
+#22 0.962 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#22 0.962 https://nextjs.org/telemetry
+#22 0.962 
+#22 1.032   ▲ Next.js 14.2.3
+#22 1.032 
+#22 1.111    Creating an optimized production build ...
+#22 21.75  ✓ Compiled successfully
+#22 21.76    Linting and checking validity of types ...
+#22 31.00    Collecting page data ...
+#22 32.95    Generating static pages (0/20) ...
+#22 33.43    Generating static pages (5/20) 
+#22 33.61    Generating static pages (10/20) 
+#22 34.15    Generating static pages (15/20) 
+#22 34.69  ✓ Generating static pages (20/20)
+#22 34.90    Finalizing page optimization ...
+#22 34.90    Collecting build traces ...
+#22 40.06 
+#22 40.08 Route (app)                              Size     First Load JS
+#22 40.08 ┌ ƒ /                                    2.54 kB         117 kB
+#22 40.08 ├ ○ /_not-found                          871 B          87.9 kB
+#22 40.08 ├ ○ /admin/categories                    1.99 kB          89 kB
+#22 40.08 ├ ○ /admin/editor-picks                  1.72 kB         110 kB
+#22 40.08 ├ ƒ /api/admin/editor-picks              0 B                0 B
+#22 40.08 ├ ƒ /api/articles                        0 B                0 B
+#22 40.08 ├ ƒ /api/articles/[id]/categories        0 B                0 B
+#22 40.08 ├ ƒ /api/categories                      0 B                0 B
+#22 40.08 ├ ƒ /api/categories/[slug]               0 B                0 B
+#22 40.08 ├ ƒ /api/challenge                       0 B                0 B
+#22 40.08 ├ ƒ /api/challenge/article/[articleId]   0 B                0 B
+#22 40.08 ├ ƒ /api/comments                        0 B                0 B
+#22 40.08 ├ ƒ /api/comments/[commentId]/upvote     0 B                0 B
+#22 40.08 ├ ƒ /api/comments/article/[articleId]    0 B                0 B
+#22 40.08 ├ ƒ /api/feedback                        0 B                0 B
+#22 40.08 ├ ƒ /api/highlights                      0 B                0 B
+#22 40.08 ├ ○ /api/history/today                   0 B                0 B
+#22 40.08 ├ ƒ /api/mirror                          0 B                0 B
+#22 40.08 ├ ƒ /api/questions                       0 B                0 B
+#22 40.08 ├ ƒ /api/reading/memory                  0 B                0 B
+#22 40.08 ├ ƒ /api/reading/streak                  0 B                0 B
+#22 40.08 ├ ƒ /api/reading/topics                  0 B                0 B
+#22 40.08 ├ ƒ /api/related-posts                   0 B                0 B
+#22 40.08 ├ ƒ /api/resonances                      0 B                0 B
+#22 40.08 ├ ƒ /api/resonances/[id]                 0 B                0 B
+#22 40.08 ├ ƒ /api/trails                          0 B                0 B
+#22 40.08 ├ ƒ /article/[id]                        15.1 kB         130 kB
+#22 40.08 ├ ○ /categories                          957 B          94.8 kB
+#22 40.08 ├ ƒ /categories/[slug]                   1.03 kB        94.9 kB
+#22 40.08 ├ ○ /explore                             4.19 kB          98 kB
+#22 40.08 ├ ○ /mirror                              3.88 kB        97.7 kB
+#22 40.08 ├ ○ /resonances                          5.79 kB        99.6 kB
+#22 40.08 ├ ○ /trails                              1.4 kB         95.2 kB
+#22 40.08 └ ƒ /trails/[id]                         1.67 kB        95.5 kB
+#22 40.08 + First Load JS shared by all            87 kB
+#22 40.08   ├ chunks/23-836e7376a143f2d1.js        31.5 kB
+#22 40.08   ├ chunks/fd9d1056-4e929951a7bb2095.js  53.6 kB
+#22 40.08   └ other shared chunks (total)          1.93 kB
+#22 40.08 
+#22 40.08 
+#22 40.08 ƒ Middleware                             27.2 kB
+#22 40.08 
+#22 40.08 ○  (Static)   prerendered as static content
+#22 40.08 ƒ  (Dynamic)  server-rendered on demand
+#22 40.08 
+#22 DONE 40.2s
 
 #23 exporting to image
 #23 exporting layers
 #23 exporting layers 0.2s done
-#23 writing image sha256:857f8420967394de2878913ebf64278021ba978b23499d75d02feb6be288dc10 done
+#23 writing image sha256:c958275d21b167cb78ec5515130ed1b6a57adc7e97b866e4dee084eb5946441c done
 #23 naming to docker.io/library/persona-blog-image:latest done
 #23 DONE 0.2s
-🎯 Starting container on port 7200...
-📊 Logging level: info
-734af89c9ebea398572f8cbce46199269b48b28e5f55b58daaa9584b32e7a50a
-⏳ Waiting for container to start...
-✅ Container is running
-🏥 Checking container health...
-✅ Container is healthy and responding
-✅ Deployment successful!
+Starting container on port 7200 (log level: info)...
+846115bf84eab742e0b86ffbb9a7162fce5818f0045bb3f8d36d01dc8d3dc927
+Container is running
+  Checking container health...
+  Container is healthy and responding
 
-📊 Deployment Summary:
-  📦 Container name: persona-blog-z
-  🌐 Application running on port: 7200
-  💾 Database volume: persona-blog-db → /app
-  📋 Logs volume: persona-blog-logs → /app/logs
-  🐳 Image: persona-blog-image:latest
+Deployment Summary:
+  Container:  persona-blog-z
+  Port:       7200
+  DB volume:  persona-blog-db -> /app
+  Log volume: persona-blog-logs -> /app/logs
+  Image:      persona-blog-image:latest
+  Log level:  info
 
-🔧 Management Commands:
-  View logs:       docker logs -f persona-blog-z
-  View app logs:   docker exec persona-blog-z cat /app/logs/combined.log
-  View errors:     docker exec persona-blog-z cat /app/logs/error.log
-  Follow app logs: docker exec persona-blog-z tail -f /app/logs/combined.log
-  Stop container:  docker stop persona-blog-z
-  Restart:         docker restart persona-blog-z
-  View deployment: cat deployment.log
+Management:
+  docker logs -f persona-blog-z
+  docker exec persona-blog-z cat /app/logs/combined.log
+  docker exec persona-blog-z cat /app/logs/error.log
+  docker stop persona-blog-z
+  docker restart persona-blog-z
 
-🐛 Troubleshooting 404 Errors:
-  1. Check combined.log for request logging: docker exec persona-blog-z cat /app/logs/combined.log
-  2. Check error.log for errors: docker exec persona-blog-z cat /app/logs/error.log
-  3. View real-time logs: docker logs -f persona-blog-z | grep -E '(REQUEST|RESPONSE|404|error)'
-  4. Check routes: docker exec persona-blog-z ls -la /app/app/
-  5. Enable debug logging: redeploy with LOG_LEVEL=debug
-
-📊 Log Levels:
-  error  - Only errors (recommended for production)
-  warn   - Warnings and errors
-  info   - Info, warnings, and errors (default)
-  http   - HTTP request logging
-  debug  - Detailed debugging (use when investigating issues)
-
-To change log level: export LOG_LEVEL=debug; ./deploy.sh
-
-Deployment completed at: Thu Apr  9 01:25:10 PM CEST 2026
-Deployment completed at: Thu Apr  9 01:25:10 PM CEST 2026
-🧹 Cleaning up dangling images...
+Deployment completed at: Thu Apr  9 03:08:10 PM CEST 2026
+Deployment completed at: Thu Apr  9 03:08:10 PM CEST 2026
 Removed dangling images
-✨ Deployment complete!
+Done.

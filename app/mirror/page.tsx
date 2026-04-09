@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useMirror } from '@/lib/hooks/useMirror';
+import { GemHome } from '@/components/navigation/GemHome';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
 import ShareOverlay from '@/components/mirror/ShareOverlay';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
@@ -59,6 +60,7 @@ export default function MirrorPage() {
 
   return (
     <div className="min-h-screen p-8">
+      <GemHome />
       <div className="max-w-md mx-auto pt-20 text-center">
         <GemOutline />
         <h1 className="text-2xl font-display font-bold text-[#f0f0f5] mb-3">

@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { GemHome } from '@/components/navigation/GemHome';
 import {
   getResonancesWithArticleAction,
   getDepthMetricsAction,
@@ -191,11 +192,10 @@ export default function ResonancesClient() {
   // Active state — render the Book of You
   return (
     <div className="max-w-2xl mx-auto pt-8">
+      <GemHome />
       {/* Header */}
       <div className="flex justify-between items-center mb-10">
-        <Link href="/" className="text-mist text-sm hover:text-primary transition-colors">
-          &larr; Back
-        </Link>
+        <div />
         <Link href="/mirror" className="text-mist text-sm hover:text-primary transition-colors">
           Your Mirror →
         </Link>

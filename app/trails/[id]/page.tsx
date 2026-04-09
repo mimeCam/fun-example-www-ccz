@@ -82,8 +82,6 @@ export default function TrailDetailPage({ params }: { params: { id: string } }) 
           </div>
         </div>
 
-        {/* TODO: Add progress tracking for logged-in users */}
-        {/* TODO: Add trail start/continue functionality */}
 
         {/* Articles with connections */}
         <div className="space-y-6">

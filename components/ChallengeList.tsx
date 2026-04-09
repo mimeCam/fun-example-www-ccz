@@ -33,7 +33,7 @@ export function ChallengeList({ articleId }: ChallengeListProps) {
 
   if (isLoading) {
     return (
-      <div className="border border-border rounded-lg p-6">
+      <div className="border border-fog/40 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 text-primary">Challenges</h3>
         <p className="text-sm text-gray-400">Loading challenges...</p>
       </div>
@@ -42,7 +42,7 @@ export function ChallengeList({ articleId }: ChallengeListProps) {
 
   if (challenges.length === 0) {
     return (
-      <div className="border border-border rounded-lg p-6">
+      <div className="border border-fog/40 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-4 text-primary">Challenges</h3>
         <p className="text-sm text-gray-400">No challenges yet. Be the first to challenge this post!</p>
       </div>
@@ -50,7 +50,7 @@ export function ChallengeList({ articleId }: ChallengeListProps) {
   }
 
   return (
-    <div className="border border-border rounded-lg p-6">
+    <div className="border border-fog/40 rounded-lg p-6">
       <h3 className="text-lg font-semibold mb-4 text-primary">
         Challenges ({challenges.length})
       </h3>
@@ -64,8 +64,6 @@ export function ChallengeList({ articleId }: ChallengeListProps) {
             <p className="text-xs text-gray-500">
               {challenge.authorName} • {new Date(challenge.createdAt).toLocaleDateString()}
             </p>
-            {/* TODO: Add voting/reaction buttons for challenges */}
-            {/* TODO: Add "view challenge thread" link for replies */}
           </div>
         ))}
       </div>

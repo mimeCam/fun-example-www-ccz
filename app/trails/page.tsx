@@ -44,7 +44,7 @@ export default function TrailsPage() {
     <div className="min-h-screen p-8 bg-gray-900 text-white">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4">Curiosity Trails</h1>
+          <h1 className="text-4xl font-display font-bold mb-4 text-foreground">Curiosity Trails</h1>
           <p className="text-gray-300 text-lg">
             Author-curated learning paths that guide you through related content with clear connections
           </p>
@@ -65,9 +65,6 @@ export default function TrailsPage() {
           </div>
         )}
 
-        {/* TODO: Add trail filtering and sorting */}
-        {/* TODO: Add trail search functionality */}
-        {/* TODO: Add user progress tracking display */}
       </div>
     </div>
   );

@@ -36,12 +36,6 @@ export function middleware(request: NextRequest) {
 
   console.log(`[RESPONSE] ${method} ${pathname} - ${responseTime}ms`);
 
-  // Log potential 404s based on pathname patterns
-  if (pathname.startsWith('/worldview/')) {
-    const worldviewType = pathname.split('/')[2];
-    console.log(`[WORLDVIEW] Accessing worldview: ${worldviewType}`);
-  }
-
   return response;
 }
 

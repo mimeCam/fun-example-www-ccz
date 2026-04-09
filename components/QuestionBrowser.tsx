@@ -43,8 +43,8 @@ export function QuestionBrowser() {
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold mb-2">Explore by Question</h1>
-        <p className="text-gray-600">Discover content through provocative questions</p>
+        <h1 className="text-3xl font-display font-bold text-foreground mb-2">Explore by Question</h1>
+        <p className="text-mist">Discover content through provocative questions</p>
       </div>
 
       {/* Search and Controls */}
@@ -54,20 +54,20 @@ export function QuestionBrowser() {
           placeholder="Search questions..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 min-w-[250px] px-4 py-2 border rounded-lg"
+          className="flex-1 min-w-[250px] px-4 py-2 border border-fog/40 rounded-xl bg-surface text-foreground placeholder:text-mist/50"
         />
         <button
           onClick={() => setMode('random')}
-          className={`px-4 py-2 rounded-lg ${
-            mode === 'random' ? 'bg-blue-600 text-white' : 'bg-gray-200'
+          className={`px-4 py-2 rounded-xl ${
+            mode === 'random' ? 'bg-primary text-white' : 'bg-surface text-mist border border-fog/40'
           }`}
         >
           Serendipity
         </button>
         <button
           onClick={() => setMode('all')}
-          className={`px-4 py-2 rounded-lg ${
-            mode === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200'
+          className={`px-4 py-2 rounded-xl ${
+            mode === 'all' ? 'bg-primary text-white' : 'bg-surface text-mist border border-fog/40'
           }`}
         >
           All Questions
@@ -76,17 +76,17 @@ export function QuestionBrowser() {
 
       {/* Questions Grid */}
       {loading ? (
-        <div className="text-center py-12 text-gray-500">Loading questions...</div>
+        <div className="text-center py-12 text-mist">Loading questions...</div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {questions.map(({ question, articleId, articleTitle }) => (
             <Link
               key={`${articleId}-${question}`}
               href={`/article/${articleId}`}
-              className="block p-4 border rounded-lg hover:shadow-md transition-shadow"
+              className="block p-4 border border-fog/40 rounded-xl bg-surface shadow-void hover:shadow-rise transition-shadow"
             >
-              <div className="text-lg font-medium mb-2">{question}</div>
-              <div className="text-sm text-gray-500">From: {articleTitle}</div>
+              <div className="text-lg font-medium text-foreground mb-2">{question}</div>
+              <div className="text-sm text-mist">From: {articleTitle}</div>
             </Link>
           ))}
         </div>
@@ -94,7 +94,7 @@ export function QuestionBrowser() {
 
       {/* Empty State */}
       {!loading && questions.length === 0 && (
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-mist">
           No questions found. Try a different search term.
         </div>
       )}

@@ -81,8 +81,6 @@ export function ChallengeModal({ articleId, isOpen, onClose }: ChallengeModalPro
           </div>
         </form>
 
-        {/* TODO: Add loading state spinner */}
-        {/* TODO: Add character counter for challenge text */}
       </div>
     </div>
   );

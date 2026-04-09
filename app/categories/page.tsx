@@ -43,7 +43,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen p-8 bg-gray-900 text-white">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8">All Categories</h1>
+        <h1 className="text-4xl font-display font-bold mb-8 text-foreground">All Categories</h1>
 
         {categories.length === 0 ? (
           <div className="bg-gray-800 rounded-lg p-8 text-center">
