@@ -1,7 +1,8 @@
 /**
  * MirrorRevealCard — full archetype reveal on /mirror page.
  *
- * Animation phases: hidden → shimmer → reveal → done.
+ * Animation phases: hidden → emergence → shimmer → reveal → done.
+ * Unified with QuickMirrorCard: same width, tokens, phases.
  * Stripped to archetype + whisper + share. No analytics dashboard.
  */
 'use client';
@@ -12,18 +13,29 @@ import type { ArchetypeKey } from '@/types/content';
 import ShareOverlay from './ShareOverlay';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 
-interface Props { mirror: ReaderMirror; }
+const T_EMERGE  = 0;
+const T_SHIMMER = 400;
+const T_REVEAL  = 1200;
+const T_REST    = 2500;
 
-type Phase = 'hidden' | 'shimmer' | 'reveal' | 'done';
+type Phase = 'hidden' | 'emergence' | 'shimmer' | 'reveal' | 'done';
 
-export default function MirrorRevealCard({ mirror }: Props) {
+interface Props {
+  mirror: ReaderMirror;
+  articleId?: string;
+}
+
+export default function MirrorRevealCard({ mirror, articleId }: Props) {
   const [phase, setPhase] = useState<Phase>('hidden');
 
   useEffect(() => {
-    setPhase('shimmer');
-    const t1 = setTimeout(() => setPhase('reveal'), 800);
-    const t2 = setTimeout(() => setPhase('done'), 2500);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const ids = [
+      setTimeout(() => setPhase('emergence'), T_EMERGE),
+      setTimeout(() => setPhase('shimmer'),   T_SHIMMER),
+      setTimeout(() => setPhase('reveal'),    T_REVEAL),
+      setTimeout(() => setPhase('done'),      T_REST),
+    ];
+    return () => ids.forEach(clearTimeout);
   }, []);
 
   const showContent = phase === 'reveal' || phase === 'done';
@@ -33,20 +45,27 @@ export default function MirrorRevealCard({ mirror }: Props) {
     archetype: mirror.archetype as ArchetypeKey,
     archetypeLabel: mirror.archetypeLabel,
     whisper: mirror.whisper,
-    confidence: 80,
+    confidence: mirror.scores
+      ? Math.round(Object.values(mirror.scores).reduce((a: number, b: unknown) => a + (b as number), 0) / Object.values(mirror.scores).length)
+      : 80,
     scores: mirror.scores,
+  };
+
+  const phaseMap: Record<Phase, string> = {
+    hidden:    'opacity-0 translate-y-4 border-transparent',
+    emergence: 'opacity-100 translate-y-0 border-gold/15',
+    shimmer:   'opacity-100 translate-y-0 border-gold/25 mirror-shimmer',
+    reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
+    done:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
 
   return (
     <div className="flex justify-center">
       <div className={`
-        mirror-card relative w-80 rounded-2xl p-8 text-center overflow-hidden
-        bg-gradient-to-b from-surface to-background
-        border border-primary/30
-        transition-all duration-700
-        ${phase === 'hidden' ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}
-        ${phase === 'shimmer' ? 'mirror-shimmer' : ''}
-        ${showContent ? 'shadow-gold border-[rgba(240,198,116,0.2)]' : ''}
+        relative max-w-[400px] w-full rounded-2xl p-8 text-center
+        bg-gradient-to-b from-surface to-background overflow-hidden
+        transition-all duration-700 ease-out
+        ${phaseMap[phase]}
       `}>
         <p className={`text-xs uppercase tracking-widest text-gold/60 mb-2
           transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
@@ -54,24 +73,25 @@ export default function MirrorRevealCard({ mirror }: Props) {
           Based on how you read…
         </p>
 
-        <h2 className={`text-2xl font-display font-bold text-gold
+        <h2 className={`text-3xl font-display font-bold text-gold
           transition-all duration-500
           ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ transitionDelay: phase === 'reveal' ? '150ms' : undefined }}>
           {mirror.archetypeLabel}
         </h2>
 
-        <p className={`text-sm text-white/80 italic mb-6 transition-all duration-500
+        <p className={`mt-3 text-sm text-white/80 italic max-w-[340px]
+          mx-auto leading-relaxed transition-all duration-500
           ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ transitionDelay: phase === 'reveal' ? '300ms' : undefined }}>
           &ldquo;{mirror.whisper}&rdquo;
         </p>
 
-        <div className={`my-4 h-px max-w-[200px] mx-auto bg-gold/40
+        <div className={`my-6 h-px max-w-[200px] mx-auto bg-gold/40
           transition-transform duration-500
           ${showContent ? 'scale-x-100' : 'scale-x-0'}`} />
 
-        {showActions && <ShareOverlay result={shareResult} />}
+        {showActions && <ShareOverlay result={shareResult} articleId={articleId} />}
       </div>
     </div>
   );

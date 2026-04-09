@@ -94,7 +94,7 @@ export default function MirrorPage() {
       <GemHome />
       <div className="max-w-md mx-auto pt-20 text-center">
         <GemOutline />
-        <h1 className="text-2xl font-display font-bold text-[#f0f0f5] mb-3">
+        <h1 className="text-2xl font-display font-bold text-white mb-3">
           Your reflection hasn&apos;t formed yet.
         </h1>
         <p className="text-mist text-sm mb-8 max-w-sm mx-auto leading-relaxed">
@@ -120,7 +120,7 @@ function QuickMirrorCardInline({ result }: { result: QuickMirrorResult }) {
       <h1 className="text-3xl font-display font-bold text-gold">
         {result.archetypeLabel}
       </h1>
-      <p className="mt-4 text-sm text-[#f0f0f5]/80 italic leading-relaxed max-w-[320px] mx-auto">
+      <p className="mt-4 text-sm text-white/80 italic leading-relaxed max-w-[320px] mx-auto">
         &ldquo;{result.whisper}&rdquo;
       </p>
       <div className="my-6 h-px max-w-[200px] mx-auto bg-gold/40" />
@@ -149,7 +149,7 @@ function IdentityStats({ articlesRead, firstDetected, confidence }: {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-[#f0f0f5] font-medium">{value}</div>
+      <div className="text-white font-medium">{value}</div>
       <div className="text-xs text-mist/50 mt-0.5">{label}</div>
     </div>
   );

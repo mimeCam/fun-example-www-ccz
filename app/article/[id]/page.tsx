@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { notFound } from 'next/navigation';
 import { DepthBar } from '@/components/reading/DepthBar';
 import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
@@ -30,9 +31,11 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
 function ArticleContent({ params }: { params: { id: string } }) {
   const article = getArticleById(params.id);
+  if (!article) notFound();
+
   const layeredContent = getLayeredContent(params.id);
-  const readTime = article ? estimateReadingTime(article.content) : 5;
-  const topics = article?.tags ?? [];
+  const readTime = estimateReadingTime(article.content);
+  const topics = article.tags ?? [];
 
   const { mirror } = useMirror();
   const readCount = typeof window !== 'undefined'
@@ -72,7 +75,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const nextArticle = allArticles[0];
   const nextContext = nextArticle
     ? generateRecommendationContext(
-        { id: params.id, title: article?.title ?? '', content: '', tags: [] },
+        { id: params.id, title: article.title, content: '', tags: [] },
         nextArticle
       )
     : '';
@@ -83,12 +86,12 @@ function ArticleContent({ params }: { params: { id: string } }) {
       <GemHome />
       <article className="min-h-screen">
         <div className="max-w-[38rem] mx-auto px-6">
-          <TopBar articleId={params.id} title={article?.title ?? ''} />
-          <ArticleHeader title={article?.title ?? 'Article'} readTime={readTime} />
+          <TopBar articleId={params.id} title={article.title} />
+          <ArticleHeader title={article.title} readTime={readTime} />
           <RecognitionWhisper recognition={recognition} />
           <hr className="border-fog mb-8" />
 
-          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-[#f0f0f5]">
+          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-white">
             {mergedBlocks.length > 0 ? (
               <StratifiedRenderer blocks={mergedBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning} />
             ) : (
@@ -126,7 +129,7 @@ function TopBar({ articleId, title }: { articleId: string; title: string }) {
 function ArticleHeader({ title, readTime }: { title: string; readTime: number }) {
   return (
     <header className="mb-8 text-center">
-      <h1 className="font-display text-[2.25rem] font-bold text-[#f0f0f5] leading-tight tracking-tight">
+      <h1 className="font-display text-[2.25rem] font-bold text-white leading-tight tracking-tight">
         {title}
       </h1>
       <p className="text-mist text-sm mt-3">Author &middot; {readTime} min read</p>

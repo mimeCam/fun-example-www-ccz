@@ -9,7 +9,7 @@ import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
  * Reads depth from ScrollDepthProvider (shared context).
  * No own observer — single truth source for the whole page.
  *
- * Design: fixed bottom, quiet, fades when finished.
+ * Design: fixed above AmbientNav (bottom-12), quiet, fades when finished.
  * Per Tanya's spec: rounded-md endpoints, shadow-none.
  */
 export function DepthBar() {
@@ -28,7 +28,7 @@ export function DepthBar() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-30 px-4 sm:px-8 pb-4 pointer-events-none"
+      className="fixed bottom-12 left-0 right-0 z-30 px-4 sm:px-8 pb-1 pointer-events-none"
       role="progressbar"
       aria-label={`Reading progress: ${Math.round(depth)}%`}
       aria-valuemin={0}

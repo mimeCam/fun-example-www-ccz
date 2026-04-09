@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 const NAV_ITEMS = [
   { href: '/mirror', label: 'Mirror', accent: 'hover:text-gold' },
   { href: '/articles', label: 'Articles', accent: 'hover:text-mist' },
-  { href: '/resonances', label: 'Resonances', accent: 'hover:text-rose' },
 ] as const;
 
 const HIDDEN_ROUTES = ['/', '/article'];
@@ -33,7 +32,7 @@ export function AmbientNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-40 bg-void/80 backdrop-blur-md border-t border-fog/20 animate-fade-in"
+      className="fixed bottom-0 inset-x-0 z-40 bg-void/80 backdrop-blur-sm border-t border-fog/20 animate-fade-in"
     >
       <div className="flex items-center justify-center gap-8 h-12">
         {NAV_ITEMS.map(({ href, label, accent }) => {

@@ -79,7 +79,7 @@ function RevealLabel({ visible }: { visible: boolean }) {
 
 function ArchetypeName({ label, visible }: { label: string; visible: boolean }) {
   return (
-    <h2 className={`mt-3 text-3xl font-display font-bold text-white ${fadeClass(visible)}`}
+    <h2 className={`mt-3 text-3xl font-display font-bold text-gold ${fadeClass(visible)}`}
       style={fadeStyle(visible, 150)}>
       {label}
     </h2>
@@ -88,7 +88,7 @@ function ArchetypeName({ label, visible }: { label: string; visible: boolean }) 
 
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
-    <p className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[340px]
+    <p className={`mt-3 text-sm text-white/80 italic max-w-[340px]
       mx-auto leading-relaxed ${fadeClass(visible)}`}
       style={fadeStyle(visible, 300)}>
       &ldquo;{text}&rdquo;
@@ -98,24 +98,24 @@ function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
 
 function GoldDivider({ visible }: { visible: boolean }) {
   return (
-    <div className={`my-6 h-px max-w-[200px] mx-auto bg-[#f0c674]/40
+    <div className={`my-6 h-px max-w-[200px] mx-auto bg-gold/40
       transition-transform duration-500 ${visible ? 'scale-x-100' : 'scale-x-0'}`} />
   );
 }
 
 function cardBase(): string {
   return 'relative my-20 mx-auto max-w-[400px] p-8 text-center'
-    + ' rounded-2xl border bg-gradient-to-b from-[#16213e] to-[#1a1a2e]'
+    + ' rounded-2xl border bg-gradient-to-b from-surface to-background'
     + ' transition-all duration-700 ease-out';
 }
 
 function phaseClass(p: Phase): string {
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-4 border-transparent',
-    emergence: 'opacity-100 translate-y-0 border-[rgba(240,198,116,0.15)]',
-    shimmer:   'opacity-100 translate-y-0 border-[rgba(240,198,116,0.25)] quick-mirror-glow',
-    reveal:    'opacity-100 translate-y-0 border-[rgba(240,198,116,0.25)] shadow-gold',
-    rest:      'opacity-100 translate-y-0 border-[rgba(240,198,116,0.2)] shadow-gold',
+    emergence: 'opacity-100 translate-y-0 border-gold/15',
+    shimmer:   'opacity-100 translate-y-0 border-gold/25 quick-mirror-glow',
+    reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
+    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
   return map[p];
 }

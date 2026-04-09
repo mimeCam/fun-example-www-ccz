@@ -1,8 +1,8 @@
 /**
  * WhisperFooter — consistent site-wide footer.
  *
- * Three links, every page, no exceptions:
- * Mirror · Articles · Resonances
+ * Two links, every page, no exceptions:
+ * Mirror · Articles
  * Plus the tagline "No algorithms. No feeds."
  */
 
@@ -11,7 +11,6 @@ import Link from 'next/link';
 const FOOTER_LINKS = [
   { href: '/mirror', label: 'Mirror', cls: 'text-gold/50 hover:text-gold' },
   { href: '/articles', label: 'Articles', cls: 'text-mist/50 hover:text-mist' },
-  { href: '/resonances', label: 'Resonances', cls: 'text-rose/50 hover:text-rose' },
 ] as const;
 
 export default function WhisperFooter() {
