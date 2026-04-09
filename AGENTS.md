@@ -8,18 +8,18 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 - `app/` — Pages & API routes
 - `components/home/` — PortalHero, ReadingInvitation, ReturningPortal, ViaWhisper
 - `components/mirror/` — MirrorRevealCard, QuickMirrorCard, ShareOverlay
+- `lib/content/stratified-paragraphs.ts` — Per-paragraph archetype variant resolver
 - `lib/mirror/` — Scoring, snapshots, whisper & season engines, card generators
 - `lib/sharing/` — Deep-link encoding, archetype share text & card export
-- `lib/utils/canvas.ts` — Shared canvas utilities (initCanvas, wrapLines)
 
 ## Core Feature
-"The blog that reads you back." Single-article doorway → read to 70% → archetype reveal → share card → friend arrives via deep link → viral loop. No email, no account — pure client-side.
+"The blog that reads you back." Paragraph-level stratified prose: two readers share the same URL, read genuinely different words. Archetype detected at 30% scroll → QuickMirrorCard reveal → share card → viral loop. No email, no account — pure client-side.
 
 ## WIP
+- Paragraph variants: only `systems-thinking` has full 5-archetype coverage. Other 5 articles need variants.
 - MirrorRevealCard: simplify to top-trait-only view
 - Return Letter: `/letters` archive, milestone/seasonal letter types
 - Homepage: returning reader adaptation (select unread via reading_memory)
-- Design token cleanup: replace raw grays in remaining components
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

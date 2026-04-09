@@ -1,7 +1,7 @@
 /**
  * useQuickMirror — triggers lightweight archetype synthesis at scroll threshold.
  *
- * Watches behavioral signals via useBehavioralSignals. At 70% (configurable),
+ * Watches behavioral signals via useBehavioralSignals. At 30% (configurable),
  * runs quickSynthesize() with enriched signal bag and persists to localStorage.
  * No API call, no DB — pure client-side.
  */
@@ -18,7 +18,7 @@ import {
 import { appendSnapshot } from './useEvolution';
 
 const STORAGE_KEY = 'quick-mirror-result';
-const DEFAULT_TRIGGER = 70;
+const DEFAULT_TRIGGER = 30;
 
 function loadCached(): QuickMirrorResult | null {
   if (typeof window === 'undefined') return null;

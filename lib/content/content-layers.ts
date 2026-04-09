@@ -6,7 +6,8 @@
  * No React, no hooks, no DB — just logic.
  */
 
-import type { ArchetypeKey, LayeredArticleContent, VisibleLayer } from '@/types/content';
+import type { ArchetypeKey, LayeredArticleContent, ResolvedParagraph, VisibleLayer } from '@/types/content';
+import { resolveStratifiedParagraphs } from './stratified-paragraphs';
 
 /** Check if a reader counts as "returning" (≥2 articles in their history) */
 export function isReturningReader(readCount: number): boolean {
@@ -101,8 +102,16 @@ export function resolveVisibleContent(
   const visible = resolveVisibleLayers(archetype, readCount);
   const blocks: ContentBlock[] = [];
 
-  // Core is always first
-  blocks.push({ layer: 'core', paragraphs: splitParagraphs(content.core) });
+  // Core is always first — resolve paragraph variants when available
+  const resolved = resolveStratifiedParagraphs(content.core, content.paragraphVariants, archetype);
+  const coreParagraphs = resolved.map(r => r.text);
+  const hasVariants = resolved.some(r => r.source !== null);
+
+  blocks.push({
+    layer: 'core',
+    paragraphs: coreParagraphs,
+    ...(hasVariants ? { resolvedParagraphs: resolved } : {}),
+  });
 
   // Marginalia for returning readers
   if (content.marginalia && isLayerVisible('marginalia', visible)) {
@@ -147,6 +156,8 @@ export function resolveLockedLayers(
 export interface ContentBlock {
   layer: VisibleLayer;
   paragraphs: string[];
+  /** When paragraph variants exist, carries per-paragraph resolution data */
+  resolvedParagraphs?: ResolvedParagraph[];
   isNew?: boolean;
   /** Resonance data — only present when layer === 'resonance-marginalia' */
   resonance?: {

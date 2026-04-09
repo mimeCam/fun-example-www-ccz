@@ -30,12 +30,20 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const layeredContent = getLayeredContent(params.id);
 
   const { mirror } = useMirror();
-  const archetype = (mirror?.archetype as ArchetypeKey) ?? null;
   const readCount = typeof window !== 'undefined'
     ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}')).length
     : 0;
 
-  // Stratified content: resolve visible layers
+  // Quick Mirror fires at 30% scroll — archetype from behavioral signals
+  const quickMirror = useQuickMirror(params.id, 5, ['systems-thinking', 'problem-solving']);
+
+  // Use QuickMirror archetype (localStorage-persisted, refreshed on detection)
+  // Falls back to email-based mirror archetype for returning readers
+  const archetype = (quickMirror.result?.archetype as ArchetypeKey)
+    ?? (mirror?.archetype as ArchetypeKey)
+    ?? null;
+
+  // Stratified content: resolve visible layers with paragraph variants
   const stratifiedBlocks = useStratifiedContent(params.id, layeredContent, archetype, readCount);
 
   // Resonance marginalia: fetch reader's resonances for this article
@@ -50,9 +58,6 @@ function ArticleContent({ params }: { params: { id: string } }) {
     if (!resonanceBlocks.length) return stratifiedBlocks;
     return insertResonanceBlocks(stratifiedBlocks, resonanceBlocks, coreParagraphs);
   }, [stratifiedBlocks, resonanceBlocks, coreParagraphs]);
-
-  // Quick Mirror — archetype synthesis at 70% scroll
-  const quickMirror = useQuickMirror(params.id, 5, ['critical-thinking'], 70);
 
   // Return recognition — ambient "I know you" for returning readers
   const recognition = useReturnRecognition();

@@ -11,7 +11,7 @@
 'use client';
 
 import { Fragment } from 'react';
-import type { ArchetypeKey } from '@/types/content';
+import type { ArchetypeKey, ResolvedParagraph } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import {
   getExtensionLabel,
@@ -28,22 +28,27 @@ interface StratifiedRendererProps {
 }
 
 /** Core paragraphs — plain body text with paragraph tracking IDs */
-function CoreBlock({ paragraphs, prefix, offset }: {
+function CoreBlock({ paragraphs, prefix, offset, resolved }: {
   paragraphs: string[];
   prefix: string;
   offset: number;
+  resolved?: ResolvedParagraph[];
 }) {
   return (
     <div className="space-y-6 leading-[1.75]">
-      {paragraphs.map((p, i) => (
-        <p
-          key={i}
-          data-paragraph-id={`${prefix}-p${offset + i}`}
-          className="text-[#f0f0f5] max-w-[65ch]"
-        >
-          {p.trim()}
-        </p>
-      ))}
+      {paragraphs.map((p, i) => {
+        const variant = resolved?.find(r => r.slotIndex === offset + i && r.source !== null);
+        return (
+          <p
+            key={i}
+            data-paragraph-id={`${prefix}-p${offset + i}`}
+            data-variant={variant?.source ?? undefined}
+            className={`text-[#f0f0f5] max-w-[65ch] ${variant ? 'pl-3 border-l-2 border-gold/30' : ''}`}
+          >
+            {p.trim()}
+          </p>
+        );
+      })}
     </div>
   );
 }
@@ -109,7 +114,12 @@ export function StratifiedRenderer({ blocks, articleId, warmer }: StratifiedRend
         if (block.layer === 'core') {
           const el = (
             <Fragment key={`core-${i}`}>
-              <CoreBlock paragraphs={block.paragraphs} prefix={articleId} offset={coreOffset} />
+              <CoreBlock
+                paragraphs={block.paragraphs}
+                prefix={articleId}
+                offset={coreOffset}
+                resolved={block.resolvedParagraphs}
+              />
             </Fragment>
           );
           coreOffset += block.paragraphs.length;

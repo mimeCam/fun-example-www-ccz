@@ -23,8 +23,22 @@ export type ArchetypeKey =
 /** Layered article content — replaces flat `content: string` */
 export interface LayeredArticleContent {
   core: string;         // Always visible — must be a complete, satisfying article
+  paragraphVariants?: ParagraphVariantMap; // Per-slot archetype overrides for core paragraphs
   marginalia?: string;  // Returning readers — side-notes, "since you were here" callouts
   extensions: Partial<Record<ArchetypeKey, string>>; // Archetype-gated bonus paragraphs
+}
+
+/** Per-paragraph archetype variants. Keyed by paragraph slot index. */
+export interface ParagraphVariantMap {
+  [slotIndex: number]: Partial<Record<ArchetypeKey, string>>;
+}
+
+/** A single paragraph resolved for a specific reader's archetype */
+export interface ResolvedParagraph {
+  slotIndex: number;
+  text: string;
+  /** Which variant was picked: null = default, ArchetypeKey = variant */
+  source: ArchetypeKey | null;
 }
 
 /** Which layers a reader is allowed to see */
