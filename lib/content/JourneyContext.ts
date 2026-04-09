@@ -67,8 +67,6 @@ export function extractContentDNA(content: string): ContentDNATag[] {
  * Generate outcome promise from content
  *
  * Analyzes first paragraph for value proposition.
- * // TODO: Use ML to extract actual outcomes
- * // TODO: Generate different outcomes for different audiences
  */
 export function generateOutcome(content: string): OutcomePromise {
   const sentences = content.split(/[.!?]+/);
@@ -92,8 +90,6 @@ export function generateOutcome(content: string): OutcomePromise {
  * Calculate full journey context from article content
  *
  * Combines all analysis functions into complete context.
- * // TODO: Add caching for performance
- * // TODO: Allow manual overrides from frontmatter
  */
 export function calculateJourneyContext(content: string): JourneyContext {
   return {
@@ -107,7 +103,6 @@ export function calculateJourneyContext(content: string): JourneyContext {
  * Get journey context with minimal display format
  *
  * Returns only depth indicator and single tag for cards.
- * // TODO: Add options for custom minimal formats
  */
 export function getMinimalContext(context: JourneyContext): {
   depthIndicator: string;

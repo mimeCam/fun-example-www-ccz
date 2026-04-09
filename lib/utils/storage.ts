@@ -78,5 +78,3 @@ export function safeRemoveItem(key: string): boolean {
   }
 }
 
-// TODO: Add session storage variants if needed
-// TODO: Add compression for large data sets

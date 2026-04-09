@@ -70,9 +70,6 @@ export interface ParagraphEngagementSummary {
 
 /**
  * A depth layer represents bonus content that unlocks after a threshold
- *
- * // TODO: Add preview/teaser text for locked content
- * // TODO: Add unlock animation style per layer
  */
 export interface ContentLayer {
   id: string;
@@ -87,10 +84,6 @@ export interface ContentLayer {
 
 /**
  * Extended article type with progressive content support
- *
- * // TODO: Add base content field (main article body)
- * // TODO: Add author metadata
- * // TODO: Add tags/topics for filtering
  */
 export interface ArticleWithDepth {
   id: string;
@@ -107,9 +100,6 @@ export interface ArticleWithDepth {
 
 /**
  * Result of checking unlock status for all layers
- *
- * // TODO: Add progress percentage toward next unlock
- * // TODO: Add estimated time until next unlock
  */
 export interface UnlockCheckResult {
   session: Session;
@@ -120,9 +110,6 @@ export interface UnlockCheckResult {
 
 /**
  * Engagement analytics for article performance
- *
- * // TODO: Add completion rate (reached final layer)
- * // TODO: Add average time spent per layer
  */
 export interface LayerEngagement {
   articleId: string;
@@ -135,9 +122,6 @@ export interface LayerEngagement {
 
 /**
  * Session data for persistence
- *
- * // TODO: Add device fingerprint for cross-session analytics
- * // TODO: Add UTM parameters for acquisition source tracking
  */
 export interface SessionData {
   sessionId: string;

@@ -37,9 +37,6 @@ export function TableOfContents({ sections }: TableOfContentsProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [sections]);
 
-  // TODO: Add smooth scroll to section when clicking links
-  // TODO: Add progress indicator showing how far into each section
-
   if (sections.length === 0) return null;
 
   return (

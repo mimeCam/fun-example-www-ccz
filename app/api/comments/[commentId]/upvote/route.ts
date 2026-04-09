@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CommentModel } from '@/lib/models/comment';
 import { createCommentUpvoteSchema } from '@/lib/validation';
+import { logError } from '@/lib/logger';
 
 export async function POST(
   request: NextRequest,
@@ -30,7 +31,7 @@ export async function POST(
 
     return NextResponse.json(upvote, { status: 201 });
   } catch (error: any) {
-    // TODO: Add proper error logging
+    logError('POST /api/comments/[commentId]/upvote: failed to upvote comment', error instanceof Error ? error : new Error(String(error)));
 
     if (error.name === 'ZodError') {
       return NextResponse.json(
@@ -46,4 +47,3 @@ export async function POST(
   }
 }
 
-// TODO: Add DELETE endpoint to remove vote

@@ -38,9 +38,6 @@ export class ChallengeModel {
     return rows.map(row => this.mapRowToChallenge(row));
   }
 
-  // TODO: Add update and delete methods
-  // TODO: Add status update method
-
   private mapRowToChallenge(row: any): Challenge {
     return {
       id: row.id,

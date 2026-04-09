@@ -16,5 +16,3 @@ export function generateId(): string {
   return `${timestamp}-${random}`;
 }
 
-// TODO: Add nanoid if shorter IDs are needed
-// TODO: Add URL-safe ID variant if needed for sharing (future feature)

@@ -5,7 +5,6 @@
  * appended to a local ring buffer. If 2+ snapshots exist AND archetype
  * changed between oldest and newest, evolution data is returned.
  *
- * // TODO: Sync localStorage snapshots to server when reader identifies via email
  */
 
 'use client';

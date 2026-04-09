@@ -47,5 +47,3 @@ export interface SlotLimits {
   nextUnlockAt?: Date; // When more slots unlock
 }
 
-// TODO: Add resonance categories/tags if needed
-// TODO: Add resonance export formats (Markdown, JSON)

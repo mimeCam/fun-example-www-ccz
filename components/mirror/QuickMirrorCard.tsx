@@ -1,5 +1,5 @@
 /**
- * QuickMirrorCard — inline archetype reveal after 70% scroll.
+ * QuickMirrorCard — inline archetype reveal after 30% scroll.
  *
  * Animation phases: hidden → emergence → shimmer → reveal → rest.
  * Total animation: ~2.5s (compressed from 3.5s per UX spec).
@@ -11,7 +11,6 @@ import { useRef, useState, useEffect } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import ShareOverlay from './ShareOverlay';
 
-// ── Phase timing (ms) — compressed to 2.5s total ──
 const T_EMERGE  = 0;
 const T_SHIMMER = 400;
 const T_REVEAL  = 1200;
@@ -23,8 +22,6 @@ interface Props {
   result: QuickMirrorResult;
   articleId?: string;
 }
-
-/* ─── Component ─────────────────────────────────────────── */
 
 export default function QuickMirrorCard({ result, articleId }: Props) {
   const [phase, setPhase]     = useState<Phase>('hidden');
@@ -62,8 +59,6 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
   );
 }
 
-/* ─── Sub-components (each ≤ 8 lines) ──────────────────── */
-
 function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
   return (
     <button onClick={onDismiss}
@@ -75,7 +70,8 @@ function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
 
 function RevealLabel({ visible }: { visible: boolean }) {
   return (
-    <p className={contentFade(visible, 'text-xs uppercase tracking-widest text-mist')}>
+    <p className={fadeClass(visible)}
+      style={fadeStyle(visible, 0)}>
       Based on how you read…
     </p>
   );
@@ -83,7 +79,8 @@ function RevealLabel({ visible }: { visible: boolean }) {
 
 function ArchetypeName({ label, visible }: { label: string; visible: boolean }) {
   return (
-    <h2 className={`mt-3 text-3xl font-display font-bold text-white ${fade(visible, 150)}`}>
+    <h2 className={`mt-3 text-3xl font-display font-bold text-white ${fadeClass(visible)}`}
+      style={fadeStyle(visible, 150)}>
       {label}
     </h2>
   );
@@ -92,7 +89,8 @@ function ArchetypeName({ label, visible }: { label: string; visible: boolean }) 
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
     <p className={`mt-3 text-sm text-[#f0f0f5]/80 italic max-w-[340px]
-      mx-auto leading-relaxed ${fade(visible, 300)}`}>
+      mx-auto leading-relaxed ${fadeClass(visible)}`}
+      style={fadeStyle(visible, 300)}>
       &ldquo;{text}&rdquo;
     </p>
   );
@@ -104,8 +102,6 @@ function GoldDivider({ visible }: { visible: boolean }) {
       transition-transform duration-500 ${visible ? 'scale-x-100' : 'scale-x-0'}`} />
   );
 }
-
-/* ─── Style helpers (pure, 1–5 lines each) ──────────────── */
 
 function cardBase(): string {
   return 'relative my-20 mx-auto max-w-[400px] p-8 text-center'
@@ -124,12 +120,11 @@ function phaseClass(p: Phase): string {
   return map[p];
 }
 
-function contentFade(visible: boolean, extra: string): string {
-  const base = `transition-all duration-500 ${extra}`;
+function fadeClass(visible: boolean): string {
+  const base = 'transition-all duration-500';
   return visible ? `${base} opacity-100 translate-y-0` : `${base} opacity-0 translate-y-2`;
 }
 
-function fade(visible: boolean, delay: number): string {
-  const d = `transition-all duration-500`;
-  return visible ? `${d} opacity-100 translate-y-0` : `${d} opacity-0 translate-y-2`;
+function fadeStyle(visible: boolean, delayMs: number): React.CSSProperties {
+  return visible ? { transitionDelay: `${delayMs}ms` } : {};
 }

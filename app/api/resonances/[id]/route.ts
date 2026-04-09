@@ -198,5 +198,3 @@ export async function POST(
   }
 }
 
-// TODO: Add rate limiting for visit recording
-// TODO: Add audit logging for resonance deletions

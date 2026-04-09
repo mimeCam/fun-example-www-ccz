@@ -22,9 +22,6 @@ export async function GET(request: NextRequest) {
   const articles = getAllArticles();
   const allQuestions = getAllQuestions(articles);
 
-  // TODO: Add caching for performance
-  // TODO: Add analytics tracking for question engagement
-
   if (mode === 'search' && query) {
     const results = searchQuestions(allQuestions, query);
     return NextResponse.json(results.slice(0, count));

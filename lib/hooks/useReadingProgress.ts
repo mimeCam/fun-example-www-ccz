@@ -4,9 +4,6 @@
  * Provides real-time reading progress and time-to-completion estimates.
  * Uses reading time calculator to provide accurate predictions.
  *
- * // TODO: Add scroll position consideration for "active" reading
- * // TODO: Add idle time exclusion (pause when user is inactive)
- * // TODO: Add completion celebration/confetti
  */
 
 'use client';
@@ -63,7 +60,6 @@ export function useReadingProgress({
   /**
    * Format time spent as human-readable string
    *
-   * // TODO: Extract to shared utility in SessionManager
    */
   const formatTimeSpent = (): string => {
     if (timeSpent < 60) return `${timeSpent}s`;
@@ -77,7 +73,6 @@ export function useReadingProgress({
    *
    * @returns Formatted time remaining string
    *
-   * // TODO: Return null if progress is complete
    */
   const getTimeRemaining = (): string | null => {
     const remainingSeconds = estimatedSeconds - timeSpent;

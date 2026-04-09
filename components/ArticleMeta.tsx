@@ -10,9 +10,6 @@
  * - Lower contrast for metadata
  * - Minimal text, no emoji (to avoid visual clutter)
  *
- * // TODO: Add more metadata fields (tags, category)
- * // TODO: Add edit time for updated posts
- * // TODO: Add view count display
  */
 
 import React from 'react';
@@ -129,8 +126,6 @@ export function ArticleMeta({
  * For cases where you only need to display reading time without other metadata.
  * Useful for cards, lists, and other compact displays.
  *
- * // TODO: Add animation when reading time is custom
- * // TODO: Add tooltip explaining reading time calculation
  */
 export interface ReadingTimeDisplayProps {
   /** Reading time display text */

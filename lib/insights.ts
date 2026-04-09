@@ -134,6 +134,3 @@ export function deleteInsight(insightId: string, userId: string): boolean {
   return result.changes > 0;
 }
 
-// TODO: Add updateInsight function
-// TODO: Add getInsightStats for capture counts
-// TODO: Add caching layer for frequently accessed insights

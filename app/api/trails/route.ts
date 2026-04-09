@@ -15,10 +15,6 @@ export async function GET(request: NextRequest) {
   const trailId = searchParams.get('id');
   const populate = searchParams.get('populate') === 'true';
 
-  // TODO: Add caching for performance
-  // TODO: Add analytics tracking for trail engagement
-  // TODO: Add user progress tracking integration
-
   // Get all articles for populating trail data
   const articles = getAllArticles();
   const getArticle = (id: string) => articles.find(a => a.id === id) || null;

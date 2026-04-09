@@ -78,6 +78,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// TODO: Add GET endpoint for fetching highlight counts by article
-// TODO: Add rate limiting per IP to prevent abuse
-// TODO: Add caching layer for frequently accessed highlight counts

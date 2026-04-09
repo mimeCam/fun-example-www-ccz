@@ -169,8 +169,6 @@ export async function recordResonanceVisitAction(
   }
 }
 
-// TODO: Add server action for deleting resonances
-
 /**
  * Get all active resonances for a user, enriched with article titles.
  * Returns resonances sorted for display (lowest vitality first = most urgent).

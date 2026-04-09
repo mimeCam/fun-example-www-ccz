@@ -39,7 +39,6 @@ export function CuriosityTrail({
   // Fetch trail data if not provided
   useEffect(() => {
     if (!initialTrail) {
-      // TODO: Fetch trail data from API
       // For now, this is a placeholder
       setIsLoading(false);
     }

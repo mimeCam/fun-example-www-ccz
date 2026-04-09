@@ -151,7 +151,7 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
 
   return (
     <aside
-      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-3xl shadow-rose-glow ${scale} ${glow}
+      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-xl shadow-rose-glow ${scale} ${glow}
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
       <p className="text-xs uppercase tracking-widest text-rose/70 mb-3">

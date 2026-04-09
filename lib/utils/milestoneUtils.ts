@@ -124,6 +124,3 @@ export function hasMilestoneProgress(currentProgress: number, milestone: Milesto
   return currentProgress >= (milestone - buffer);
 }
 
-// TODO: Add social proof count fetching
-// TODO: Add milestone analytics tracking
-// TODO: Add milestone celebration effects configuration

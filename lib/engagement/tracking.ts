@@ -4,8 +4,6 @@
  * Saves reader engagement sessions and layer unlock events for analytics.
  * This module provides server-side functions for storing engagement metrics.
  *
- * // TODO: Add batch insert for multiple unlock events
- * // TODO: Add aggregation queries for analytics dashboard
  */
 
 import Database from 'better-sqlite3';
@@ -20,8 +18,6 @@ import { getDb } from '@/lib/db';
  * @param deviceType - Optional device type for analytics
  * @returns true if successful
  *
- * // TODO: Add upsert logic to handle session updates
- * // TODO: Add validation to prevent duplicate sessions
  */
 export function saveSession(
   session: Session,
@@ -63,7 +59,6 @@ export function saveSession(
  * @param thresholdMinutes - Threshold for this layer
  * @returns true if successful
  *
- * // TODO: Add deduplication to prevent duplicate unlock events
  */
 export function recordLayerUnlock(
   sessionId: string,
@@ -116,8 +111,6 @@ export function recordLayerUnlock(
  * @param articleId - Article identifier
  * @returns Analytics data including unlock rates
  *
- * // TODO: Add completion rate calculation
- * // TODO: Add average time spent per layer
  */
 export function getArticleAnalytics(articleId: string) {
   try {
@@ -168,8 +161,6 @@ export function getArticleAnalytics(articleId: string) {
  * @param limit - Number of articles to return
  * @returns Array of article engagement metrics
  *
- * // TODO: Add date range filtering
- * // TODO: Add sorting by different metrics (avg time, completion rate)
  */
 export function getTopArticles(limit: number = 10) {
   try {
@@ -200,8 +191,6 @@ export function getTopArticles(limit: number = 10) {
  * @param daysToKeep - Number of days of history to retain
  * @returns Number of sessions deleted
  *
- * // TODO: Add scheduled cleanup job
- * // TODO: Add aggregation before deletion
  */
 export function cleanupOldSessions(daysToKeep: number = 90): number {
   try {

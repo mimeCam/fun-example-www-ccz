@@ -12,12 +12,6 @@
  *
  * Returns confidence score (0-100) for genuine reading completion.
  *
- * // TODO: Add scroll velocity tracking (pixels per second)
- * // TODO: Add section-specific time tracking (time in each 10% segment)
- * // TODO: Add mouse movement/interaction tracking
- * // TODO: Add focus/blur detection to detect tab switching
- * // TODO: Add configurable thresholds per article or writer preference
- * // TODO: Add machine learning model for pattern recognition
  */
 
 export interface ReadingMetrics {

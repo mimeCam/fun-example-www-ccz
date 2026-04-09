@@ -4,8 +4,6 @@
  * Displays content layers that unlock based on reader engagement time.
  * Features fade-in animations and visual distinction from base content.
  *
- * // TODO: Add unlock animation variants (slide, fade, scale)
- * // TODO: Add confetti celebration for final layer
  */
 
 'use client';
@@ -25,8 +23,6 @@ interface DepthLayerProps {
  * @param onRender - Callback when content is rendered
  * @returns Rendered bonus content section
  *
- * // TODO: Add collapse/expand functionality
- * // TODO: Add keyboard shortcut to jump to next layer
  */
 export function DepthLayer({ layer, onRender }: DepthLayerProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -91,8 +87,6 @@ export function DepthLayer({ layer, onRender }: DepthLayerProps) {
         dangerouslySetInnerHTML={{ __html: layer.content }}
       />
 
-      {/* Optional: Share this insight button */}
-      {/* // TODO: Implement share functionality for specific layers */}
     </section>
   );
 }
@@ -109,8 +103,6 @@ interface DepthLayersProps {
  * @param onLayerRender - Callback when each layer renders
  * @returns All unlocked layers in sequence
  *
- * // TODO: Add table of contents for unlocked layers
- * // TODO: Add progress indicator showing remaining locked layers
  */
 export function DepthLayers({ layers, onLayerRender }: DepthLayersProps) {
   if (layers.length === 0) {
@@ -147,8 +139,6 @@ interface LockedLayerTeaserProps {
  * @param timeUntilUnlock - Time remaining until unlock
  * @returns Teaser component showing what's coming
  *
- * // TODO: Add progress bar animation
- * // TODO: Add estimated unlock time
  */
 export function LockedLayerTeaser({
   layer,

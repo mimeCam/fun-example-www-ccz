@@ -9,16 +9,9 @@
 
 import { Article } from './ContentTagger';
 
-// TODO: Add more signals as we track them:
-// - Return visitor rate
-// - Bookmark-to-view ratio
-// - Comment quality scores
-// - Notes/highlights density
-// - Reading completion rate
-
 export interface TimelessSignals {
   totalViews: number;
-  totalReads: number; // TODO: Define "read" as >80% scroll depth
+  totalReads: number;
   avgReadingTime: number; // minutes
   commentCount: number;
   bookmarkCount: number;
@@ -90,6 +83,3 @@ export function compareByTimelessness(
   return a.score - b.score;
 }
 
-// TODO: Add temporal analysis - track score changes over time
-// TODO: Add decay factor for very old articles
-// TODO: Add boost for recent quality engagement

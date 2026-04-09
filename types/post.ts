@@ -10,9 +10,6 @@ import type { JourneyContext } from './journey-context';
 
 /**
  * Post metadata including optional custom reading time
- *
- * // TODO: Add more metadata fields (tags, category, featured image)
- * // TODO: Add SEO fields (meta description, og image)
  */
 export interface PostMetadata {
   /** Post title */
@@ -39,10 +36,6 @@ export interface PostMetadata {
 
 /**
  * Complete blog post structure
- *
- * // TODO: Add content field (HTML or markdown)
- * // TODO: Add excerpt/summary field
- * // TODO: Add featured image URL
  */
 export interface Post {
   /** Unique post identifier */
@@ -66,8 +59,6 @@ export interface Post {
 
 /**
  * Reading time display options
- *
- * // TODO: Add more formatting options (verbose, compact, with emoji)
  */
 export interface ReadingTimeDisplayOptions {
   /** Whether to show custom message if available */

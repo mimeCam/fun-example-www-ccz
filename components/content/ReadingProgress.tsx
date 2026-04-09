@@ -4,10 +4,6 @@
  * Simple component to display reading time investment and progress.
  * Helps readers manage their time and track completion.
  *
- * // TODO: Add compact mode for mobile
- * // TODO: Add option to hide progress bar
- * // TODO: Add visual completion celebration
- * // TODO: Respect prefers-reduced-motion for progress bar animation
  */
 
 'use client';
@@ -89,8 +85,6 @@ export function ReadingProgress({
 /**
  * Compact variant for tight spaces (sidebar, mobile)
  *
- * // TODO: Add click to expand full details
- * // TODO: Add visual indicator when approaching completion
  */
 export function CompactReadingProgress({
   content,

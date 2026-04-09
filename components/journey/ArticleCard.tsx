@@ -4,9 +4,6 @@
  * Demonstrates how to display journey context on article cards.
  * Shows minimal badge (depth + primary tag) with hover state for full context.
  *
- * // TODO: Add hover state to reveal outcome promise
- * // TODO: Add click tracking for analytics
- * // TODO: Add animation for context reveal
  */
 
 import type { JourneyContext } from '@/types/journey-context';

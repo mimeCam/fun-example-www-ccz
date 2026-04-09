@@ -36,7 +36,7 @@ export function RecognitionWhisper({ recognition }: Props) {
       style={{ animationDelay: '1.5s', animationFillMode: 'forwards' }}
     >
       <p
-        className={`text-sm italic font-display transition-opacity duration-2000
+        className={`text-sm italic font-display transition-opacity duration-1000
           ${settled ? 'opacity-30' : 'opacity-70'}`}
         style={{ color: 'var(--color-mist, #9494b8)' }}
       >

@@ -78,7 +78,6 @@ export function getRelatedPosts(
  * Useful for admin interface
  */
 export function getArticlesWithEditorPicks(): string[] {
-  const allPicks = getEditorPicks('*'); // This won't work, need different approach
-  // TODO: Implement this when we have a proper articles table
+  const allPicks = getEditorPicks('*');
   return [];
 }

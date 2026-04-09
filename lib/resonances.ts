@@ -265,12 +265,6 @@ export function getUserSlotLimit(userId: string): SlotLimits {
     WHERE userId = ? AND status = 'active'
   `).get(userId) as { count: number };
 
-  // TODO: Implement progressive unlock logic
-  // - Start with 5 slots
-  // - +3 after 30 days of activity
-  // - +5 at 70% return-visit rate
-  // - +10 when 10 resonances aged 90+ days
-
   const currentSlots = INITIAL_SLOT_LIMIT;
   const usedSlots = activeCount.count;
 
@@ -377,4 +371,3 @@ export function getResonancesWithArticles(userId: string): ResonanceWithArticle[
   }, []);
 }
 
-// TODO: Implement progressive unlock logic in getUserSlotLimit

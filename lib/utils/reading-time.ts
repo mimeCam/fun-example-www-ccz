@@ -14,8 +14,6 @@
  * - Code block detection and weighting (3x multiplier)
  * - Markdown-aware parsing
  *
- * // TODO: Add configurable reading speed (for different languages/audiences)
- * // TODO: Add image/media time consideration
  */
 
 /**
@@ -24,8 +22,6 @@
  * @param html - HTML content string
  * @returns Plain text without HTML tags
  *
- * // TODO: Handle SVG and other edge cases
- * // TODO: Preserve meaningful whitespace
  */
 export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -56,9 +52,6 @@ export interface CodeBlockInfo {
  * parseCodeBlocks("Some text ```code here``` more text")
  * // => { codeBlocks: [{ content: "code here", wordCount: 2, lineCount: 1 }], content: "Some text  more text" }
  *
- * // TODO: Handle indented code blocks (4 spaces)
- * // TODO: Handle inline code (backticks)
- * // TODO: Preserve code block language info for analysis
  */
 export function parseCodeBlocks(content: string): {
   codeBlocks: CodeBlockInfo[];
@@ -96,8 +89,6 @@ export function parseCodeBlocks(content: string): {
  * @param text - Plain text content
  * @returns Number of words in the text
  *
- * // TODO: Better handling of non-Latin scripts (CJK, etc.)
- * // TODO: Handle hyphenated words intelligently
  */
 export function countWords(text: string): number {
   const words = text.trim().split(/\s+/).filter(word => word.length > 0);
@@ -119,8 +110,6 @@ export function countWords(text: string): number {
  * countWeightedWords("Hello world ```console.log('test')```", 3)
  * // => 2 + 3 = 5 (2 prose words + 3x weighted code word)
  *
- * // TODO: Add support for different weighting factors by language
- * // TODO: Consider code complexity (nested blocks, long lines)
  */
 export function countWeightedWords(
   content: string,
@@ -167,8 +156,6 @@ export function countWeightedWords(
  * calculateReadingTime(longProseArticle) // ~5-10 min
  * calculateReadingTime(heavyCodeTutorial) // ~15-20 min (code weighted 3x)
  *
- * // TODO: Add confidence interval based on content complexity
- * // TODO: Consider image/figure count in estimation
  */
 export function calculateReadingTime(
   content: string,
@@ -193,8 +180,6 @@ export function calculateReadingTime(
  * @param minutes - Reading time in minutes
  * @returns Human-readable string (e.g., "5 min read", "15 min read")
  *
- * // TODO: Add localization support
- * // TODO: Show seconds for very short content (< 1 min)
  */
 export function formatReadingTime(minutes: number): string {
   if (minutes === 0) return 'No content';
@@ -225,8 +210,6 @@ export function formatReadingTime(minutes: number): string {
  * //      formatted: "7 min read"
  * //    }
  *
- * // TODO: Add character count for social media sharing
- * // TODO: Add estimated completion time based on current progress
  */
 export function getReadingStats(
   content: string,
@@ -285,8 +268,6 @@ export function getReadingStats(
  * getReadingTimeDisplay(markdownContentWithCode)
  * // => { display: "7 min read", minutes: 7, isCustom: false }
  *
- * // TODO: Add validation for custom message format
- * // TODO: Add support for time range (e.g., "5-8 min")
  */
 export function getReadingTimeDisplay(
   content: string,
@@ -348,8 +329,6 @@ export function getReadingTimeDisplay(
  * //      calculatedAt: 1712345678901
  * //    }
  *
- * // TODO: Add batch processing for multiple posts
- * // TODO: Add cache invalidation strategy
  */
 export function calculateReadingTimeForCache(
   content: string,

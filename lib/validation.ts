@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 // Shared validation schemas for the challenge feature
-// TODO: Add more validation rules as needed
 
 export const createChallengeSchema = z.object({
   articleId: z.string().min(1, 'Article ID is required'),

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChallengeModel } from '@/lib/models/challenge';
+import { logError } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
@@ -20,7 +21,7 @@ export async function GET(
 
     return NextResponse.json(challenges);
   } catch (error: any) {
-    // TODO: Add proper error logging
+    logError('GET /api/challenge/article/[articleId]: failed to get challenges', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -28,5 +29,3 @@ export async function GET(
   }
 }
 
-// TODO: Add filtering by status
-// TODO: Add pagination

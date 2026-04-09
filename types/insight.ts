@@ -34,5 +34,3 @@ export interface InsightStats {
   articleId: string;
 }
 
-// TODO: Add insight categories/tags if needed
-// TODO: Add insight export formats (Markdown, JSON)

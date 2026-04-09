@@ -124,6 +124,3 @@ export function useTextSelection(
   };
 }
 
-// TODO: Add touch event support for mobile
-// TODO: Add keyboard shortcut for highlighting (Cmd+Shift+H)
-// TODO: Handle multi-paragraph selections better

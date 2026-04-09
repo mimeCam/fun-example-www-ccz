@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CommentModel } from '@/lib/models/comment';
+import { logError } from '@/lib/logger';
 
 export async function GET(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function GET(
 
     return NextResponse.json(comments, { status: 200 });
   } catch (error: any) {
-    // TODO: Add proper error logging
+    logError('GET /api/comments/article/[articleId]: failed to get comments', error instanceof Error ? error : new Error(String(error)));
 
     return NextResponse.json(
       { error: 'Internal server error' },

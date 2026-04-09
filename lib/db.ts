@@ -354,6 +354,4 @@ function initializeSchema(database: Database.Database): void {
     ON mirror_snapshots(emailFingerprint, createdAt DESC)
   `);
 
-  // TODO: Add indexes for better query performance on challenges table
-  // TODO: Add articles table when needed
 }

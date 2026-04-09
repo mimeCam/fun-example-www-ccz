@@ -8,6 +8,17 @@ interface CommentListProps {
   articleId: string;
 }
 
+function getAnonId(): string {
+  if (typeof window === 'undefined') return 'anonymous';
+  const key = 'anon-reader-id';
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = `anon_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
+
 interface CommentItemProps {
   comment: CommentWithReplies;
   depth?: number;
@@ -23,8 +34,7 @@ function CommentItem({ comment, depth = 0, onReply }: CommentItemProps) {
   const handleVote = async (voteType: 'up' | 'down') => {
     if (isVoting) return;
 
-    // In a real app, you'd get the user's email from authentication
-    const userEmail = 'user@example.com'; // TODO: Replace with actual auth
+    const userEmail = getAnonId();
 
     setIsVoting(true);
     try {

@@ -48,7 +48,6 @@ export function useChallengeForm(
         throw new Error(data.error || 'Failed to submit challenge');
       }
 
-      // TODO: Show success message
       resetForm();
       onSuccess();
     } catch (error: any) {
@@ -73,5 +72,3 @@ export function useChallengeForm(
   };
 }
 
-// TODO: Add form validation on the client side
-// TODO: Add success toast notification

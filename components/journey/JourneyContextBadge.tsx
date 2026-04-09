@@ -29,8 +29,6 @@ interface JourneyContextBadgeProps {
  * Minimal badge for article cards
  *
  * Shows depth indicator + single DNA tag
- * // TODO: Add hover state to reveal outcome
- * // TODO: Add color coding by depth level
  */
 export function JourneyContextBadge({
   context,
@@ -104,8 +102,6 @@ export function JourneyContextBadge({
  * Journey Context Bar - Full context for article detail page
  *
  * Displays above title as ambient information layer.
- * // TODO: Add collapse/expand behavior
- * // TODO: Add visual depth gradient by level
  */
 export function JourneyContextBar({ context }: { context: JourneyContext }) {
   const depthIndicator = depthToIndicator(context.depth);

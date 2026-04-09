@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ChallengeModel } from '@/lib/models/challenge';
 import { createChallengeSchema } from '@/lib/validation';
+import { logError } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(challenge, { status: 201 });
   } catch (error: any) {
-    // TODO: Add proper error logging
+    logError('POST /api/challenge: failed to create challenge', error instanceof Error ? error : new Error(String(error)));
 
     if (error.name === 'ZodError') {
       return NextResponse.json(
@@ -31,4 +32,3 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// TODO: Add GET endpoint to retrieve challenges for an article

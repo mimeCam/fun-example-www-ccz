@@ -2,8 +2,6 @@
  * QuestionBrowser - Explore content through provocative questions
  *
  * Simple question discovery interface with search and serendipity modes
- * // TODO: Add question filtering by topic/category
- * // TODO: Add engagement analytics tracking
  */
 
 'use client';

@@ -133,7 +133,7 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
     <>
       <button
         onClick={() => slotsAvailable ? openModal() : null}
-        className={`p-2 rounded-xl transition-colors ${
+        className={`relative p-2 rounded-xl transition-colors ${
           slotsAvailable
             ? 'text-mist hover:text-primary hover:bg-surface'
             : 'text-fog cursor-default'

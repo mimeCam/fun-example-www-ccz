@@ -20,8 +20,6 @@ export interface Session {
  *
  * @returns A new session object with current timestamp
  *
- * // TODO: Add A/B test group assignment for future experiments
- * // TODO: Add referrer tracking for analytics
  */
 export function createSession(): Session {
   return {
@@ -39,8 +37,6 @@ export function createSession(): Session {
  * @param session - The session to calculate time for
  * @returns Time elapsed since session start in milliseconds
  *
- * // TODO: Handle tab visibility changes to pause timer when user switches away
- * // TODO: Add idle detection (no mouse/keyboard activity for >2min)
  */
 export function getTimeOnPage(session: Session): number {
   return Date.now() - session.startTime;
@@ -52,8 +48,6 @@ export function getTimeOnPage(session: Session): number {
  * @param session - The session to evaluate
  * @returns Engagement tier based on minutes spent
  *
- * // TODO: Make thresholds configurable per article
- * // TODO: Consider scroll depth in addition to time
  */
 export function getEngagementLevel(session: Session): 'casual' | 'engaged' | 'deep' {
   const minutes = getTimeOnPage(session) / 60000;
@@ -69,7 +63,6 @@ export function getEngagementLevel(session: Session): 'casual' | 'engaged' | 'de
  * @param ms - Time in milliseconds
  * @returns Formatted string (e.g., "5m 23s" or "45s")
  *
- * // TODO: Add localization support for time formatting
  */
 export function formatDuration(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -104,8 +97,6 @@ export function isLayerUnlocked(session: Session, layerId: string): boolean {
  * @param layerId - The content layer ID to unlock
  * @returns Updated session with the layer marked as unlocked
  *
- * // TODO: Add timestamp for when layer was unlocked
- * // TODO: Prevent duplicate unlocks (idempotent operation)
  */
 export function unlockLayer(session: Session, layerId: string): Session {
   if (session.unlocks.includes(layerId)) {
@@ -126,7 +117,6 @@ export function unlockLayer(session: Session, layerId: string): Session {
  * @param articleId - The article ID to associate with
  * @returns Updated session with article ID set
  *
- * // TODO: Track multiple articles in a single session for cross-article analytics
  */
 export function setArticleId(session: Session, articleId: string): Session {
   return {

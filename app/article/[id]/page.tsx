@@ -13,6 +13,7 @@ import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
 import { useResonanceMarginalia, extractCoreParagraphs } from '@/lib/hooks/useResonanceMarginalia';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { getLayeredContent, getArticleById, getAllArticles } from '@/lib/content/articleData';
+import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import { RecognitionWhisper } from '@/components/return/RecognitionWhisper';
@@ -28,6 +29,8 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 function ArticleContent({ params }: { params: { id: string } }) {
   const article = getArticleById(params.id);
   const layeredContent = getLayeredContent(params.id);
+  const readTime = article ? estimateReadingTime(article.content) : 5;
+  const topics = article?.tags ?? [];
 
   const { mirror } = useMirror();
   const readCount = typeof window !== 'undefined'
@@ -35,7 +38,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
     : 0;
 
   // Quick Mirror fires at 30% scroll — archetype from behavioral signals
-  const quickMirror = useQuickMirror(params.id, 5, ['systems-thinking', 'problem-solving']);
+  const quickMirror = useQuickMirror(params.id, readTime, topics);
 
   // Use QuickMirror archetype (localStorage-persisted, refreshed on detection)
   // Falls back to email-based mirror archetype for returning readers
@@ -78,7 +81,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
       <article className="min-h-screen">
         <div className="max-w-[38rem] mx-auto px-6">
           <TopBar articleId={params.id} title={article?.title ?? ''} />
-          <ArticleHeader title={article?.title ?? 'Article'} />
+          <ArticleHeader title={article?.title ?? 'Article'} readTime={readTime} />
           <RecognitionWhisper recognition={recognition} />
           <hr className="border-fog mb-8" />
 
@@ -126,13 +129,13 @@ function TopBar({ articleId, title }: { articleId: string; title: string }) {
   );
 }
 
-function ArticleHeader({ title }: { title: string }) {
+function ArticleHeader({ title, readTime }: { title: string; readTime: number }) {
   return (
     <header className="mb-8 text-center">
       <h1 className="font-display text-[2.25rem] font-bold text-[#f0f0f5] leading-tight tracking-tight">
         {title}
       </h1>
-      <p className="text-mist text-sm mt-3">Author &middot; 5 min read</p>
+      <p className="text-mist text-sm mt-3">Author &middot; {readTime} min read</p>
     </header>
   );
 }

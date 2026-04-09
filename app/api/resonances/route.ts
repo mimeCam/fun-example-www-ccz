@@ -7,6 +7,7 @@ import {
 } from '@/lib/resonances';
 import { createEmailFingerprint } from '@/lib/reading-memory';
 import { createResonanceSchema } from '@/lib/validation';
+import { logError } from '@/lib/logger';
 
 /**
  * POST /api/resonances
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(resonance, { status: 201 });
   } catch (error: any) {
-    // TODO: Add proper error logging
+    logError('POST /api/resonances: failed to create resonance', error instanceof Error ? error : new Error(String(error)));
 
     if (error.name === 'ZodError') {
       return NextResponse.json(
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
       slots,
     });
   } catch (error: any) {
-    console.error('Failed to get resonances:', error);
+    logError('GET /api/resonances: failed to get resonances', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -107,6 +108,3 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// TODO: Add DELETE endpoint for archiving/deleting resonances
-// TODO: Add PATCH endpoint for updating resonance notes
-// TODO: Add POST endpoint for recording visits

@@ -6,10 +6,6 @@
  *
  * Returns detection result when user finishes article.
  *
- * // TODO: Add real-time detection updates (not just on finish)
- * // TODO: Add haptic feedback for mobile devices
- * // TODO: Add sound notification option
- * // TODO: Add celebration animation trigger
  */
 
 'use client';
@@ -64,8 +60,6 @@ export function useCompletionDetection({
       onDetect(detection);
     }
 
-    // TODO: Store detection result in localStorage for persistence
-    // TODO: Send detection result to analytics
   }, [isFinished, depth, timeSpent, estimatedReadTime, thresholds, hasTriggered, onDetect]);
 
   return {

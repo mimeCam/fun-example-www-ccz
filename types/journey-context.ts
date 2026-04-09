@@ -34,9 +34,6 @@ export type OutcomePromise = string;
 
 /**
  * Journey context metadata for an article
- *
- * // TODO: Add manual override fields for authors to set context
- * // TODO: Add confidence scores for auto-calculated values
  */
 export interface JourneyContext {
   /** Depth level of the content */
@@ -51,9 +48,6 @@ export interface JourneyContext {
 
 /**
  * Journey context display options
- *
- * // TODO: Add compact mode for mobile
- * // TODO: Add tooltip behavior for icons
  */
 export interface JourneyContextDisplayOptions {
   /** Whether to show full context or minimal */

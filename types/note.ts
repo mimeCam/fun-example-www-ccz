@@ -27,5 +27,3 @@ export interface TextSelection {
   rect: DOMRect;
 }
 
-// TODO: Add export format types (Markdown, JSON)
-// TODO: Add note categories/tags if needed in future
