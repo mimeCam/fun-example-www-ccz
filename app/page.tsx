@@ -7,10 +7,10 @@
  * Deep link support: ?via=ARCHETYPE&a=ARTICLE_ID
  */
 
-import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { getDefaultFeaturedArticle, selectFeaturedArticle, readArticleIdsFromMemory } from '@/lib/content/featured';
 import { GemHome } from '@/components/navigation/GemHome';
+import WhisperFooter from '@/components/shared/WhisperFooter';
 import { decodeDeepLink } from '@/lib/sharing/deep-link';
 
 const ReturningPortal = dynamic(
@@ -50,22 +50,7 @@ export default function Home({
 
       </div>
 
-      <footer className="text-center pb-8 space-y-2">
-        <p className="text-mist/40 text-sm">
-          No algorithms. No feeds.
-        </p>
-        <div className="flex justify-center gap-4 text-xs">
-          <Link href="/mirror"
-            className="text-gold/50 hover:text-gold transition-colors">
-            Mirror
-          </Link>
-          <span className="text-mist/20">&middot;</span>
-          <Link href="/articles"
-            className="text-mist/50 hover:text-mist transition-colors">
-            Articles
-          </Link>
-        </div>
-      </footer>
+      <WhisperFooter />
     </main>
   );
 }

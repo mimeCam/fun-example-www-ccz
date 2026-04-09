@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
   { href: '/mirror', label: 'Mirror', accent: 'hover:text-gold' },
-  { href: '/articles', label: 'Articles', accent: 'hover:text-foreground' },
+  { href: '/articles', label: 'Articles', accent: 'hover:text-mist' },
   { href: '/resonances', label: 'Resonances', accent: 'hover:text-rose' },
 ] as const;
 
@@ -43,7 +43,7 @@ export function AmbientNav() {
               key={href}
               href={href}
               className={`text-xs tracking-wide transition-colors ${
-                active ? 'text-gold' : `text-mist/50 ${accent}`
+                active ? 'text-mist/80' : `text-mist/50 ${accent}`
               }`}
             >
               {label}

@@ -18,6 +18,7 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import { RecognitionWhisper } from '@/components/return/RecognitionWhisper';
+import WhisperFooter from '@/components/shared/WhisperFooter';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -107,13 +108,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
           <hr className="border-fog my-12" />
           {nextArticle && <NextRead article={nextArticle} context={nextContext} />}
 
-          <footer className="text-center py-12 text-mist text-sm">
-            <p className="mb-2">No algorithms. No feeds.</p>
-            <div className="flex justify-center gap-6">
-              <a href="/mirror" className="text-primary hover:text-secondary transition-colors">Mirror</a>
-              <a href="/explore" className="text-primary hover:text-secondary transition-colors">Explore</a>
-            </div>
-          </footer>
+          <WhisperFooter />
         </div>
       </article>
     </>
