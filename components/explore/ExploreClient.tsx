@@ -3,24 +3,20 @@
 import { useState, useEffect } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import { Trail } from '@/types/trail';
-import { QuestionWithArticle } from '@/lib/content/questionUtils';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import ExploreHeader from './ExploreHeader';
 import ArchetypeCuratedSection from './ArchetypeCuratedSection';
 import TrailCards from './TrailCards';
-import QuestionTeasers from './QuestionTeasers';
 import AllArticlesGrid from './AllArticlesGrid';
 
 interface ExploreClientProps {
   articles: Article[];
   trails: Trail[];
-  questions: QuestionWithArticle[];
 }
 
 export default function ExploreClient({
   articles,
   trails,
-  questions,
 }: ExploreClientProps) {
   const { archetype, recognitionTier, lastWhisper, visitCount } =
     useReturnRecognition();
@@ -50,8 +46,6 @@ export default function ExploreClient({
       )}
 
       <TrailCards trails={showTrailProgress ? trails : trails.slice(0, 2)} />
-
-      <QuestionTeasers questions={questions} />
 
       <AllArticlesGrid articles={articles} />
     </div>

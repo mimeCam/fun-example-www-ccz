@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { GemHome } from '@/components/navigation/GemHome';
 import { CategoryWithStats } from '@/types/category';
 
 export default function CategoriesPage() {
@@ -34,21 +35,25 @@ export default function CategoriesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-8 bg-gray-900 text-white">
-        <p>Loading...</p>
+      <div className="min-h-screen p-8 bg-background">
+        <GemHome />
+        <p className="text-mist">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen p-8 bg-gray-900 text-white">
+    <div className="min-h-screen p-8 bg-background">
+      <GemHome />
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-display font-bold mb-8 text-foreground">All Categories</h1>
+        <h1 className="text-4xl font-display font-bold mb-8 text-[#f0f0f5]">
+          All Categories
+        </h1>
 
         {categories.length === 0 ? (
-          <div className="bg-gray-800 rounded-lg p-8 text-center">
-            <p className="text-gray-400 mb-4">No categories yet.</p>
-            <p className="text-sm text-gray-500">
+          <div className="bg-surface rounded-xl p-8 text-center shadow-void">
+            <p className="text-mist mb-4">No categories yet.</p>
+            <p className="text-sm text-mist/60">
               Categories help organize content and make discovery easier.
             </p>
           </div>
@@ -58,25 +63,25 @@ export default function CategoriesPage() {
               <Link
                 key={category.id}
                 href={`/categories/${category.slug}`}
-                className="block bg-gray-800 rounded-lg p-6 hover:bg-gray-700 transition-colors"
+                className="block bg-surface rounded-xl p-6 hover:bg-fog transition-colors shadow-void hover:shadow-rise"
               >
                 <div className="flex items-center gap-3 mb-3">
                   {category.color && (
                     <div
-                      className="w-4 h-4 rounded"
+                      className="w-4 h-4 rounded-md"
                       style={{ backgroundColor: category.color }}
                     />
                   )}
-                  <h2 className="text-xl font-semibold">{category.name}</h2>
+                  <h2 className="text-xl font-semibold text-[#f0f0f5]">{category.name}</h2>
                 </div>
 
                 {category.description && (
-                  <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+                  <p className="text-[#f0f0f5]/80 text-sm mb-4 line-clamp-2">
                     {category.description}
                   </p>
                 )}
 
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-mist">
                   {category.articleCount}{' '}
                   {category.articleCount === 1 ? 'article' : 'articles'}
                 </p>
@@ -84,16 +89,6 @@ export default function CategoriesPage() {
             ))}
           </div>
         )}
-
-        {/* Admin link */}
-        <div className="mt-12 pt-8 border-t border-gray-700">
-          <Link
-            href="/admin/categories"
-            className="text-sm text-primary hover:underline"
-          >
-            Manage Categories →
-          </Link>
-        </div>
       </div>
     </div>
   );

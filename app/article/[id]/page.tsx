@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { DepthBar } from '@/components/reading/DepthBar';
+import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
@@ -78,6 +79,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
   return (
     <>
       <DepthBar />
+      <GemHome />
       <article className="min-h-screen">
         <div className="max-w-[38rem] mx-auto px-6">
           <TopBar articleId={params.id} title={article?.title ?? ''} />
@@ -120,10 +122,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
 function TopBar({ articleId, title }: { articleId: string; title: string }) {
   return (
-    <div className="flex items-center justify-between pt-8 pb-4">
-      <a href="/" className="text-mist text-sm hover:text-primary transition-colors">
-        &larr; Back
-      </a>
+    <div className="flex items-center justify-end pt-8 pb-4">
       <ResonanceButton articleId={articleId} articleTitle={title} />
     </div>
   );

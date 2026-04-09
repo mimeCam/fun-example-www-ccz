@@ -163,6 +163,7 @@ export default function ResonancesClient() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
+      <GemHome />
       <div className="w-80 h-48 rounded-3xl bg-gradient-to-b from-rose/10 to-surface/20 border border-rose/10 animate-pulse" />
     </div>
   );
@@ -175,6 +176,7 @@ export default function ResonancesClient() {
   // Empty state — no resonances captured yet
   if (isEmpty) return (
     <div className="max-w-md mx-auto pt-20 text-center">
+      <GemHome />
       <GemIcon className="mx-auto text-mist/30 mb-8" />
       <h1 className="text-2xl font-display font-bold text-[#f0f0f5] mb-3">
         Your chapter hasn&apos;t been written yet.
@@ -290,9 +292,6 @@ export default function ResonancesClient() {
       {/* Footer navigation */}
       <div className="h-px bg-fog mb-8" />
       <div className="flex justify-center gap-6 text-xs pb-12">
-        <Link href="/" className="text-primary hover:text-accent transition-colors">
-          &larr; Back to Articles
-        </Link>
         <Link href="/mirror" className="text-primary hover:text-accent transition-colors">
           Your Mirror →
         </Link>

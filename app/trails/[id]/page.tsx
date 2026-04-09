@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { GemHome } from '@/components/navigation/GemHome';
 import type { TrailWithArticles, TrailConnection } from '@/types/trail';
 
 export default function TrailDetailPage({ params }: { params: { id: string } }) {
@@ -34,25 +35,24 @@ export default function TrailDetailPage({ params }: { params: { id: string } }) 
 
   if (loading) {
     return (
-      <div className="min-h-screen p-8 bg-gray-900 text-white">
-        <p>Loading trail...</p>
+      <div className="min-h-screen p-8 bg-background">
+        <GemHome />
+        <p className="text-mist">Loading trail...</p>
       </div>
     );
   }
 
   if (!trail) {
     return (
-      <div className="min-h-screen p-8 bg-gray-900 text-white">
+      <div className="min-h-screen p-8 bg-background">
+        <GemHome />
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl font-bold mb-4">Trail Not Found</h1>
-          <p className="text-gray-400 mb-8">
-            The trail you're looking for doesn't exist or hasn't been created yet.
+          <h1 className="text-3xl font-bold text-[#f0f0f5] mb-4">Trail Not Found</h1>
+          <p className="text-mist mb-8">
+            The trail you&apos;re looking for doesn&apos;t exist or hasn&apos;t been created yet.
           </p>
-          <Link
-            href="/trails"
-            className="text-purple-400 hover:text-purple-300"
-          >
-            ← Back to all trails
+          <Link href="/trails" className="text-accent hover:text-primary transition-colors text-sm">
+            Browse all trails
           </Link>
         </div>
       </div>
@@ -60,28 +60,22 @@ export default function TrailDetailPage({ params }: { params: { id: string } }) 
   }
 
   return (
-    <div className="min-h-screen p-8 bg-gray-900 text-white">
+    <div className="min-h-screen p-8 bg-background">
+      <GemHome />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/trails"
-            className="text-purple-400 hover:text-purple-300 text-sm mb-4 inline-block"
-          >
-            ← Back to all trails
-          </Link>
-          <h1 className="text-4xl font-bold mb-4">{trail.name}</h1>
-          <p className="text-gray-300 text-lg mb-4">{trail.description}</p>
+          <h1 className="text-4xl font-bold mb-4 text-[#f0f0f5]">{trail.name}</h1>
+          <p className="text-[#f0f0f5]/80 text-lg mb-4">{trail.description}</p>
 
-          <div className="flex items-center gap-4 text-sm text-gray-400">
-            <span>⏱️ {trail.estimatedTime}</span>
-            <span>📚 {trail.articleIds.length} articles</span>
-            <span className="px-2 py-1 bg-purple-800/50 text-purple-200 text-xs rounded">
+          <div className="flex items-center gap-4 text-sm text-mist">
+            <span>{trail.estimatedTime}</span>
+            <span>{trail.articleIds.length} articles</span>
+            <span className="px-2 py-1 bg-primary/20 text-[#f0f0f5]/80 text-xs rounded-md">
               {trail.metadata.category}
             </span>
           </div>
         </div>
-
 
         {/* Articles with connections */}
         <div className="space-y-6">
@@ -95,13 +89,8 @@ export default function TrailDetailPage({ params }: { params: { id: string } }) 
 
             return (
               <div key={article.id}>
-                {/* Article Card */}
                 <ArticleCard article={article} index={index} />
-
-                {/* Connection between articles */}
-                {connection && (
-                  <ConnectionCard connection={connection} />
-                )}
+                {connection && <ConnectionCard connection={connection} />}
               </div>
             );
           })}
@@ -111,21 +100,18 @@ export default function TrailDetailPage({ params }: { params: { id: string } }) 
   );
 }
 
-/**
- * Article Card Component
- */
 function ArticleCard({ article, index }: { article: any; index: number }) {
   return (
-    <div className="bg-gray-800 rounded-lg p-6 border-l-4 border-purple-500">
+    <div className="bg-surface rounded-xl p-6 border-l-4 border-primary shadow-void">
       <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold">
+        <div className="flex-shrink-0 w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
           {index + 1}
         </div>
 
         <div className="flex-1">
           <Link
             href={`/article/${article.id}`}
-            className="text-xl font-semibold text-purple-100 hover:text-purple-200"
+            className="text-xl font-semibold text-[#f0f0f5] hover:text-[#f0f0f5]/80 transition-colors"
           >
             {article.title}
           </Link>
@@ -135,7 +121,7 @@ function ArticleCard({ article, index }: { article: any; index: number }) {
               {article.tags.map((tag: string) => (
                 <span
                   key={tag}
-                  className="px-2 py-1 bg-gray-700 text-gray-300 text-xs rounded"
+                  className="px-2 py-1 bg-fog text-[#f0f0f5]/80 text-xs rounded-md"
                 >
                   {tag}
                 </span>
@@ -148,15 +134,12 @@ function ArticleCard({ article, index }: { article: any; index: number }) {
   );
 }
 
-/**
- * Connection Card Component - Shows "Why this order"
- */
 function ConnectionCard({ connection }: { connection: TrailConnection }) {
   return (
-    <div className="my-4 ml-14 p-4 bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg border border-blue-700/50">
+    <div className="my-4 ml-14 p-4 bg-gradient-to-r from-cyan/10 to-primary/10 rounded-xl border border-cyan/40 shadow-void">
       <div className="flex items-start gap-3">
         <svg
-          className="w-6 h-6 text-blue-400 flex-shrink-0"
+          className="w-6 h-6 text-cyan flex-shrink-0"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -165,11 +148,11 @@ function ConnectionCard({ connection }: { connection: TrailConnection }) {
         </svg>
 
         <div>
-          <h4 className="text-sm font-semibold text-blue-300 mb-2">
+          <h4 className="text-sm font-semibold text-cyan/80 mb-2">
             Why this order
           </h4>
-          <p className="text-gray-300 text-sm italic">
-            "{connection.reason}"
+          <p className="text-[#f0f0f5]/80 text-sm italic">
+            &ldquo;{connection.reason}&rdquo;
           </p>
           <ConnectionTypeBadge type={connection.connectionType} />
         </div>
@@ -178,16 +161,13 @@ function ConnectionCard({ connection }: { connection: TrailConnection }) {
   );
 }
 
-/**
- * Connection Type Badge Component
- */
 function ConnectionTypeBadge({ type }: { type: string }) {
   const colors: Record<string, string> = {
-    foundational: 'bg-blue-900/50 text-blue-300 border-blue-700',
-    extension: 'bg-green-900/50 text-green-300 border-green-700',
-    practical: 'bg-yellow-900/50 text-yellow-300 border-yellow-700',
-    alternative: 'bg-orange-900/50 text-orange-300 border-orange-700',
-    related: 'bg-purple-900/50 text-purple-300 border-purple-700',
+    foundational: 'bg-cyan/10 text-cyan/80 border-cyan/40',
+    extension: 'bg-cyan/10 text-cyan/80 border-cyan/40',
+    practical: 'text-gold bg-gold/10 border-gold/40',
+    alternative: 'text-gold bg-gold/10 border-gold/40',
+    related: 'bg-primary/10 text-accent border-primary/40',
   };
 
   const labels: Record<string, string> = {
@@ -199,7 +179,7 @@ function ConnectionTypeBadge({ type }: { type: string }) {
   };
 
   return (
-    <span className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded border ${colors[type] || colors.related}`}>
+    <span className={`inline-block mt-2 px-2 py-1 text-xs font-medium rounded-md border ${colors[type] || colors.related}`}>
       {labels[type] || 'Related'}
     </span>
   );

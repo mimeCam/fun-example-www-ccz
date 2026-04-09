@@ -9,6 +9,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { GemHome } from '@/components/navigation/GemHome';
 import { CategoryWithArticles } from '@/types/category';
 
 export default function CategoryPage() {
@@ -38,25 +39,24 @@ export default function CategoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-8 bg-gray-900 text-white">
-        <p>Loading...</p>
+      <div className="min-h-screen p-8 bg-background">
+        <GemHome />
+        <p className="text-mist">Loading...</p>
       </div>
     );
   }
 
   if (!category) {
     return (
-      <div className="min-h-screen p-8 bg-gray-900 text-white">
+      <div className="min-h-screen p-8 bg-background">
+        <GemHome />
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold mb-4">Category Not Found</h1>
-          <p className="text-gray-400 mb-8">
+          <h1 className="text-3xl font-bold text-[#f0f0f5] mb-4">Category Not Found</h1>
+          <p className="text-mist mb-8">
             The category &quot;{slug}&quot; does not exist.
           </p>
-          <Link
-            href="/categories"
-            className="text-primary hover:underline"
-          >
-            ← Back to all categories
+          <Link href="/categories" className="text-accent hover:text-primary transition-colors text-sm">
+            Browse all categories
           </Link>
         </div>
       </div>
@@ -64,17 +64,11 @@ export default function CategoryPage() {
   }
 
   return (
-    <div className="min-h-screen p-8 bg-gray-900 text-white">
+    <div className="min-h-screen p-8 bg-background">
+      <GemHome />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/categories"
-            className="text-sm text-primary hover:underline mb-4 inline-block"
-          >
-            ← All Categories
-          </Link>
-
           <div className="flex items-center gap-4 mb-4">
             {category.color && (
               <div
@@ -82,14 +76,14 @@ export default function CategoryPage() {
                 style={{ backgroundColor: category.color }}
               />
             )}
-            <h1 className="text-4xl font-bold">{category.name}</h1>
+            <h1 className="text-4xl font-bold text-[#f0f0f5]">{category.name}</h1>
           </div>
 
           {category.description && (
-            <p className="text-xl text-gray-300">{category.description}</p>
+            <p className="text-xl text-[#f0f0f5]/80">{category.description}</p>
           )}
 
-          <p className="text-sm text-gray-400 mt-2">
+          <p className="text-sm text-mist mt-2">
             {category.articles.length}{' '}
             {category.articles.length === 1 ? 'article' : 'articles'}
           </p>
@@ -97,8 +91,8 @@ export default function CategoryPage() {
 
         {/* Articles */}
         {category.articles.length === 0 ? (
-          <div className="bg-gray-800 rounded-lg p-8 text-center">
-            <p className="text-gray-400">No articles in this category yet.</p>
+          <div className="bg-surface rounded-xl p-8 text-center shadow-void">
+            <p className="text-mist">No articles in this category yet.</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -106,7 +100,7 @@ export default function CategoryPage() {
               <Link
                 key={article.id}
                 href={`/article/${article.id}`}
-                className="block bg-gray-800 rounded-lg p-6 hover:bg-gray-700 transition-colors"
+                className="block bg-surface rounded-xl p-6 hover:bg-fog transition-colors shadow-void hover:shadow-rise"
               >
                 <h2 className="text-xl font-semibold text-primary hover:underline">
                   {article.title}

@@ -10,8 +10,7 @@
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { getDefaultFeaturedArticle, selectFeaturedArticle, readArticleIdsFromMemory } from '@/lib/content/featured';
-import PortalHero from '@/components/home/PortalHero';
-import ReadingInvitation from '@/components/home/ReadingInvitation';
+import { GemHome } from '@/components/navigation/GemHome';
 import { decodeDeepLink } from '@/lib/sharing/deep-link';
 
 const ReturningPortal = dynamic(
@@ -39,6 +38,7 @@ export default function Home({
 
   return (
     <main className="min-h-screen flex flex-col">
+      <GemHome />
       <div className="flex-1 flex flex-col justify-center max-w-3xl
         mx-auto px-4 md:px-6 py-16 md:py-24">
 

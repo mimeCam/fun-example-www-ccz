@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       const backfilled = backfillReadingMemory(emailFingerprint);
 
       if (backfilled > 0) {
-        console.log(`Backfilled ${backfilled} articles for user`);
+        // Backfill completed silently — no PII in logs
       }
     }
 

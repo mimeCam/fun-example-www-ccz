@@ -54,7 +54,7 @@ export function NextRead({ article, context }: NextReadProps) {
         </h3>
 
         {/* Context - WHY this article was recommended */}
-        <p className="text-sm text-gray-400 mb-6 leading-relaxed opacity-70">
+        <p className="text-sm text-mist mb-6 leading-relaxed opacity-70">
           {context}
         </p>
 

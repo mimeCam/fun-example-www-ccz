@@ -36,6 +36,7 @@ export default function MirrorPage() {
 
   if (mirror) return (
     <div className="min-h-screen p-8">
+      <GemHome />
       <div className="max-w-2xl mx-auto pt-8">
         <MirrorRevealCard mirror={mirror} />
         <MirrorFooter />
@@ -45,12 +46,14 @@ export default function MirrorPage() {
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
+      <GemHome />
       <div className="mirror-pulse w-80 h-96 rounded-3xl bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
     </div>
   );
 
   if (quickMirror) return (
     <div className="min-h-screen p-8">
+      <GemHome />
       <div className="max-w-2xl mx-auto pt-20 text-center">
         <QuickMirrorCardInline result={quickMirror} />
         <MirrorFooter />
@@ -98,14 +101,11 @@ function QuickMirrorCardInline({ result }: { result: QuickMirrorResult }) {
 
 function MirrorFooter() {
   return (
-    <div className="text-center mt-8 space-y-3">
+    <div className="text-center mt-8">
       <p className="text-mist text-xs">
         Your archetype is shaped by how deeply you read,
         how often you return, and what ideas stay with you.
       </p>
-      <Link href="/" className="text-primary hover:text-accent transition-colors text-sm">
-        &larr; Back to Articles
-      </Link>
     </div>
   );
 }

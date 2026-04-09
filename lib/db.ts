@@ -6,7 +6,8 @@ let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
   if (!db) {
-    const dbPath = path.join(process.cwd(), 'challenges.db');
+    const dataDir = process.env.DATA_DIR || process.cwd();
+    const dbPath = path.join(dataDir, 'challenges.db');
     db = new Database(dbPath);
 
     // Initialize schema

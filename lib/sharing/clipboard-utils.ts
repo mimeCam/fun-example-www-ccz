@@ -89,7 +89,7 @@ export function showCopyFeedback(message: string = 'Copied to clipboard!', durat
   const toast = document.createElement('div');
   toast.id = 'copy-feedback-toast';
   toast.textContent = message;
-  toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg shadow-lg z-50 animate-fadeIn';
+  toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-surface text-white px-4 py-2 rounded-xl shadow-float z-50 animate-fadeIn';
   toast.style.cssText = `
     position: fixed;
     bottom: 1rem;

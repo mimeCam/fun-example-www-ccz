@@ -4,8 +4,8 @@ FROM node:20-alpine
 # Set working directory
 WORKDIR /app
 
-# Create logs directory for error logging
-RUN mkdir -p /app/logs
+# Create data & logs directories for persistent storage
+RUN mkdir -p /app/data /app/logs
 
 # Install build dependencies for native modules (better-sqlite3)
 RUN apk add --no-cache python3 make g++
@@ -36,6 +36,7 @@ RUN npm run build
 
 # Set environment to production
 ENV NODE_ENV=production
+ENV DATA_DIR=/app/data
 
 # Expose the application port
 EXPOSE 7200
