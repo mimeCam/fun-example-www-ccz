@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 const NAV_ITEMS = [
   { href: '/mirror', label: 'Mirror', accent: 'hover:text-gold' },
-  { href: '/explore', label: 'Explore', accent: 'hover:text-foreground' },
+  { href: '/articles', label: 'Articles', accent: 'hover:text-foreground' },
   { href: '/resonances', label: 'Resonances', accent: 'hover:text-rose' },
 ] as const;
 

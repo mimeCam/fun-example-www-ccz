@@ -60,9 +60,9 @@ export default function Home({
             Mirror
           </Link>
           <span className="text-mist/20">&middot;</span>
-          <Link href="/explore"
+          <Link href="/articles"
             className="text-mist/50 hover:text-mist transition-colors">
-            Explore
+            Articles
           </Link>
         </div>
       </footer>

@@ -15,8 +15,8 @@ export default function WhisperFooter() {
           Home
         </Link>
         <span className="text-mist/20">&middot;</span>
-        <Link href="/explore" className="text-mist/50 hover:text-mist transition-colors">
-          Explore
+        <Link href="/articles" className="text-mist/50 hover:text-mist transition-colors">
+          Articles
         </Link>
         <span className="text-mist/20">&middot;</span>
         <Link href="/resonances" className="text-rose/50 hover:text-rose transition-colors">
