@@ -1,19 +1,19 @@
 /**
- * ArticlesPageClient — unified article discovery page.
+ * ArticlesPageClient — unified article discovery with worldview filtering.
  *
- * Merged /explore archetype curation into this single listing.
- * Returning readers with a detected archetype see a curated row
- * before the full article grid.
+ * Returning readers with a detected archetype see a curated row.
+ * Worldview filter chips allow browsing by perspective.
  */
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import { ArchetypeKey } from '@/types/content';
 import { getExtensionLabel } from '@/lib/content/content-layers';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import ExploreArticleCard from '@/components/explore/ExploreArticleCard';
+import WorldviewFilter from '@/components/articles/WorldviewFilter';
 
 // ─── Archetype affinity scoring ────────────────────────────
 
@@ -26,13 +26,21 @@ function getAffinityScore(article: Article, archetype: ArchetypeKey): number {
 
 interface Props {
   articles: Article[];
+  worldview: string | null;
 }
 
-export default function ArticlesPageClient({ articles }: Props) {
+export default function ArticlesPageClient({ articles, worldview }: Props) {
   const { archetype, recognitionTier } = useReturnRecognition();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  const filtered = useMemo(
+    () => worldview
+      ? articles.filter(a => a.worldview === worldview)
+      : articles,
+    [articles, worldview],
+  );
 
   const showCurated = mounted && archetype && recognitionTier !== 'stranger';
   const curated = showCurated
@@ -55,47 +63,50 @@ export default function ArticlesPageClient({ articles }: Props) {
       </header>
 
       {showCurated && (
-        <section className="mb-12">
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="font-display text-gold text-xl font-semibold">
-              {getExtensionLabel(archetype!)}
-            </h2>
-            <div className="flex-1 h-px bg-gold/20" />
-          </div>
-          <p className="text-mist/60 text-xs mb-4">Matches your reading pattern</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {curated.map(article => (
-              <ExploreArticleCard
-                key={article.id}
-                article={article}
-                variant="curated"
-                reason="Matches your reading pattern"
-              />
-            ))}
-          </div>
-        </section>
+        <CuratedRow curated={curated} archetype={archetype!} />
       )}
 
-      <div className="flex items-center gap-3 mb-6">
-        <h2 className="font-display text-mist/40 text-xs uppercase tracking-widest">
-          {showCurated ? 'All Articles' : ''}
-        </h2>
-        {showCurated && <div className="flex-1 h-px bg-fog/20" />}
-      </div>
+      <WorldviewFilter />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {articles.map(article => (
+        {filtered.map(article => (
           <ExploreArticleCard
             key={article.id}
             article={article}
-            showWorldview
+            showWorldview={!worldview}
           />
         ))}
       </div>
-
-      <p className="text-mist/40 text-xs mt-8">
-        {articles.length} {articles.length === 1 ? 'article' : 'articles'}
-      </p>
     </div>
+  );
+}
+
+function CuratedRow({
+  curated,
+  archetype,
+}: {
+  curated: Article[];
+  archetype: ArchetypeKey;
+}) {
+  return (
+    <section className="mb-12">
+      <div className="flex items-center gap-3 mb-6">
+        <h2 className="font-display text-gold text-xl font-semibold">
+          {getExtensionLabel(archetype)}
+        </h2>
+        <div className="flex-1 h-px bg-gold/20" />
+      </div>
+      <p className="text-mist/60 text-xs mb-4">Matches your reading pattern</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {curated.map(article => (
+          <ExploreArticleCard
+            key={article.id}
+            article={article}
+            variant="curated"
+            reason="Matches your reading pattern"
+          />
+        ))}
+      </div>
+    </section>
   );
 }

@@ -9,6 +9,8 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 - `components/mirror/` — MirrorRevealCard, QuickMirrorCard, ShareOverlay
 - `components/navigation/` — GemHome, AmbientNav
 - `components/reading/` — DepthBar, MirrorWhisper, NextRead
+- `components/articles/` — ArticlesPageClient, WorldviewFilter
+- `components/explore/` — ExploreArticleCard, ExploreHeader (shared with articles page)
 - `lib/content/stratified-paragraphs.ts` — Per-paragraph archetype variant resolver
 - `lib/mirror/` — Scoring, snapshots, whisper & season engines
 
@@ -16,6 +18,11 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 "The blog that reads you back." Paragraph-level stratified prose: same URL, different words per archetype. QuickMirrorCard at 30% scroll → share card → viral loop. No accounts — pure client-side.
 
 Gold (#f0c674): 3 moments only — homepage CTA, QuickMirrorCard reveal, share card export.
+
+## Navigation
+- Homepage WorldviewDoors → `/articles?worldview=X` (filtered article listing)
+- `/explore` redirects to `/articles` (backward compat via middleware)
+- `/articles` supports `?worldview=` and `?type=` params for filtering
 
 ## WIP
 - [ ] "For the [Archetype]" NextRead CTA

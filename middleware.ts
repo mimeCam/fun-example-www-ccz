@@ -1,13 +1,23 @@
 /**
- * Next.js middleware — Edge Runtime request timing.
+ * Next.js middleware — request timing + route redirects.
  *
  * Sets x-request-start and x-response-time headers for observability.
- * No PII logging — console logging removed for production safety.
+ * Redirects stale routes to their canonical equivalents.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 
+const REDIRECTS: Record<string, string> = {
+  '/explore': '/articles',
+};
+
 export function middleware(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+  const target = REDIRECTS[pathname];
+  if (target) {
+    return NextResponse.redirect(new URL(target + search, request.url));
+  }
+
   const startTime = Date.now();
   const response = NextResponse.next();
 

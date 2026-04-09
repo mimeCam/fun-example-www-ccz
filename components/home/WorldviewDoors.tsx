@@ -3,17 +3,15 @@
  *
  * Second act of the Threshold: after the featured article,
  * 4 "doors" invite readers to explore by perspective.
- * Each card links directly to the best article for that worldview.
+ * Each card links to /articles?worldview=X for filtered browsing.
  *
- * Self-contained — imports worldview→article mapping from articleData.
- * Uses existing design tokens: gold for hover accent, mist for body text.
+ * Self-contained — uses worldview mapping from articleData for teasers.
+ * Uses mist for hover accent (gold reserved for Mirror moments only).
  */
 
 import Link from 'next/link';
 import { FilterType } from '@/types/filter';
 import { getBestArticleForWorldview } from '@/lib/content/articleData';
-
-// ─── Door configuration ────────────────────────────
 
 interface DoorDef {
   type: FilterType;
@@ -27,8 +25,6 @@ const DOORS: DoorDef[] = [
   { type: 'practical', icon: '\u26A1', label: 'Practical Application' },
   { type: 'contrarian', icon: '\u274C', label: 'Contrarian Viewpoint' },
 ];
-
-// ─── Component ─────────────────────────────────────
 
 export default function WorldviewDoors() {
   return (
@@ -47,9 +43,9 @@ export default function WorldviewDoors() {
 
 function DoorCard({ door }: { door: DoorDef }) {
   const article = getBestArticleForWorldview(door.type);
-  const href = article ? `/article/${article.id}` : '/articles';
+  const href = `/articles?worldview=${door.type}`;
   const teaser = article
-    ? article.content.slice(0, 80).replace(/[#*_]/g, '').trim() + '…'
+    ? article.content.slice(0, 80).replace(/[#*_]/g, '').trim() + '\u2026'
     : door.label;
 
   return (
@@ -57,9 +53,9 @@ function DoorCard({ door }: { door: DoorDef }) {
       href={href}
       className="block bg-surface/60 rounded-2xl p-4
         border border-fog/10
-        hover:border-gold/40 hover:shadow-rise
+        hover:border-mist/30 hover:shadow-rise
         transition-all duration-300 group
-        focus:ring-2 focus:ring-gold/30 focus:ring-offset-2
+        focus:ring-2 focus:ring-mist/30 focus:ring-offset-2
         focus:ring-offset-background outline-none"
       aria-label={`${door.label}: ${teaser}`}
     >
@@ -67,7 +63,7 @@ function DoorCard({ door }: { door: DoorDef }) {
         {door.icon}
       </span>
       <h3 className="font-display text-sm font-bold text-white/80
-        group-hover:text-gold transition-colors leading-tight">
+        group-hover:text-mist transition-colors leading-tight">
         {door.label}
       </h3>
       <p className="text-mist/50 text-xs mt-1 leading-relaxed line-clamp-2">
