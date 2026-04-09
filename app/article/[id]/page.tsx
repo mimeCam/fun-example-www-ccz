@@ -8,6 +8,7 @@ import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead, generateRecommendationContext } from '@/components/reading/NextRead';
+import MirrorWhisper from '@/components/reading/MirrorWhisper';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
@@ -107,6 +108,8 @@ function ArticleContent({ params }: { params: { id: string } }) {
               />
             </div>
           )}
+
+          <MirrorWhisper archetype={archetype} />
 
           <hr className="border-fog my-12" />
           {nextArticle && <NextRead article={nextArticle} context={nextContext} />}
