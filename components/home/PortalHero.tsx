@@ -1,25 +1,18 @@
 /**
  * PortalHero — cinematic article hero for the Threshold (homepage).
  *
- * Renders: worldview badge, title, metadata line, and a compelling excerpt.
+ * Renders: title, metadata line, and a compelling excerpt.
  * Server component — receives article as prop, no hooks, no state.
- * Uses design tokens: gold for title accents, mist for metadata, accent for badge.
+ * Uses design tokens: gold for title accents, mist for metadata.
+ *
+ * Note: worldview badge intentionally omitted per UX spec.
+ * The Threshold should feel like opening a book, not browsing a catalog.
  */
 
 import type { Article } from '@/lib/content/ContentTagger';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
 
 // ─── Helpers ──────────────────────────────────────────────
-
-function worldviewBadge(worldview?: string) {
-  if (!worldview) return null;
-  return (
-    <span className="inline-block text-xs uppercase tracking-wider
-      text-accent font-semibold bg-accent/10 px-3 py-1 rounded-md mb-6">
-      {worldview}
-    </span>
-  );
-}
 
 function excerptParagraphs(content: string): string[] {
   return content.split(/\n\n+/).map(p => p.trim()).filter(Boolean).slice(0, 2);
@@ -33,8 +26,6 @@ export default function PortalHero({ article }: { article: Article }) {
 
   return (
     <div className="text-center max-w-2xl mx-auto animate-fade-in">
-      {worldviewBadge(article.worldview)}
-
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold
         text-white leading-tight tracking-tight">
         {article.title}

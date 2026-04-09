@@ -36,6 +36,9 @@ export default function ArticlesPageClient({ articles, activeFilter }: Props) {
         <h1 className="font-display text-foreground text-2xl md:text-3xl font-bold">
           Articles
         </h1>
+        <p className="text-mist text-sm italic mt-1">
+          Writing that pays attention back.
+        </p>
         {tpl && (
           <p className="text-mist text-sm mt-2">{tpl.description}</p>
         )}

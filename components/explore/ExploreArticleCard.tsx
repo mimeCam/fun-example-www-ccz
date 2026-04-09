@@ -25,7 +25,7 @@ export default function ExploreArticleCard({
         className={`bg-surface rounded-xl p-5 transition-all duration-200 h-full flex flex-col ${
           isCurated
             ? 'border border-gold/30 shadow-gold hover:shadow-gold-intense'
-            : 'shadow-void hover:shadow-rise'
+            : 'border border-fog/10 shadow-void hover:shadow-rise'
         }`}
       >
         <h3 className="font-display text-foreground font-bold text-lg mb-2 group-hover:text-gold transition-colors">

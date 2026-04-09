@@ -13,7 +13,7 @@ import Link from 'next/link';
 // ─── Social proof hints ───────────────────────────────────
 
 const HINTS = [
-  '85% of readers discover something about themselves',
+  'Keep reading. The Mirror is already watching.',
   'Most readers find their reflection within the first article',
   'The blog reads you back — if you let it',
 ];
