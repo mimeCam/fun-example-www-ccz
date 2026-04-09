@@ -1,48 +1,28 @@
 /**
- * /articles — Worldview-filtered article listing.
+ * /articles — Unified article listing (no filter tabs).
  *
- * Server Component. Reads ?type= from searchParams, filters by worldview.
- * Invalid type values fall through to show all articles (no 404).
+ * Server Component. Shows all articles in a clean grid.
+ * Backward-compatible: ?type= still accepted but no longer used for filtering.
  */
 
 import { Metadata } from 'next';
 import { getAllArticles } from '@/lib/content/articleData';
-import { FilterType, FILTER_TEMPLATES } from '@/types/filter';
 import { GemHome } from '@/components/navigation/GemHome';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import ArticlesPageClient from '@/components/articles/ArticlesPageClient';
 
-const VALID_TYPES = new Set<string>(['technical', 'philosophical', 'practical', 'contrarian']);
+export const metadata: Metadata = {
+  title: 'Articles',
+  description: 'Writing that pays attention back.',
+};
 
-function toFilterType(raw: string | string[] | undefined): FilterType | null {
-  if (!raw || Array.isArray(raw)) return null;
-  return VALID_TYPES.has(raw) ? (raw as FilterType) : null;
-}
-
-export function generateMetadata({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}): Metadata {
-  const type = toFilterType(searchParams.type);
-  if (!type) return { title: 'Articles', description: 'Browse all articles' };
-  const tpl = FILTER_TEMPLATES[type];
-  return { title: `${tpl.title} — Articles`, description: tpl.description };
-}
-
-export default function ArticlesPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
-  const type = toFilterType(searchParams.type);
-  const all = getAllArticles();
-  const articles = type ? all.filter(a => a.worldview === type) : all;
+export default function ArticlesPage() {
+  const articles = getAllArticles();
 
   return (
     <main className="min-h-screen bg-gradient-to-r from-background via-background to-surface/10">
       <GemHome />
-      <ArticlesPageClient articles={articles} activeFilter={type} />
+      <ArticlesPageClient articles={articles} />
       <WhisperFooter />
     </main>
   );

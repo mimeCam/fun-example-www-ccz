@@ -21,7 +21,8 @@ Gold (#f0c674): 3 moments only — homepage CTA, QuickMirrorCard reveal, share c
 ## WIP
 - [ ] "For the [Archetype]" NextRead CTA
 - [ ] Articles page consolidation (merge /explore, /trails, /categories)
-- [ ] Kill worldview filter tabs on /articles (6 articles is too few for tabs)
+- [x] Kill worldview filter tabs on /articles (6 articles is too few for tabs)
+- [x] Worldview Doors link directly to best article per worldview (not filtered list)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

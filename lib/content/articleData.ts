@@ -5,6 +5,7 @@
 
 import { Article } from './ContentTagger';
 import type { LayeredArticleContent } from '@/types/content';
+import type { FilterType } from '@/types/filter';
 
 export const SAMPLE_ARTICLES: Article[] = [
   {
@@ -378,4 +379,19 @@ export function getAllArticles(): Article[] {
  */
 export function getArticleById(id: string): Article | undefined {
   return SAMPLE_ARTICLES.find(article => article.id === id);
+}
+
+/**
+ * Best article for each worldview — used by WorldviewDoors on homepage.
+ * Maps worldview type → article ID. Centralized so any component can use it.
+ */
+const WORLDVIEW_BEST: Record<FilterType, string> = {
+  technical: 'design-principles',
+  philosophical: 'systems-thinking',
+  practical: 'deep-work',
+  contrarian: 'art-of-challenging',
+};
+
+export function getBestArticleForWorldview(type: FilterType): Article | undefined {
+  return getArticleById(WORLDVIEW_BEST[type]);
 }

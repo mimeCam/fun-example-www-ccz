@@ -8,12 +8,21 @@ interface ExploreArticleCardProps {
   article: Article;
   variant?: 'default' | 'curated';
   reason?: string;
+  showWorldview?: boolean;
 }
+
+const WORLDVIEW_COLORS: Record<string, string> = {
+  technical: 'bg-primary/20 text-accent',
+  philosophical: 'bg-purple-500/20 text-purple-300',
+  practical: 'bg-cyan-500/20 text-cyan-300',
+  contrarian: 'bg-rose-500/20 text-rose-300',
+};
 
 export default function ExploreArticleCard({
   article,
   variant = 'default',
   reason,
+  showWorldview = false,
 }: ExploreArticleCardProps) {
   const minutes = estimateReadingTime(article.content);
   const excerpt = article.content.slice(0, 120).replace(/[#*_]/g, '').trim();
@@ -42,7 +51,15 @@ export default function ExploreArticleCard({
 
         <div className="flex items-center gap-2 text-xs text-mist/60">
           <span>{minutes} min read</span>
-          {article.tags && article.tags.length > 0 && (
+          {showWorldview && article.worldview && (
+            <>
+              <span className="text-mist/30">·</span>
+              <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-medium ${WORLDVIEW_COLORS[article.worldview] ?? 'bg-fog/20 text-mist'}`}>
+                {article.worldview}
+              </span>
+            </>
+          )}
+          {!showWorldview && article.tags && article.tags.length > 0 && (
             <>
               <span className="text-mist/30">·</span>
               <span>{article.tags[0]}</span>

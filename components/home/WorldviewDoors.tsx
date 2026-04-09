@@ -3,37 +3,30 @@
  *
  * Second act of the Threshold: after the featured article,
  * 4 "doors" invite readers to explore by perspective.
- * Each card links to /articles?type=<worldview>.
+ * Each card links directly to the best article for that worldview.
  *
- * Self-contained — imports worldview definitions from types/filter.
+ * Self-contained — imports worldview→article mapping from articleData.
  * Uses existing design tokens: gold for hover accent, mist for body text.
  */
 
 import Link from 'next/link';
-import { FilterType, FILTER_TEMPLATES } from '@/types/filter';
+import { FilterType } from '@/types/filter';
+import { getBestArticleForWorldview } from '@/lib/content/articleData';
 
 // ─── Door configuration ────────────────────────────
 
 interface DoorDef {
   type: FilterType;
   icon: string;
-  belief: string;
+  label: string;
 }
 
 const DOORS: DoorDef[] = [
-  { type: 'technical', icon: '\u2699', belief: 'Implementation matters more than theory' },
-  { type: 'philosophical', icon: '\u2728', belief: 'First principles beat best practices' },
-  { type: 'practical', icon: '\u26A1', belief: 'Done is better than perfect' },
-  { type: 'contrarian', icon: '\u274C', belief: 'Popular opinions are usually wrong' },
+  { type: 'technical', icon: '\u2699', label: 'Deep Technical Dive' },
+  { type: 'philosophical', icon: '\u2728', label: 'Philosophical Exploration' },
+  { type: 'practical', icon: '\u26A1', label: 'Practical Application' },
+  { type: 'contrarian', icon: '\u274C', label: 'Contrarian Viewpoint' },
 ];
-
-function doorHref(type: FilterType): string {
-  return `/articles?type=${type}`;
-}
-
-function doorTitle(d: DoorDef): string {
-  return FILTER_TEMPLATES[d.type].title;
-}
 
 // ─── Component ─────────────────────────────────────
 
@@ -53,26 +46,32 @@ export default function WorldviewDoors() {
 }
 
 function DoorCard({ door }: { door: DoorDef }) {
+  const article = getBestArticleForWorldview(door.type);
+  const href = article ? `/article/${article.id}` : '/articles';
+  const teaser = article
+    ? article.content.slice(0, 80).replace(/[#*_]/g, '').trim() + '…'
+    : door.label;
+
   return (
     <Link
-      href={doorHref(door.type)}
+      href={href}
       className="block bg-surface/60 rounded-2xl p-4
         border border-fog/10
         hover:border-gold/40 hover:shadow-rise
         transition-all duration-300 group
         focus:ring-2 focus:ring-gold/30 focus:ring-offset-2
         focus:ring-offset-background outline-none"
-      aria-label={`${doorTitle(door)}: ${door.belief}`}
+      aria-label={`${door.label}: ${teaser}`}
     >
       <span className="text-2xl block mb-2" aria-hidden="true">
         {door.icon}
       </span>
       <h3 className="font-display text-sm font-bold text-white/80
         group-hover:text-gold transition-colors leading-tight">
-        {doorTitle(door)}
+        {door.label}
       </h3>
       <p className="text-mist/50 text-xs mt-1 leading-relaxed line-clamp-2">
-        {door.belief}
+        {teaser}
       </p>
     </Link>
   );
