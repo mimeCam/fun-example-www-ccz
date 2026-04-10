@@ -10,7 +10,7 @@
 
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import type { ArchetypeKey, ResolvedParagraph } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import {
@@ -25,6 +25,8 @@ interface StratifiedRendererProps {
   articleId: string;
   /** Warm mode: intensified marginalia for returning readers */
   warmer?: boolean;
+  /** Optional ReactNode to inject at the block with layer='quick-mirror' */
+  mirrorSlot?: ReactNode;
 }
 
 /** Core paragraphs — plain body text with paragraph tracking IDs */
@@ -102,15 +104,64 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
   );
 }
 
+/**
+ * enforceMarginaliaLimit — max 1 injected block after each core block.
+ *
+ * Priority: resonance-marginalia > archetype extension > marginalia.
+ * Prevents the visual chaos of 3 stacked injected blocks per paragraph.
+ */
+function enforceMarginaliaLimit(blocks: ContentBlock[]): ContentBlock[] {
+  const out: ContentBlock[] = [];
+  let pendingCore = false;
+
+  for (const block of blocks) {
+    if (block.layer === 'core') {
+      flushPending();
+      out.push(block);
+      pendingCore = true;
+      continue;
+    }
+    if (!pendingCore) { out.push(block); continue; }
+
+    // Only keep the highest-priority injected block after a core block
+    const pri = injectedPriority(block.layer);
+    if (pri === 0) { out.push(block); continue; }
+
+    const existing = out[out.length - 1];
+    if (existing && existing.layer !== 'core' && injectedPriority(existing.layer) >= pri) {
+      out[out.length - 1] = block;  // replace lower-priority with higher
+    } else {
+      out.push(block);
+    }
+    pendingCore = false;
+  }
+
+  return out;
+
+  function flushPending() { pendingCore = false; }
+}
+
+/** 0 = not injected, 1 = marginalia (lowest), 2 = extension, 3 = resonance */
+function injectedPriority(layer: string): number {
+  if (layer === 'marginalia') return 1;
+  if (layer === 'resonance-marginalia') return 3;
+  if (layer !== 'core') return 2;  // archetype extensions
+  return 0;
+}
+
 /** Main renderer — iterates blocks, tracks core paragraph offset for IDs */
-export function StratifiedRenderer({ blocks, articleId, warmer }: StratifiedRendererProps) {
+export function StratifiedRenderer({ blocks, articleId, warmer, mirrorSlot }: StratifiedRendererProps) {
   if (!blocks.length) return null;
 
+  const filtered = enforceMarginaliaLimit(blocks);
   let coreOffset = 0;
 
   return (
     <article className="stratified-content">
-      {blocks.map((block, i) => {
+      {filtered.map((block, i) => {
+        if (block.layer === 'quick-mirror') {
+          return <Fragment key={`mirror-${i}`}>{mirrorSlot ?? null}</Fragment>;
+        }
         if (block.layer === 'core') {
           const el = (
             <Fragment key={`core-${i}`}>

@@ -73,7 +73,6 @@ export default function MirrorPage() {
         <IdentityStats
           articlesRead={articlesRead}
           firstDetected={firstDetected}
-          confidence={data === quickMirror ? quickMirror.confidence : undefined}
         />
         <ArchetypeDescription archetype={(data.archetype as ArchetypeKey)} />
         <BrowseArticlesLink />
@@ -100,8 +99,8 @@ export default function MirrorPage() {
         <p className="text-mist text-sm mb-8 max-w-sm mx-auto leading-relaxed">
           Read an article to the end and the Mirror will find you.
         </p>
-        <Link href="/"
-          className="inline-block px-6 py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-xl transition-colors">
+        <Link href="/articles"
+          className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold rounded-xl transition-colors">
           Browse Articles →
         </Link>
       </div>
@@ -129,8 +128,8 @@ function QuickMirrorCardInline({ result }: { result: QuickMirrorResult }) {
   );
 }
 
-function IdentityStats({ articlesRead, firstDetected, confidence }: {
-  articlesRead: number; firstDetected: string | null; confidence?: number;
+function IdentityStats({ articlesRead, firstDetected }: {
+  articlesRead: number; firstDetected: string | null;
 }) {
   return (
     <div className="mt-10 pt-6 border-t border-fog/30 text-center">
@@ -140,7 +139,6 @@ function IdentityStats({ articlesRead, firstDetected, confidence }: {
       <div className="flex justify-center gap-8 text-sm text-mist">
         <Stat label="Articles read" value={String(articlesRead)} />
         {firstDetected && <Stat label="First detected" value={formatDate(firstDetected)} />}
-        {confidence != null && <Stat label="Confidence" value={`${confidence}%`} />}
       </div>
     </div>
   );

@@ -1,19 +1,18 @@
 /**
- * ArticlesPageClient — unified article discovery with worldview filtering.
+ * ArticlesPageClient — article listing with curated row for returning readers.
  *
- * Returning readers with a detected archetype see a curated row.
- * Worldview filter chips allow browsing by perspective.
+ * Worldview filter chips removed: 6 articles don't need filtering.
+ * Tags serve the same purpose. The curated row is the filter that matters.
  */
 
 'use client';
 
-import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import { ArchetypeKey } from '@/types/content';
 import { getExtensionLabel } from '@/lib/content/content-layers';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import ExploreArticleCard from '@/components/explore/ExploreArticleCard';
-import WorldviewFilter from '@/components/articles/WorldviewFilter';
 
 // ─── Archetype affinity scoring ────────────────────────────
 
@@ -26,21 +25,13 @@ function getAffinityScore(article: Article, archetype: ArchetypeKey): number {
 
 interface Props {
   articles: Article[];
-  worldview: string | null;
 }
 
-export default function ArticlesPageClient({ articles, worldview }: Props) {
+export default function ArticlesPageClient({ articles }: Props) {
   const { archetype, recognitionTier } = useReturnRecognition();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
-
-  const filtered = useMemo(
-    () => worldview
-      ? articles.filter(a => a.worldview === worldview)
-      : articles,
-    [articles, worldview],
-  );
 
   const showCurated = mounted && archetype && recognitionTier !== 'stranger';
   const curated = showCurated
@@ -66,16 +57,11 @@ export default function ArticlesPageClient({ articles, worldview }: Props) {
         <CuratedRow curated={curated} archetype={archetype!} />
       )}
 
-      <Suspense fallback={null}>
-        <WorldviewFilter />
-      </Suspense>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {filtered.map(article => (
+        {articles.map(article => (
           <ExploreArticleCard
             key={article.id}
             article={article}
-            showWorldview={!worldview}
           />
         ))}
       </div>

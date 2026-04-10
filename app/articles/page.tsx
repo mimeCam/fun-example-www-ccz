@@ -1,9 +1,8 @@
 /**
- * /articles — Unified article listing with worldview filtering.
+ * /articles — Article listing.
  *
  * Server Component. Shows all articles in a clean grid.
- * Supports ?worldview= filter via URL search params.
- * Backward-compatible: ?type= still accepted.
+ * Curated row for returning readers with detected archetype.
  */
 
 import { Suspense } from 'react';
@@ -18,27 +17,16 @@ export const metadata: Metadata = {
   description: 'Writing that pays attention back.',
 };
 
-export default function ArticlesPage({
-  searchParams,
-}: {
-  searchParams: Record<string, string | string[] | undefined>;
-}) {
+export default function ArticlesPage() {
   const articles = getAllArticles();
-  const worldview = normalizeWorldview(searchParams.worldview ?? searchParams.type);
 
   return (
     <main className="min-h-screen bg-gradient-to-r from-background via-background to-surface/10">
       <GemHome />
       <Suspense>
-        <ArticlesPageClient articles={articles} worldview={worldview} />
+        <ArticlesPageClient articles={articles} />
       </Suspense>
       <WhisperFooter />
     </main>
   );
-}
-
-function normalizeWorldview(raw: string | string[] | undefined): string | null {
-  if (!raw || Array.isArray(raw)) return null;
-  const valid = ['technical', 'philosophical', 'practical', 'contrarian'];
-  return valid.includes(raw) ? raw : null;
 }

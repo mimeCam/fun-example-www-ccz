@@ -4,10 +4,11 @@
  * Animation phases: hidden → emergence → shimmer → reveal → rest.
  * Total animation: ~2.5s (compressed from 3.5s per UX spec).
  * ShareOverlay appears at rest phase — the viral loop starts here.
+ * Smooth-scrolls into view so the reader's current paragraph stays in place.
  */
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import ShareOverlay from './ShareOverlay';
 
@@ -28,7 +29,18 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
   const [dismissed, setDismissed] = useState(false);
   const cardRef               = useRef<HTMLDivElement>(null);
 
+  // Smooth-scroll the card into view so the reader doesn't lose their place.
+  // Offset by -25vh so the card appears near the bottom of the viewport,
+  // keeping the reader's current paragraph visible above it.
+  const scrollIntoView = useCallback(() => {
+    if (!cardRef.current) return;
+    const offset = window.innerHeight * 0.25;
+    const top = cardRef.current.getBoundingClientRect().top + window.scrollY - offset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, []);
+
   useEffect(() => {
+    scrollIntoView();
     const ids = [
       setTimeout(() => setPhase('emergence'), T_EMERGE),
       setTimeout(() => setPhase('shimmer'),   T_SHIMMER),
@@ -36,7 +48,7 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
       setTimeout(() => setPhase('rest'),      T_REST),
     ];
     return () => ids.forEach(clearTimeout);
-  }, []);
+  }, [scrollIntoView]);
 
   if (dismissed) return (
     <div className="my-12 mx-auto max-w-[200px] h-px bg-gold/30 rounded-full" />

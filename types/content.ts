@@ -42,7 +42,7 @@ export interface ResolvedParagraph {
 }
 
 /** Which layers a reader is allowed to see */
-export type VisibleLayer = 'core' | 'marginalia' | 'resonance-marginalia' | ArchetypeKey;
+export type VisibleLayer = 'core' | 'marginalia' | 'resonance-marginalia' | 'quick-mirror' | ArchetypeKey;
 
 // ─── Paragraph Engagement Types ────────────────────────────
 
