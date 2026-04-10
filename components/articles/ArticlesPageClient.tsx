@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import { ArchetypeKey } from '@/types/content';
 import { getExtensionLabel } from '@/lib/content/content-layers';
@@ -66,7 +66,9 @@ export default function ArticlesPageClient({ articles, worldview }: Props) {
         <CuratedRow curated={curated} archetype={archetype!} />
       )}
 
-      <WorldviewFilter />
+      <Suspense fallback={null}>
+        <WorldviewFilter />
+      </Suspense>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filtered.map(article => (
