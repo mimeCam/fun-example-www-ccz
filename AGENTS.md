@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS
 SQLite (better-sqlite3) · Zod · Fuse.js
 
 ## Key Paths
-- `components/home/` — PortalHero, ReturningPortal, FeaturedArticle, WorldviewDoors
+- `components/home/` — PortalHero, ReturningPortal, FeaturedArticle
 - `components/mirror/` — MirrorRevealCard, QuickMirrorCard, ShareOverlay
 - `components/navigation/` — GemHome, AmbientNav
 - `components/reading/` — DepthBar, MirrorWhisper, NextRead
@@ -21,12 +21,11 @@ SQLite (better-sqlite3) · Zod · Fuse.js
 Gold (#f0c674): 3 moments only — QuickMirrorCard archetype name, Mirror page title, Book of You title. ReturnLetter uses accent (#c77dff) instead.
 
 ## Navigation
-- Homepage WorldviewDoors → `/articles?worldview=X` (filtered article listing)
+- Homepage → single featured article + "Begin Reading" CTA (zero decisions)
 - `/explore` redirects to `/articles` (backward compat via middleware)
 - `/articles` supports `?worldview=` and `?type=` params for filtering
 
 ## WIP
-- [ ] Remove WorldviewDoors from homepage
 - [ ] Colored whisper shadows on marginalia blocks
 - [ ] Smooth scroll on QuickMirrorCard appearance
 - [ ] Restrict simultaneous marginalia to 1 type per paragraph

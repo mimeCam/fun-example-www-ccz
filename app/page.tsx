@@ -8,11 +8,10 @@
  */
 
 import dynamic from 'next/dynamic';
-import { getDefaultFeaturedArticle, selectFeaturedArticle, readArticleIdsFromMemory } from '@/lib/content/featured';
+import { getDefaultFeaturedArticle } from '@/lib/content/featured';
 import { GemHome } from '@/components/navigation/GemHome';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { decodeDeepLink } from '@/lib/sharing/deep-link';
-import WorldviewDoors from '@/components/home/WorldviewDoors';
 
 const ReturningPortal = dynamic(
   () => import('@/components/home/ReturningPortal'),
@@ -48,9 +47,6 @@ export default function Home({
 
         {/* Server fallback — replaced client-side if returning reader */}
         <FeaturedArticle defaultArticle={defaultArticle} />
-
-        {/* 4 Worldview Doors — second act for curious scanners */}
-        <WorldviewDoors />
 
       </div>
 
