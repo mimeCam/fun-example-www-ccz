@@ -5,6 +5,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./lib/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -39,6 +40,15 @@ const config: Config = {
         'content-lock-breath': 'contentLockBreath 3s ease-in-out infinite',
         'resonance-remembered': 'resonanceRemembered 1s ease-out',
         'portal-glow': 'portalGlow 3s ease-in-out infinite',
+        // Mirror reveal — gold glow pulse (2 cycles during shimmer phase)
+        'mirror-shimmer': 'mirrorGlow 0.8s ease-in-out infinite',
+        'mirror-pulse': 'mirrorGlow 1.5s ease-in-out infinite',
+        // QuickMirrorCard — 2-cycle gold glow during emergence
+        'quick-mirror-glow': 'quickMirrorPulse 600ms ease-in-out 2',
+        // Discovery — one-shot gold-to-cyan border transition
+        'discovery-shimmer': 'discoveryShimmer 1.2s ease-out forwards',
+        // Toast transitions
+        'fade-out': 'fadeOut 0.3s ease-out',
       },
       keyframes: {
         'bounce-subtle': {
@@ -48,10 +58,6 @@ const config: Config = {
         'fade-in': {
           '0%': { opacity: '0', transform: 'translateY(4px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
-        },
-        'shimmerReveal': {
-          '0%': { borderColor: '#f0c674', boxShadow: '0 0 12px rgba(240,198,116,0.3)' },
-          '100%': { borderColor: 'inherit', boxShadow: 'none' },
         },
         'contentLockBreath': {
           '0%, 100%': { borderColor: '#222244' },
@@ -66,6 +72,23 @@ const config: Config = {
         'portalGlow': {
           '0%, 100%': { boxShadow: '0 0 20px rgba(240,198,116,0.08)' },
           '50%': { boxShadow: '0 0 40px rgba(240,198,116,0.18)' },
+        },
+        mirrorGlow: {
+          '0%, 100%': { boxShadow: '0 0 20px rgba(123, 44, 191, 0.3)' },
+          '50%': { boxShadow: '0 0 50px rgba(199, 125, 255, 0.5)' },
+        },
+        quickMirrorPulse: {
+          '0%, 100%': { boxShadow: '0 8px 40px rgba(240, 198, 116, 0.25)' },
+          '50%': { boxShadow: '0 12px 60px rgba(240, 198, 116, 0.40)' },
+        },
+        discoveryShimmer: {
+          '0%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 16px rgba(240, 198, 116, 0.25)' },
+          '60%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 8px rgba(240, 198, 116, 0.1)' },
+          '100%': { borderLeftColor: '#4ecdc4', boxShadow: 'none' },
+        },
+        fadeOut: {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
         },
       },
     },

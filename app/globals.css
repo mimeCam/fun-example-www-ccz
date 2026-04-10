@@ -12,102 +12,12 @@ body {
   background: var(--background);
 }
 
-/* Reading position banner animation */
-@keyframes slideDown {
-  from {
-    transform: translate(-50%, -100%);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
-}
-
-.animate-slideDown {
-  animation: slideDown 0.3s ease-out;
-}
-
-/* Fade in animation for tooltips */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translate(-50%, -10px);
-  }
-  to {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
-}
-
 /* Margin note highlights */
 .mark {
   transition: background-color 0.2s ease;
 }
 
-/* Badge pop animation for Export Notes button */
-@keyframes badgePop {
-  0% {
-    transform: scale(0);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2);
-  }
-  100% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.animate-badge-pop {
-  animation: badgePop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-/* Scale in animation for modals */
-@keyframes scaleIn {
-  from {
-    transform: scale(0.95);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-.animate-scaleIn {
-  animation: scaleIn 0.2s ease-out;
-}
-
-/* Fade out animation */
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-.animate-fadeOut {
-  animation: fadeOut 0.3s ease-out;
-}
-
-/* Mirror reveal animations */
-@keyframes mirrorGlow {
-  0%, 100% { box-shadow: 0 0 20px rgba(123, 44, 191, 0.3); }
-  50% { box-shadow: 0 0 50px rgba(199, 125, 255, 0.5); }
-}
-
-.mirror-shimmer {
-  animation: mirrorGlow 0.8s ease-in-out infinite;
-}
-
+/* Mirror chromatic aberration — child selector can't be expressed in Tailwind */
 @keyframes chromaticShift {
   0%, 100% { text-shadow: -1px 0 rgba(255,0,0,0.4), 1px 0 rgba(0,255,0,0.4); }
   33% { text-shadow: 2px 0 rgba(255,0,0,0.6), -2px 0 rgba(0,255,0,0.6); }
@@ -116,73 +26,4 @@ body {
 
 .mirror-chromatic h2 {
   animation: chromaticShift 0.4s ease-in-out infinite;
-}
-
-.mirror-pulse {
-  animation: mirrorGlow 1.5s ease-in-out infinite;
-}
-
-/* Discovery shimmer — one-shot gold pulse when new content is revealed */
-@keyframes discoveryShimmer {
-  0% {
-    border-left-color: #f0c674;
-    box-shadow: -4px 0 16px rgba(240, 198, 116, 0.25);
-  }
-  60% {
-    border-left-color: #f0c674;
-    box-shadow: -4px 0 8px rgba(240, 198, 116, 0.1);
-  }
-  100% {
-    border-left-color: #4ecdc4;
-    box-shadow: none;
-  }
-}
-
-.discovery-shimmer {
-  animation: discoveryShimmer 1.2s ease-out forwards;
-}
-
-/* Quick Mirror gold glow pulse — 2 cycles during shimmer phase */
-@keyframes quickMirrorPulse {
-  0%, 100% { box-shadow: 0 8px 40px rgba(240, 198, 116, 0.25); }
-  50% { box-shadow: 0 12px 60px rgba(240, 198, 116, 0.40); }
-}
-
-.quick-mirror-glow {
-  animation: quickMirrorPulse 600ms ease-in-out 2;
-}
-
-/* Evolution Card — phased fade-in */
-@keyframes evolutionFadeIn {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.evolution-card {
-  animation: evolutionFadeIn 300ms ease-out forwards;
-}
-
-.evolution-side {
-  animation: evolutionFadeIn 300ms ease-out both;
-}
-
-/* Golden thread: scales from center outward */
-@keyframes threadScale {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
-}
-
-.evolution-thread {
-  transform-origin: center;
-  animation: threadScale 400ms ease-out 300ms both;
-}
-
-/* Stats row: delayed fade-in */
-@keyframes statsFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.evolution-stats {
-  animation: statsFade 300ms ease-out 500ms both;
 }

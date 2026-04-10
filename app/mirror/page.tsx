@@ -85,7 +85,7 @@ export default function MirrorPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="mirror-pulse w-80 h-96 rounded-3xl bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
+      <div className="animate-mirror-pulse w-80 h-96 rounded-3xl bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
     </div>
   );
 

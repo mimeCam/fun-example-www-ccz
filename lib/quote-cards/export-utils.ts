@@ -106,14 +106,14 @@ export function showExportFeedback(
 
   // Create toast element
   const toast = document.createElement('div');
-  toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fadeIn';
+  toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
   toast.textContent = message;
 
   document.body.appendChild(toast);
 
   // Remove after delay
   setTimeout(() => {
-    toast.classList.add('animate-fadeOut');
+    toast.classList.add('animate-fade-out');
     setTimeout(() => {
       document.body.removeChild(toast);
     }, 300);
@@ -135,13 +135,13 @@ export function showExportError(
     : 'Failed to copy to clipboard';
 
   const toast = document.createElement('div');
-  toast.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fadeIn';
+  toast.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
   toast.textContent = message;
 
   document.body.appendChild(toast);
 
   setTimeout(() => {
-    toast.classList.add('animate-fadeOut');
+    toast.classList.add('animate-fade-out');
     setTimeout(() => {
       document.body.removeChild(toast);
     }, 300);

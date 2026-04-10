@@ -60,7 +60,7 @@ function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: bool
   return (
     <aside
       className={`my-8 pl-4 border-l-2 ${border} bg-[#242445]/30 rounded-r-md py-3 pr-4
-        ${block.isNew ? 'discovery-shimmer' : ''}`}
+        ${block.isNew ? 'animate-discovery-shimmer' : ''}`}
     >
       {block.isNew && <NewContentBadge />}
       {block.paragraphs.map((p, i) => (
@@ -82,7 +82,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
     <section
       data-layer={block.layer}
       className={`my-8 pl-4 pr-4 py-3 rounded-r-md border-l-2 ${borderColor}
-        ${block.isNew ? 'discovery-shimmer' : ''}
+        ${block.isNew ? 'animate-discovery-shimmer' : ''}
         bg-[#242445]/20`}
     >
       <div className="flex items-center gap-2 mb-2">

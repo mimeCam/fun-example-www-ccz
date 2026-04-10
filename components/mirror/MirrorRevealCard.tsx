@@ -54,7 +54,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   const phaseMap: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-4 border-transparent',
     emergence: 'opacity-100 translate-y-0 border-gold/15',
-    shimmer:   'opacity-100 translate-y-0 border-gold/25 mirror-shimmer',
+    shimmer:   'opacity-100 translate-y-0 border-gold/25 animate-mirror-shimmer',
     reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
     done:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
