@@ -29,9 +29,9 @@ function phaseStyles(phase: Phase, settled: boolean): string {
   }
   if (phase === 'settle') {
     return `opacity-100 translate-y-0 transition-all duration-700 ease-out
-            border-gold/20 shadow-gold`;
+            border-accent/20 shadow-gold`;
   }
-  return `opacity-100 translate-y-0 ${settled ? 'border-gold/20 shadow-gold' : 'border-gold/10 shadow-none'}`;
+  return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-gold' : 'border-accent/10 shadow-none'}`;
 }
 
 // ─── Compact greeting (known readers, < 3 days) ──────────
@@ -173,11 +173,11 @@ function LetterCard({
           aria-label="Dismiss">&times;</button>
       )}
       {/* Label */}
-      <p className="text-xs uppercase tracking-widest text-gold/60 text-center">
+      <p className="text-xs uppercase tracking-widest text-accent/60 text-center">
         Based on how you read&hellip;
       </p>
       {/* Salutation */}
-      <p className="text-gold text-lg font-display font-semibold mt-4 text-center">
+      <p className="text-accent text-lg font-display font-semibold mt-4 text-center">
         {letter.salutation}
       </p>
       {/* Opening */}
@@ -192,7 +192,7 @@ function LetterCard({
       ))}
       {/* Divider */}
       <div className="my-6 flex justify-center">
-        <div className={`h-px max-w-[120px] bg-gold/30 transition-transform duration-500 ${dividerScale}`} />
+        <div className={`h-px max-w-[120px] bg-accent/20 transition-transform duration-500 ${dividerScale}`} />
       </div>
       {/* Closing */}
       <p className="text-[#f0f0f5]/80 text-base italic text-center">{letter.closing}</p>
@@ -202,7 +202,7 @@ function LetterCard({
       {visible && (
         <div className="mt-6 flex justify-center gap-3">
           <button onClick={handleCopy}
-            className="px-5 py-2 rounded-lg border border-gold/40 text-gold text-sm hover:bg-gold/10 transition-colors">
+            className="px-5 py-2 rounded-lg border border-accent/40 text-accent text-sm hover:bg-accent/10 transition-colors">
             {copied ? 'Copied!' : 'Copy & Share'}
           </button>
           <button onClick={handleImage}

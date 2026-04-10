@@ -7,7 +7,8 @@ import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
-import { NextRead, generateRecommendationContext } from '@/components/reading/NextRead';
+import { NextRead } from '@/components/reading/NextRead';
+import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import MirrorWhisper from '@/components/reading/MirrorWhisper';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
@@ -71,15 +72,12 @@ function ArticleContent({ params }: { params: { id: string } }) {
   // Return recognition — ambient "I know you" for returning readers
   const recognition = useReturnRecognition();
 
-  // Next read recommendation
+  // Archetype-aware next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
-  const nextArticle = allArticles[0];
-  const nextContext = nextArticle
-    ? generateRecommendationContext(
-        { id: params.id, title: article.title, content: '', tags: [] },
-        nextArticle
-      )
-    : '';
+  const readArticleIds = typeof window !== 'undefined'
+    ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}'))
+    : [];
+  const recommendation = bestRecommendation(article, allArticles, archetype, readArticleIds);
 
   return (
     <>
@@ -112,7 +110,13 @@ function ArticleContent({ params }: { params: { id: string } }) {
           <MirrorWhisper archetype={archetype} />
 
           <hr className="border-fog my-12" />
-          {nextArticle && <NextRead article={nextArticle} context={nextContext} />}
+          {recommendation && (
+            <NextRead
+              article={recommendation.article}
+              context={recommendation.reason}
+              archetype={archetype}
+            />
+          )}
 
           <WhisperFooter />
         </div>

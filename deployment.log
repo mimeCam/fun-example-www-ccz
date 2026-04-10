@@ -1,4 +1,4 @@
-Deployment started at: Fri Apr 10 02:26:08 AM CEST 2026
+Deployment started at: Fri Apr 10 03:30:07 AM CEST 2026
 Stopping existing container (if running)...
   Removing container: persona-blog-z
 Removing old image...
@@ -21,7 +21,7 @@ Building Docker image...
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 58.56kB 0.0s done
+#5 transferring context: 41.50kB 0.0s done
 #5 DONE 0.0s
 
 #6 [ 7/18] COPY next.config.js ./
@@ -30,32 +30,32 @@ Building Docker image...
 #7 [ 3/18] RUN mkdir -p /app/data /app/logs
 #7 CACHED
 
-#8 [ 4/18] RUN apk add --no-cache python3 make g++
+#8 [ 5/18] COPY package*.json ./
 #8 CACHED
 
-#9 [ 5/18] COPY package*.json ./
+#9 [ 8/18] COPY tsconfig.json ./
 #9 CACHED
 
-#10 [ 6/18] RUN npm ci && npm cache clean --force
+#10 [ 9/18] COPY tailwind.config.ts ./
 #10 CACHED
 
-#11 [ 2/18] WORKDIR /app
+#11 [10/18] COPY postcss.config.js ./
 #11 CACHED
 
-#12 [ 8/18] COPY tsconfig.json ./
+#12 [ 4/18] RUN apk add --no-cache python3 make g++
 #12 CACHED
 
-#13 [ 9/18] COPY tailwind.config.ts ./
-#13 DONE 0.0s
+#13 [11/18] COPY next-env.d.ts ./
+#13 CACHED
 
-#14 [10/18] COPY postcss.config.js ./
-#14 DONE 0.0s
+#14 [ 2/18] WORKDIR /app
+#14 CACHED
 
-#15 [11/18] COPY next-env.d.ts ./
-#15 DONE 0.0s
+#15 [ 6/18] RUN npm ci && npm cache clean --force
+#15 CACHED
 
 #16 [12/18] COPY middleware.ts ./
-#16 DONE 0.0s
+#16 CACHED
 
 #17 [13/18] COPY app ./app
 #17 DONE 0.0s
@@ -73,86 +73,85 @@ Building Docker image...
 #21 DONE 0.0s
 
 #22 [18/18] RUN npm run build
-#22 0.305 
-#22 0.305 > persona-blog@0.1.0 build
-#22 0.305 > next build
-#22 0.305 
-#22 0.956 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#22 0.956 This information is used to shape Next.js' roadmap and prioritize features.
-#22 0.956 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#22 0.956 https://nextjs.org/telemetry
-#22 0.956 
-#22 1.030   ▲ Next.js 14.2.3
-#22 1.030 
-#22 1.107    Creating an optimized production build ...
-#22 16.40 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap failed, reason: 
-#22 16.40 
-#22 16.40 Retrying 1/3...
-#22 16.40 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
-#22 16.40 
-#22 16.40 Retrying 1/3...
-#22 17.24 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap failed, reason: 
-#22 17.24 
-#22 17.24 Retrying 2/3...
-#22 17.24 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
-#22 17.24 
-#22 17.24 Retrying 2/3...
-#22 21.68  ✓ Compiled successfully
-#22 21.68    Linting and checking validity of types ...
-#22 30.24    Collecting page data ...
-#22 31.89    Generating static pages (0/15) ...
-#22 32.43    Generating static pages (3/15) 
-#22 32.60    Generating static pages (7/15) 
-#22 32.98    Generating static pages (11/15) 
-#22 33.21  ✓ Generating static pages (15/15)
-#22 33.81    Finalizing page optimization ...
-#22 33.81    Collecting build traces ...
-#22 38.90 
-#22 38.92 Route (app)                              Size     First Load JS
-#22 38.92 ┌ ƒ /                                    2.48 kB         117 kB
-#22 38.92 ├ ○ /_not-found                          137 B          87.2 kB
-#22 38.92 ├ ○ /admin/categories                    1.99 kB          89 kB
-#22 38.92 ├ ○ /admin/editor-picks                  1.72 kB         110 kB
-#22 38.92 ├ ƒ /api/admin/editor-picks              0 B                0 B
-#22 38.92 ├ ƒ /api/articles                        0 B                0 B
-#22 38.92 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#22 38.92 ├ ƒ /api/categories                      0 B                0 B
-#22 38.92 ├ ƒ /api/categories/[slug]               0 B                0 B
-#22 38.92 ├ ƒ /api/highlights                      0 B                0 B
-#22 38.92 ├ ○ /api/history/today                   0 B                0 B
-#22 38.92 ├ ƒ /api/mirror                          0 B                0 B
-#22 38.92 ├ ƒ /api/reading/memory                  0 B                0 B
-#22 38.92 ├ ƒ /api/reading/streak                  0 B                0 B
-#22 38.92 ├ ƒ /api/reading/topics                  0 B                0 B
-#22 38.92 ├ ƒ /api/related-posts                   0 B                0 B
-#22 38.92 ├ ƒ /api/resonances                      0 B                0 B
-#22 38.92 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#22 38.92 ├ ƒ /api/trails                          0 B                0 B
-#22 38.92 ├ ƒ /article/[id]                        16.1 kB         131 kB
-#22 38.92 ├ ƒ /articles                            4.04 kB        97.8 kB
-#22 38.92 ├ ○ /mirror                              5.5 kB         99.3 kB
-#22 38.92 └ ○ /resonances                          5.78 kB        99.6 kB
-#22 38.92 + First Load JS shared by all            87 kB
-#22 38.92   ├ chunks/23-e0c69bdbb34266f3.js        31.5 kB
-#22 38.92   ├ chunks/fd9d1056-431a1727a1189585.js  53.6 kB
-#22 38.92   └ other shared chunks (total)          1.93 kB
-#22 38.92 
-#22 38.92 
-#22 38.92 ƒ Middleware                             27.1 kB
-#22 38.92 
-#22 38.92 ○  (Static)   prerendered as static content
-#22 38.92 ƒ  (Dynamic)  server-rendered on demand
-#22 38.92 
-#22 DONE 39.0s
+#22 0.311 
+#22 0.311 > persona-blog@0.1.0 build
+#22 0.311 > next build
+#22 0.311 
+#22 0.997 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#22 0.999 This information is used to shape Next.js' roadmap and prioritize features.
+#22 0.999 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#22 0.999 https://nextjs.org/telemetry
+#22 0.999 
+#22 1.082   ▲ Next.js 14.2.3
+#22 1.083 
+#22 1.173    Creating an optimized production build ...
+#22 16.26 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap failed, reason: 
+#22 16.26 
+#22 16.26 Retrying 1/3...
+#22 16.26 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
+#22 16.26 
+#22 16.26 Retrying 1/3...
+#22 17.33 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap failed, reason: 
+#22 17.33 
+#22 17.33 Retrying 2/3...
+#22 17.33 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap failed, reason: 
+#22 17.33 
+#22 17.33 Retrying 2/3...
+#22 21.71  ✓ Compiled successfully
+#22 21.71    Linting and checking validity of types ...
+#22 30.29    Collecting page data ...
+#22 32.07    Generating static pages (0/15) ...
+#22 32.62    Generating static pages (3/15) 
+#22 32.74    Generating static pages (7/15) 
+#22 33.22    Generating static pages (11/15) 
+#22 33.56  ✓ Generating static pages (15/15)
+#22 33.93    Finalizing page optimization ...
+#22 33.93    Collecting build traces ...
+#22 39.15 
+#22 39.17 Route (app)                              Size     First Load JS
+#22 39.17 ┌ ƒ /                                    2.48 kB         117 kB
+#22 39.17 ├ ○ /_not-found                          137 B          87.2 kB
+#22 39.17 ├ ○ /admin/categories                    1.99 kB          89 kB
+#22 39.17 ├ ○ /admin/editor-picks                  1.72 kB         110 kB
+#22 39.17 ├ ƒ /api/admin/editor-picks              0 B                0 B
+#22 39.17 ├ ƒ /api/articles                        0 B                0 B
+#22 39.17 ├ ƒ /api/articles/[id]/categories        0 B                0 B
+#22 39.17 ├ ƒ /api/categories                      0 B                0 B
+#22 39.17 ├ ƒ /api/categories/[slug]               0 B                0 B
+#22 39.17 ├ ƒ /api/highlights                      0 B                0 B
+#22 39.17 ├ ○ /api/history/today                   0 B                0 B
+#22 39.17 ├ ƒ /api/mirror                          0 B                0 B
+#22 39.17 ├ ƒ /api/reading/memory                  0 B                0 B
+#22 39.17 ├ ƒ /api/reading/streak                  0 B                0 B
+#22 39.17 ├ ƒ /api/reading/topics                  0 B                0 B
+#22 39.17 ├ ƒ /api/related-posts                   0 B                0 B
+#22 39.17 ├ ƒ /api/resonances                      0 B                0 B
+#22 39.17 ├ ƒ /api/resonances/[id]                 0 B                0 B
+#22 39.17 ├ ƒ /api/trails                          0 B                0 B
+#22 39.17 ├ ƒ /article/[id]                        17 kB           132 kB
+#22 39.17 ├ ƒ /articles                            4.04 kB        97.8 kB
+#22 39.17 ├ ○ /mirror                              5.5 kB         99.3 kB
+#22 39.17 └ ○ /resonances                          5.78 kB        99.6 kB
+#22 39.17 + First Load JS shared by all            87 kB
+#22 39.17   ├ chunks/23-e0c69bdbb34266f3.js        31.5 kB
+#22 39.17   ├ chunks/fd9d1056-431a1727a1189585.js  53.6 kB
+#22 39.17   └ other shared chunks (total)          1.93 kB
+#22 39.17 
+#22 39.17 
+#22 39.17 ƒ Middleware                             27.1 kB
+#22 39.17 
+#22 39.17 ○  (Static)   prerendered as static content
+#22 39.17 ƒ  (Dynamic)  server-rendered on demand
+#22 39.17 
+#22 DONE 39.3s
 
 #23 exporting to image
-#23 exporting layers
-#23 exporting layers 0.2s done
-#23 writing image sha256:381efc4ff9be84f4b20b394707f72138cb4fcc424aab2caf2b94a277890915b9 done
+#23 exporting layers 0.1s done
+#23 writing image sha256:a1a210a3151261429c7ec3f30972ce7d5e84c8fed813449a028443d9332f7dda done
 #23 naming to docker.io/library/persona-blog-image:latest done
 #23 DONE 0.2s
 Starting container on port 7200 (log level: info)...
-79979bf8b61ba52fd8395a3114e5d35d17d9361634b9ba81d007e180882a6f35
+969b40b4be7c95775d9d85431834bd1a7b5ac86b5ff20189ac34351447510cd0
 Container is running
   Checking container health...
   Container is healthy and responding
@@ -172,6 +171,6 @@ Management:
   docker stop persona-blog-z
   docker restart persona-blog-z
 
-Deployment completed at: Fri Apr 10 02:26:55 AM CEST 2026
+Deployment completed at: Fri Apr 10 03:30:54 AM CEST 2026
 Removed dangling images
 Done.

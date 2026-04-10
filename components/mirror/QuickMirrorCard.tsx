@@ -113,7 +113,7 @@ function phaseClass(p: Phase): string {
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-4 border-transparent',
     emergence: 'opacity-100 translate-y-0 border-gold/15',
-    shimmer:   'opacity-100 translate-y-0 border-gold/25 animate-quick-mirror-glow',
+    shimmer:   'opacity-100 translate-y-0 border-gold/25 shadow-gold-intense animate-quick-mirror-glow',
     reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
     rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
