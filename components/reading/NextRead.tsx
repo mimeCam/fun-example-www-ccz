@@ -53,7 +53,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
   const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
 
   return (
-    <div className="my-12 p-8 rounded-2xl relative overflow-hidden transition-all duration-600 ease-out animate-fade-in">
+    <div className="my-12 p-8 rounded-lg relative overflow-hidden transition-all duration-600 ease-out animate-fade-in thermal-shadow">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
       <div className="absolute top-0 left-0 right-0 h-px bg-primary opacity-15" />
 
@@ -72,7 +72,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
         <div className={`w-16 h-0.5 ${archetype ? accent.split(' ')[0] : 'bg-primary'} mt-2 mb-5`} />
 
         {/* Article title */}
-        <h3 className="text-2xl font-semibold text-white mb-3 leading-tight">
+        <h3 className="text-2xl font-semibold text-foreground mb-3 leading-tight">
           {article.title}
         </h3>
 
@@ -84,7 +84,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
         {/* CTA Button */}
         <Link
           href={`/article/${article.id}`}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary rounded-xl hover:bg-primary/20 transition-all duration-200 font-medium text-sm shadow-rise"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-all duration-200 font-medium text-sm shadow-rise"
         >
           Read this next
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import { notFound } from 'next/navigation';
 import { DepthBar } from '@/components/reading/DepthBar';
 import { GemHome } from '@/components/navigation/GemHome';
@@ -22,6 +22,9 @@ import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import { RecognitionWhisper } from '@/components/return/RecognitionWhisper';
 import WhisperFooter from '@/components/shared/WhisperFooter';
+import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvider';
+import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
+import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -102,6 +105,20 @@ function ArticleContent({ params }: { params: { id: string } }) {
   // Return recognition — ambient "I know you" for returning readers
   const recognition = useReturnRecognition();
 
+  // Thermal state from ThermalProvider
+  const { isWarm, refresh: refreshThermal } = useThermal();
+  const { maxDepth } = useScrollDepth();
+  const startTime = useRef(Date.now());
+
+  // Accumulate reading session into thermal history on unmount
+  useEffect(() => {
+    return () => {
+      const dwell = (Date.now() - startTime.current) / 1000;
+      const h = accumulateArticle(loadHistory(), params.id, maxDepth, dwell);
+      saveHistory(h);
+    };
+  }, [params.id, maxDepth]);
+
   // Archetype-aware next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
   const readArticleIds = typeof window !== 'undefined'
@@ -120,7 +137,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
           <RecognitionWhisper recognition={recognition} />
           <hr className="border-fog mb-8" />
 
-          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-white">
+          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-foreground">
             {displayBlocks.length > 0 ? (
               <StratifiedRenderer blocks={displayBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning}
                 mirrorSlot={quickMirror.triggered && quickMirror.result ? (
@@ -172,7 +189,7 @@ function TopBar({ articleId, title }: { articleId: string; title: string }) {
 function ArticleHeader({ title, readTime }: { title: string; readTime: number }) {
   return (
     <header className="mb-8 text-center">
-      <h1 className="font-display text-[2.25rem] font-bold text-white leading-tight tracking-tight">
+      <h1 className="font-display text-[2.25rem] font-bold text-foreground leading-tight tracking-tight">
         {title}
       </h1>
       <p className="text-mist text-sm mt-3">Author &middot; {readTime} min read</p>

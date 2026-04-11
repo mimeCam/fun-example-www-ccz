@@ -163,8 +163,8 @@ function LetterCard({
   return (
     <div className={`relative max-w-lg mx-auto my-12 p-8 md:p-10
       max-h-[40vh] overflow-y-auto
-      bg-gradient-to-b from-[#16213e] to-[#1a1a2e]
-      rounded-2xl border transition-all duration-700
+      bg-gradient-to-b from-surface to-background
+      rounded-lg border transition-all duration-700
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss */}
       {visible && (
@@ -181,12 +181,12 @@ function LetterCard({
         {letter.salutation}
       </p>
       {/* Opening */}
-      <p className="text-[#f0f0f5]/90 text-base leading-[1.9] mt-4 text-center">
+      <p className="text-foreground/90 text-base leading-[1.9] mt-4 text-center">
         {letter.opening}
       </p>
       {/* Body */}
       {letter.body.map((para, i) => (
-        <p key={i} className="text-[#f0f0f5]/90 text-base leading-[1.9] mt-4 text-center">
+        <p key={i} className="text-foreground/90 text-base leading-[1.9] mt-4 text-center">
           {para}
         </p>
       ))}
@@ -195,7 +195,7 @@ function LetterCard({
         <div className={`h-px max-w-[120px] bg-accent/20 transition-transform duration-500 ${dividerScale}`} />
       </div>
       {/* Closing */}
-      <p className="text-[#f0f0f5]/80 text-base italic text-center">{letter.closing}</p>
+      <p className="text-foreground/80 text-base italic text-center">{letter.closing}</p>
       {/* Sign-off */}
       <p className="text-mist text-sm italic text-center mt-3">{letter.signOff}</p>
       {/* Actions */}
@@ -206,7 +206,7 @@ function LetterCard({
             {copied ? 'Copied!' : 'Copy & Share'}
           </button>
           <button onClick={handleImage}
-            className="px-5 py-2 rounded-lg text-mist text-sm hover:text-[#f0f0f5]/80 transition-colors">
+            className="px-5 py-2 rounded-lg text-mist text-sm hover:text-foreground/80 transition-colors">
             Save as Image
           </button>
         </div>

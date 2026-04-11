@@ -10,17 +10,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "#1a1a2e", // Void — Deep Indigo, page background
-        primary: "#7b2cbf",    // Pulse — Electric Purple, interactive states
-        secondary: "#9d4edd",  // Glow — Violet, hover/focus states
-        accent: "#c77dff",     // Shimmer — Light Violet, highlights
-        surface: "#16213e",    // Surface — Navy Slate, raised elements
-        fog: "#222244",        // Fog — borders, dividers
-        mist: "#9494b8",       // Mist — secondary text, metadata
-        gold: "#f0c674",       // Gold — mirror reveal, discovery
-        cyan: "#4ecdc4",       // Cyan — marginalia, unlocked markers
-        rose: "#e88fa7",       // Rose — reader-authored marginalia, "your voice"
-        void: "#0d0d1a",       // Void deep — code blocks, pressed surfaces
+        // Thermal-aware tokens — shift with reader engagement
+        background: 'var(--token-bg)',
+        surface: 'var(--token-surface)',
+        foreground: 'var(--token-foreground)',
+        // Static tokens — never change with thermal state
+        primary: "var(--primary)",
+        secondary: "var(--secondary)",
+        accent: "var(--accent-violet)",
+        fog: "var(--fog)",
+        mist: "var(--mist)",
+        gold: "var(--gold)",
+        cyan: "var(--cyan)",
+        rose: "var(--rose)",
+        void: "var(--void-deep)",
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
@@ -33,6 +36,7 @@ const config: Config = {
         'gold': '0 8px 40px rgba(240,198,116,0.25)',
         'gold-intense': '0 12px 60px rgba(240,198,116,0.40)',
         'rose-glow': '0 6px 32px rgba(232,143,167,0.20)',
+        'cyan-whisper': '0 2px 20px rgba(78,205,196,0.15)',
       },
       animation: {
         'bounce-subtle': 'bounce-subtle 0.3s ease-in-out',
@@ -49,6 +53,14 @@ const config: Config = {
         'discovery-shimmer': 'discoveryShimmer 1.2s ease-out forwards',
         // Toast transitions
         'fade-out': 'fadeOut 0.3s ease-out',
+        // Thermal animations
+        'slide-up': 'slideUp 300ms ease-out',
+        'gem-appear': 'gemAppear 600ms ease-out',
+        'whisper-shadow': 'whisperShadow 400ms ease-out',
+        // Thermal breathing — CSS custom properties drive duration/intensity
+        'thermal-breath': 'thermalBreath 4s ease-in-out infinite',
+        'thermal-glow': 'thermalGlow 4s ease-in-out infinite',
+        'thermal-drift': 'thermalDrift 6s ease-in-out infinite',
       },
       keyframes: {
         'bounce-subtle': {
@@ -89,6 +101,31 @@ const config: Config = {
         fadeOut: {
           from: { opacity: '1' },
           to: { opacity: '0' },
+        },
+        slideUp: {
+          from: { transform: 'translateY(8px)', opacity: '0' },
+          to: { transform: 'translateY(0)', opacity: '1' },
+        },
+        gemAppear: {
+          from: { opacity: '0', transform: 'scale(0.9)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        whisperShadow: {
+          from: { boxShadow: 'none' },
+          to: { boxShadow: '0 2px 20px rgba(78,205,196,0.15)' },
+        },
+        // Thermal breathing — duration/intensity driven by CSS custom properties
+        thermalBreath: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(calc(1 + var(--token-breath-scale)))' },
+        },
+        thermalGlow: {
+          '0%, 100%': { opacity: 'var(--token-glow-min)' },
+          '50%': { opacity: 'var(--token-glow-max)' },
+        },
+        thermalDrift: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(var(--token-drift-range))' },
         },
       },
     },

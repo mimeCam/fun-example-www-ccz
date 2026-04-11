@@ -74,7 +74,7 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
 function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
   return (
     <button onClick={onDismiss}
-      className="absolute top-3 right-3 text-mist/40 hover:text-white/80
+      className="absolute top-3 right-3 text-mist/30 hover:text-mist/60
         transition-colors duration-200 text-lg leading-none"
       aria-label="Dismiss">×</button>
   );
@@ -100,7 +100,7 @@ function ArchetypeName({ label, visible }: { label: string; visible: boolean }) 
 
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
-    <p className={`mt-3 text-sm text-white/80 italic max-w-[340px]
+    <p className={`mt-3 text-sm text-foreground/80 italic max-w-[340px]
       mx-auto leading-relaxed ${fadeClass(visible)}`}
       style={fadeStyle(visible, 300)}>
       &ldquo;{text}&rdquo;
@@ -117,7 +117,7 @@ function GoldDivider({ visible }: { visible: boolean }) {
 
 function cardBase(): string {
   return 'relative my-20 mx-auto max-w-[400px] p-8 text-center'
-    + ' rounded-2xl border bg-gradient-to-b from-surface to-background'
+    + ' rounded-lg border bg-gradient-to-b from-surface to-background'
     + ' transition-all duration-700 ease-out';
 }
 

@@ -84,7 +84,7 @@ export default function MirrorPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="animate-mirror-pulse w-80 h-96 rounded-3xl bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
+      <div className="animate-mirror-pulse w-80 h-96 rounded-lg bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
     </div>
   );
 
@@ -93,14 +93,14 @@ export default function MirrorPage() {
       <GemHome />
       <div className="max-w-md mx-auto pt-20 text-center">
         <GemOutline />
-        <h1 className="text-2xl font-display font-bold text-white mb-3">
+        <h1 className="text-2xl font-display font-bold text-foreground mb-3">
           Your reflection hasn&apos;t formed yet.
         </h1>
         <p className="text-mist text-sm mb-8 max-w-sm mx-auto leading-relaxed">
           Read an article to the end and the Mirror will find you.
         </p>
         <Link href="/articles"
-          className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold rounded-xl transition-colors">
+          className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold rounded-lg transition-colors">
           Browse Articles →
         </Link>
       </div>
@@ -112,14 +112,14 @@ export default function MirrorPage() {
 
 function QuickMirrorCardInline({ result }: { result: QuickMirrorResult }) {
   return (
-    <div className="bg-surface border border-fog/40 rounded-2xl p-8 shadow-gold max-w-md mx-auto">
+    <div className="bg-surface border border-fog/40 rounded-lg p-8 shadow-gold max-w-md mx-auto">
       <p className="text-xs uppercase tracking-widest text-mist mb-3">
         Based on how you read…
       </p>
       <h1 className="text-3xl font-display font-bold text-gold">
         {result.archetypeLabel}
       </h1>
-      <p className="mt-4 text-sm text-white/80 italic leading-relaxed max-w-[320px] mx-auto">
+      <p className="mt-4 text-sm text-foreground/80 italic leading-relaxed max-w-[320px] mx-auto">
         &ldquo;{result.whisper}&rdquo;
       </p>
       <div className="my-6 h-px max-w-[200px] mx-auto bg-gold/40" />
@@ -147,7 +147,7 @@ function IdentityStats({ articlesRead, firstDetected }: {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <div className="text-white font-medium">{value}</div>
+      <div className="text-foreground font-medium">{value}</div>
       <div className="text-xs text-mist/50 mt-0.5">{label}</div>
     </div>
   );

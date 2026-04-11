@@ -3,13 +3,105 @@
 @tailwind utilities;
 
 :root {
-  --background: #1a1a2e;
-  --foreground: #f0f0f5;
+  /* Thermal-interpolated tokens — dormant defaults match current static values.
+     ThermalProvider overwrites these via JS at runtime.
+     If ThermalProvider isn't mounted, the site looks exactly like before. */
+  --token-bg: #1a1a2e;
+  --token-surface: #16213e;
+  --token-foreground: #e8e8f0;
+  --token-accent: #7b2cbf;
+  --token-glow: none;
+  --token-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  --token-border: #222244;
+  --token-spacing-breath: 0px;
+
+  /* Continuous thermal tokens — typography, shadow, radius, accent */
+  --token-letter-spacing: 0em;
+  --token-line-height: 1.75;
+  --token-shadow-depth: 0.30;
+  --token-radius-soft: 0rem;
+  --token-accent-opacity: 0.30;
+
+  /* Animation tokens — ThermalProvider sets these at runtime.
+     '0' = animation disabled (dormant state). */
+  --token-breath-speed: 0;
+  --token-breath-scale: 0;
+  --token-glow-speed: 0;
+  --token-glow-min: 0;
+  --token-glow-max: 0;
+  --token-drift-speed: 0;
+  --token-drift-range: 0;
+
+  /* Static design tokens — never change with thermal state */
+  --gold: #f0c674;
+  --cyan: #4ecdc4;
+  --rose: #e88fa7;
+  --mist: #9494b8;
+  --fog: #222244;
+  --void-deep: #0d0d1a;
+  --primary: #7b2cbf;
+  --secondary: #9d4edd;
+  --accent-violet: #c77dff;
+
+  /* Legacy aliases (kept for backward compat during migration) */
+  --background: var(--token-bg);
+  --foreground: var(--token-foreground);
+}
+
+/* Thermal transitions — smooth state changes (1.5s prevents jitter) */
+html {
+  transition: background-color 1.5s ease-out;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  color: var(--token-foreground);
+  background: var(--token-bg);
+  letter-spacing: var(--token-letter-spacing);
+  line-height: var(--token-line-height);
+  transition: color 1.5s ease-out,
+              letter-spacing 1.5s ease-out,
+              line-height 1.5s ease-out;
+}
+
+/* Thermal-responsive utility — applies continuous typography tokens */
+.thermal-typography {
+  letter-spacing: var(--token-letter-spacing);
+  line-height: var(--token-line-height);
+  transition: letter-spacing 1.5s ease-out,
+              line-height 1.5s ease-out;
+}
+
+/* Thermal shadow depth — continuous alpha scaling for card surfaces */
+.thermal-shadow {
+  box-shadow: 0 calc(1px + 7px * var(--token-shadow-depth))
+              calc(2px + 30px * var(--token-shadow-depth))
+              rgba(0, 0, 0, calc(0.3 + 0.2 * var(--token-shadow-depth)));
+  transition: box-shadow 1.5s ease-out;
+}
+
+/* Thermal radius softening — additive bonus on top of base rounded-lg */
+.thermal-radius {
+  border-radius: calc(1rem + var(--token-radius-soft));
+  transition: border-radius 1.5s ease-out;
+}
+
+/* Dormant state "lit candle" — faint gold glow on CTA elements */
+.thermal-candle {
+  box-shadow: 0 0 20px rgba(240,198,116,0.08);
+  animation: candlePulse 3s ease-in-out infinite;
+}
+
+@keyframes candlePulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.08); }
+  50% { box-shadow: 0 0 40px rgba(240,198,116,0.18); }
+}
+
+/* Warm state warm-spotlight — subtle radial gradient on bg */
+[data-thermal="warm"] body,
+[data-thermal="luminous"] body {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(240,198,116,0.03), transparent 70%),
+    var(--token-bg);
 }
 
 /* Margin note highlights */
@@ -26,4 +118,79 @@ body {
 
 .mirror-chromatic h2 {
   animation: chromaticShift 0.4s ease-in-out infinite;
+}
+
+/* New thermal animations */
+@keyframes thermalShift {
+  from { background-color: var(--token-bg); }
+  to { background-color: var(--token-bg); }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes gemAppear {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes whisperShadow {
+  from { box-shadow: none; }
+  to { box-shadow: 0 2px 20px rgba(78,205,196,0.15); }
+}
+
+/* ─── Thermal Breathing Animations ─────────────────────── */
+
+@keyframes thermalBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(calc(1 + var(--token-breath-scale))); }
+}
+
+@keyframes thermalGlow {
+  0%, 100% { opacity: var(--token-glow-min); }
+  50% { opacity: var(--token-glow-max); }
+}
+
+@keyframes thermalDrift {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(var(--token-drift-range)); }
+}
+
+/* Thermal animation utility classes — gated by data-thermal on <html>.
+   Only animate when thermal state is stirring+ (score >= 25).
+   Dormant = no animation = stillness. Server components can use these
+   classes safely — the CSS gate handles everything. */
+[data-thermal="stirring"] .thermal-breath,
+[data-thermal="warm"] .thermal-breath,
+[data-thermal="luminous"] .thermal-breath {
+  animation: thermalBreath var(--token-breath-speed) ease-in-out infinite;
+  will-change: transform;
+}
+
+[data-thermal="stirring"] .thermal-glow,
+[data-thermal="warm"] .thermal-glow,
+[data-thermal="luminous"] .thermal-glow {
+  animation: thermalGlow var(--token-glow-speed) ease-in-out infinite;
+  will-change: opacity;
+}
+
+[data-thermal="stirring"] .thermal-drift,
+[data-thermal="warm"] .thermal-drift,
+[data-thermal="luminous"] .thermal-drift {
+  animation: thermalDrift var(--token-drift-speed) ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Respect reduced motion — hard kill on all animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle {
+    animation: none !important;
+  }
 }

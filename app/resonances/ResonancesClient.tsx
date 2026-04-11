@@ -164,7 +164,7 @@ export default function ResonancesClient() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="w-80 h-48 rounded-3xl bg-gradient-to-b from-rose/10 to-surface/20 border border-rose/10 animate-pulse" />
+      <div className="w-80 h-48 rounded-lg bg-gradient-to-b from-rose/10 to-surface/20 border border-rose/10 animate-pulse" />
     </div>
   );
 
@@ -178,14 +178,14 @@ export default function ResonancesClient() {
     <div className="max-w-md mx-auto pt-20 text-center">
       <GemHome />
       <GemIcon className="mx-auto text-mist/30 mb-8" />
-      <h1 className="text-2xl font-display font-bold text-[#f0f0f5] mb-3">
+      <h1 className="text-2xl font-display font-bold text-foreground mb-3">
         Your chapter hasn&apos;t been written yet.
       </h1>
       <p className="text-mist text-sm mb-8 max-w-sm mx-auto leading-relaxed">
         Read something that stops you. Capture it. Tell it why it matters.
       </p>
       <Link href="/"
-        className="inline-block px-6 py-3 bg-primary hover:bg-secondary text-white font-semibold rounded-xl transition-colors">
+        className="inline-block px-6 py-3 bg-primary hover:bg-secondary text-foreground font-semibold rounded-lg transition-colors">
         Browse Articles →
       </Link>
     </div>

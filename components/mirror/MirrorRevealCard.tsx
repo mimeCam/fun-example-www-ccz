@@ -62,7 +62,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   return (
     <div className="flex justify-center">
       <div className={`
-        relative max-w-[400px] w-full rounded-2xl p-8 text-center
+        relative max-w-[400px] w-full rounded-lg p-8 text-center
         bg-gradient-to-b from-surface to-background overflow-hidden
         transition-all duration-700 ease-out
         ${phaseMap[phase]}
@@ -80,7 +80,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
           {mirror.archetypeLabel}
         </h2>
 
-        <p className={`mt-3 text-sm text-white/80 italic max-w-[340px]
+        <p className={`mt-3 text-sm text-foreground/80 italic max-w-[340px]
           mx-auto leading-relaxed transition-all duration-500
           ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ transitionDelay: phase === 'reveal' ? '300ms' : undefined }}>

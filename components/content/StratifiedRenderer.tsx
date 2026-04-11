@@ -5,6 +5,9 @@
  * Archetype extensions fade in with a gold shimmer on first discovery.
  * NewContentBadge marks first-time reveals with a ✦ icon.
  *
+ * Thermal-aware: uses CSS custom properties (--token-*) for all colors.
+ * No hard-coded hex values in components — all resolve to design tokens.
+ *
  * Core paragraphs carry data-paragraph-id for the engagement tracking pipeline.
  */
 
@@ -45,7 +48,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
             key={i}
             data-paragraph-id={`${prefix}-p${offset + i}`}
             data-variant={variant?.source ?? undefined}
-            className={`text-[#f0f0f5] max-w-[65ch] ${variant ? 'pl-3 border-l-2 border-gold/30' : ''}`}
+            className={`text-foreground max-w-[65ch] ${variant ? 'pl-3 border-l-2 border-gold/30' : ''}`}
           >
             {p.trim()}
           </p>
@@ -57,16 +60,16 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
 
 /** Marginalia — returning-reader side notes with cyan border + shimmer */
 function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
-  const border = warmer ? 'border-l-[#6ec6ca]/70' : 'border-l-[#6ec6ca]/40';
-  const text = warmer ? 'text-[#b4b4d0]' : 'text-[#9494b8]';
+  const border = warmer ? 'border-l-cyan/70' : 'border-l-cyan/40';
+  const shadow = warmer ? 'shadow-cyan-whisper' : '';
   return (
     <aside
-      className={`my-8 pl-4 border-l-2 ${border} bg-[#242445]/30 rounded-r-md py-3 pr-4
+      className={`my-8 pl-4 border-l-2 ${border} bg-surface/30 rounded-r-md py-3 pr-4 ${shadow}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}`}
     >
       {block.isNew && <NewContentBadge />}
       {block.paragraphs.map((p, i) => (
-        <p key={i} className={`${text} italic text-sm leading-relaxed`}>
+        <p key={i} className={`text-mist italic text-sm leading-relaxed`}>
           {p.trim()}
         </p>
       ))}
@@ -74,7 +77,7 @@ function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: bool
   );
 }
 
-/** Archetype extension — gold border, label, shimmer on first discovery */
+/** Archetype extension — archetype accent border, label, shimmer on first discovery */
 function ExtensionBlock({ block }: { block: ContentBlock }) {
   const key = block.layer as ArchetypeKey;
   const borderColor = getExtensionBorderColor(key);
@@ -85,17 +88,17 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
       data-layer={block.layer}
       className={`my-8 pl-4 pr-4 py-3 rounded-r-md border-l-2 ${borderColor}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}
-        bg-[#242445]/20`}
+        bg-surface/20`}
     >
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs uppercase tracking-widest text-[#6ec6ca] font-medium">
+        <span className="text-xs uppercase tracking-widest text-cyan font-medium">
           {label}
         </span>
         {block.isNew && <NewContentBadge label="Unlocked" />}
       </div>
       <div className="space-y-4">
         {block.paragraphs.map((p, i) => (
-          <p key={i} className="text-[#f0f0f5] max-w-[65ch] leading-[1.75]">
+          <p key={i} className="text-foreground max-w-[65ch] leading-[1.75]">
             {p.trim()}
           </p>
         ))}
@@ -202,13 +205,13 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
 
   return (
     <aside
-      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-xl shadow-rose-glow ${scale} ${glow}
+      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-lg shadow-rose-glow ${scale} ${glow}
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
       <p className="text-xs uppercase tracking-widest text-rose/70 mb-3">
         Your resonance
       </p>
-      <p className="text-[0.9375rem] text-[#f0f0f5]/70 italic leading-[1.7]">
+      <p className="text-[0.9375rem] text-foreground/70 italic leading-[1.7]">
         &ldquo;{data.quote}&rdquo;
       </p>
       <div className="h-px bg-gold/30 max-w-[120px] my-3" />

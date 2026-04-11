@@ -120,7 +120,7 @@ export default function ResonanceExport({ resonances }: Props) {
     <div className="text-center">
       <button onClick={handleExport}
         className="px-5 py-2.5 bg-surface border border-fog/40 text-mist text-sm
-          rounded-xl hover:border-rose/40 hover:text-rose transition-all duration-300">
+          rounded-lg hover:border-rose/40 hover:text-rose transition-all duration-300">
         Export as Image
       </button>
     </div>

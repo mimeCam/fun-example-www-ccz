@@ -59,7 +59,7 @@ function IconBtn({ onClick, label, icon }: {
   return (
     <button
       onClick={onClick}
-      className="group relative w-12 h-12 rounded-xl border border-gold/30
+      className="group relative w-12 h-12 rounded-lg border border-gold/30
         text-gold/70 hover:text-gold hover:bg-gold/10
         flex items-center justify-center transition-colors duration-200"
       aria-label={label}

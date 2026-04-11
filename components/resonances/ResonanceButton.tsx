@@ -133,7 +133,7 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
     <>
       <button
         onClick={() => slotsAvailable ? openModal() : null}
-        className={`relative p-2 rounded-xl transition-colors ${
+        className={`relative p-2 rounded-lg transition-colors ${
           slotsAvailable
             ? 'text-mist hover:text-primary hover:bg-surface'
             : 'text-fog cursor-default'
@@ -152,13 +152,13 @@ export function ResonanceButton({ articleId, articleTitle }: ResonanceButtonProp
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={closeModal} />
-          <div className="relative bg-surface border border-fog/40 rounded-2xl max-w-lg w-full p-6 shadow-float animate-fade-in">
+          <div className="relative bg-surface border border-fog/40 rounded-lg max-w-lg w-full p-6 shadow-float animate-fade-in">
             <button onClick={closeModal}
-              className="absolute top-4 right-4 text-mist hover:text-white transition-colors"
+              className="absolute top-4 right-4 text-mist hover:text-foreground transition-colors"
               aria-label="Close">
               <CloseIcon />
             </button>
-            <h3 className="text-xl font-semibold text-white mb-1">Save Resonance</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-1">Save Resonance</h3>
             <p className="text-mist text-sm mb-5">Why does this matter to you?</p>
             <SlotIndicator used={usedSlots} total={SLOT_COUNT} />
             {success ? (
@@ -226,7 +226,7 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
       {quote && <QuotePreview quote={quote} />}
       <div className="mb-4">
         <label htmlFor="resonanceNote"
-          className="block text-sm font-medium text-[#f0f0f5]/80 mb-2">
+          className="block text-sm font-medium text-foreground/80 mb-2">
           Your resonance note <span className="text-primary">*</span>
         </label>
         <textarea
@@ -234,7 +234,7 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What truth did this reveal to you?"
-          className="w-full px-4 py-3 bg-void border border-fog rounded-xl text-white placeholder-mist/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-void border border-fog rounded-lg text-foreground placeholder-mist/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           rows={4}
           maxLength={280}
           disabled={isLoading}
@@ -246,12 +246,12 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
       {error && <ErrorBanner message={error} />}
       <div className="flex gap-3">
         <button onClick={onCancel} disabled={isLoading}
-          className="flex-1 px-4 py-2.5 bg-void text-mist rounded-xl hover:bg-fog transition-colors disabled:opacity-50">
+          className="flex-1 px-4 py-2.5 bg-void text-mist rounded-lg hover:bg-fog transition-colors disabled:opacity-50">
           Cancel
         </button>
         <button onClick={onSubmit}
           disabled={isLoading || !note.trim()}
-          className="flex-1 px-4 py-2.5 bg-primary text-white rounded-xl hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium">
+          className="flex-1 px-4 py-2.5 bg-primary text-foreground rounded-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium">
           {isLoading ? 'Saving...' : 'Save Resonance'}
         </button>
       </div>
@@ -261,8 +261,8 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
 
 function QuotePreview({ quote }: { quote: string }) {
   return (
-    <div className="mb-4 bg-void/60 border-l-2 border-rose/40 rounded-xl p-3">
-      <p className="text-[#f0f0f5]/70 italic text-sm leading-relaxed">
+    <div className="mb-4 bg-void/60 border-l-2 border-rose/40 rounded-lg p-3">
+      <p className="text-foreground/70 italic text-sm leading-relaxed">
         &ldquo;{quote}&rdquo;
       </p>
     </div>
@@ -271,7 +271,7 @@ function QuotePreview({ quote }: { quote: string }) {
 
 function ErrorBanner({ message }: { message: string }) {
   return (
-    <div className="mb-4 p-3 bg-red-900/20 border border-red-800/50 rounded-xl">
+    <div className="mb-4 p-3 bg-red-900/20 border border-red-800/50 rounded-lg">
       <p className="text-red-400 text-sm">{message}</p>
     </div>
   );

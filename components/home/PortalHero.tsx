@@ -27,7 +27,7 @@ export default function PortalHero({ article }: { article: Article }) {
   return (
     <div className="text-center max-w-2xl mx-auto animate-fade-in">
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold
-        text-white leading-tight tracking-tight">
+        text-foreground leading-tight tracking-tight thermal-typography">
         {article.title}
       </h1>
 
@@ -38,7 +38,7 @@ export default function PortalHero({ article }: { article: Article }) {
       <div className="border-t border-fog mt-8 mb-8 mx-auto max-w-xs" />
 
       {excerpts.map((para, i) => (
-        <p key={i} className="text-[#f0f0f5]/80 text-lg md:text-xl
+        <p key={i} className="text-foreground/80 text-lg md:text-xl
           leading-relaxed mb-4 max-w-xl mx-auto font-light">
           {para}
         </p>

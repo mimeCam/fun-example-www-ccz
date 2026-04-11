@@ -5,6 +5,9 @@
  * to the article page. Uses gold token (ties homepage invitation
  * to the eventual archetype reveal on the article page).
  *
+ * The "lit candle" in dormant state — thermal-candle provides a
+ * subtle gold pulse that says "this page is alive" even when cold.
+ *
  * Server component — no hooks, no state.
  */
 
@@ -34,13 +37,15 @@ export default function ReadingInvitation(
   return (
     <div className="text-center mt-12 mb-16">
       <Link href={`/article/${articleId}`}
-        className="inline-block px-8 py-3.5 rounded-xl
+        className="inline-block px-8 py-3.5 rounded-lg
           bg-gold/10 border border-gold/30 text-gold
           font-display font-semibold text-lg
           hover:bg-gold/20 hover:border-gold/50 hover:shadow-gold
+          hover:-translate-y-px active:translate-y-0
           transition-all duration-300
           focus:ring-2 focus:ring-gold/40 focus:ring-offset-2
-          focus:ring-offset-background outline-none">
+          focus:ring-offset-background outline-none
+          thermal-candle thermal-glow">
         Begin Reading &rarr;
       </Link>
 

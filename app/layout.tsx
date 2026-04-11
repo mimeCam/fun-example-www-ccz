@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { AmbientNav } from "@/components/navigation/AmbientNav";
+import { ThermalLayout } from "@/components/thermal/ThermalLayout";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,8 +29,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased bg-background`}>
-        {children}
-        <AmbientNav />
+        <ThermalLayout>
+          {children}
+          <AmbientNav />
+        </ThermalLayout>
       </body>
     </html>
   );

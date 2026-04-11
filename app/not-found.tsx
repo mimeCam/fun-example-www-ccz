@@ -43,7 +43,7 @@ function GemOutline() {
 
 function Title() {
   return (
-    <h1 className="font-display text-2xl font-bold text-[#f0f0f5] text-center">
+    <h1 className="font-display text-2xl font-bold text-foreground text-center">
       This page hasn&apos;t formed yet.
     </h1>
   );
@@ -61,7 +61,7 @@ function Subtitle() {
 function ThresholdLink() {
   return (
     <Link href="/"
-      className="px-6 py-3 rounded-xl border border-gold/40 text-gold text-sm
+      className="px-6 py-3 rounded-lg border border-gold/40 text-gold text-sm
         hover:bg-gold/10 transition-colors duration-200">
       Return to the Threshold →
     </Link>

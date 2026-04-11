@@ -76,11 +76,11 @@ export function getExtensionLabel(key: ArchetypeKey): string {
 /** Get the CSS border color class for an archetype extension */
 export function getExtensionBorderColor(key: ArchetypeKey): string {
   const colors: Record<ArchetypeKey, string> = {
-    'deep-diver': 'border-l-[#6ec6ca]',   // whisper cyan
-    'explorer': 'border-l-[#c77dff]',      // accent purple
-    'faithful': 'border-l-[#e8836b]',       // warm coral
-    'resonator': 'border-l-[#2e2e50]',      // mist
-    'collector': 'border-l-[#7b2cbf]',      // primary purple
+    'deep-diver': 'border-l-cyan',        // cyan — marginalia, unlocked
+    'explorer': 'border-l-accent',        // light violet — connections
+    'faithful': 'border-l-secondary',     // violet — intimate
+    'resonator': 'border-l-rose',         // rose — reader's voice
+    'collector': 'border-l-primary',      // purple — curation
   };
   return colors[key];
 }
