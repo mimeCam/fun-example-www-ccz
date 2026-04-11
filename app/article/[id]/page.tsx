@@ -130,7 +130,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
       <GoldenThread />
       <GemHome />
       <article className="min-h-screen">
-        <div className="max-w-[38rem] mx-auto px-6">
+        <div className="max-w-prose mx-auto px-6">
           <TopBar articleId={params.id} title={article.title} />
           <ArticleHeader title={article.title} readTime={readTime} />
           <hr className="border-fog mb-8" />
@@ -181,7 +181,7 @@ function ArticleHeader({ title, readTime }: { title: string; readTime: number })
       <h1 className="font-display text-[2.25rem] font-bold text-foreground leading-tight tracking-tight">
         {title}
       </h1>
-      <p className="text-mist text-sm mt-3">Author &middot; {readTime} min read</p>
+      <p className="text-mist text-sm mt-3">{readTime} min read</p>
     </header>
   );
 }

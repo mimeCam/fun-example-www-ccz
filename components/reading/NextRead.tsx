@@ -53,7 +53,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
   const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
 
   return (
-    <div className="my-12 p-8 rounded-lg relative overflow-hidden transition-all duration-600 ease-out animate-fade-in thermal-shadow">
+    <div className="my-12 p-8 rounded-lg relative overflow-hidden transition-all duration-enter ease-out animate-fade-in thermal-shadow">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 pointer-events-none" />
       <div className="absolute top-0 left-0 right-0 h-px bg-primary opacity-15" />
 

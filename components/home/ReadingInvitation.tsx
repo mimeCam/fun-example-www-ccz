@@ -41,8 +41,8 @@ export default function ReadingInvitation(
           bg-gold/10 border border-gold/30 text-gold
           font-display font-semibold text-lg
           hover:bg-gold/20 hover:border-gold/50 hover:shadow-gold
-          hover:-translate-y-px active:translate-y-0
-          transition-all duration-300
+          hover:-translate-y-micro active:translate-y-0
+          transition-all duration-enter
           focus:ring-2 focus:ring-gold/40 focus:ring-offset-2
           focus:ring-offset-background outline-none
           thermal-candle thermal-glow">

@@ -44,7 +44,7 @@ function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean })
 }
 
 export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine }: Props) {
-  const base = 'rounded-lg p-6 my-8 transition-all duration-300';
+  const base = 'rounded-lg p-6 my-8 transition-all duration-enter';
   const alive = 'bg-surface/60 border-l-4 border-rose shadow-rose-glow';
   const dimmed = 'bg-surface/30 border-l-4 border-rose/30 opacity-60';
   const cls = `${base} ${faded ? dimmed : alive}`;
@@ -61,13 +61,13 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
 
       {/* Captured quote */}
       {resonance.quote && (
-        <p className="text-foreground/70 italic text-[0.9375rem] max-w-[55ch] mb-3">
+        <p className="text-foreground/70 italic text-[0.9375rem] max-w-prose-sm mb-3">
           &ldquo;{resonance.quote}&rdquo;
         </p>
       )}
 
       {/* Gold divider */}
-      <div className="h-px max-w-[120px] bg-gold/30 mb-3" />
+      <div className="h-px max-w-divider bg-gold/30 mb-3" />
 
       {/* Reader's note */}
       <p className="text-rose italic text-[0.9375rem] leading-[1.7] mb-4">

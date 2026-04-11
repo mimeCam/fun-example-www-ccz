@@ -48,7 +48,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
             key={i}
             data-paragraph-id={`${prefix}-p${offset + i}`}
             data-variant={variant?.source ?? undefined}
-            className={`text-foreground max-w-[65ch] ${variant ? 'pl-3 border-l-2 border-gold/30' : ''}`}
+            className={`text-foreground max-w-prose-ch ${variant ? 'pl-3 border-l-2 border-gold/30' : ''}`}
           >
             {p.trim()}
           </p>
@@ -98,7 +98,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
       </div>
       <div className="space-y-4">
         {block.paragraphs.map((p, i) => (
-          <p key={i} className="text-foreground max-w-[65ch] leading-[1.75]">
+          <p key={i} className="text-foreground max-w-prose-ch leading-[1.75]">
             {p.trim()}
           </p>
         ))}
@@ -226,7 +226,7 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
       <p className="text-[0.9375rem] text-foreground/70 italic leading-[1.7]">
         &ldquo;{data.quote}&rdquo;
       </p>
-      <div className="h-px bg-gold/30 max-w-[120px] my-3" />
+      <div className="h-px bg-gold/30 max-w-divider my-3" />
       <p className="text-[0.9375rem] text-rose italic leading-[1.7]">
         {data.note}
       </p>

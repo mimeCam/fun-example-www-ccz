@@ -62,7 +62,7 @@ function ThresholdLink() {
   return (
     <Link href="/"
       className="px-6 py-3 rounded-lg border border-gold/40 text-gold text-sm
-        hover:bg-gold/10 transition-colors duration-200">
+        hover:bg-gold/10 transition-colors duration-hover">
       Return to the Threshold →
     </Link>
   );

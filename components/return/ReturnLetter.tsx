@@ -25,10 +25,10 @@ type Phase = 'approach' | 'settle' | 'rest';
 
 function phaseStyles(phase: Phase, settled: boolean): string {
   if (phase === 'approach') {
-    return 'opacity-0 translate-y-2';
+    return 'opacity-0 translate-y-enter-sm';
   }
   if (phase === 'settle') {
-    return `opacity-100 translate-y-0 transition-all duration-700 ease-out
+    return `opacity-100 translate-y-0 transition-all duration-reveal ease-out
             border-accent/20 shadow-gold`;
   }
   return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-gold' : 'border-accent/10 shadow-none'}`;
@@ -164,7 +164,7 @@ function LetterCard({
     <div className={`relative max-w-lg mx-auto my-12 p-8 md:p-10
       max-h-[40vh] overflow-y-auto
       bg-gradient-to-b from-surface to-background
-      rounded-lg border transition-all duration-700
+      rounded-lg border transition-all duration-reveal
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss */}
       {visible && (
@@ -192,7 +192,7 @@ function LetterCard({
       ))}
       {/* Divider */}
       <div className="my-6 flex justify-center">
-        <div className={`h-px max-w-[120px] bg-accent/20 transition-transform duration-500 ${dividerScale}`} />
+        <div className={`h-px max-w-divider bg-accent/20 transition-transform duration-500 ${dividerScale}`} />
       </div>
       {/* Closing */}
       <p className="text-foreground/80 text-base italic text-center">{letter.closing}</p>

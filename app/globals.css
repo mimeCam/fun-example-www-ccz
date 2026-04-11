@@ -43,6 +43,23 @@
   --secondary: #9d4edd;
   --accent-violet: #c77dff;
 
+  /* System tokens — spatial, temporal, easing. Static constants.
+     Never change with thermal state. Named for Tailwind mapping. */
+  --sys-maxw-prose: 38rem;
+  --sys-maxw-prose-ch: 65ch;
+  --sys-maxw-prose-sm: 55ch;
+  --sys-maxw-card: 400px;
+  --sys-maxw-card-body: 340px;
+  --sys-maxw-divider: 120px;
+
+  --sys-time-hover: 200ms;
+  --sys-time-enter: 300ms;
+  --sys-time-reveal: 700ms;
+  --sys-time-linger: 1000ms;
+
+  --sys-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+  --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
+
   /* Legacy aliases (kept for backward compat during migration) */
   --background: var(--token-bg);
   --foreground: var(--token-foreground);
@@ -87,13 +104,13 @@ body {
 
 /* Dormant state "lit candle" — faint gold glow on CTA elements */
 .thermal-candle {
-  box-shadow: 0 0 20px rgba(240,198,116,0.08);
+  box-shadow: 0 0 20px rgba(240,198,116,0.06);
   animation: candlePulse 3s ease-in-out infinite;
 }
 
 @keyframes candlePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.08); }
-  50% { box-shadow: 0 0 40px rgba(240,198,116,0.18); }
+  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.06); }
+  50% { box-shadow: 0 0 40px rgba(240,198,116,0.25); }
 }
 
 /* Warm state warm-spotlight — subtle radial gradient on bg */
@@ -126,20 +143,8 @@ body {
   to { background-color: var(--token-bg); }
 }
 
-@keyframes slideUp {
-  from { transform: translateY(8px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes gemAppear {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes whisperShadow {
-  from { box-shadow: none; }
-  to { box-shadow: 0 2px 20px rgba(78,205,196,0.15); }
-}
+/* slideUp, gemAppear, whisperShadow — defined in tailwind.config.ts keyframes.
+   CSS duplicates removed (single source of truth: Tailwind config). */
 
 /* ─── Thermal Breathing Animations ─────────────────────── */
 

@@ -119,10 +119,10 @@ function QuickMirrorCardInline({ result }: { result: QuickMirrorResult }) {
       <h1 className="text-3xl font-display font-bold text-gold">
         {result.archetypeLabel}
       </h1>
-      <p className="mt-4 text-sm text-foreground/80 italic leading-relaxed max-w-[320px] mx-auto">
+      <p className="mt-4 text-sm text-foreground/80 italic leading-relaxed max-w-card-body mx-auto">
         &ldquo;{result.whisper}&rdquo;
       </p>
-      <div className="my-6 h-px max-w-[200px] mx-auto bg-gold/40" />
+      <div className="my-6 h-px max-w-divider mx-auto bg-gold/40" />
       <ShareOverlay result={result} />
     </div>
   );

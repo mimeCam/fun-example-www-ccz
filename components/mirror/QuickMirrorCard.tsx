@@ -51,7 +51,7 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
   }, [scrollIntoView]);
 
   if (dismissed) return (
-    <div className="my-12 mx-auto max-w-[200px] h-px bg-gold/30 rounded-full" />
+    <div className="my-12 mx-auto max-w-divider h-px bg-gold/30 rounded-full" />
   );
 
   const showContent = phase === 'reveal' || phase === 'rest';
@@ -75,7 +75,7 @@ function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
   return (
     <button onClick={onDismiss}
       className="absolute top-3 right-3 text-mist/30 hover:text-mist/60
-        transition-colors duration-200 text-lg leading-none"
+        transition-colors duration-hover text-lg leading-none"
       aria-label="Dismiss">×</button>
   );
 }
@@ -100,7 +100,7 @@ function ArchetypeName({ label, visible }: { label: string; visible: boolean }) 
 
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
-    <p className={`mt-3 text-sm text-foreground/80 italic max-w-[340px]
+    <p className={`mt-3 text-sm text-foreground/80 italic max-w-card-body
       mx-auto leading-relaxed ${fadeClass(visible)}`}
       style={fadeStyle(visible, 300)}>
       &ldquo;{text}&rdquo;
@@ -110,20 +110,20 @@ function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
 
 function GoldDivider({ visible }: { visible: boolean }) {
   return (
-    <div className={`my-6 h-px max-w-[200px] mx-auto bg-gold/40
+    <div className={`my-6 h-px max-w-divider mx-auto bg-gold/40
       transition-transform duration-500 ${visible ? 'scale-x-100' : 'scale-x-0'}`} />
   );
 }
 
 function cardBase(): string {
-  return 'relative my-20 mx-auto max-w-[400px] p-8 text-center'
+  return 'relative my-20 mx-auto max-w-card p-8 text-center'
     + ' rounded-lg border bg-gradient-to-b from-surface to-background'
-    + ' transition-all duration-700 ease-out';
+    + ' transition-all duration-reveal ease-out';
 }
 
 function phaseClass(p: Phase): string {
   const map: Record<Phase, string> = {
-    hidden:    'opacity-0 translate-y-4 border-transparent',
+    hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-100 translate-y-0 border-gold/15',
     shimmer:   'opacity-100 translate-y-0 border-gold/25 shadow-gold-intense animate-quick-mirror-glow',
     reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
@@ -134,7 +134,7 @@ function phaseClass(p: Phase): string {
 
 function fadeClass(visible: boolean): string {
   const base = 'transition-all duration-500';
-  return visible ? `${base} opacity-100 translate-y-0` : `${base} opacity-0 translate-y-2`;
+  return visible ? `${base} opacity-100 translate-y-0` : `${base} opacity-0 translate-y-enter-sm`;
 }
 
 function fadeStyle(visible: boolean, delayMs: number): React.CSSProperties {

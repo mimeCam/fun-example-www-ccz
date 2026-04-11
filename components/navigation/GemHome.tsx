@@ -34,7 +34,7 @@ export function GemHome() {
     <Link
       href="/"
       className={`fixed top-4 left-4 z-30 hover:text-gold
-        transition-colors duration-1000 ease-out
+        transition-colors duration-linger ease-out
         ${gemColor(state)} ${gemShadow(state)}`}
       aria-label="Home"
     >

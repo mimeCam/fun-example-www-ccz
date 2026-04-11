@@ -52,7 +52,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   };
 
   const phaseMap: Record<Phase, string> = {
-    hidden:    'opacity-0 translate-y-4 border-transparent',
+    hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-100 translate-y-0 border-gold/15',
     shimmer:   'opacity-100 translate-y-0 border-gold/25 animate-mirror-shimmer',
     reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
@@ -62,32 +62,32 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   return (
     <div className="flex justify-center">
       <div className={`
-        relative max-w-[400px] w-full rounded-lg p-8 text-center
+        relative max-w-card w-full rounded-lg p-8 text-center
         bg-gradient-to-b from-surface to-background overflow-hidden
-        transition-all duration-700 ease-out
+        transition-all duration-reveal ease-out
         ${phaseMap[phase]}
       `}>
         <p className={`text-xs uppercase tracking-widest text-gold/60 mb-2
-          transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+          transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md'}`}
           style={{ transitionDelay: phase === 'reveal' ? '0ms' : undefined }}>
           Because you stayed…
         </p>
 
         <h2 className={`text-3xl font-display font-bold text-gold
           transition-all duration-500
-          ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+          ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md'}`}
           style={{ transitionDelay: phase === 'reveal' ? '150ms' : undefined }}>
           {mirror.archetypeLabel}
         </h2>
 
-        <p className={`mt-3 text-sm text-foreground/80 italic max-w-[340px]
+        <p className={`mt-3 text-sm text-foreground/80 italic max-w-card-body
           mx-auto leading-relaxed transition-all duration-500
-          ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+          ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md'}`}
           style={{ transitionDelay: phase === 'reveal' ? '300ms' : undefined }}>
           &ldquo;{mirror.whisper}&rdquo;
         </p>
 
-        <div className={`my-6 h-px max-w-[200px] mx-auto bg-gold/40
+        <div className={`my-6 h-px max-w-divider mx-auto bg-gold/40
           transition-transform duration-500
           ${showContent ? 'scale-x-100' : 'scale-x-0'}`} />
 

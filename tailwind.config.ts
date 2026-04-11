@@ -38,6 +38,29 @@ const config: Config = {
         'rose-glow': '0 6px 32px rgba(232,143,167,0.20)',
         'cyan-whisper': '0 2px 20px rgba(78,205,196,0.15)',
       },
+      maxWidth: {
+        'prose': 'var(--sys-maxw-prose)',
+        'prose-ch': 'var(--sys-maxw-prose-ch)',
+        'prose-sm': 'var(--sys-maxw-prose-sm)',
+        'card': 'var(--sys-maxw-card)',
+        'card-body': 'var(--sys-maxw-card-body)',
+        'divider': 'var(--sys-maxw-divider)',
+      },
+      transitionDuration: {
+        'hover': '200ms',
+        'enter': '300ms',
+        'reveal': '700ms',
+        'linger': '1000ms',
+      },
+      transitionTimingFunction: {
+        'out': 'cubic-bezier(0.0, 0.0, 0.2, 1)',
+        'sustain': 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+      },
+      translate: {
+        'enter-sm': '2px',
+        'enter-md': '4px',
+        'micro': '1px',
+      },
       animation: {
         'bounce-subtle': 'bounce-subtle 0.3s ease-in-out',
         'fade-in': 'fade-in 0.2s ease-out',

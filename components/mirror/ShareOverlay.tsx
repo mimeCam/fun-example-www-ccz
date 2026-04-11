@@ -61,7 +61,7 @@ function IconBtn({ onClick, label, icon }: {
       onClick={onClick}
       className="group relative w-12 h-12 rounded-lg border border-gold/30
         text-gold/70 hover:text-gold hover:bg-gold/10
-        flex items-center justify-center transition-colors duration-200"
+        flex items-center justify-center transition-colors duration-hover"
       aria-label={label}
     >
       {icon}
@@ -123,7 +123,7 @@ function XIcon() {
 
 function DeepLink({ url }: { url: string }) {
   return (
-    <p className="text-mist/30 text-xs mt-2 max-w-[320px] truncate text-center">
+    <p className="text-mist/30 text-xs mt-2 max-w-card-body truncate text-center">
       {url}
     </p>
   );

@@ -68,7 +68,7 @@ export default function MirrorWhisper({ archetype: propArchetype }: MirrorWhispe
 
   return (
     <div
-      className={`my-10 text-center transition-opacity duration-300 ease-out ${fadedIn ? 'opacity-100' : 'opacity-0'}`}
+      className={`my-10 text-center transition-opacity duration-enter ease-out ${fadedIn ? 'opacity-100' : 'opacity-0'}`}
       role="complementary"
       aria-label="Mirror archetype prompt"
     >
@@ -78,7 +78,7 @@ export default function MirrorWhisper({ archetype: propArchetype }: MirrorWhispe
       <Link
         href="/mirror"
         className="inline-block mt-2 text-gold text-sm
-          hover:text-gold/80 transition-colors duration-200"
+          hover:text-gold/80 transition-colors duration-hover"
       >
         See your full reflection →
       </Link>

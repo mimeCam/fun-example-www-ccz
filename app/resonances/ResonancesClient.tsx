@@ -230,7 +230,7 @@ export default function ResonancesClient() {
                 {/* Chapter break marker */}
                 {brk?.isBreak && (
                   <div className="my-10 text-center">
-                    <div className="h-px bg-gold/20 max-w-[120px] mx-auto" />
+                    <div className="h-px bg-gold/20 max-w-divider mx-auto" />
                     <p className="text-mist/50 text-xs italic mt-2">
                       {brk.label}
                     </p>

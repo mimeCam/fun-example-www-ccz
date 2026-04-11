@@ -18,6 +18,9 @@ import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
  */
 type Phase = 'hidden' | 'active' | 'settled' | 'fading';
 
+/** Time to hold at 'settled' before fading (matches --sys-time-linger: 1000ms + visual buffer). */
+const T_LINGER = 2000;
+
 export function GoldenThread() {
   const { depth, isReading, isFinished } = useScrollDepth();
   const [phase, setPhase] = useState<Phase>('hidden');
@@ -29,7 +32,7 @@ export function GoldenThread() {
   useEffect(() => {
     if (!isFinished || phase !== 'active') return;
     setPhase('settled');
-    const t = setTimeout(() => setPhase('fading'), 2000);
+    const t = setTimeout(() => setPhase('fading'), T_LINGER);
     return () => clearTimeout(t);
   }, [isFinished, phase]);
 
@@ -51,7 +54,7 @@ export function GoldenThread() {
           height: `${depth}%`,
           backgroundColor: 'var(--token-accent)',
           opacity: phase === 'fading' ? 0.3 : 1,
-          transition: 'height 300ms ease-out, opacity 1.5s ease-out',
+          transition: 'height 300ms var(--sys-ease-out), opacity 1.5s ease-out',
         }}
       />
     </div>
