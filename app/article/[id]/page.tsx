@@ -20,7 +20,6 @@ import { getLayeredContent, getArticleById, getAllArticles } from '@/lib/content
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
-import { RecognitionWhisper } from '@/components/return/RecognitionWhisper';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvider';
 import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
@@ -134,7 +133,6 @@ function ArticleContent({ params }: { params: { id: string } }) {
         <div className="max-w-[38rem] mx-auto px-6">
           <TopBar articleId={params.id} title={article.title} />
           <ArticleHeader title={article.title} readTime={readTime} />
-          <RecognitionWhisper recognition={recognition} />
           <hr className="border-fog mb-8" />
 
           <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-foreground">
@@ -150,15 +148,6 @@ function ArticleContent({ params }: { params: { id: string } }) {
               <p className="text-mist">Article content not available.</p>
             )}
           </div>
-
-          {quickMirror.triggered && quickMirror.result && !hasInlineMirror && (
-            <div className="my-16">
-              <QuickMirrorCard
-                result={quickMirror.result}
-                articleId={params.id}
-              />
-            </div>
-          )}
 
           <MirrorWhisper archetype={archetype} />
 

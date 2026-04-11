@@ -64,15 +64,15 @@ describe('computeAnimationTokens — output tokens', () => {
 
   it('stirring state (score 30) activates breath with 6s cycle', () => {
     // Check the stirring breath config
-    expect(SRC).toContain("stirring: { cycleSec: 6, scalePeak: 0.001 }");
+    expect(SRC).toContain("stirring: { cycleSec: 6, scalePeak: 0.002 }");
   });
 
   it('warm state (score 60) uses 4.5s breath cycle', () => {
-    expect(SRC).toContain("warm:     { cycleSec: 4.5, scalePeak: 0.002 }");
+    expect(SRC).toContain("warm:     { cycleSec: 4.5, scalePeak: 0.003 }");
   });
 
   it('luminous state (score 90) uses 3.5s breath cycle', () => {
-    expect(SRC).toContain("luminous: { cycleSec: 3.5, scalePeak: 0.003 }");
+    expect(SRC).toContain("luminous: { cycleSec: 3.5, scalePeak: 0.005 }");
   });
 
   it('glow opacity ranges are correct for warm state', () => {

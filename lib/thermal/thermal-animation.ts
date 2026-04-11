@@ -24,9 +24,9 @@ interface DriftConfig { cycleSec: number; rangePx: number }
 
 const BREATH: Record<string, BreathConfig> = {
   dormant:  { cycleSec: 0, scalePeak: 0 },
-  stirring: { cycleSec: 6, scalePeak: 0.001 },
-  warm:     { cycleSec: 4.5, scalePeak: 0.002 },
-  luminous: { cycleSec: 3.5, scalePeak: 0.003 },
+  stirring: { cycleSec: 6, scalePeak: 0.002 },
+  warm:     { cycleSec: 4.5, scalePeak: 0.003 },
+  luminous: { cycleSec: 3.5, scalePeak: 0.005 },
 };
 
 const GLOW: Record<string, GlowConfig> = {

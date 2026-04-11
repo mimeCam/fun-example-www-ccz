@@ -76,7 +76,7 @@ describe('computeThermalTokens — output tokens', () => {
   it('has radius soft anchors', () => {
     expect(SRC).toContain('RADIUS_SOFT');
     expect(SRC).toContain('dormant: 0');
-    expect(SRC).toContain('warm: 0.25');
+    expect(SRC).toContain('warm: 0.5');
   });
 
   it('has accent opacity anchors', () => {

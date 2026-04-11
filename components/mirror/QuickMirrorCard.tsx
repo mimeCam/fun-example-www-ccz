@@ -84,7 +84,7 @@ function RevealLabel({ visible }: { visible: boolean }) {
   return (
     <p className={fadeClass(visible)}
       style={fadeStyle(visible, 0)}>
-      Based on how you read…
+      Because you stayed…
     </p>
   );
 }

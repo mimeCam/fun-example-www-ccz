@@ -229,12 +229,11 @@ export default function ResonancesClient() {
               <div key={r.id}>
                 {/* Chapter break marker */}
                 {brk?.isBreak && (
-                  <div className="my-6 text-center">
-                    <div className="h-px bg-fog/40 max-w-[200px] mx-auto" />
+                  <div className="my-10 text-center">
+                    <div className="h-px bg-gold/20 max-w-[120px] mx-auto" />
                     <p className="text-mist/50 text-xs italic mt-2">
                       {brk.label}
                     </p>
-                    <div className="h-px bg-fog/40 max-w-[200px] mx-auto mt-2" />
                   </div>
                 )}
                 <ResonanceEntry resonance={r} timeAgo={formatTimeAgo(r.createdAt)} />
@@ -248,16 +247,16 @@ export default function ResonancesClient() {
         </section>
       )}
 
-      {/* Divider between sections */}
+      {/* Divider between sections — spacing, no line */}
       {carrying.length > 0 && shaped.length > 0 && (
-        <div className="h-px bg-fog my-10" />
+        <div className="my-16" />
       )}
 
       {/* Shaped section — faded resonances with closing lines */}
       {shaped.length > 0 && (
         <section className="mb-10">
-          <p className="text-xs uppercase tracking-widest text-mist mb-6">
-            What shaped you
+          <p className="text-xs uppercase tracking-widest text-gold/40 mb-6">
+            what shaped you
           </p>
           {shaped.map((r) => {
             const closingCtx = buildClosingCtx(r);
@@ -290,7 +289,6 @@ export default function ResonancesClient() {
       )}
 
       {/* Footer navigation */}
-      <div className="h-px bg-fog mb-8" />
       <div className="flex justify-center gap-6 text-xs pb-12">
         <Link href="/mirror" className="text-primary hover:text-accent transition-colors">
           Your Mirror →

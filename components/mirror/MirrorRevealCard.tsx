@@ -70,7 +70,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
         <p className={`text-xs uppercase tracking-widest text-gold/60 mb-2
           transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ transitionDelay: phase === 'reveal' ? '0ms' : undefined }}>
-          Based on how you read…
+          Because you stayed…
         </p>
 
         <h2 className={`text-3xl font-display font-bold text-gold

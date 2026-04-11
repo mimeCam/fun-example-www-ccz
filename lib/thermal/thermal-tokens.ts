@@ -29,7 +29,7 @@ const LINE_HEIGHT = { dormant: 1.75, warm: 1.85 };      // unitless
 const SHADOW_DEPTH = { dormant: 0.3, warm: 0.5 };
 
 // Radius softening bonus — additive to base rounded-lg in warm state.
-const RADIUS_SOFT = { dormant: 0, warm: 0.25 };         // rem
+const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
 
 // Accent opacity — controls accent element visibility.
 const ACCENT_OPACITY = { dormant: 0.3, warm: 1.0 };     // 0-1

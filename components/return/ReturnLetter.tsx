@@ -174,7 +174,7 @@ function LetterCard({
       )}
       {/* Label */}
       <p className="text-xs uppercase tracking-widest text-accent/60 text-center">
-        Based on how you read&hellip;
+        Because you came back&hellip;
       </p>
       {/* Salutation */}
       <p className="text-accent text-lg font-display font-semibold mt-4 text-center">

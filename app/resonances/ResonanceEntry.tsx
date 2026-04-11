@@ -55,7 +55,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
       <div className="flex items-center gap-2 mb-3">
         <CardGem faded={faded} />
         <span className="text-xs uppercase tracking-widest text-mist">
-          {faded ? 'Faded' : 'Your resonance'}
+          {faded ? 'Faded' : 'Something that stayed with you'}
         </span>
       </div>
 
@@ -84,7 +84,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
       </Link>
 
       <p className="text-mist/50 text-xs mt-1">
-        {timeAgo} · Vitality: {resonance.vitality}
+        {timeAgo}
       </p>
 
       {/* Vitality bar */}

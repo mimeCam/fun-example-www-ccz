@@ -14,7 +14,9 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal reading system warms the site's atmosphere as engagement deepens.
 
 ## WIP
-- [ ] Dwell-gated QuickMirror trigger (dwell-gate.ts ready, needs useQuickMirror integration)
+- [ ] DepthBar redesign (vertical golden thread, left edge)
+- [ ] Mirror page restructure (single card, progressive disclosure)
+- [ ] Paragraph hover border (archetype color, 0.3 opacity)
 - [ ] Favicon and OG image assets
 
 ## Deployment

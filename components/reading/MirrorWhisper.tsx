@@ -23,6 +23,14 @@ const LABELS: Record<ArchetypeKey, string> = {
   'collector': 'Collector',
 };
 
+const BEHAVIORAL: Record<ArchetypeKey, string> = {
+  'deep-diver': 'You go deeper than most.',
+  'explorer': 'You never stay on the path.',
+  'faithful': 'You always come back.',
+  'resonator': 'Something in here echoes in you.',
+  'collector': 'You keep what matters.',
+};
+
 function loadArchetype(): ArchetypeKey | null {
   if (typeof window === 'undefined') return null;
   try {
@@ -56,6 +64,7 @@ export default function MirrorWhisper({ archetype: propArchetype }: MirrorWhispe
   if (!show || !archetype) return null;
 
   const label = LABELS[archetype] ?? archetype;
+  const behavioral = BEHAVIORAL[archetype] ?? 'You were here.';
 
   return (
     <div
@@ -64,9 +73,7 @@ export default function MirrorWhisper({ archetype: propArchetype }: MirrorWhispe
       aria-label="Mirror archetype prompt"
     >
       <p className="text-mist/60 text-sm italic">
-        The Mirror sees a{' '}
-        <span className="text-gold font-medium not-italic">{label}</span>
-        {' '}in you.
+        {behavioral}
       </p>
       <Link
         href="/mirror"
