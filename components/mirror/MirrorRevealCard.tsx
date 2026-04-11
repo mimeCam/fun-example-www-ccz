@@ -2,16 +2,18 @@
  * MirrorRevealCard — full archetype reveal on /mirror page.
  *
  * Animation phases: hidden → emergence → shimmer → reveal → done.
- * Unified with QuickMirrorCard: same width, tokens, phases.
- * Stripped to archetype + whisper + share. No analytics dashboard.
+ * Archetype-specific color identity: each archetype gets its own color.
+ * Share actions appear with staggered delays (0/100/200ms).
  */
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import type { ReaderMirror } from '@/types/mirror';
 import type { ArchetypeKey } from '@/types/content';
-import ShareOverlay from './ShareOverlay';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
+import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
+import ShareOverlay from './ShareOverlay';
 
 const T_EMERGE  = 0;
 const T_SHIMMER = 400;
@@ -41,6 +43,8 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   const showContent = phase === 'reveal' || phase === 'done';
   const showActions = phase === 'done';
 
+  const colors = ARCHETYPE_COLORS[(mirror.archetype as ArchetypeKey) ?? 'collector'];
+
   const shareResult: QuickMirrorResult = {
     archetype: mirror.archetype as ArchetypeKey,
     archetypeLabel: mirror.archetypeLabel,
@@ -51,32 +55,25 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
     scores: mirror.scores,
   };
 
-  const phaseMap: Record<Phase, string> = {
-    hidden:    'opacity-0 translate-y-enter-md border-transparent',
-    emergence: 'opacity-100 translate-y-0 border-gold/15',
-    shimmer:   'opacity-100 translate-y-0 border-gold/25 animate-mirror-shimmer',
-    reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
-    done:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
-  };
-
   return (
     <div className="flex justify-center">
       <div className={`
-        relative max-w-card w-full rounded-lg p-8 text-center
+        relative max-w-md w-full rounded-xl p-8 text-center
         bg-gradient-to-b from-surface to-background overflow-hidden
         transition-all duration-reveal ease-out
-        ${phaseMap[phase]}
-      `}>
-        <p className={`text-xs uppercase tracking-widest text-gold/60 mb-2
+        ${phaseStyle(phase)}
+      `}
+        style={shimmerStyle(phase, colors)}>
+        <p className={`text-xs uppercase tracking-widest mb-2
           transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md'}`}
-          style={{ transitionDelay: phase === 'reveal' ? '0ms' : undefined }}>
+          style={{ transitionDelay: phase === 'reveal' ? '0ms' : undefined, color: colors.hex, opacity: showContent ? 0.7 : 0 }}>
           Because you stayed…
         </p>
 
-        <h2 className={`text-3xl font-display font-bold text-gold
+        <h2 className={`text-3xl font-display font-bold tracking-tight
           transition-all duration-500
           ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md'}`}
-          style={{ transitionDelay: phase === 'reveal' ? '150ms' : undefined }}>
+          style={{ transitionDelay: phase === 'reveal' ? '150ms' : undefined, color: colors.hex }}>
           {mirror.archetypeLabel}
         </h2>
 
@@ -87,12 +84,31 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
           &ldquo;{mirror.whisper}&rdquo;
         </p>
 
-        <div className={`my-6 h-px max-w-divider mx-auto bg-gold/40
-          transition-transform duration-500
-          ${showContent ? 'scale-x-100' : 'scale-x-0'}`} />
+        <div className={`my-6 h-px max-w-divider mx-auto transition-transform duration-500
+          ${showContent ? 'scale-x-100' : 'scale-x-0'}`}
+          style={{ backgroundColor: colors.hex, opacity: 0.4 }} />
 
         {showActions && <ShareOverlay result={shareResult} articleId={articleId} />}
       </div>
     </div>
   );
+}
+
+/* ─── Style helpers ──────────────────────────────────────── */
+
+function phaseStyle(p: Phase): string {
+  const map: Record<Phase, string> = {
+    hidden:    'opacity-0 translate-y-enter-md border-transparent',
+    emergence: 'opacity-80 translate-y-0 border-gold/10',
+    shimmer:   'opacity-100 translate-y-0 border-gold/25',
+    reveal:    'opacity-100 translate-y-0 border-gold/30 shadow-gold',
+    done:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
+  };
+  return map[p];
+}
+
+/** Applies archetype-colored shimmer box-shadow during the shimmer phase. */
+function shimmerStyle(p: Phase, colors: { shimmerFrom: string; shimmerTo: string }): React.CSSProperties {
+  if (p !== 'shimmer') return {};
+  return { boxShadow: `0 12px 60px ${colors.shimmerTo}` };
 }

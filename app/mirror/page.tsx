@@ -1,9 +1,9 @@
 /**
  * Mirror Page — Your full reflection.
  *
- * Three states: full mirror data, quick-mirror only, no data (empty state).
- * Enriched with reading identity stats and archetype description
- * to make /mirror a destination, not just a card viewer.
+ * Two states: has data (full mirror or quick-mirror), empty (no archetype yet).
+ * The card IS the page — no separate stats/description sections.
+ * Metadata collapsed into a single whisper line below the card.
  */
 
 'use client';
@@ -13,10 +13,9 @@ import Link from 'next/link';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { GemHome } from '@/components/navigation/GemHome';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
-import ShareOverlay from '@/components/mirror/ShareOverlay';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
-import type { ArchetypeKey } from '@/types/content';
+import type { ReaderMirror } from '@/types/mirror';
 
 const QUICK_MIRROR_KEY = 'quick-mirror-result';
 
@@ -40,8 +39,7 @@ function loadFirstDetectedDate(): string | null {
   try {
     const raw = localStorage.getItem('quick-mirror-result');
     if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed?.detectedAt ?? null;
+    return JSON.parse(raw)?.detectedAt ?? null;
   } catch { return null; }
 }
 
@@ -65,17 +63,14 @@ export default function MirrorPage() {
   if (data) return (
     <div className="min-h-screen p-8">
       <GemHome />
-      <div className="max-w-2xl mx-auto pt-8">
-        {mirror ? <MirrorRevealCard mirror={mirror} /> : null}
-        {quickMirror && !mirror ? (
-          <QuickMirrorCardInline result={quickMirror} />
-        ) : null}
-        <IdentityStats
+      <div className="flex flex-col items-center justify-center min-h-[85vh]">
+        {mirror
+          ? <MirrorRevealCard mirror={mirror} />
+          : <QuickMirrorAsReveal result={quickMirror!} />}
+        <MetaLine
           articlesRead={articlesRead}
           firstDetected={firstDetected}
         />
-        <ArchetypeDescription archetype={(data.archetype as ArchetypeKey)} />
-        <BrowseArticlesLink />
         <WhisperFooter />
       </div>
     </div>
@@ -110,70 +105,30 @@ export default function MirrorPage() {
 
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
-function QuickMirrorCardInline({ result }: { result: QuickMirrorResult }) {
-  return (
-    <div className="bg-surface border border-fog/40 rounded-lg p-8 shadow-gold max-w-md mx-auto">
-      <p className="text-xs uppercase tracking-widest text-mist mb-3">
-        Based on how you read…
-      </p>
-      <h1 className="text-3xl font-display font-bold text-gold">
-        {result.archetypeLabel}
-      </h1>
-      <p className="mt-4 text-sm text-foreground/80 italic leading-relaxed max-w-card-body mx-auto">
-        &ldquo;{result.whisper}&rdquo;
-      </p>
-      <div className="my-6 h-px max-w-divider mx-auto bg-gold/40" />
-      <ShareOverlay result={result} />
-    </div>
-  );
+/** Quick-mirror result rendered in the same card style as MirrorRevealCard. */
+function QuickMirrorAsReveal({ result }: { result: QuickMirrorResult }) {
+  const fakeMirror: ReaderMirror = {
+    archetype: result.archetype,
+    archetypeLabel: result.archetypeLabel,
+    whisper: result.whisper,
+    topicDNA: [],
+    scores: result.scores ?? { depth: 80, breadth: 60, consistency: 70 },
+    resonanceThemes: [],
+  };
+  return <MirrorRevealCard mirror={fakeMirror} />;
 }
 
-function IdentityStats({ articlesRead, firstDetected }: {
+/** Single whisper line: "5 articles · detected Apr 4" */
+function MetaLine({ articlesRead, firstDetected }: {
   articlesRead: number; firstDetected: string | null;
 }) {
+  if (!articlesRead) return null;
+  const parts = [`${articlesRead} article${articlesRead !== 1 ? 's' : ''}`];
+  if (firstDetected) parts.push(`since ${formatDate(firstDetected)}`);
   return (
-    <div className="mt-10 pt-6 border-t border-fog/30 text-center">
-      <h3 className="text-xs uppercase tracking-widest text-mist/60 mb-4">
-        Your Reading Identity
-      </h3>
-      <div className="flex justify-center gap-8 text-sm text-mist">
-        <Stat label="Articles read" value={String(articlesRead)} />
-        {firstDetected && <Stat label="First detected" value={formatDate(firstDetected)} />}
-      </div>
-    </div>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div className="text-foreground font-medium">{value}</div>
-      <div className="text-xs text-mist/50 mt-0.5">{label}</div>
-    </div>
-  );
-}
-
-function ArchetypeDescription({ archetype }: { archetype: ArchetypeKey }) {
-  const desc = ARCHETYPE_DESCRIPTIONS[archetype];
-  if (!desc) return null;
-  return (
-    <div className="mt-8 text-center">
-      <h3 className="text-xs uppercase tracking-widest text-mist/60 mb-3">
-        What This Means
-      </h3>
-      <p className="text-sm text-mist leading-relaxed max-w-md mx-auto">{desc}</p>
-    </div>
-  );
-}
-
-function BrowseArticlesLink() {
-  return (
-    <div className="mt-8 text-center">
-      <Link href="/articles"
-        className="text-primary hover:text-secondary text-sm transition-colors">
-        Browse Articles →
-      </Link>
-    </div>
+    <p className="text-xs text-mist/40 text-center mt-8">
+      {parts.join(' · ')}
+    </p>
   );
 }
 
@@ -194,13 +149,3 @@ function formatDate(iso: string): string {
     return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   } catch { return iso; }
 }
-
-/* ─── Archetype descriptions ─────────────────────────────── */
-
-const ARCHETYPE_DESCRIPTIONS: Record<ArchetypeKey, string> = {
-  'deep-diver': 'Deep Divers read slowly and re-read passages that resonate. You value depth over breadth — one article, fully absorbed, beats ten skimmed. Your archetype emerges from sustained attention and a willingness to sit with complexity.',
-  'explorer': 'Explorers range freely across topics and never met a subject they didn\'t want to sample. Your curiosity is boundless and your reading patterns reveal a mind that connects dots across disciplines.',
-  'faithful': 'The Faithful reader shows up consistently, building a quiet library of understanding over time. Your steady engagement is your superpower — depth grows from repeated visits and patient attention.',
-  'resonator': 'Resonators don\'t just read — they feel. You save passages, mark moments, and carry ideas with you. Your reading is an emotional experience, and the words that stay with you shape your inner world.',
-  'collector': 'Collectors have an appetite for ideas that borders on insatiable. You browse widely, sample often, and build a personal library of concepts that you\'ll connect when the moment is right.',
-};

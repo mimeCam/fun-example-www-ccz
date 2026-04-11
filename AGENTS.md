@@ -16,7 +16,6 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## WIP
 - [ ] QuickMirrorCard collision prevention (quiet zone after mirror reveal)
-- [ ] Mirror page progressive disclosure
 - [ ] Resonances page: collapse export behind action link, section header restyle
 - [ ] Articles page: card hover -translate-y-px, curated divider max-w-divider
 

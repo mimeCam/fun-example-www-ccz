@@ -20,10 +20,10 @@ const FOREGROUND = { dormant: '#e8e8f0', warm: '#f0f0f5' };
 const ACCENT = { dormant: '#7b2cbf', warm: '#f0c674' };
 const BORDER = { dormant: '#222244', warm: '#2e2e60' };
 
-// Typography anchors — letter-spacing and line-height breathe with score.
-// Conservative range: readers should feel it, not see it.
-const LETTER_SPACING = { dormant: 0, warm: 0.01 };     // em
-const LINE_HEIGHT = { dormant: 1.75, warm: 1.85 };      // unitless
+// Typography anchors — line-height breathes with score.
+// Letter-spacing removed: 0→0.01em delta was imperceptible (0.16px).
+// Line-height range increased to cross the 1px perceptibility threshold.
+const LINE_HEIGHT = { dormant: 1.75, warm: 1.90 };      // unitless
 
 // Shadow depth anchor — alpha multiplier for shadow intensity.
 const SHADOW_DEPTH = { dormant: 0.3, warm: 0.5 };
@@ -117,8 +117,7 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-shadow': shadowValue(t),
     '--token-border': lerpColor(BORDER.dormant, BORDER.warm, t),
     '--token-spacing-breath': `${Math.round(t * 4)}px`,
-    // Typography — subtle breathing via letter-spacing + line-height
-    '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, t).toFixed(3)}em`,
+    // Typography — line-height breathing (perceptible 2.4px total delta)
     '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, t).toFixed(3),
     // Shadow depth — continuous alpha scaling
     '--token-shadow-depth': lerp(SHADOW_DEPTH.dormant, SHADOW_DEPTH.warm, t).toFixed(2),

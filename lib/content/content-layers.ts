@@ -73,16 +73,48 @@ export function getExtensionLabel(key: ArchetypeKey): string {
   return labels[key];
 }
 
+/** Archetype-to-color mapping — single source of truth for all surfaces. */
+export const ARCHETYPE_COLORS: Record<ArchetypeKey, {
+  hex: string;
+  border: string;
+  shimmerFrom: string;
+  shimmerTo: string;
+}> = {
+  'deep-diver': {
+    hex: '#4ecdc4',
+    border: 'border-l-cyan',
+    shimmerFrom: 'rgba(78, 205, 196, 0.3)',
+    shimmerTo: 'rgba(78, 205, 196, 0.5)',
+  },
+  'explorer': {
+    hex: '#c77dff',
+    border: 'border-l-accent',
+    shimmerFrom: 'rgba(199, 125, 255, 0.3)',
+    shimmerTo: 'rgba(199, 125, 255, 0.5)',
+  },
+  'faithful': {
+    hex: '#9d4edd',
+    border: 'border-l-secondary',
+    shimmerFrom: 'rgba(157, 78, 221, 0.3)',
+    shimmerTo: 'rgba(157, 78, 221, 0.5)',
+  },
+  'resonator': {
+    hex: '#e88fa7',
+    border: 'border-l-rose',
+    shimmerFrom: 'rgba(232, 143, 167, 0.3)',
+    shimmerTo: 'rgba(232, 143, 167, 0.5)',
+  },
+  'collector': {
+    hex: '#f0c674',
+    border: 'border-l-primary',
+    shimmerFrom: 'rgba(240, 198, 116, 0.3)',
+    shimmerTo: 'rgba(240, 198, 116, 0.5)',
+  },
+};
+
 /** Get the CSS border color class for an archetype extension */
 export function getExtensionBorderColor(key: ArchetypeKey): string {
-  const colors: Record<ArchetypeKey, string> = {
-    'deep-diver': 'border-l-cyan',        // cyan — marginalia, unlocked
-    'explorer': 'border-l-accent',        // light violet — connections
-    'faithful': 'border-l-secondary',     // violet — intimate
-    'resonator': 'border-l-rose',         // rose — reader's voice
-    'collector': 'border-l-primary',      // purple — curation
-  };
-  return colors[key];
+  return ARCHETYPE_COLORS[key].border;
 }
 
 /** Split a content block into paragraphs (on double newline) */

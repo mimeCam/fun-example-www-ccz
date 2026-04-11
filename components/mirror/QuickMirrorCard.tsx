@@ -2,20 +2,23 @@
  * QuickMirrorCard — inline archetype reveal after 30% scroll.
  *
  * Animation phases: hidden → emergence → shimmer → reveal → rest.
- * Total animation: ~2.5s (compressed from 3.5s per UX spec).
- * ShareOverlay appears at rest phase — the viral loop starts here.
- * Smooth-scrolls into view so the reader's current paragraph stays in place.
+ * Two-phase reveal: text appears first, share actions fade in after delay.
+ * No auto-scroll — reader finds the card naturally on their next scroll.
  */
+
 'use client';
 
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
+import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
+import type { ArchetypeKey } from '@/types/content';
 import ShareOverlay from './ShareOverlay';
 
 const T_EMERGE  = 0;
 const T_SHIMMER = 400;
 const T_REVEAL  = 1200;
 const T_REST    = 2500;
+const T_SHARES  = T_REST + 800;  // Share actions appear 800ms after rest
 
 type Phase = 'hidden' | 'emergence' | 'shimmer' | 'reveal' | 'rest';
 
@@ -25,51 +28,47 @@ interface Props {
 }
 
 export default function QuickMirrorCard({ result, articleId }: Props) {
-  const [phase, setPhase]     = useState<Phase>('hidden');
+  const [phase, setPhase]         = useState<Phase>('hidden');
   const [dismissed, setDismissed] = useState(false);
-  const cardRef               = useRef<HTMLDivElement>(null);
-
-  // Smooth-scroll the card into view so the reader doesn't lose their place.
-  // Offset by -25vh so the card appears near the bottom of the viewport,
-  // keeping the reader's current paragraph visible above it.
-  const scrollIntoView = useCallback(() => {
-    if (!cardRef.current) return;
-    const offset = window.innerHeight * 0.25;
-    const top = cardRef.current.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: 'smooth' });
-  }, []);
+  const [showShares, setShowShares] = useState(false);
 
   useEffect(() => {
-    scrollIntoView();
     const ids = [
       setTimeout(() => setPhase('emergence'), T_EMERGE),
       setTimeout(() => setPhase('shimmer'),   T_SHIMMER),
       setTimeout(() => setPhase('reveal'),    T_REVEAL),
       setTimeout(() => setPhase('rest'),      T_REST),
+      setTimeout(() => setShowShares(true),   T_SHARES),
     ];
     return () => ids.forEach(clearTimeout);
-  }, [scrollIntoView]);
+  }, []);
 
   if (dismissed) return (
     <div className="my-12 mx-auto max-w-divider h-px bg-gold/30 rounded-full" />
   );
 
   const showContent = phase === 'reveal' || phase === 'rest';
-  const showActions = phase === 'rest';
+  const colors = ARCHETYPE_COLORS[(result.archetype as ArchetypeKey) ?? 'collector'];
 
   return (
-    <div ref={cardRef} className={`${cardBase()} ${phaseClass(phase)}`}>
+    <div className={`${cardBase()} ${phaseClass(phase, colors)}`}>
       <DismissBtn onDismiss={() => setDismissed(true)} />
       <RevealLabel visible={showContent} />
-      <ArchetypeName label={result.archetypeLabel} visible={showContent} />
+      <ArchetypeName
+        label={result.archetypeLabel}
+        visible={showContent}
+        color={colors.hex}
+      />
       <WhisperQuote text={result.whisper} visible={showContent} />
-      <GoldDivider visible={showContent} />
-      {showActions && (
+      <GoldDivider visible={showContent} color={colors.hex} />
+      {showShares && (
         <ShareOverlay result={result} articleId={articleId} />
       )}
     </div>
   );
 }
+
+/* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
 function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
   return (
@@ -82,17 +81,18 @@ function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
 
 function RevealLabel({ visible }: { visible: boolean }) {
   return (
-    <p className={fadeClass(visible)}
-      style={fadeStyle(visible, 0)}>
+    <p className={fadeClass(visible)} style={fadeStyle(visible, 0)}>
       Because you stayed…
     </p>
   );
 }
 
-function ArchetypeName({ label, visible }: { label: string; visible: boolean }) {
+function ArchetypeName({ label, visible, color }: {
+  label: string; visible: boolean; color: string;
+}) {
   return (
-    <h2 className={`mt-3 text-3xl font-display font-bold text-gold ${fadeClass(visible)}`}
-      style={fadeStyle(visible, 150)}>
+    <h2 className={`mt-3 text-3xl font-display font-bold tracking-tight ${fadeClass(visible)}`}
+      style={{ ...fadeStyle(visible, 150), color: visible ? color : undefined }}>
       {label}
     </h2>
   );
@@ -108,25 +108,28 @@ function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   );
 }
 
-function GoldDivider({ visible }: { visible: boolean }) {
+function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
   return (
-    <div className={`my-6 h-px max-w-divider mx-auto bg-gold/40
-      transition-transform duration-500 ${visible ? 'scale-x-100' : 'scale-x-0'}`} />
+    <div className={`my-6 h-px max-w-divider mx-auto transition-transform duration-500
+      ${visible ? 'scale-x-100' : 'scale-x-0'}`}
+      style={{ backgroundColor: visible ? color : undefined, opacity: 0.4 }} />
   );
 }
 
+/* ─── Style helpers ──────────────────────────────────────── */
+
 function cardBase(): string {
   return 'relative my-20 mx-auto max-w-card p-8 text-center'
-    + ' rounded-lg border bg-gradient-to-b from-surface to-background'
+    + ' rounded-xl border bg-gradient-to-b from-surface to-background'
     + ' transition-all duration-reveal ease-out';
 }
 
-function phaseClass(p: Phase): string {
+function phaseClass(p: Phase, colors: { shimmerFrom: string; shimmerTo: string }): string {
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
-    emergence: 'opacity-100 translate-y-0 border-gold/15',
-    shimmer:   'opacity-100 translate-y-0 border-gold/25 shadow-gold-intense animate-quick-mirror-glow',
-    reveal:    'opacity-100 translate-y-0 border-gold/25 shadow-gold',
+    emergence: 'opacity-80 translate-y-0 border-gold/10',
+    shimmer:   `opacity-100 translate-y-0 border-gold/25 shadow-gold-intense`,
+    reveal:    'opacity-100 translate-y-0 border-gold/30 shadow-gold',
     rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
   return map[p];

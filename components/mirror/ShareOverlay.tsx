@@ -1,9 +1,9 @@
 /**
- * ShareOverlay — icon-based share actions after QuickMirrorCard rest phase.
+ * ShareOverlay — icon-based share actions after mirror card reveal.
  *
  * Three icon buttons (Save PNG, Copy Link, Share on X) in a row.
+ * Staggered reveal: 0ms / 100ms / 200ms delay for each button.
  * Icons > text for instant visual parsing (Picture Superiority effect).
- * Tooltips on hover reveal the action label.
  */
 
 'use client';
@@ -30,23 +30,30 @@ export default function ShareOverlay({ result, articleId }: Props) {
   return (
     <div className="mt-4 flex flex-col items-center gap-3">
       <div className="flex justify-center gap-4">
-        <IconBtn
+        <StaggeredIconBtn delay={0}
           onClick={useSaveImage(result)}
-          label="Save PNG"
-          icon={<DownloadIcon />}
-        />
-        <IconBtn
+          label="Save PNG" icon={<DownloadIcon />} />
+        <StaggeredIconBtn delay={100}
           onClick={useCopyText(result.archetype, articleId, setCopied)}
           label={copied ? 'Copied!' : 'Copy Link'}
-          icon={copied ? <CheckIcon /> : <ClipboardIcon />}
-        />
-        <IconBtn
+          icon={copied ? <CheckIcon /> : <ClipboardIcon />} />
+        <StaggeredIconBtn delay={200}
           onClick={useXShare(result.archetype, articleId)}
-          label="Share on X"
-          icon={<XIcon />}
-        />
+          label="Share on X" icon={<XIcon />} />
       </div>
       <DeepLink url={deepUrl} />
+    </div>
+  );
+}
+
+/* ─── Staggered icon button with fade-in ─────────────────── */
+
+function StaggeredIconBtn({ onClick, label, icon, delay }: {
+  onClick: () => void; label: string; icon: React.ReactNode; delay: number;
+}) {
+  return (
+    <div className="animate-fade-in" style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}>
+      <IconBtn onClick={onClick} label={label} icon={icon} />
     </div>
   );
 }
@@ -143,7 +150,7 @@ function useCopyText(
   setCopied: (v: boolean) => void,
 ) {
   return useCallback(async () => {
-    const text = generateShareText(archetype as any, articleId);
+    const text = generateShareText(archetype as never, articleId);
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -152,7 +159,7 @@ function useCopyText(
 
 function useXShare(archetype: string, articleId: string | undefined) {
   return useCallback(() => {
-    const url = generateXLink(archetype as any, articleId);
+    const url = generateXLink(archetype as never, articleId);
     window.open(url, 'share', 'width=600,height=400');
   }, [archetype, articleId]);
 }

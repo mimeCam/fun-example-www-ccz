@@ -15,8 +15,7 @@
   --token-border: #222244;
   --token-spacing-breath: 0px;
 
-  /* Continuous thermal tokens — typography, shadow, radius, accent */
-  --token-letter-spacing: 0em;
+  /* Continuous thermal tokens — shadow, radius, accent */
   --token-line-height: 1.75;
   --token-shadow-depth: 0.30;
   --token-radius-soft: 0rem;
@@ -73,19 +72,15 @@ html {
 body {
   color: var(--token-foreground);
   background: var(--token-bg);
-  letter-spacing: var(--token-letter-spacing);
   line-height: var(--token-line-height);
   transition: color 1.5s ease-out,
-              letter-spacing 1.5s ease-out,
               line-height 1.5s ease-out;
 }
 
 /* Thermal-responsive utility — applies continuous typography tokens */
 .thermal-typography {
-  letter-spacing: var(--token-letter-spacing);
   line-height: var(--token-line-height);
-  transition: letter-spacing 1.5s ease-out,
-              line-height 1.5s ease-out;
+  transition: line-height 1.5s ease-out;
 }
 
 /* Thermal shadow depth — continuous alpha scaling for card surfaces */
@@ -102,15 +97,15 @@ body {
   transition: border-radius 1.5s ease-out;
 }
 
-/* Dormant state "lit candle" — faint gold glow on CTA elements */
+/* Dormant state "lit candle" — visible gold glow on CTA elements */
 .thermal-candle {
-  box-shadow: 0 0 20px rgba(240,198,116,0.06);
+  box-shadow: 0 0 20px rgba(240,198,116,0.10);
   animation: candlePulse 3s ease-in-out infinite;
 }
 
 @keyframes candlePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.06); }
-  50% { box-shadow: 0 0 40px rgba(240,198,116,0.25); }
+  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.10); }
+  50% { box-shadow: 0 0 40px rgba(240,198,116,0.40); }
 }
 
 /* Warm state warm-spotlight — subtle radial gradient on bg */
