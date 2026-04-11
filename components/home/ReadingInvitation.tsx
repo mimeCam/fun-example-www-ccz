@@ -45,7 +45,7 @@ export default function ReadingInvitation(
           transition-all duration-enter
           focus:ring-2 focus:ring-gold/40 focus:ring-offset-2
           focus:ring-offset-background outline-none
-          thermal-candle thermal-glow">
+          thermal-candle">
         Begin Reading &rarr;
       </Link>
 

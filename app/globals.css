@@ -88,6 +88,11 @@ body {
   transition: line-height 1.5s ease-out;
 }
 
+/* Paragraph spacing opens up as the site warms (0 → 4px perceptible delta) */
+.thermal-typography p {
+  margin-bottom: calc(0.75rem + var(--token-spacing-breath));
+}
+
 /* Thermal shadow depth — continuous alpha scaling for card surfaces */
 .thermal-shadow {
   box-shadow: 0 calc(1px + 7px * var(--token-shadow-depth))
@@ -132,31 +137,8 @@ body {
   transition: text-shadow 400ms ease-out;
 }
 
-/* New thermal animations */
-@keyframes thermalShift {
-  from { background-color: var(--token-bg); }
-  to { background-color: var(--token-bg); }
-}
-
-/* slideUp, gemAppear, whisperShadow — defined in tailwind.config.ts keyframes.
-   CSS duplicates removed (single source of truth: Tailwind config). */
-
-/* ─── Thermal Breathing Animations ─────────────────────── */
-
-@keyframes thermalBreath {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(calc(1 + var(--token-breath-scale))); }
-}
-
-@keyframes thermalGlow {
-  0%, 100% { opacity: var(--token-glow-min); }
-  50% { opacity: var(--token-glow-max); }
-}
-
-@keyframes thermalDrift {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(var(--token-drift-range)); }
-}
+/* slideUp, gemAppear, whisperShadow, thermalBreath/Glow/Drift —
+   defined in tailwind.config.ts keyframes. Single source of truth: Tailwind config. */
 
 /* Thermal animation utility classes — gated by data-thermal on <html>.
    Only animate when thermal state is stirring+ (score >= 25).

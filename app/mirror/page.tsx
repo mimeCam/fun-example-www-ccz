@@ -71,8 +71,8 @@ export default function MirrorPage() {
           articlesRead={articlesRead}
           firstDetected={firstDetected}
         />
-        <WhisperFooter />
       </div>
+      <WhisperFooter />
     </div>
   );
 

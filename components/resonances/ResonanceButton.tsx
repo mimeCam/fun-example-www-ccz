@@ -234,7 +234,7 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What truth did this reveal to you?"
-          className="w-full px-4 py-3 bg-void border border-fog rounded-lg text-foreground placeholder-mist/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+          className="w-full px-4 py-3 bg-background border border-fog rounded-lg text-foreground placeholder-mist/50 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
           rows={4}
           maxLength={280}
           disabled={isLoading}
@@ -246,7 +246,7 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
       {error && <ErrorBanner message={error} />}
       <div className="flex gap-3">
         <button onClick={onCancel} disabled={isLoading}
-          className="flex-1 px-4 py-2.5 bg-void text-mist rounded-lg hover:bg-fog transition-colors disabled:opacity-50">
+          className="flex-1 px-4 py-2.5 bg-background text-mist rounded-lg hover:bg-fog transition-colors disabled:opacity-50">
           Cancel
         </button>
         <button onClick={onSubmit}
@@ -261,7 +261,7 @@ function ResonanceForm({ note, setNote, quote, error, isLoading, onSubmit, onCan
 
 function QuotePreview({ quote }: { quote: string }) {
   return (
-    <div className="mb-4 bg-void/60 border-l-2 border-rose/40 rounded-lg p-3">
+    <div className="mb-4 bg-background/60 border-l-2 border-rose/40 rounded-lg p-3">
       <p className="text-foreground/70 italic text-sm leading-relaxed">
         &ldquo;{quote}&rdquo;
       </p>

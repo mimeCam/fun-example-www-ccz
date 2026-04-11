@@ -21,7 +21,7 @@ export default function ArticlesPage() {
   const articles = getAllArticles();
 
   return (
-    <main className="min-h-screen bg-gradient-to-r from-background via-background to-surface/10">
+    <main className="min-h-screen bg-background">
       <GemHome />
       <Suspense>
         <ArticlesPageClient articles={articles} />

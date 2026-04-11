@@ -3,8 +3,8 @@
  *
  * Wraps children in ThermalProvider and adds thermal animation classes
  * to the body wrapper based on thermal state:
- * - dormant/stirring: no animation (stillness)
- * - warm+: .thermal-breath on body wrapper
+ * - dormant: no animation (stillness)
+ * - stirring+: .thermal-breath .thermal-glow on body wrapper
  *
  * Prefers-reduced-motion is handled at two levels:
  * 1. CSS: globals.css kills all animations with !important
@@ -28,7 +28,7 @@ function ThermalClassApplier({ children }: { children: ReactNode }) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  const animate = !reducedMotion && (state === 'warm' || state === 'luminous');
+  const animate = !reducedMotion && state !== 'dormant';
 
   return (
     <div className={animate ? 'thermal-breath thermal-glow' : ''}>

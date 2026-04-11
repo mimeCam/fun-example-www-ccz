@@ -42,29 +42,24 @@ describe('computeThermalTokens — output tokens', () => {
     '--token-shadow',
     '--token-border',
     '--token-spacing-breath',
-    // New continuous tokens
-    '--token-letter-spacing',
+    // Continuous tokens
     '--token-line-height',
     '--token-shadow-depth',
     '--token-radius-soft',
     '--token-accent-opacity',
   ];
 
-  it('returns 13 CSS custom property keys', () => {
+  it('returns 12 CSS custom property keys', () => {
     for (const key of TOKEN_KEYS) {
       expect(SRC).toContain(`'${key}'`);
     }
   });
 
   it('has typography anchors matching spec', () => {
-    // Letter-spacing: 0em (dormant) to 0.01em (warm)
-    expect(SRC).toContain('LETTER_SPACING');
-    expect(SRC).toContain('dormant: 0');
-    expect(SRC).toContain('warm: 0.01');
-    // Line-height: 1.75 (dormant) to 1.85 (warm)
+    // Line-height: 1.75 (dormant) to 1.90 (warm) — 2.4px total delta
     expect(SRC).toContain('LINE_HEIGHT');
     expect(SRC).toContain('dormant: 1.75');
-    expect(SRC).toContain('warm: 1.85');
+    expect(SRC).toContain('warm: 1.90');
   });
 
   it('has shadow depth anchors', () => {

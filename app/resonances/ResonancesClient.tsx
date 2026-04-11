@@ -27,6 +27,7 @@ import { detectChapterBreak } from '@/lib/mirror/book-whisper-engine';
 import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import ResonanceExport from './ResonanceExport';
+import WhisperFooter from '@/components/shared/WhisperFooter';
 
 const ANON_KEY = 'anon-reader-id';
 const MIRROR_KEY = 'quick-mirror-result';
@@ -185,7 +186,7 @@ export default function ResonancesClient() {
         Read something that stops you. Capture it. Tell it why it matters.
       </p>
       <Link href="/"
-        className="inline-block px-6 py-3 bg-primary hover:bg-secondary text-foreground font-semibold rounded-lg transition-colors">
+        className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold rounded-lg transition-colors">
         Browse Articles →
       </Link>
     </div>
@@ -288,12 +289,8 @@ export default function ResonancesClient() {
         </div>
       )}
 
-      {/* Footer navigation */}
-      <div className="flex justify-center gap-6 text-xs pb-12">
-        <Link href="/mirror" className="text-primary hover:text-accent transition-colors">
-          Your Mirror →
-        </Link>
-      </div>
+      {/* Footer */}
+      <WhisperFooter />
     </div>
   );
 }

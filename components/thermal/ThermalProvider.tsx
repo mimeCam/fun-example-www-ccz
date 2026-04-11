@@ -2,7 +2,7 @@
  * ThermalProvider — React Context distributing thermal state to the component tree.
  *
  * Loads history from localStorage on mount, computes score + state + tokens,
- * applies CSS vars to <html> via useEffect with 500ms debounce.
+ * applies CSS vars to <html> via useEffect with 100ms debounce.
  * Provides { score, state, tokens, refresh } to consumers.
  *
  * V1: binary cold/warm based on reading_memory existence.
@@ -26,7 +26,7 @@ interface ThermalContextValue {
   confidence: number;
   tokens: ThermalTokens;
   animation: AnimationTokens;
-  isWarm: boolean;
+  isEngaged: boolean;
   refresh: () => void;
 }
 
@@ -39,7 +39,7 @@ export function useThermal(): ThermalContextValue {
     return {
       score: 0, state: 'dormant', confidence: 0,
       tokens: {}, animation: computeAnimationTokens(0),
-      isWarm: false, refresh: () => {},
+      isEngaged: false, refresh: () => {},
     };
   }
   return ctx;
@@ -90,7 +90,7 @@ export function ThermalProvider({ children }: { children: ReactNode }) {
     confidence: thermal.result.confidence,
     tokens: thermal.tokens,
     animation: thermal.animation,
-    isWarm: thermal.result.score >= 25,
+    isEngaged: thermal.result.score >= 25,
     refresh,
   }), [thermal, refresh]);
 

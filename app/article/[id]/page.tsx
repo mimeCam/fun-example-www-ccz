@@ -104,7 +104,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const recognition = useReturnRecognition();
 
   // Thermal state from ThermalProvider
-  const { isWarm, refresh: refreshThermal } = useThermal();
+  const { isEngaged, refresh: refreshThermal } = useThermal();
   const { maxDepth } = useScrollDepth();
   const startTime = useRef(Date.now());
 
@@ -156,9 +156,8 @@ function ArticleContent({ params }: { params: { id: string } }) {
               archetype={archetype}
             />
           )}
-
-          <WhisperFooter />
         </div>
+        <WhisperFooter />
       </article>
     </>
   );

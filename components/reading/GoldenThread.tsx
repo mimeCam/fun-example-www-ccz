@@ -40,7 +40,7 @@ export function GoldenThread() {
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-3 sm:left-0 z-10 pointer-events-none"
+      className="fixed top-0 bottom-0 left-2 z-10 pointer-events-none"
       role="progressbar"
       aria-label={`Reading progress: ${Math.round(depth)}%`}
       aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(depth)}

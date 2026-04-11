@@ -16,11 +16,12 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — a spine of light that climbs and glows.
 
 ## WIP
-- [ ] Resonances page: collapse export behind action link, section header restyle
-- [ ] Articles page: card hover -translate-y-px, curated divider max-w-divider, deduplicate curated row
 - [ ] ResonanceButton: modal → slide-in side panel
-- [ ] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
+- [ ] QuickMirrorCard: move from mid-prose to end-of-section
 - [ ] Extract shared `GemIcon` component (3 copies of same SVG)
+- [ ] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
+- [ ] Nav active state: thermal-aware dot indicator
+- [ ] Threshold duplication: thermal-score thresholds vs thermal-animation constants
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

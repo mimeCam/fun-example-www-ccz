@@ -91,18 +91,6 @@ function lerpColor(cold: string, warm: string, t: number): string {
   return hslToHex(lerpHsl(hexToHsl(cold), hexToHsl(warm), t));
 }
 
-// ─── Non-linear interpolation ─────────────────────────────
-// The dormant→stirring band (0→25) must show more visual shift
-// per point than the higher bands. A slight exponential curve
-// in the low range ensures first-time readers see the page transform.
-
-function easeLowEnd(raw: number): number {
-  // Apply subtle power curve: more change at low end
-  return raw < 0.25
-    ? Math.pow(raw / 0.25, 0.7) * 0.25
-    : 0.25 + (raw - 0.25) * (0.75 / 0.75);
-}
-
 // ─── Public API ───────────────────────────────────────────
 
 /** Compute thermal CSS tokens from a 0-100 score. */
