@@ -190,7 +190,48 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle {
+  .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;
+  }
+}
+
+/* ─── Golden Thread ─────────────────────────────────── */
+
+/* Base glow — subtle even at dormant */
+.golden-thread-glow {
+  box-shadow: 0 0 2px var(--token-accent);
+}
+
+@keyframes goldenThreadGlow {
+  0%, 100% {
+    box-shadow: 0 0 4px var(--token-accent),
+                0 0 8px rgba(240,198,116,0.08);
+  }
+  50% {
+    box-shadow: 0 0 6px var(--token-accent),
+                0 0 12px rgba(240,198,116,0.18);
+  }
+}
+
+/* Thermal-gated: glow only at stirring+ */
+[data-thermal="stirring"] .golden-thread-glow,
+[data-thermal="warm"] .golden-thread-glow,
+[data-thermal="luminous"] .golden-thread-glow {
+  animation: goldenThreadGlow var(--token-glow-speed) ease-in-out infinite;
+  will-change: box-shadow;
+}
+
+/* ─── Paragraph Hover Micro-Feedback ────────────────── */
+
+/* Archetype-colored left-border on paragraph hover.
+   0.15 opacity — felt peripherally, not distracting.
+   Only on devices with hover capability (no mobile). */
+@media (hover: hover) {
+  .stratified-content p[data-paragraph-id]:not([data-variant]) {
+    transition: border-color 200ms ease-in-out, padding-left 200ms ease-in-out;
+  }
+  .stratified-content p[data-paragraph-id]:not([data-variant]):hover {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--archetype-hover-color, rgba(34, 34, 68, 0.10));
   }
 }

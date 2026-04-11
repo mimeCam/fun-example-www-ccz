@@ -152,15 +152,27 @@ function injectedPriority(layer: string): number {
   return 0;
 }
 
+/** Archetype-specific hover border color for paragraph micro-feedback. */
+function archetypeHoverColor(key: ArchetypeKey | null): string {
+  const map: Record<string, string> = {
+    "deep-diver": "rgba(78, 205, 196, 0.15)",
+    "explorer": "rgba(199, 125, 255, 0.15)",
+    "faithful": "rgba(157, 78, 221, 0.15)",
+    "resonator": "rgba(232, 143, 167, 0.15)",
+    "collector": "rgba(240, 198, 116, 0.15)",
+  };
+  return map[key ?? ""] ?? "rgba(34, 34, 68, 0.10)";
+}
+
 /** Main renderer — iterates blocks, tracks core paragraph offset for IDs */
-export function StratifiedRenderer({ blocks, articleId, warmer, mirrorSlot }: StratifiedRendererProps) {
+export function StratifiedRenderer({ blocks, archetype, articleId, warmer, mirrorSlot }: StratifiedRendererProps) {
   if (!blocks.length) return null;
 
   const filtered = enforceMarginaliaLimit(blocks);
   let coreOffset = 0;
 
   return (
-    <article className="stratified-content">
+    <article className="stratified-content" style={{ "--archetype-hover-color": archetypeHoverColor(archetype) } as React.CSSProperties}>
       {filtered.map((block, i) => {
         if (block.layer === 'quick-mirror') {
           return <Fragment key={`mirror-${i}`}>{mirrorSlot ?? null}</Fragment>;

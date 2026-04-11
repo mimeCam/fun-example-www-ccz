@@ -2,7 +2,7 @@
 
 import { useMemo, useEffect, useRef } from 'react';
 import { notFound } from 'next/navigation';
-import { DepthBar } from '@/components/reading/DepthBar';
+import { GoldenThread } from '@/components/reading/GoldenThread';
 import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
@@ -127,7 +127,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
   return (
     <>
-      <DepthBar />
+      <GoldenThread />
       <GemHome />
       <article className="min-h-screen">
         <div className="max-w-[38rem] mx-auto px-6">
@@ -135,11 +135,11 @@ function ArticleContent({ params }: { params: { id: string } }) {
           <ArticleHeader title={article.title} readTime={readTime} />
           <hr className="border-fog mb-8" />
 
-          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] leading-[1.8] text-foreground">
+          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] thermal-typography text-foreground">
             {displayBlocks.length > 0 ? (
               <StratifiedRenderer blocks={displayBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning}
                 mirrorSlot={quickMirror.triggered && quickMirror.result ? (
-                  <div className="my-16">
+                  <div className="my-12">
                     <QuickMirrorCard result={quickMirror.result} articleId={params.id} />
                   </div>
                 ) : undefined}
@@ -169,7 +169,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
 function TopBar({ articleId, title }: { articleId: string; title: string }) {
   return (
-    <div className="flex items-center justify-end pt-8 pb-4">
+    <div className="flex items-center justify-end pt-6 pb-2">
       <ResonanceButton articleId={articleId} articleTitle={title} />
     </div>
   );
