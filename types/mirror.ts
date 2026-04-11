@@ -61,3 +61,16 @@ export interface SnapshotMeta {
   firstVisitAt: string | null;
   previousVisitAt: string | null;
 }
+
+/** Quiet Zone — prevents mirror over-reveal across articles/sessions. */
+export interface QuietZoneState {
+  lastArticleId: string;
+  lastRevealAt: number;       // epoch ms
+  articlesSince: number;
+}
+
+export interface QuietZoneConfig {
+  articleCooldown: number;    // skip next N unique articles after reveal
+  timeCooldownMs: number;     // ms of silence after last reveal
+  sessionTtlMs: number;       // ms before quiet zone fully resets
+}

@@ -51,10 +51,13 @@ const config: Config = {
         'enter': '300ms',
         'reveal': '700ms',
         'linger': '1000ms',
+        'fade': '500ms',
+        'instant': '150ms',
       },
       transitionTimingFunction: {
         'out': 'cubic-bezier(0.0, 0.0, 0.2, 1)',
         'sustain': 'cubic-bezier(0.4, 0.0, 0.2, 1)',
+        'settle': 'cubic-bezier(0.0, 0.0, 0.2, 0.5)',
       },
       translate: {
         'enter-sm': '2px',

@@ -6,6 +6,9 @@
  * Warm: clear gold — the site "remembers".
  * Luminous: bright gold with glow — the site is "open".
  *
+ * On article pages: always mist/20 — a waypoint, not a lantern.
+ * The reader is deep in prose; GemHome should not compete for attention.
+ *
  * Slow 1s transition so the shift feels atmospheric, not reactive.
  */
 
@@ -14,7 +17,8 @@
 import Link from 'next/link';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 
-function gemColor(state: string): string {
+function gemColor(state: string, quiet: boolean): string {
+  if (quiet) return 'text-mist/20';
   switch (state) {
     case 'luminous': return 'text-gold/80';
     case 'warm':     return 'text-gold/60';
@@ -23,19 +27,25 @@ function gemColor(state: string): string {
   }
 }
 
-function gemShadow(state: string): string {
+function gemShadow(state: string, quiet: boolean): string {
+  if (quiet) return '';
   return state === 'luminous' ? 'drop-shadow-[0_0_6px_rgba(240,198,116,0.4)]' : '';
 }
 
-export function GemHome() {
+interface GemHomeProps {
+  /** On article pages, suppress thermal glow — waypoint, not lantern. */
+  quiet?: boolean;
+}
+
+export function GemHome({ quiet = false }: GemHomeProps) {
   const { state } = useThermal();
 
   return (
     <Link
       href="/"
-      className={`fixed top-4 left-4 z-30 hover:text-gold
+      className={`fixed top-4 left-6 z-30 hover:text-gold
         transition-colors duration-linger ease-out
-        ${gemColor(state)} ${gemShadow(state)}`}
+        ${gemColor(state, quiet)} ${gemShadow(state, quiet)}`}
       aria-label="Home"
     >
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

@@ -24,3 +24,10 @@ export function shouldReveal(input: DwellGateInput): boolean {
 /** Default thresholds per feature. */
 export const QUICK_MIRROR_GATE = { triggerDepth: 30, minDwell: 15 };
 export const EXTENSION_GATE = { triggerDepth: 50, minDwell: 20 };
+
+/** Quiet Zone config — how long the mirror stays silent after a reveal. */
+export const QUIET_ZONE_CONFIG = {
+  articleCooldown: 3,
+  timeCooldownMs: 45 * 60 * 1000,   // 45 min
+  sessionTtlMs: 4 * 60 * 60 * 1000,  // 4 hours
+} as const;

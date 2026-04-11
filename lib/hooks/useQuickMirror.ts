@@ -5,7 +5,11 @@
  * the trigger depth for a minimum time (default 15s). Speed-scrollers get
  * nothing. Careful readers earn the reveal.
  *
+ * Quiet Zone: after a reveal, the mirror goes silent for the next N articles
+ * or T minutes — preventing the "followed" feeling across reads.
+ *
  * Uses shouldReveal() from dwell-gate.ts (pure function, tested).
+ * Uses shouldAllowReveal() from quiet-zone.ts (pure function, tested).
  */
 
 'use client';
@@ -19,6 +23,7 @@ import {
 } from '@/lib/mirror/quick-synthesize';
 import { appendSnapshot } from './useEvolution';
 import { shouldReveal, QUICK_MIRROR_GATE } from '@/lib/thermal/dwell-gate';
+import { shouldAllowReveal, enterQuietZone, trackArticleVisit } from '@/lib/mirror/quiet-zone';
 
 const STORAGE_KEY = 'quick-mirror-result';
 
@@ -47,8 +52,16 @@ export function useQuickMirror(
   const [triggered, setTriggered] = useState(false);
   const [result, setResult] = useState<QuickMirrorResult | null>(loadCached);
 
+  // Track article visit for quiet zone on mount
+  useEffect(() => {
+    trackArticleVisit(articleId);
+  }, [articleId]);
+
   useEffect(() => {
     if (triggered) return;
+
+    // Quiet zone: synchronous check BEFORE any synthesis work
+    if (!shouldAllowReveal(articleId)) return;
 
     // Track when reader first reaches the trigger depth
     if (bag.depth >= triggerDepth && depthReachedAt.current === null) {
@@ -76,6 +89,7 @@ export function useQuickMirror(
     setResult(synthesized);
     setTriggered(true);
     persist(synthesized);
+    enterQuietZone(articleId);
     appendSnapshot({
       archetype: synthesized.archetype,
       archetypeLabel: synthesized.archetypeLabel,

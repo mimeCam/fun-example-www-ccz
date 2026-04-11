@@ -55,9 +55,14 @@
   --sys-time-enter: 300ms;
   --sys-time-reveal: 700ms;
   --sys-time-linger: 1000ms;
+  --sys-time-fade: 500ms;
+  --sys-time-instant: 150ms;
 
   --sys-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --sys-ease-settle: cubic-bezier(0.0, 0.0, 0.2, 0.5);
+
+  --sys-text-prose: 1.0625rem;
 
   /* Legacy aliases (kept for backward compat during migration) */
   --background: var(--token-bg);
@@ -121,15 +126,10 @@ body {
   transition: background-color 0.2s ease;
 }
 
-/* Mirror chromatic aberration — child selector can't be expressed in Tailwind */
-@keyframes chromaticShift {
-  0%, 100% { text-shadow: -1px 0 rgba(255,0,0,0.4), 1px 0 rgba(0,255,0,0.4); }
-  33% { text-shadow: 2px 0 rgba(255,0,0,0.6), -2px 0 rgba(0,255,0,0.6); }
-  66% { text-shadow: -2px 0 rgba(255,0,0,0.6), 2px 0 rgba(0,255,0,0.6); }
-}
-
+/* Mirror gold glow — warm pulse during shimmer phase */
 .mirror-chromatic h2 {
-  animation: chromaticShift 0.4s ease-in-out infinite;
+  text-shadow: 0 0 20px rgba(240,198,116,0.30);
+  transition: text-shadow 400ms ease-out;
 }
 
 /* New thermal animations */

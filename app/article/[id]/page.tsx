@@ -9,7 +9,6 @@ import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
 import { bestRecommendation } from '@/lib/content/archetype-recommendations';
-import MirrorWhisper from '@/components/reading/MirrorWhisper';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
@@ -128,14 +127,14 @@ function ArticleContent({ params }: { params: { id: string } }) {
   return (
     <>
       <GoldenThread />
-      <GemHome />
+      <GemHome quiet />
       <article className="min-h-screen">
         <div className="max-w-prose mx-auto px-6">
           <TopBar articleId={params.id} title={article.title} />
           <ArticleHeader title={article.title} readTime={readTime} />
-          <hr className="border-fog mb-8" />
+          <hr className="border-gold/10 mb-8" />
 
-          <div className="prose prose-invert max-w-none mb-12 text-[1.0625rem] thermal-typography text-foreground">
+          <div className="prose prose-invert max-w-none mb-12 text-[length:var(--sys-text-prose)] thermal-typography text-foreground">
             {displayBlocks.length > 0 ? (
               <StratifiedRenderer blocks={displayBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning}
                 mirrorSlot={quickMirror.triggered && quickMirror.result ? (
@@ -149,9 +148,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          <MirrorWhisper archetype={archetype} />
-
-          <hr className="border-fog my-12" />
+          <hr className="border-gold/10 my-8" />
           {recommendation && (
             <NextRead
               article={recommendation.article}
@@ -178,7 +175,7 @@ function TopBar({ articleId, title }: { articleId: string; title: string }) {
 function ArticleHeader({ title, readTime }: { title: string; readTime: number }) {
   return (
     <header className="mb-8 text-center">
-      <h1 className="font-display text-[2.25rem] font-bold text-foreground leading-tight tracking-tight">
+      <h1 className="font-display text-[2.5rem] font-bold text-foreground leading-tight tracking-tight">
         {title}
       </h1>
       <p className="text-mist text-sm mt-3">{readTime} min read</p>
