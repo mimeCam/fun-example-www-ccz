@@ -1,9 +1,10 @@
 /**
- * AmbientNav — bottom navigation bar.
+ * AmbientNav — bottom navigation bar with thermal-aware active state.
  *
  * Four links: Threshold, Articles, Mirror, Book.
  * No thermal-drift — navigation must be spatially stable.
- * Active state: mist/80, inactive: mist/50, hover per-item accent.
+ * Active state: thermal accent color + NavPulseDot.
+ * Inactive: mist/50, hover per-item accent.
  */
 
 'use client';
@@ -11,6 +12,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { NavPulseDot } from './NavPulseDot';
 
 const NAV_ITEMS = [
   { href: '/', label: 'Threshold', accent: 'hover:text-gold' },
@@ -51,10 +53,14 @@ export function AmbientNav() {
             <Link
               key={href}
               href={href}
-              className={`text-xs tracking-wide transition-colors ${
-                active ? 'text-mist/80' : `text-mist/50 ${accent}`
+              aria-current={active ? 'page' : undefined}
+              className={`text-xs tracking-wide transition-colors duration-[1500ms] ease-out ${
+                active
+                  ? 'nav-active-link'
+                  : `text-mist/50 ${accent}`
               }`}
             >
+              {active && <NavPulseDot />}
               {label}
             </Link>
           );

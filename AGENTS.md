@@ -20,7 +20,6 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## WIP
 - [ ] QuickMirrorCard: move from mid-prose to end-of-section
 - [ ] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
-- [ ] Nav active state: thermal-aware dot indicator
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

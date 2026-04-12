@@ -252,3 +252,89 @@ body {
     border-left: 2px solid var(--archetype-hover-color, rgba(34, 34, 68, 0.10));
   }
 }
+
+/* ─── Nav Pulse Dot ─────────────────────────────────── */
+
+/* Active nav link color — thermal accent (violet→gold), default mist at dormant */
+.nav-active-link {
+  color: var(--mist);
+  opacity: 0.8;
+  transition: color 1.5s ease-out, opacity 1.5s ease-out;
+  display: inline-flex;
+  align-items: center;
+}
+
+[data-thermal="stirring"] .nav-active-link,
+[data-thermal="warm"] .nav-active-link,
+[data-thermal="luminous"] .nav-active-link {
+  color: var(--token-accent);
+  opacity: var(--token-accent-opacity);
+}
+
+/* Dot container — 6px inline box with right margin for label spacing */
+.nav-pulse-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 6px;
+  height: 6px;
+  margin-right: 0.375rem;
+  flex-shrink: 0;
+}
+
+/* Core dot — 6px circle, mist at dormant, thermal accent at stirring+ */
+.nav-pulse-core {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: var(--mist);
+  opacity: 0.3;
+  position: relative;
+  z-index: 1;
+  transition: background-color 1.5s ease-out, opacity 1.5s ease-out;
+}
+
+[data-thermal="stirring"] .nav-pulse-core,
+[data-thermal="warm"] .nav-pulse-core,
+[data-thermal="luminous"] .nav-pulse-core {
+  background-color: var(--token-accent);
+  opacity: var(--token-accent-opacity);
+}
+
+/* Glow ring — 10px blurred halo behind core */
+.nav-pulse-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px 0 var(--token-accent);
+  opacity: 0.4;
+  transition: box-shadow 1.5s ease-out, opacity 1.5s ease-out;
+}
+
+/* Outer aura — 16px wider glow at warm+ */
+.nav-pulse-aura {
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  box-shadow: 0 0 24px 0 var(--token-accent);
+  opacity: 0.2;
+  transition: box-shadow 1.5s ease-out, opacity 1.5s ease-out;
+}
+
+/* Pulse animation — synchronized with thermal glow tokens */
+@keyframes navPulse {
+  0%, 100% { opacity: var(--token-glow-min); }
+  50% { opacity: var(--token-glow-max); }
+}
+
+/* Thermal-gated pulse on ring and aura — stirring+ only */
+[data-thermal="stirring"] .nav-pulse-ring,
+[data-thermal="warm"] .nav-pulse-ring,
+[data-thermal="luminous"] .nav-pulse-ring,
+[data-thermal="stirring"] .nav-pulse-aura,
+[data-thermal="warm"] .nav-pulse-aura,
+[data-thermal="luminous"] .nav-pulse-aura {
+  animation: navPulse var(--token-glow-speed) ease-in-out infinite;
+  will-change: opacity;
+}
