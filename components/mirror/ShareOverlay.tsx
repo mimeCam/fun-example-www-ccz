@@ -10,6 +10,7 @@
 
 import { useState, useCallback } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
+import type { ArchetypeKey } from '@/types/content';
 import { generateQuickMirrorCard } from '@/lib/mirror/quick-mirror-card-generator';
 import {
   generateShareText,
@@ -36,7 +37,8 @@ export default function ShareOverlay({ result, articleId }: Props) {
         <StaggeredIconBtn delay={100}
           onClick={useCopyText(result.archetype, articleId, setCopied)}
           label={copied ? 'Copied!' : 'Copy Link'}
-          icon={copied ? <CheckIcon /> : <ClipboardIcon />} />
+          icon={copied ? <CheckIcon /> : <ClipboardIcon />}
+          confirm={copied} />
         <StaggeredIconBtn delay={200}
           onClick={useXShare(result.archetype, articleId)}
           label="Share on X" icon={<XIcon />} />
@@ -48,32 +50,35 @@ export default function ShareOverlay({ result, articleId }: Props) {
 
 /* ─── Staggered icon button with fade-in ─────────────────── */
 
-function StaggeredIconBtn({ onClick, label, icon, delay }: {
-  onClick: () => void; label: string; icon: React.ReactNode; delay: number;
+function StaggeredIconBtn({ onClick, label, icon, delay, confirm }: {
+  onClick: () => void; label: string; icon: React.ReactNode;
+  delay: number; confirm?: boolean;
 }) {
   return (
     <div className="animate-fade-in" style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}>
-      <IconBtn onClick={onClick} label={label} icon={icon} />
+      <IconBtn onClick={onClick} label={label} icon={icon} confirm={confirm} />
     </div>
   );
 }
 
 /* ─── Icon button with tooltip ──────────────────────────── */
 
-function IconBtn({ onClick, label, icon }: {
-  onClick: () => void; label: string; icon: React.ReactNode;
+function IconBtn({ onClick, label, icon, confirm }: {
+  onClick: () => void; label: string; icon: React.ReactNode; confirm?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className="group relative w-12 h-12 rounded-lg border border-gold/20
-        text-gold/70 hover:text-gold hover:bg-gold/10
-        flex items-center justify-center transition-colors duration-hover"
+      className={`group relative w-12 h-12 rounded-sys-medium
+        border border-gold/20 text-gold/70
+        hover:text-gold hover:bg-gold/10 hover:border-gold/40
+        flex items-center justify-center transition-all duration-hover
+        ${confirm ? 'mirror-share-confirm' : ''}`}
       aria-label={label}
     >
       {icon}
       <span className="pointer-events-none absolute -bottom-8 left-1/2
-        -translate-x-1/2 rounded-lg bg-void text-mist text-xs px-2 py-1
+        -translate-x-1/2 rounded-sys-medium bg-void text-mist text-xs px-2 py-1
         opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap">
         {label}
       </span>
@@ -130,7 +135,7 @@ function XIcon() {
 
 function DeepLink({ url }: { url: string }) {
   return (
-    <p className="text-mist/30 text-xs mt-2 max-w-card-body truncate text-center">
+    <p className="text-mist/30 text-sys-micro mt-2 max-w-card-body truncate text-center">
       {url}
     </p>
   );
@@ -146,20 +151,20 @@ function useSaveImage(result: QuickMirrorResult) {
 }
 
 function useCopyText(
-  archetype: string, articleId: string | undefined,
+  archetype: ArchetypeKey, articleId: string | undefined,
   setCopied: (v: boolean) => void,
 ) {
   return useCallback(async () => {
-    const text = generateShareText(archetype as never, articleId);
+    const text = generateShareText(archetype, articleId);
     await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }, [archetype, articleId, setCopied]);
 }
 
-function useXShare(archetype: string, articleId: string | undefined) {
+function useXShare(archetype: ArchetypeKey, articleId: string | undefined) {
   return useCallback(() => {
-    const url = generateXLink(archetype as never, articleId);
+    const url = generateXLink(archetype, articleId);
     window.open(url, 'share', 'width=600,height=400');
   }, [archetype, articleId]);
 }

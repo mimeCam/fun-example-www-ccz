@@ -22,6 +22,7 @@ import type { ContentBlock } from '@/lib/content/content-layers';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvider';
 import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
+import { safeGetItem } from '@/lib/utils/storage';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
@@ -41,9 +42,8 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const topics = article.tags ?? [];
 
   const { mirror } = useMirror();
-  const readCount = typeof window !== 'undefined'
-    ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}')).length
-    : 0;
+  const history = useMemo(() => loadHistory(), []);
+  const readCount = history.articleIds.length;
 
   // Quick Mirror fires after reader engagement — archetype from behavioral signals
   const quickMirror = useQuickMirror(params.id, readTime, topics);
@@ -94,21 +94,21 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const { isEngaged, refresh: refreshThermal } = useThermal();
   const { maxDepth } = useScrollDepth();
   const startTime = useRef(Date.now());
+  const maxDepthRef = useRef(maxDepth);
+  maxDepthRef.current = maxDepth;
 
   // Accumulate reading session into thermal history on unmount
   useEffect(() => {
     return () => {
       const dwell = (Date.now() - startTime.current) / 1000;
-      const h = accumulateArticle(loadHistory(), params.id, maxDepth, dwell);
+      const h = accumulateArticle(loadHistory(), params.id, maxDepthRef.current, dwell);
       saveHistory(h);
     };
-  }, [params.id, maxDepth]);
+  }, [params.id]);
 
   // Archetype-aware next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
-  const readArticleIds = typeof window !== 'undefined'
-    ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}'))
-    : [];
+  const readArticleIds = history.articleIds;
   const recommendation = bestRecommendation(article, allArticles, archetype, readArticleIds);
 
   return (

@@ -105,10 +105,10 @@ export const ARCHETYPE_COLORS: Record<ArchetypeKey, {
     shimmerTo: 'rgba(232, 143, 167, 0.5)',
   },
   'collector': {
-    hex: '#e6a23c',
+    hex: '#d4922a',
     border: 'border-l-amber',
-    shimmerFrom: 'rgba(230, 162, 60, 0.3)',
-    shimmerTo: 'rgba(230, 162, 60, 0.5)',
+    shimmerFrom: 'rgba(212, 146, 42, 0.3)',
+    shimmerTo: 'rgba(212, 146, 42, 0.5)',
   },
 };
 

@@ -136,6 +136,10 @@ const config: Config = {
         // Resonance drawer — ceremony, not form
         'slide-in-right': 'slideInRight 300ms var(--sys-ease-out)',
         'slide-out-right': 'slideInRight 150ms var(--sys-ease-settle) reverse',
+        // Mirror reveal — archetype label blur-to-sharp
+        'archetype-reveal': 'archetypeReveal 600ms cubic-bezier(0.0, 0.0, 0.2, 1) both',
+        'mirror-radius-breathe': 'mirrorRadiusBreathe 0.8s ease-in-out',
+        'share-confirm': 'shareConfirmFlash 300ms ease-out',
       },
       keyframes: {
         'bounce-subtle': {
@@ -201,6 +205,22 @@ const config: Config = {
         thermalDrift: {
           '0%, 100%': { transform: 'translateX(0)' },
           '50%': { transform: 'translateX(var(--token-drift-range))' },
+        },
+        // Mirror reveal — archetype label emergence (blur-to-sharp)
+        archetypeReveal: {
+          '0%': { opacity: '0', transform: 'translateY(4px) scale(0.98)', filter: 'blur(2px)' },
+          '60%': { opacity: '1', transform: 'translateY(0) scale(1)', filter: 'blur(0)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)', filter: 'blur(0)' },
+        },
+        // Mirror card — radius breathe during shimmer phase
+        mirrorRadiusBreathe: {
+          '0%, 100%': { borderRadius: 'calc(var(--sys-radius-wide) + var(--token-radius-soft))' },
+          '50%': { borderRadius: 'calc(var(--sys-radius-wide) + var(--token-radius-soft) + 4px)' },
+        },
+        // Share confirm — brief gold flash
+        shareConfirmFlash: {
+          '0%': { boxShadow: '0 0 0 0 rgba(240, 198, 116, 0.4)' },
+          '100%': { boxShadow: '0 0 12px 4px rgba(240, 198, 116, 0)' },
         },
       },
     },

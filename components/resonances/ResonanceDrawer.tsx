@@ -132,8 +132,8 @@ export function ResonanceDrawer({
                    animate-slide-in-right
                    flex flex-col overflow-y-auto"
         style={{
-          // Thermal-aware left border accent
-          borderLeftColor: 'var(--token-accent-opacity)',
+          // Thermal-aware left border accent — gold color, thermal opacity
+          borderLeftColor: 'var(--token-accent)',
         }}
       >
         {/* Header */}

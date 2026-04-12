@@ -155,13 +155,13 @@ function injectedPriority(layer: string): number {
 /** Archetype-specific hover border color for paragraph micro-feedback. */
 function archetypeHoverColor(key: ArchetypeKey | null): string {
   const map: Record<string, string> = {
-    "deep-diver": "rgba(78, 205, 196, 0.15)",
-    "explorer": "rgba(199, 125, 255, 0.15)",
-    "faithful": "rgba(157, 78, 221, 0.15)",
-    "resonator": "rgba(232, 143, 167, 0.15)",
-    "collector": "rgba(230, 162, 60, 0.15)",
+    "deep-diver": "var(--arch-deep-diver)",
+    "explorer": "var(--arch-explorer)",
+    "faithful": "var(--arch-faithful)",
+    "resonator": "var(--arch-resonator)",
+    "collector": "var(--arch-collector)",
   };
-  return map[key ?? ""] ?? "rgba(34, 34, 68, 0.10)";
+  return map[key ?? ""] ?? "var(--fog)";
 }
 
 /** Main renderer — iterates blocks, tracks core paragraph offset for IDs */

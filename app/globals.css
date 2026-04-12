@@ -44,7 +44,7 @@
 
   /* Static design tokens — never change with thermal state */
   --gold: #f0c674;
-  --amber: #e6a23c;     /* Collector archetype — distinct from thermal gold */
+  --amber: #d4922a;     /* Collector archetype — shifted from #e6a23c to separate from gold */
   --cyan: #4ecdc4;
   --rose: #e88fa7;
   --mist: #9494b8;
@@ -53,6 +53,14 @@
   --primary: #7b2cbf;
   --secondary: #9d4edd;
   --accent-violet: #c77dff;
+
+  /* Archetype identity tokens — single source of truth for all archetype colors.
+     Used by paragraph hover, mirror cards, extensions, and share cards. */
+  --arch-deep-diver: #4ecdc4;
+  --arch-explorer: #c77dff;
+  --arch-faithful: #9d4edd;
+  --arch-resonator: #e88fa7;
+  --arch-collector: #d4922a;    /* shifted from #e6a23c — separates from thermal gold */
 
   /* System tokens — spatial, temporal, easing, typography. Static constants.
      Never change with thermal state. Named for Tailwind mapping. */
@@ -215,6 +223,61 @@ body {
   transition: text-shadow 400ms ease-out;
 }
 
+/* ─── Mirror Reveal — Archetype-specific animations ────── */
+
+/* Blur-to-sharp archetype name emergence — "the mirror clearing".
+   600ms deceleration: subtle blur → crisp text. Camera focusing. */
+@keyframes archetypeReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+    filter: blur(2px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+/* Mirror card radius breathe — peaks during shimmer phase (+4px), settles back.
+   Synced to shimmer duration. Invisible consciously, card feels alive. */
+@keyframes mirrorRadiusBreathe {
+  0%, 100% {
+    border-radius: calc(var(--sys-radius-wide) + var(--token-radius-soft));
+  }
+  50% {
+    border-radius: calc(var(--sys-radius-wide) + var(--token-radius-soft) + 4px);
+  }
+}
+
+/* Archetype label — blur-to-sharp reveal */
+.mirror-archetype-label {
+  animation: archetypeReveal 600ms var(--sys-ease-out) both;
+}
+
+/* Card shimmer — archetype-colored glow + radius breathe */
+.mirror-card-shimmer {
+  animation:
+    mirrorRadiusBreathe 0.8s ease-in-out,
+    mirrorGlow 0.8s ease-in-out infinite;
+}
+
+/* Share action confirmation — brief gold flash */
+@keyframes shareConfirmFlash {
+  0% { box-shadow: 0 0 0 0 rgba(240, 198, 116, 0.4); }
+  100% { box-shadow: 0 0 12px 4px rgba(240, 198, 116, 0); }
+}
+
+.mirror-share-confirm {
+  animation: shareConfirmFlash 300ms ease-out;
+}
+
 /* slideUp, gemAppear, whisperShadow, thermalBreath/Glow/Drift —
    defined in tailwind.config.ts keyframes. Single source of truth: Tailwind config. */
 
@@ -294,15 +357,18 @@ body {
 /* ─── Paragraph Hover Micro-Feedback ────────────────── */
 
 /* Archetype-colored left-border on paragraph hover.
-   0.15 opacity — felt peripherally, not distracting.
+   Felt peripherally, not distracting.
+   Uses design tokens (--arch-*) with alpha overlay.
    Only on devices with hover capability (no mobile). */
 @media (hover: hover) {
   .stratified-content p[data-paragraph-id]:not([data-variant]) {
-    transition: border-color 200ms ease-in-out, padding-left 200ms ease-in-out;
+    transition: border-color var(--sys-time-hover) ease-in-out,
+                padding-left var(--sys-time-hover) ease-in-out;
   }
   .stratified-content p[data-paragraph-id]:not([data-variant]):hover {
     padding-left: 0.75rem;
-    border-left: 2px solid var(--archetype-hover-color, rgba(34, 34, 68, 0.10));
+    border-left: 2px solid var(--archetype-hover-color, var(--fog));
+    border-left-color: color-mix(in srgb, var(--archetype-hover-color, var(--fog)) 15%, transparent);
   }
 }
 

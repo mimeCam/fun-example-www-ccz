@@ -2,28 +2,18 @@
  * QuickMirrorCard — inline archetype reveal, placed at end-of-article.
  *
  * Animation phases: hidden → emergence → shimmer → reveal → rest.
- * Two-phase reveal: text appears first, share actions fade in after delay.
- * No auto-scroll — reader finds the card naturally on their next scroll.
- *
- * Timing tuned for reflective state (reader just finished reading):
- * slow, generous phases that arrive at reading pace.
+ * Uses useMirrorPhases for state machine, useMirrorPhases for timing.
+ * Archetype-specific: each archetype has its own shimmer color and personality.
  */
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import type { ArchetypeKey } from '@/types/content';
+import { useMirrorPhases, QUICK_TIMINGS, type Phase } from '@/lib/hooks/useMirrorPhases';
 import ShareOverlay from './ShareOverlay';
-
-const T_EMERGE  = 0;
-const T_SHIMMER = 800;
-const T_REVEAL  = 2000;
-const T_REST    = 4000;
-const T_SHARES  = T_REST + 1200;
-
-type Phase = 'hidden' | 'emergence' | 'shimmer' | 'reveal' | 'rest';
 
 interface Props {
   result: QuickMirrorResult;
@@ -31,42 +21,23 @@ interface Props {
 }
 
 export default function QuickMirrorCard({ result, articleId }: Props) {
-  const [phase, setPhase]         = useState<Phase>('hidden');
+  const { phase, showContent, showShares } = useMirrorPhases(QUICK_TIMINGS);
   const [dismissed, setDismissed] = useState(false);
-  const [showShares, setShowShares] = useState(false);
-
-  useEffect(() => {
-    const ids = [
-      setTimeout(() => setPhase('emergence'), T_EMERGE),
-      setTimeout(() => setPhase('shimmer'),   T_SHIMMER),
-      setTimeout(() => setPhase('reveal'),    T_REVEAL),
-      setTimeout(() => setPhase('rest'),      T_REST),
-      setTimeout(() => setShowShares(true),   T_SHARES),
-    ];
-    return () => ids.forEach(clearTimeout);
-  }, []);
+  const colors = ARCHETYPE_COLORS[(result.archetype as ArchetypeKey) ?? 'collector'];
 
   if (dismissed) return (
     <div className="my-sys-8 mx-auto max-w-divider h-px bg-gold/20 rounded-full" />
   );
 
-  const showContent = phase === 'reveal' || phase === 'rest';
-  const colors = ARCHETYPE_COLORS[(result.archetype as ArchetypeKey) ?? 'collector'];
-
   return (
-    <div className={`${cardBase()} ${phaseClass(phase, colors)}`}>
+    <div className={`${cardBase()} ${phaseClass(phase)}`}
+      style={shimmerStyle(phase, colors)}>
       <DismissBtn onDismiss={() => setDismissed(true)} />
-      <RevealLabel visible={showContent} />
-      <ArchetypeName
-        label={result.archetypeLabel}
-        visible={showContent}
-        color={colors.hex}
-      />
+      <RevealLabel visible={showContent} color={colors.hex} />
+      <ArchetypeName label={result.archetypeLabel} visible={showContent} color={colors.hex} />
       <WhisperQuote text={result.whisper} visible={showContent} />
       <GoldDivider visible={showContent} color={colors.hex} />
-      {showShares && (
-        <ShareOverlay result={result} articleId={articleId} />
-      )}
+      {showShares && <ShareOverlay result={result} articleId={articleId} />}
     </div>
   );
 }
@@ -77,14 +48,15 @@ function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
   return (
     <button onClick={onDismiss}
       className="absolute top-sys-3 right-sys-3 text-mist/30 hover:text-mist/60
-        transition-colors duration-hover text-sys-lg leading-none"
+        transition-colors duration-hover text-sys-lg leading-none min-w-[48px] min-h-[48px]
+        flex items-center justify-center"
       aria-label="Dismiss">×</button>
   );
 }
 
-function RevealLabel({ visible }: { visible: boolean }) {
+function RevealLabel({ visible, color }: { visible: boolean; color: string }) {
   return (
-    <p className={fadeClass(visible)} style={fadeStyle(visible, 0)}>
+    <p className={fadeClass(visible)} style={{ ...fadeStyle(visible, 0), color }}>
       Because you stayed…
     </p>
   );
@@ -94,7 +66,8 @@ function ArchetypeName({ label, visible, color }: {
   label: string; visible: boolean; color: string;
 }) {
   return (
-    <h2 className={`mt-sys-3 text-sys-h2 font-sys-display font-bold tracking-tight ${fadeClass(visible)}`}
+    <h2 className={`mt-sys-3 text-sys-h2 font-display font-bold tracking-tight
+      ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
       style={{ ...fadeStyle(visible, 150), color: visible ? color : undefined }}>
       {label}
     </h2>
@@ -127,15 +100,21 @@ function cardBase(): string {
     + ' transition-all duration-reveal ease-out';
 }
 
-function phaseClass(p: Phase, colors: { shimmerFrom: string; shimmerTo: string }): string {
+function phaseClass(p: Phase): string {
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-80 translate-y-0 border-gold/10',
-    shimmer:   `opacity-100 translate-y-0 border-gold/20 shadow-gold`,
+    shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
     reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-gold',
     rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
   return map[p];
+}
+
+/** Archetype-colored box-shadow during shimmer — each archetype glows its own color. */
+function shimmerStyle(p: Phase, colors: { shimmerTo: string }): React.CSSProperties {
+  if (p !== 'shimmer') return {};
+  return { boxShadow: `0 12px 60px ${colors.shimmerTo}` };
 }
 
 function fadeClass(visible: boolean): string {
