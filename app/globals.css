@@ -32,6 +32,23 @@
   --token-para-rhythm: 0px;
   --token-text-glow: none;
 
+  /* Spacing lift tokens — thermal-interpolated additive spacing.
+     Zero at dormant, grows with warmth via computeSpacingTokens().
+     The 0px fallback in --sys-space-* calc() means the site works
+     even if ThermalProvider never runs (SSR, JS disabled). */
+  --token-space-lift-1: 0px;
+  --token-space-lift-2: 0px;
+  --token-space-lift-3: 0px;
+  --token-space-lift-4: 0px;
+  --token-space-lift-5: 0px;
+  --token-space-lift-6: 0px;
+  --token-space-lift-7: 0px;
+  --token-space-lift-8: 0px;
+  --token-space-lift-9: 0px;
+  --token-space-lift-10: 0px;
+  --token-space-lift-11: 0px;
+  --token-space-lift-12: 0px;
+
   /* Animation tokens — ThermalProvider sets these at runtime.
      '0' = animation disabled (dormant state). */
   --token-breath-speed: 0;
@@ -82,19 +99,22 @@
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
   --sys-ease-settle: cubic-bezier(0.0, 0.0, 0.2, 0.5);
 
-  /* ─── Spacing Scale (12 steps, rem-based) ─────────────── */
-  --sys-space-1:  0.25rem;    /*  4px — tight: icon gaps, inline padding */
-  --sys-space-2:  0.375rem;   /*  6px — compact: badge padding, dot margins */
-  --sys-space-3:  0.5rem;     /*  8px — small: button padding, list gaps */
-  --sys-space-4:  0.75rem;    /* 12px — medium: card internal gaps, borders */
-  --sys-space-5:  1rem;       /* 16px — standard: card padding, section gaps */
-  --sys-space-6:  1.25rem;    /* 20px — comfortable: card padding default */
-  --sys-space-7:  1.5rem;     /* 24px — generous: section margins */
-  --sys-space-8:  2rem;       /* 32px — section: inter-block breathing room */
-  --sys-space-9:  2.5rem;     /* 40px — spacious: hero spacing */
-  --sys-space-10: 3rem;       /* 48px — dramatic: major sections */
-  --sys-space-11: 4rem;       /* 64px — monumental: page rhythm */
-  --sys-space-12: 6rem;       /* 96px — expansive: hero-level */
+  /* ─── Spacing Scale (12 steps, thermal-interpolated) ─── */
+  /* Base values + thermal lift. The lift grows with warmth score:
+     dormant = base only. Luminous = base + up to 8px (macro steps).
+     The calc() trick: constants become minimums, not absolutes. */
+  --sys-space-1:  calc(0.25rem  + var(--token-space-lift-1,  0px));  /*  4px+ — tight */
+  --sys-space-2:  calc(0.375rem + var(--token-space-lift-2,  0px));  /*  6px+ — compact */
+  --sys-space-3:  calc(0.5rem   + var(--token-space-lift-3,  0px));  /*  8px+ — small */
+  --sys-space-4:  calc(0.75rem  + var(--token-space-lift-4,  0px));  /* 12px+ — medium */
+  --sys-space-5:  calc(1rem     + var(--token-space-lift-5,  0px));  /* 16px+ — standard */
+  --sys-space-6:  calc(1.25rem  + var(--token-space-lift-6,  0px));  /* 20px+ — comfortable */
+  --sys-space-7:  calc(1.5rem   + var(--token-space-lift-7,  0px));  /* 24px+ — generous */
+  --sys-space-8:  calc(2rem     + var(--token-space-lift-8,  0px));  /* 32px+ — section */
+  --sys-space-9:  calc(2.5rem   + var(--token-space-lift-9,  0px));  /* 40px+ — spacious */
+  --sys-space-10: calc(3rem     + var(--token-space-lift-10, 0px));  /* 48px+ — dramatic */
+  --sys-space-11: calc(4rem     + var(--token-space-lift-11, 0px));  /* 64px+ — monumental */
+  --sys-space-12: calc(6rem     + var(--token-space-lift-12, 0px));  /* 96px+ — expansive */
 
   /* ─── Typography Scale ────────────────────────────────── */
   --sys-text-micro:  0.75rem;    /* 12px — badges, slot indicators */
@@ -175,8 +195,8 @@ body {
 }
 
 /* Paragraph spacing opens up as the site warms.
-   spacing-breath (0→10px) + para-rhythm (0→8px) = 0→18px total additive gap.
-   18px ceiling — generous but not excessive for long-form reading. */
+   spacing-breath (0→14px) + para-rhythm (0→12px) = 0→26px total additive gap.
+   26px ceiling — generous but not excessive for long-form reading. */
 .thermal-typography p {
   margin-bottom: calc(0.75rem + var(--token-spacing-breath) + var(--token-para-rhythm));
 }
@@ -201,6 +221,15 @@ body {
 .thermal-radius-wide {
   border-radius: calc(var(--sys-radius-wide) + var(--token-radius-soft));
   transition: border-radius 2.5s ease-out;
+}
+
+/* Thermal space transition — spacing properties settle smoothly.
+   1s — slower than hover, faster than color shift.
+   Space should feel like it's settling, not popping.
+   Apply to containers using p-sys-*, gap-sys-*, m-sys-*. */
+.thermal-space {
+  transition: padding var(--sys-time-linger) var(--sys-ease-out),
+              gap var(--sys-time-linger) var(--sys-ease-out);
 }
 
 /* Dormant state "lit candle" — visible gold glow on CTA elements.

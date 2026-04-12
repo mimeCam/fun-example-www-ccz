@@ -39,9 +39,16 @@ const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
 // Font-weight crosses JND: 400→450 is one grade shift that the reader feels
 // as "the text gained confidence". 400→420 was literally imperceptible.
 // Combined with letter-spacing and para-rhythm, creates cumulative warmth.
-const FONT_WEIGHT = { dormant: 400, warm: 450 };          // crosses JND
-const LETTER_SPACING = { dormant: -0.01, warm: 0.01 };    // em — tight→open
-const PARA_RHYTHM = { dormant: 0, warm: 8 };              // px — additive para gap
+const FONT_WEIGHT = { dormant: 400, warm: 500 };          // crosses JND — text gains confidence
+const LETTER_SPACING = { dormant: -0.01, warm: 0.02 };    // em — wider opening, visible relaxation
+const PARA_RHYTHM = { dormant: 0, warm: 12 };             // px — paragraphs breathe open
+
+// Spacing lift — scale-aware thermal interpolation for --sys-space-* tokens.
+// Larger spacing steps get proportionally more lift via sqrt(N/6).
+// Dormant (score < 18) = zero lift. The room doesn't expand for strangers.
+const SPACING_LIFT_MAX = 5.66;   // calibrates to 8px max lift at step 12
+const SPACING_SCALE_REF = 6;     // normalization reference step
+const SPACING_THRESHOLD = 18;    // dormant cutoff — zero lift below this
 
 // ─── HSL interpolation ────────────────────────────────────
 
@@ -113,7 +120,7 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-glow': glowValue(t),
     '--token-shadow': shadowValue(t),
     '--token-border': lerpColor(BORDER.dormant, BORDER.warm, t),
-    '--token-spacing-breath': `${Math.round(t * 10)}px`,
+    '--token-spacing-breath': `${Math.round(t * 14)}px`,
     // Typography — line-height breathing (perceptible 3.5px total delta)
     '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, t).toFixed(3),
     // Shadow depth — continuous alpha scaling
@@ -127,6 +134,7 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, t).toFixed(3)}em`,
     '--token-para-rhythm': `${Math.round(lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, t))}px`,
     '--token-text-glow': textGlowValue(t),
+    ...computeSpacingTokens(score),
   };
 }
 
@@ -146,9 +154,27 @@ function shadowValue(t: number): string {
 }
 
 /** Text glow — warm gold shadow on .thermal-typography, only at warm+.
- *  Alpha capped at 0.05 — peripheral warmth, not "glowing text". */
+ *  Alpha capped at 0.12 — perceivable peripheral warmth (was 0.05, below JND). */
 function textGlowValue(t: number): string {
   if (t < 0.5) return 'none';
-  const alpha = Math.min(0.05, t * 0.06).toFixed(3);
+  const alpha = Math.min(0.12, t * 0.10).toFixed(3);
   return `0 0 40px rgba(240,198,116,${alpha})`;
+}
+
+// ─── Spacing interpolation ────────────────────────────────
+
+/** Compute 12 spacing-lift tokens from a thermal score.
+ *  Each step gets lift proportional to sqrt(N/6) — macro opens more than micro.
+ *  Returns { '--token-space-lift-1': '0px', ..., '--token-space-lift-12': 'Xpx' } */
+export function computeSpacingTokens(score: number): Record<string, string> {
+  const t = score < SPACING_THRESHOLD ? 0
+    : (score - SPACING_THRESHOLD) / (100 - SPACING_THRESHOLD);
+  return Object.fromEntries(
+    Array.from({ length: 12 }, (_, i) => spacingLiftEntry(i + 1, t)),
+  );
+}
+
+function spacingLiftEntry(n: number, t: number): [string, string] {
+  const lift = t * SPACING_LIFT_MAX * Math.sqrt(n / SPACING_SCALE_REF);
+  return [`--token-space-lift-${n}`, `${lift.toFixed(2)}px`];
 }

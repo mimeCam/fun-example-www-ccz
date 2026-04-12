@@ -20,8 +20,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## WIP
 - [ ] Remaining component migrations: articles page listing, mirror page empty state, ReturnLetter body
-- [ ] Thermal interpolation of spacing tokens (--sys-space-* shift with score)
-- [ ] Migrate PortalHero title to system typography
+- [x] Thermal interpolation of spacing tokens (--sys-space-* shift with score)
+- [x] Migrate PortalHero title to system typography
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

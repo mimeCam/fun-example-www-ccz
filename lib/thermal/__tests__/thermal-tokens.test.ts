@@ -58,6 +58,7 @@ describe('computeThermalTokens — output tokens', () => {
     for (const key of TOKEN_KEYS) {
       expect(SRC).toContain(`'${key}'`);
     }
+    // Plus 12 spacing lift tokens (verified in spacing describe block)
   });
 
   it('has typography anchors matching spec', () => {
@@ -140,22 +141,22 @@ describe('glowValue and shadowValue', () => {
 // ─── Typography depth token tests ──────────────────────────
 
 describe('thermal-tokens — typography depth anchors', () => {
-  it('has FONT_WEIGHT anchors (400 → 450, crosses JND)', () => {
+  it('has FONT_WEIGHT anchors (400 → 500, crosses JND)', () => {
     expect(SRC).toContain('FONT_WEIGHT');
     expect(SRC).toContain('dormant: 400');
-    expect(SRC).toContain('warm: 450');
+    expect(SRC).toContain('warm: 500');
   });
 
-  it('has LETTER_SPACING anchors (-0.01em → +0.01em)', () => {
+  it('has LETTER_SPACING anchors (-0.01em → +0.02em)', () => {
     expect(SRC).toContain('LETTER_SPACING');
     expect(SRC).toContain('dormant: -0.01');
-    expect(SRC).toContain('warm: 0.01');
+    expect(SRC).toContain('warm: 0.02');
   });
 
-  it('has PARA_RHYTHM anchors (0px → 8px)', () => {
+  it('has PARA_RHYTHM anchors (0px → 12px)', () => {
     expect(SRC).toContain('PARA_RHYTHM');
     expect(SRC).toContain('dormant: 0');
-    expect(SRC).toContain('warm: 8');
+    expect(SRC).toContain('warm: 12');
   });
 
   it('emits --token-font-weight using lerp', () => {
@@ -185,11 +186,120 @@ describe('textGlowValue — warm-only text glow', () => {
     expect(SRC).toContain("if (t < 0.5) return 'none'");
   });
 
-  it('caps alpha at 0.05 — peripheral warmth', () => {
-    expect(SRC).toContain('0.05');
+  it('caps alpha at 0.12 — perceivable peripheral warmth', () => {
+    expect(SRC).toContain('0.12');
   });
 
   it('uses gold rgba for text glow', () => {
     expect(SRC).toContain('rgba(240,198,116,');
+  });
+});
+
+// ─── Spacing interpolation tests ─────────────────────────────
+
+import { computeSpacingTokens } from '@/lib/thermal/thermal-tokens';
+
+describe('computeSpacingTokens', () => {
+  it('returns 12 lift tokens with correct key names', () => {
+    const tokens = computeSpacingTokens(50);
+    for (let n = 1; n <= 12; n++) {
+      expect(tokens).toHaveProperty(`--token-space-lift-${n}`);
+    }
+    expect(Object.keys(tokens)).toHaveLength(12);
+  });
+
+  it('dormant score (0) produces all-zero lifts', () => {
+    const tokens = computeSpacingTokens(0);
+    for (let n = 1; n <= 12; n++) {
+      expect(tokens[`--token-space-lift-${n}`]).toBe('0.00px');
+    }
+  });
+
+  it('below-threshold score (17) produces all-zero lifts', () => {
+    const tokens = computeSpacingTokens(17);
+    for (let n = 1; n <= 12; n++) {
+      expect(tokens[`--token-space-lift-${n}`]).toBe('0.00px');
+    }
+  });
+
+  it('stirring score (25) produces non-zero lifts for larger steps', () => {
+    const tokens = computeSpacingTokens(25);
+    // Small steps should have minimal lift
+    expect(parseFloat(tokens['--token-space-lift-2'])).toBeLessThan(1.5);
+    // Large steps should have noticeable lift
+    expect(parseFloat(tokens['--token-space-lift-12'])).toBeGreaterThan(0);
+    expect(parseFloat(tokens['--token-space-lift-12'])).toBeLessThan(4);
+  });
+
+  it('warm score (60) produces meaningful lifts', () => {
+    const tokens = computeSpacingTokens(60);
+    const lift12 = parseFloat(tokens['--token-space-lift-12']);
+    expect(lift12).toBeGreaterThan(3);
+    expect(lift12).toBeLessThan(7);
+  });
+
+  it('luminous score (100) caps at ~8px for largest step', () => {
+    const tokens = computeSpacingTokens(100);
+    const lift12 = parseFloat(tokens['--token-space-lift-12']);
+    expect(lift12).toBeCloseTo(8.0, 0);
+    expect(lift12).toBeLessThanOrEqual(8.1);
+  });
+
+  it('larger steps get proportionally more lift than smaller ones', () => {
+    const tokens = computeSpacingTokens(70);
+    const lift2 = parseFloat(tokens['--token-space-lift-2']);
+    const lift8 = parseFloat(tokens['--token-space-lift-8']);
+    const lift12 = parseFloat(tokens['--token-space-lift-12']);
+    expect(lift8).toBeGreaterThan(lift2);
+    expect(lift12).toBeGreaterThan(lift8);
+  });
+
+  it('lifts are monotonically increasing with score', () => {
+    const scores = [20, 40, 60, 80, 100];
+    const lifts = scores.map(s => parseFloat(computeSpacingTokens(s)['--token-space-lift-8']));
+    for (let i = 1; i < lifts.length; i++) {
+      expect(lifts[i]).toBeGreaterThan(lifts[i - 1]);
+    }
+  });
+
+  it('all values are in px units', () => {
+    const tokens = computeSpacingTokens(50);
+    for (const val of Object.values(tokens)) {
+      expect(val).toMatch(/^\d+\.\d{2}px$/);
+    }
+  });
+
+  it('no lift exceeds 8.1px even at score 100', () => {
+    const tokens = computeSpacingTokens(100);
+    for (const val of Object.values(tokens)) {
+      expect(parseFloat(val)).toBeLessThanOrEqual(8.1);
+    }
+  });
+});
+
+// ─── Source inspection: spacing constants ─────────────────────
+
+describe('thermal-tokens — spacing constants in source', () => {
+  it('defines SPACING_LIFT_MAX constant', () => {
+    expect(SRC).toContain('SPACING_LIFT_MAX');
+    expect(SRC).toContain('5.66');
+  });
+
+  it('defines SPACING_THRESHOLD at 18 (dormant cutoff)', () => {
+    expect(SRC).toContain('SPACING_THRESHOLD');
+    expect(SRC).toContain('18');
+  });
+
+  it('exports computeSpacingTokens function', () => {
+    expect(SRC).toContain('export function computeSpacingTokens');
+  });
+
+  it('uses sqrt scale for proportional growth', () => {
+    expect(SRC).toContain('Math.sqrt');
+    expect(SRC).toContain('SPACING_SCALE_REF');
+  });
+
+  it('spacing-breath max is 14px', () => {
+    expect(SRC).toContain('t * 14');
   });
 });
