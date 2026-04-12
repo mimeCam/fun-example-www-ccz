@@ -203,6 +203,13 @@ body {
   will-change: box-shadow;
 }
 
+/* ─── Resonance Drawer ─────────────────────────────── */
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
 /* ─── Paragraph Hover Micro-Feedback ────────────────── */
 
 /* Archetype-colored left-border on paragraph hover.

@@ -87,6 +87,9 @@ const config: Config = {
         'thermal-breath': 'thermalBreath 4s ease-in-out infinite',
         'thermal-glow': 'thermalGlow 4s ease-in-out infinite',
         'thermal-drift': 'thermalDrift 6s ease-in-out infinite',
+        // Resonance drawer — ceremony, not form
+        'slide-in-right': 'slideInRight 300ms var(--sys-ease-out)',
+        'slide-out-right': 'slideInRight 150ms var(--sys-ease-settle) reverse',
       },
       keyframes: {
         'bounce-subtle': {

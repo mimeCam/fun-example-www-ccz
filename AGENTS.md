@@ -11,14 +11,14 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `components/content/StratifiedRenderer.tsx` — archetype variant renderer
 - `components/reading/GoldenThread.tsx` — vertical reading spine
 - `components/navigation/GemHome.tsx` — thermal-aware home link (quiet on article pages)
+- `components/resonances/ResonanceDrawer.tsx` — slide-in side panel for resonance capture
 
 ## Core Feature
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — a spine of light that climbs and glows.
 
 ## WIP
-- [ ] ResonanceButton: modal → slide-in side panel
 - [ ] QuickMirrorCard: move from mid-prose to end-of-section
-- [ ] Extract shared `GemIcon` component (3 copies of same SVG)
+- [ ] Extract shared `GemIcon` component (3 copies of same SVG — ResonanceDrawer added another)
 - [ ] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
 - [ ] Nav active state: thermal-aware dot indicator
 - [ ] Threshold duplication: thermal-score thresholds vs thermal-animation constants
