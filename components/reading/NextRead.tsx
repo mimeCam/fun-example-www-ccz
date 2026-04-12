@@ -56,7 +56,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
           Up Next
         </span>
         {label && (
-          <span className={`text-sys-micro tracking-wide font-sys-accent border rounded-sys-full px-2.5 py-0.5 ${ARCHETYPE_ACCENT[archetype!]}`}>
+          <span className={`text-sys-micro tracking-wide font-sys-accent border rounded-sys-full px-sys-3 py-sys-1 ${ARCHETYPE_ACCENT[archetype!]}`}>
             For the {label}
           </span>
         )}

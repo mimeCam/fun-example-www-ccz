@@ -21,5 +21,10 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## WIP
 _None_
 
+## Recent Changes
+- Design Token Compliance Pass (100% adoption): all radius, weight, typography, spacing tokens migrated from raw Tailwind to `sys-*` system tokens
+- Canvas generators (3 files) deduplicated: hardcoded hex → runtime CSS custom property reads
+- UX fixes: GoldenThread → `left-[3px]`, WhisperFooter → `pb-sys-12` to clear AmbientNav
+
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

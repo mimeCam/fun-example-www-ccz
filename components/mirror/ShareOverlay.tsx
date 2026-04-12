@@ -29,8 +29,8 @@ export default function ShareOverlay({ result, articleId }: Props) {
   const deepUrl = encodeDeepLink(result.archetype, articleId);
 
   return (
-    <div className="mt-4 flex flex-col items-center gap-3">
-      <div className="flex justify-center gap-4">
+    <div className="mt-sys-4 flex flex-col items-center gap-sys-3">
+      <div className="flex justify-center gap-sys-4">
         <StaggeredIconBtn delay={0}
           onClick={useSaveImage(result)}
           label="Save PNG" icon={<DownloadIcon />} />
@@ -78,7 +78,7 @@ function IconBtn({ onClick, label, icon, confirm }: {
     >
       {icon}
       <span className="pointer-events-none absolute -bottom-8 left-1/2
-        -translate-x-1/2 rounded-sys-medium bg-void text-mist text-xs px-2 py-1
+        -translate-x-1/2 rounded-sys-medium bg-void text-mist text-sys-micro px-sys-2 py-sys-1
         opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap">
         {label}
       </span>
@@ -135,7 +135,7 @@ function XIcon() {
 
 function DeepLink({ url }: { url: string }) {
   return (
-    <p className="text-mist/30 text-sys-micro mt-2 max-w-card-body truncate text-center">
+    <p className="text-mist/30 text-sys-micro mt-sys-2 max-w-card-body truncate text-center">
       {url}
     </p>
   );

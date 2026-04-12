@@ -2,6 +2,7 @@
  * ResonanceExport — Canvas-based PNG export of the reader's resonances.
  * Follows the pattern from quick-mirror-card-generator.ts: pure Canvas, zero deps.
  * Produces a 1080×1350 image (Instagram-portrait friendly).
+ * Colors resolved from CSS design tokens at runtime — single source of truth.
  */
 'use client';
 
@@ -11,12 +12,30 @@ import type { ResonanceWithArticle } from '@/types/resonance-display';
 const W = 1080;
 const H = 1350;
 const PAD = 80;
-const ROSE = '#e88fa7';
-const TEXT = '#f0f0f5';
-const MUTED = '#9494b8';
-const BG_START = '#1a1a2e';
-const BG_END = '#16213e';
-const GOLD = '#f0c674';
+
+interface Colors {
+  rose: string;
+  text: string;
+  muted: string;
+  bgStart: string;
+  bgEnd: string;
+  gold: string;
+}
+
+function cssToken(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function resolveColors(): Colors {
+  return {
+    rose: cssToken('--rose') || '#e88fa7',
+    text: cssToken('--token-foreground') || '#f0f0f5',
+    muted: cssToken('--mist') || '#9494b8',
+    bgStart: cssToken('--token-bg') || '#1a1a2e',
+    bgEnd: cssToken('--token-surface') || '#16213e',
+    gold: cssToken('--gold') || '#f0c674',
+  };
+}
 
 interface Props {
   resonances: ResonanceWithArticle[];
@@ -33,20 +52,20 @@ function initCanvas() {
   return { ctx, canvas };
 }
 
-function drawBg(ctx: CanvasRenderingContext2D) {
+function drawBg(ctx: CanvasRenderingContext2D, c: Colors) {
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, BG_START);
-  g.addColorStop(1, BG_END);
+  g.addColorStop(0, c.bgStart);
+  g.addColorStop(1, c.bgEnd);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
 }
 
-function drawHeader(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = ROSE;
+function drawHeader(ctx: CanvasRenderingContext2D, c: Colors) {
+  ctx.fillStyle = c.rose;
   ctx.font = '600 14px "Space Grotesk", sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('YOUR RESONANCES', W / 2, PAD);
-  ctx.fillStyle = TEXT;
+  ctx.fillStyle = c.text;
   ctx.font = '700 28px "Space Grotesk", sans-serif';
   ctx.fillText('The Book of You', W / 2, PAD + 38);
 }
@@ -58,52 +77,51 @@ function truncText(ctx: CanvasRenderingContext2D, text: string, maxW: number): s
   return t + '…';
 }
 
-function drawEntry(ctx: CanvasRenderingContext2D, r: ResonanceWithArticle, y: number): number {
+function drawEntry(ctx: CanvasRenderingContext2D, c: Colors, r: ResonanceWithArticle, y: number): number {
   const innerW = W - PAD * 2 - 40;
-  // Quote
   if (r.quote) {
-    ctx.fillStyle = `${TEXT}aa`;
+    ctx.fillStyle = `${c.text}aa`;
     ctx.font = 'italic 16px "Inter", sans-serif';
-    const q = truncText(ctx, `"${r.quote}"`, innerW);
-    ctx.fillText(q, PAD + 20, y);
+    ctx.fillText(truncText(ctx, `"${r.quote}"`, innerW), PAD + 20, y);
     y += 28;
   }
-  // Note
-  ctx.fillStyle = ROSE;
+  ctx.fillStyle = c.rose;
   ctx.font = 'italic 15px "Inter", sans-serif';
-  const note = truncText(ctx, r.resonanceNote, innerW);
-  ctx.fillText(note, PAD + 20, y);
+  ctx.fillText(truncText(ctx, r.resonanceNote, innerW), PAD + 20, y);
   y += 24;
-  // Article title
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = c.muted;
   ctx.font = '12px "Inter", sans-serif';
   ctx.fillText(truncText(ctx, r.articleTitle, innerW), PAD + 20, y);
   return y + 16;
 }
 
-function drawBranding(ctx: CanvasRenderingContext2D) {
-  ctx.fillStyle = `${MUTED}66`;
+function drawBranding(ctx: CanvasRenderingContext2D, c: Colors) {
+  ctx.fillStyle = `${c.muted}66`;
   ctx.font = '11px "Inter", sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('theanti.blog', W / 2, H - 40);
 }
 
+function drawSeparator(ctx: CanvasRenderingContext2D, c: Colors, y: number) {
+  ctx.strokeStyle = `${c.gold}44`;
+  ctx.beginPath();
+  ctx.moveTo(PAD + 20, y - 8);
+  ctx.lineTo(PAD + 120, y - 8);
+  ctx.stroke();
+}
+
 function generateImage(resonances: ResonanceWithArticle[]): string {
   const { ctx, canvas } = initCanvas();
-  drawBg(ctx);
-  drawHeader(ctx);
+  const c = resolveColors();
+  drawBg(ctx, c);
+  drawHeader(ctx, c);
   let y = PAD + 80;
   const maxEntries = Math.min(resonances.length, 5);
   for (let i = 0; i < maxEntries; i++) {
-    // Separator line
-    ctx.strokeStyle = `${GOLD}44`;
-    ctx.beginPath();
-    ctx.moveTo(PAD + 20, y - 8);
-    ctx.lineTo(PAD + 120, y - 8);
-    ctx.stroke();
-    y = drawEntry(ctx, resonances[i], y);
+    drawSeparator(ctx, c, y);
+    y = drawEntry(ctx, c, resonances[i], y);
   }
-  drawBranding(ctx);
+  drawBranding(ctx, c);
   return canvas.toDataURL('image/png');
 }
 
@@ -119,8 +137,8 @@ export default function ResonanceExport({ resonances }: Props) {
   return (
     <div className="text-center">
       <button onClick={handleExport}
-        className="px-5 py-2.5 bg-surface border border-fog/40 text-mist text-sm
-          rounded-lg hover:border-rose/40 hover:text-rose transition-all duration-enter">
+        className="px-sys-5 py-sys-3 bg-surface border border-fog/40 text-mist text-sys-caption
+          rounded-sys-medium hover:border-rose/40 hover:text-rose transition-all duration-enter">
         Export as Image
       </button>
     </div>

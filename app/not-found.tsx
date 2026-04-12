@@ -15,11 +15,11 @@ export default function NotFound() {
     <main className="min-h-screen flex flex-col bg-background">
       <GemHome />
 
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <GemIcon size="lg" className="text-mist/20 mb-8" />
+      <div className="flex-1 flex flex-col items-center justify-center px-sys-6">
+        <GemIcon size="lg" className="text-mist/20 mb-sys-8" />
         <Title />
         <Subtitle />
-        <div className="mt-8 flex flex-col items-center gap-4">
+        <div className="mt-sys-8 flex flex-col items-center gap-sys-4">
           <ThresholdLink />
           <ArticlesLink />
         </div>
@@ -32,7 +32,7 @@ export default function NotFound() {
 
 function Title() {
   return (
-    <h1 className="font-display text-2xl font-bold text-foreground text-center">
+    <h1 className="font-display text-sys-h2 font-sys-display text-foreground text-center">
       This page hasn&apos;t formed yet.
     </h1>
   );
@@ -40,7 +40,7 @@ function Title() {
 
 function Subtitle() {
   return (
-    <p className="text-mist/60 text-base text-center mt-3 max-w-sm leading-relaxed">
+    <p className="text-mist/60 text-sys-body text-center mt-sys-3 max-w-sm leading-relaxed">
       The Threshold doesn&apos;t have a page here.
       But the right page is waiting for you.
     </p>
@@ -50,7 +50,7 @@ function Subtitle() {
 function ThresholdLink() {
   return (
     <Link href="/"
-      className="px-6 py-3 rounded-lg border border-gold/40 text-gold text-sm
+      className="px-sys-6 py-sys-3 rounded-sys-medium border border-gold/30 text-gold text-sys-caption
         hover:bg-gold/10 transition-colors duration-hover">
       Return to the Threshold →
     </Link>
@@ -60,7 +60,7 @@ function ThresholdLink() {
 function ArticlesLink() {
   return (
     <Link href="/articles"
-      className="text-mist/50 text-sm hover:text-mist transition-colors">
+      className="text-mist/50 text-sys-caption hover:text-mist transition-colors">
       Or browse articles →
     </Link>
   );

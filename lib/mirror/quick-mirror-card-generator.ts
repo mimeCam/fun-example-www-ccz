@@ -3,6 +3,7 @@
  * Renders a QuickMirrorResult as a 1080×1080 branded PNG via Canvas API.
  * Archetype-specific colors flow through: text, bars, dividers, glow.
  * No external deps — pure client-side Canvas.
+ * Colors resolved from CSS design tokens at runtime — single source of truth.
  */
 
 import type { QuickMirrorResult } from './quick-synthesize';
@@ -13,32 +14,55 @@ import { initCanvas, wrapLines } from '@/lib/utils/canvas';
 const W = 1080;
 const H = 1080;
 const PAD = 100;
-const TEXT = '#f0f0f5';
-const MUTED = '#94a3b8';
+
+interface CanvasColors {
+  text: string;
+  muted: string;
+  barBg: string;
+  brand: string;
+  bgStart: string;
+  bgEnd: string;
+}
+
+function cssToken(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function resolveColors(): CanvasColors {
+  return {
+    text: cssToken('--token-foreground') || '#f0f0f5',
+    muted: cssToken('--mist') || '#94a3b8',
+    barBg: '#334155',
+    brand: '#4b5563',
+    bgStart: '#0f172a',
+    bgEnd: cssToken('--token-bg') || '#1a1a2e',
+  };
+}
 
 /* ─── Public API ─────────────────────────────────────────── */
 
 export function generateQuickMirrorCard(result: QuickMirrorResult): string {
   const { ctx, canvas } = initCanvas(W, H);
+  const c = resolveColors();
   const ac = ARCHETYPE_COLORS[(result.archetype as ArchetypeKey) ?? 'collector'];
-  drawBackground(ctx, ac);
+  drawBackground(ctx, c, ac);
   drawLabel(ctx, ac);
   drawArchetype(ctx, result.archetypeLabel, ac);
-  drawWhisper(ctx, result.whisper);
+  drawWhisper(ctx, c, result.whisper);
   drawDivider(ctx, 460, ac);
-  drawScoreBars(ctx, result.scores, ac);
+  drawScoreBars(ctx, c, result.scores, ac);
   drawDivider(ctx, 700, ac);
-  drawConfidence(ctx, result.confidence, ac);
-  drawBranding(ctx);
+  drawConfidence(ctx, c, result.confidence, ac);
+  drawBranding(ctx, c);
   return canvas.toDataURL('image/png');
 }
 
 /* ─── Drawing helpers (each ≤ 8 lines) ──────────────────── */
 
-function drawBackground(ctx: CanvasRenderingContext2D, ac: { hex: string }): void {
+function drawBackground(ctx: CanvasRenderingContext2D, c: CanvasColors, ac: { hex: string }): void {
   const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#0f172a');
-  g.addColorStop(1, '#1a1a2e');
+  g.addColorStop(0, c.bgStart);
+  g.addColorStop(1, c.bgEnd);
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
   drawCornerGlow(ctx, ac);
@@ -66,9 +90,9 @@ function drawArchetype(ctx: CanvasRenderingContext2D, label: string, ac: { hex: 
   ctx.fillText(label, W / 2, 280);
 }
 
-function drawWhisper(ctx: CanvasRenderingContext2D, whisper: string): void {
+function drawWhisper(ctx: CanvasRenderingContext2D, c: CanvasColors, whisper: string): void {
   ctx.font = 'italic 26px Georgia, serif';
-  ctx.fillStyle = '#d1d5db';
+  ctx.fillStyle = c.text;
   ctx.textAlign = 'center';
   const lines = wrapLines(ctx, `\u201C${whisper}\u201D`, W - PAD * 2);
   lines.forEach((line, i) => ctx.fillText(line, W / 2, 360 + i * 40));
@@ -84,19 +108,19 @@ function drawDivider(ctx: CanvasRenderingContext2D, y: number, ac: { hex: string
   ctx.stroke();
 }
 
-function drawScoreBars(ctx: CanvasRenderingContext2D, scores: QuickMirrorResult['scores'], ac: { hex: string }): void {
+function drawScoreBars(ctx: CanvasRenderingContext2D, c: CanvasColors, scores: QuickMirrorResult['scores'], ac: { hex: string }): void {
   const entries = Object.entries(scores) as [string, number][];
-  entries.forEach(([key, val], i) => drawOneBar(ctx, key, val, 500 + i * 65, ac));
+  entries.forEach(([key, val], i) => drawOneBar(ctx, c, key, val, 500 + i * 65, ac));
 }
 
-function drawOneBar(ctx: CanvasRenderingContext2D, label: string, val: number, y: number, ac: { hex: string }): void {
+function drawOneBar(ctx: CanvasRenderingContext2D, c: CanvasColors, label: string, val: number, y: number, ac: { hex: string }): void {
   const barW = W - PAD * 2;
   const barH = 10;
   ctx.font = '18px system-ui, sans-serif';
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = c.muted;
   ctx.textAlign = 'left';
   ctx.fillText(`${cap(label)}: ${val}%`, PAD, y);
-  ctx.fillStyle = '#334155';
+  ctx.fillStyle = c.barBg;
   ctx.fillRect(PAD, y + 10, barW, barH);
   const g = ctx.createLinearGradient(PAD, 0, PAD + barW, 0);
   g.addColorStop(0, hexToRgba(ac.hex, 0.7));
@@ -105,20 +129,20 @@ function drawOneBar(ctx: CanvasRenderingContext2D, label: string, val: number, y
   ctx.fillRect(PAD, y + 10, barW * (val / 100), barH);
 }
 
-function drawConfidence(ctx: CanvasRenderingContext2D, confidence: number, ac: { hex: string }): void {
+function drawConfidence(ctx: CanvasRenderingContext2D, c: CanvasColors, confidence: number, ac: { hex: string }): void {
   const y = 750;
   ctx.font = '24px system-ui, sans-serif';
   ctx.fillStyle = ac.hex;
   ctx.textAlign = 'center';
   ctx.fillText('\u25CF  \u25CF  \u25CF', W / 2, y);
   ctx.font = '18px system-ui, sans-serif';
-  ctx.fillStyle = MUTED;
+  ctx.fillStyle = c.muted;
   ctx.fillText(`${confidence}% confidence`, W / 2, y + 36);
 }
 
-function drawBranding(ctx: CanvasRenderingContext2D): void {
+function drawBranding(ctx: CanvasRenderingContext2D, c: CanvasColors): void {
   ctx.font = '14px system-ui, sans-serif';
-  ctx.fillStyle = '#4b5563';
+  ctx.fillStyle = c.brand;
   ctx.textAlign = 'center';
   ctx.fillText('theanti.blog', W / 2, H - 40);
 }

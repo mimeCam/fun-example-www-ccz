@@ -20,7 +20,7 @@ const ReturnLetter = dynamic(
 
 export default function ReturningPortal() {
   return (
-    <div className="mb-8 animate-fade-in">
+    <div className="mb-sys-8 animate-fade-in">
       <ReturnLetter />
     </div>
   );

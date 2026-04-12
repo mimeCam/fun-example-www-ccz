@@ -37,9 +37,9 @@ export default function ReadingInvitation(
   return (
     <div className="text-center mt-sys-10 mb-sys-11">
       <Link href={`/article/${articleId}`}
-        className="inline-block px-8 py-3.5 thermal-radius
+        className="inline-block px-sys-8 py-sys-4 thermal-radius
           bg-gold/10 border border-gold/20 text-gold
-          font-display font-semibold text-sys-lg
+          font-display font-sys-heading text-sys-lg
           hover:bg-gold/20 hover:border-gold/40 hover:shadow-gold
           hover:-translate-y-micro active:translate-y-0
           transition-all duration-enter

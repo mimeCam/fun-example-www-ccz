@@ -66,7 +66,7 @@ function ArchetypeName({ label, visible, color }: {
   label: string; visible: boolean; color: string;
 }) {
   return (
-    <h2 className={`mt-sys-3 text-sys-h2 font-display font-bold tracking-tight
+    <h2 className={`mt-sys-3 text-sys-h2 font-display font-sys-display tracking-tight
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
       style={{ ...fadeStyle(visible, 150), color: visible ? color : undefined }}>
       {label}

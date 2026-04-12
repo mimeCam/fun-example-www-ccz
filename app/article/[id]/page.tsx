@@ -161,7 +161,7 @@ function TopBar({ articleId, title }: { articleId: string; title: string }) {
 function ArticleHeader({ title, readTime }: { title: string; readTime: number }) {
   return (
     <header className="mb-sys-8 text-center">
-      <h1 className="font-display text-sys-h2 font-bold text-foreground leading-tight tracking-tight">
+      <h1 className="font-display text-sys-h2 font-sys-display text-foreground leading-tight tracking-tight">
         {title}
       </h1>
       <p className="text-mist text-sys-caption mt-sys-3">{readTime} min read</p>

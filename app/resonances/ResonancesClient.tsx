@@ -112,7 +112,7 @@ function SlotIndicator({ used, total }: { used: number; total: number }) {
         {Array.from({ length: total }, (_, i) =>
           i < used ? '◆' : '◇'
         ).join('')}
-        <span className="ml-2">{used} of {total} resonances</span>
+        <span className="ml-sys-2">{used} of {total} resonances</span>
       </p>
       {used >= total && (
         <p className="text-sys-micro text-gold/70 mt-sys-1">
@@ -167,7 +167,7 @@ export default function ResonancesClient() {
     <div className="max-w-md mx-auto pt-sys-11 text-center">
       <GemHome />
       <GemIcon size="lg" className="mx-auto text-mist/30 mb-sys-8" />
-      <h1 className="text-2xl font-display font-sys-display text-foreground mb-sys-4">
+      <h1 className="text-sys-h2 font-display font-sys-display text-foreground mb-sys-4">
         Your chapter hasn&apos;t been written yet.
       </h1>
       <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
@@ -194,10 +194,10 @@ export default function ResonancesClient() {
 
       {/* Page title */}
       <div className="mb-sys-9">
-        <h1 className="text-[var(--token-accent)] text-3xl font-display font-sys-body lowercase">
+        <h1 className="text-[var(--token-accent)] text-sys-h3 font-display font-sys-body lowercase">
           the book of you
         </h1>
-        <p className="text-mist text-md italic mt-sys-1">What you&apos;re still carrying</p>
+        <p className="text-mist text-sys-body italic mt-sys-1">What you&apos;re still carrying</p>
       </div>
 
       {/* Carrying section — alive resonances */}
