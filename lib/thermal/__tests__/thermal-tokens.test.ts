@@ -140,10 +140,10 @@ describe('glowValue and shadowValue', () => {
 // ─── Typography depth token tests ──────────────────────────
 
 describe('thermal-tokens — typography depth anchors', () => {
-  it('has FONT_WEIGHT anchors (400 → 420, one grade shift)', () => {
+  it('has FONT_WEIGHT anchors (400 → 450, crosses JND)', () => {
     expect(SRC).toContain('FONT_WEIGHT');
     expect(SRC).toContain('dormant: 400');
-    expect(SRC).toContain('warm: 420');
+    expect(SRC).toContain('warm: 450');
   });
 
   it('has LETTER_SPACING anchors (-0.01em → +0.01em)', () => {
@@ -152,10 +152,10 @@ describe('thermal-tokens — typography depth anchors', () => {
     expect(SRC).toContain('warm: 0.01');
   });
 
-  it('has PARA_RHYTHM anchors (0px → 6px)', () => {
+  it('has PARA_RHYTHM anchors (0px → 8px)', () => {
     expect(SRC).toContain('PARA_RHYTHM');
     expect(SRC).toContain('dormant: 0');
-    expect(SRC).toContain('warm: 6');
+    expect(SRC).toContain('warm: 8');
   });
 
   it('emits --token-font-weight using lerp', () => {

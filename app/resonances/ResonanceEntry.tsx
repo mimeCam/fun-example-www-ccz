@@ -24,20 +24,20 @@ function CardGem({ faded }: { faded?: boolean }) {
 /** Vitality bar — rose gradient for alive, empty for faded. */
 function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean }) {
   if (faded) return (
-    <div className="h-1.5 rounded-full bg-fog/30 w-full" />
+    <div className="h-1.5 rounded-sys-full bg-fog/30 w-full" />
   );
 
   const pct = Math.min(100, Math.round((vitality / 30) * 100));
   return (
-    <div className="h-1.5 rounded-full bg-fog/30 w-full overflow-hidden">
-      <div className="h-full rounded-full bg-gradient-to-r from-rose to-rose/60 transition-all duration-500"
+    <div className="h-1.5 rounded-sys-full bg-fog/30 w-full overflow-hidden">
+      <div className="h-full rounded-sys-full bg-gradient-to-r from-rose to-rose/60 transition-all duration-500"
         style={{ width: `${pct}%` }} />
     </div>
   );
 }
 
 export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine }: Props) {
-  const base = 'rounded-lg p-6 my-8 transition-all duration-enter';
+  const base = 'rounded-sys-medium p-sys-7 my-sys-8 transition-all duration-enter';
   const alive = 'bg-surface/60 border-l-4 border-rose shadow-rose-glow';
   const dimmed = 'bg-surface/30 border-l-4 border-rose/30 opacity-60';
   const cls = `${base} ${faded ? dimmed : alive}`;
@@ -45,49 +45,49 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
   return (
     <div className={cls}>
       {/* Label */}
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-sys-3 mb-sys-4">
         <CardGem faded={faded} />
-        <span className="text-xs uppercase tracking-widest text-mist">
+        <span className="text-sys-micro uppercase tracking-widest text-mist">
           {faded ? 'Faded' : 'Something that stayed with you'}
         </span>
       </div>
 
       {/* Captured quote */}
       {resonance.quote && (
-        <p className="text-foreground/70 italic text-[0.9375rem] max-w-prose-sm mb-3">
+        <p className="text-foreground/70 italic text-sys-body max-w-prose-sm mb-sys-4">
           &ldquo;{resonance.quote}&rdquo;
         </p>
       )}
 
       {/* Gold divider */}
-      <div className="h-px max-w-divider bg-gold/20 mb-3" />
+      <div className="h-px max-w-divider bg-gold/20 mb-sys-4" />
 
       {/* Reader's note */}
-      <p className="text-rose italic text-[0.9375rem] leading-[1.7] mb-4">
+      <p className="text-rose italic text-sys-body leading-[var(--token-line-height)] mb-sys-5">
         {resonance.resonanceNote}
       </p>
 
       {/* Fog divider */}
-      <div className="h-px bg-fog mb-3" />
+      <div className="h-px bg-fog mb-sys-4" />
 
       {/* Article link + metadata */}
       <Link href={`/article/${resonance.articleId}`}
-        className="text-primary hover:text-accent transition-colors text-sm font-medium">
+        className="text-primary hover:text-accent transition-colors text-sys-caption font-sys-accent">
         {resonance.articleTitle}
       </Link>
 
-      <p className="text-mist/50 text-xs mt-1">
+      <p className="text-mist/50 text-sys-micro mt-sys-1">
         {timeAgo}
       </p>
 
       {/* Vitality bar */}
-      <div className="mt-3">
+      <div className="mt-sys-4">
         <VitalityBar vitality={resonance.vitality} faded={faded} />
       </div>
 
       {/* Closing line — farewell for shaped resonances */}
       {faded && closingLine && (
-        <p className="mt-4 text-gold/50 italic text-xs leading-relaxed">
+        <p className="mt-sys-5 text-gold/50 italic text-sys-micro leading-relaxed">
           {closingLine}
         </p>
       )}

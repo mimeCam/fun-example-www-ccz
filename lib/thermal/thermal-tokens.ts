@@ -36,11 +36,12 @@ const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
 const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
 
 // Typography depth anchors — "the room warms, the text breathes".
-// Each delta is individually below the Just Noticeable Difference (JND).
-// Combined, they create a cumulative felt difference (Jason Fried test).
-const FONT_WEIGHT = { dormant: 400, warm: 420 };          // one grade shift
+// Font-weight crosses JND: 400→450 is one grade shift that the reader feels
+// as "the text gained confidence". 400→420 was literally imperceptible.
+// Combined with letter-spacing and para-rhythm, creates cumulative warmth.
+const FONT_WEIGHT = { dormant: 400, warm: 450 };          // crosses JND
 const LETTER_SPACING = { dormant: -0.01, warm: 0.01 };    // em — tight→open
-const PARA_RHYTHM = { dormant: 0, warm: 6 };              // px — additive para gap
+const PARA_RHYTHM = { dormant: 0, warm: 8 };              // px — additive para gap
 
 // ─── HSL interpolation ────────────────────────────────────
 
@@ -112,7 +113,7 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-glow': glowValue(t),
     '--token-shadow': shadowValue(t),
     '--token-border': lerpColor(BORDER.dormant, BORDER.warm, t),
-    '--token-spacing-breath': `${Math.round(t * 8)}px`,
+    '--token-spacing-breath': `${Math.round(t * 10)}px`,
     // Typography — line-height breathing (perceptible 3.5px total delta)
     '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, t).toFixed(3),
     // Shadow depth — continuous alpha scaling

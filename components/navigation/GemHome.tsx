@@ -44,7 +44,7 @@ export function GemHome({ quiet = false }: GemHomeProps) {
   return (
     <Link
       href="/"
-      className={`fixed top-4 left-6 z-30 hover:text-gold
+      className={`fixed top-sys-4 left-sys-6 z-30 hover:text-gold
         transition-colors duration-linger ease-out
         ${gemColor(state, quiet)} ${gemShadow(state, quiet)}`}
       aria-label="Home"

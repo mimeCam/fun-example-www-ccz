@@ -54,7 +54,7 @@
   --secondary: #9d4edd;
   --accent-violet: #c77dff;
 
-  /* System tokens — spatial, temporal, easing. Static constants.
+  /* System tokens — spatial, temporal, easing, typography. Static constants.
      Never change with thermal state. Named for Tailwind mapping. */
   --sys-maxw-prose: 38rem;
   --sys-maxw-prose-ch: 65ch;
@@ -74,7 +74,48 @@
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
   --sys-ease-settle: cubic-bezier(0.0, 0.0, 0.2, 0.5);
 
-  --sys-text-prose: 1.0625rem;
+  /* ─── Spacing Scale (12 steps, rem-based) ─────────────── */
+  --sys-space-1:  0.25rem;    /*  4px — tight: icon gaps, inline padding */
+  --sys-space-2:  0.375rem;   /*  6px — compact: badge padding, dot margins */
+  --sys-space-3:  0.5rem;     /*  8px — small: button padding, list gaps */
+  --sys-space-4:  0.75rem;    /* 12px — medium: card internal gaps, borders */
+  --sys-space-5:  1rem;       /* 16px — standard: card padding, section gaps */
+  --sys-space-6:  1.25rem;    /* 20px — comfortable: card padding default */
+  --sys-space-7:  1.5rem;     /* 24px — generous: section margins */
+  --sys-space-8:  2rem;       /* 32px — section: inter-block breathing room */
+  --sys-space-9:  2.5rem;     /* 40px — spacious: hero spacing */
+  --sys-space-10: 3rem;       /* 48px — dramatic: major sections */
+  --sys-space-11: 4rem;       /* 64px — monumental: page rhythm */
+  --sys-space-12: 6rem;       /* 96px — expansive: hero-level */
+
+  /* ─── Typography Scale ────────────────────────────────── */
+  --sys-text-micro:  0.75rem;    /* 12px — badges, slot indicators */
+  --sys-text-caption: 0.875rem;  /* 14px — metadata, labels, nav items */
+  --sys-text-body:   0.9375rem;  /* 15px — prose text (absorbs 4x hardcoded) */
+  --sys-text-md:     1rem;       /* 16px — standard body */
+  --sys-text-lg:     1.125rem;   /* 18px — subheadings, card titles */
+  --sys-text-xl:     1.25rem;    /* 20px — emphasis text */
+
+  /* ─── Heading Scale ───────────────────────────────────── */
+  --sys-text-h4: 1.375rem;   /* 22px — sub-sections, article metadata */
+  --sys-text-h3: 1.75rem;    /* 28px — section headings, card titles */
+  --sys-text-h2: 2.25rem;    /* 36px — page titles */
+  --sys-text-h1: 3rem;       /* 48px — hero titles only */
+
+  /* ─── Weight Tokens (semantic, not absolute) ──────────── */
+  --sys-weight-body:    400;   /* Inter default — prose paragraphs */
+  --sys-weight-heading: 600;   /* Inter semibold — all headings */
+  --sys-weight-display: 700;   /* Space Grotesk bold — hero titles */
+  --sys-weight-accent:  500;   /* medium — labels, badges, CTA */
+
+  /* ─── Radius Scale (4 steps) ──────────────────────────── */
+  --sys-radius-soft:   0.375rem;  /*  6px — tags, badges (absorbs rounded-md) */
+  --sys-radius-medium: 0.5rem;    /*  8px — cards, buttons, inputs (absorbs rounded-lg) */
+  --sys-radius-wide:   0.75rem;   /* 12px — mirror cards, elevated surfaces (absorbs rounded-xl) */
+  --sys-radius-full:   9999px;    /* pills, avatars, progress bars */
+
+  /* Legacy text-prose alias — now points to sys-text-body */
+  --sys-text-prose: var(--sys-text-body);
 
   /* Legacy aliases (kept for backward compat during migration) */
   --background: var(--token-bg);
@@ -107,7 +148,8 @@ body {
 }
 
 /* Paragraph spacing opens up as the site warms.
-   spacing-breath (0→8px) + para-rhythm (0→6px) = 0→14px total additive gap */
+   spacing-breath (0→10px) + para-rhythm (0→8px) = 0→18px total additive gap.
+   18px ceiling — generous but not excessive for long-form reading. */
 .thermal-typography p {
   margin-bottom: calc(0.75rem + var(--token-spacing-breath) + var(--token-para-rhythm));
 }
@@ -120,22 +162,23 @@ body {
   transition: box-shadow 1.5s ease-out;
 }
 
-/* Thermal radius softening — additive bonus on top of base rounded-lg */
+/* Thermal radius softening — additive bonus on top of --sys-radius-medium.
+   At dormant: 0.5rem (base). At luminous: 1.0rem (base + 0.5rem bonus). */
 .thermal-radius {
-  border-radius: calc(1rem + var(--token-radius-soft));
+  border-radius: calc(var(--sys-radius-medium) + var(--token-radius-soft));
   transition: border-radius 1.5s ease-out;
 }
 
 /* Dormant state "lit candle" — visible gold glow on CTA elements.
-   Pulse smoothed: 0.14→0.24 alpha — felt, not seen. */
+   Pulse widened: 0.12→0.28 alpha — the candle should pulse, not breathe. */
 .thermal-candle {
-  box-shadow: 0 0 20px rgba(240,198,116,0.14);
+  box-shadow: 0 0 20px rgba(240,198,116,0.12);
   animation: candlePulse 3s ease-in-out infinite;
 }
 
 @keyframes candlePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.14); }
-  50% { box-shadow: 0 0 40px rgba(240,198,116,0.24); }
+  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.12); }
+  50% { box-shadow: 0 0 40px rgba(240,198,116,0.28); }
 }
 
 /* Warm state warm-spotlight — radial gradient creates perceptible "room warming" */

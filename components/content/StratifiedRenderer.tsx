@@ -40,7 +40,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
   resolved?: ResolvedParagraph[];
 }) {
   return (
-    <div className="space-y-6 leading-[1.75]">
+    <div className="space-y-sys-7 leading-[var(--token-line-height)]">
       {paragraphs.map((p, i) => {
         const variant = resolved?.find(r => r.slotIndex === offset + i && r.source !== null);
         return (
@@ -48,7 +48,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
             key={i}
             data-paragraph-id={`${prefix}-p${offset + i}`}
             data-variant={variant?.source ?? undefined}
-            className={`text-foreground max-w-prose-ch ${variant ? 'pl-3 border-l-2 border-gold/20' : ''}`}
+            className={`text-foreground max-w-prose-ch ${variant ? 'pl-sys-4 border-l-2 border-gold/20' : ''}`}
           >
             {p.trim()}
           </p>
@@ -64,12 +64,12 @@ function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: bool
   const shadow = warmer ? 'shadow-cyan-whisper' : '';
   return (
     <aside
-      className={`my-10 pl-4 border-l-2 ${border} bg-surface/30 rounded-r-md py-3 pr-4 ${shadow}
+      className={`my-sys-9 pl-sys-5 border-l-2 ${border} bg-surface/30 rounded-r-sys-soft py-sys-4 pr-sys-5 ${shadow}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}`}
     >
       {block.isNew && <NewContentBadge />}
       {block.paragraphs.map((p, i) => (
-        <p key={i} className={`text-mist italic text-sm leading-relaxed`}>
+        <p key={i} className={`text-mist italic text-sys-caption leading-relaxed`}>
           {p.trim()}
         </p>
       ))}
@@ -86,19 +86,19 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
   return (
     <section
       data-layer={block.layer}
-      className={`my-12 pl-4 pr-4 py-3 rounded-r-md border-l-2 ${borderColor}
+      className={`my-sys-10 pl-sys-5 pr-sys-5 py-sys-4 rounded-r-sys-soft border-l-2 ${borderColor}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}
         bg-surface/20`}
     >
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs uppercase tracking-widest text-cyan font-medium">
+      <div className="flex items-center gap-sys-3 mb-sys-3">
+        <span className="text-sys-micro uppercase tracking-widest text-cyan font-sys-accent">
           {label}
         </span>
         {block.isNew && <NewContentBadge label="Unlocked" />}
       </div>
-      <div className="space-y-4">
+      <div className="space-y-sys-5">
         {block.paragraphs.map((p, i) => (
-          <p key={i} className="text-foreground max-w-prose-ch leading-[1.75]">
+          <p key={i} className="text-foreground max-w-prose-ch leading-[var(--token-line-height)]">
             {p.trim()}
           </p>
         ))}
@@ -216,20 +216,20 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
 
   return (
     <aside
-      className={`my-14 px-5 py-4 bg-surface/60 border-l-4 border-rose rounded-lg shadow-rose-glow ${glow}
+      className={`my-sys-10 px-sys-6 py-sys-5 bg-surface/60 border-l-4 border-rose rounded-sys-medium shadow-rose-glow ${glow}
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
-      <p className="text-xs uppercase tracking-widest text-rose/70 mb-3">
+      <p className="text-sys-micro uppercase tracking-widest text-rose/70 mb-sys-4">
         Your resonance
       </p>
-      <p className="text-[0.9375rem] text-foreground/70 italic leading-[1.7]">
+      <p className="text-sys-body text-foreground/70 italic leading-[var(--token-line-height)]">
         &ldquo;{data.quote}&rdquo;
       </p>
-      <div className="h-px bg-gold/20 max-w-divider my-3" />
-      <p className="text-[0.9375rem] text-rose italic leading-[1.7]">
+      <div className="h-px bg-gold/20 max-w-divider my-sys-4" />
+      <p className="text-sys-body text-rose italic leading-[var(--token-line-height)]">
         {data.note}
       </p>
-      <p className="text-xs text-mist/50 mt-3">
+      <p className="text-sys-micro text-mist/50 mt-sys-4">
         Saved {data.createdAt}
       </p>
     </aside>

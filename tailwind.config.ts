@@ -47,6 +47,51 @@ const config: Config = {
         'card-body': 'var(--sys-maxw-card-body)',
         'divider': 'var(--sys-maxw-divider)',
       },
+      /* System spacing scale — maps --sys-space-* to Tailwind spacing utilities.
+         Usage: p-sys-5, gap-sys-3, my-sys-8, etc. */
+      spacing: {
+        'sys-1': 'var(--sys-space-1)',
+        'sys-2': 'var(--sys-space-2)',
+        'sys-3': 'var(--sys-space-3)',
+        'sys-4': 'var(--sys-space-4)',
+        'sys-5': 'var(--sys-space-5)',
+        'sys-6': 'var(--sys-space-6)',
+        'sys-7': 'var(--sys-space-7)',
+        'sys-8': 'var(--sys-space-8)',
+        'sys-9': 'var(--sys-space-9)',
+        'sys-10': 'var(--sys-space-10)',
+        'sys-11': 'var(--sys-space-11)',
+        'sys-12': 'var(--sys-space-12)',
+      },
+      /* System typography scale — semantic text sizes with baked line-heights. */
+      fontSize: {
+        'sys-micro':   ['var(--sys-text-micro)',   { lineHeight: '1.5' }],
+        'sys-caption': ['var(--sys-text-caption)',  { lineHeight: '1.5' }],
+        'sys-body':    ['var(--sys-text-body)',     { lineHeight: 'var(--token-line-height)' }],
+        'sys-md':      ['var(--sys-text-md)',       { lineHeight: 'var(--token-line-height)' }],
+        'sys-lg':      ['var(--sys-text-lg)',       { lineHeight: '1.4' }],
+        'sys-xl':      ['var(--sys-text-xl)',       { lineHeight: '1.4' }],
+        'sys-h4':      ['var(--sys-text-h4)',       { lineHeight: '1.3', fontWeight: 'var(--sys-weight-heading)' }],
+        'sys-h3':      ['var(--sys-text-h3)',       { lineHeight: '1.3', fontWeight: 'var(--sys-weight-heading)' }],
+        'sys-h2':      ['var(--sys-text-h2)',       { lineHeight: '1.2', fontWeight: 'var(--sys-weight-heading)' }],
+        'sys-h1':      ['var(--sys-text-h1)',       { lineHeight: '1.1', fontWeight: 'var(--sys-weight-display)' }],
+      },
+      /* System font weights — semantic names, not absolute numbers.
+         Future: ThermalProvider can shift --sys-weight-body for JND crossing. */
+      fontWeight: {
+        'sys-body':    'var(--sys-weight-body)',
+        'sys-heading': 'var(--sys-weight-heading)',
+        'sys-display': 'var(--sys-weight-display)',
+        'sys-accent':  'var(--sys-weight-accent)',
+      },
+      /* System radius scale — absorbs ad-hoc rounded-* values.
+         Thermal bonus adds 0–0.5rem on top of --sys-radius-medium at warm+. */
+      borderRadius: {
+        'sys-soft':   'var(--sys-radius-soft)',
+        'sys-medium': 'var(--sys-radius-medium)',
+        'sys-wide':   'var(--sys-radius-wide)',
+        'sys-full':   'var(--sys-radius-full)',
+      },
       transitionDuration: {
         'hover': '200ms',
         'enter': '300ms',

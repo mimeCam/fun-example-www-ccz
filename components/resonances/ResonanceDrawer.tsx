@@ -137,17 +137,17 @@ export function ResonanceDrawer({
         }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 pb-3">
+        <div className="flex items-center justify-between p-sys-6 pb-sys-4">
           <div>
-            <h3 className="text-lg font-display font-bold text-foreground">
+            <h3 className="text-sys-lg font-display font-sys-display text-foreground">
               Save Resonance
             </h3>
-            <p className="text-mist text-sm mt-0.5">Why does this matter to you?</p>
+            <p className="text-mist text-sys-caption mt-sys-1">Why does this matter to you?</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 -mr-2 text-mist hover:text-foreground
-                       transition-colors rounded-lg hover:bg-fog/20"
+            className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
+                       transition-colors rounded-sys-medium hover:bg-fog/20"
             aria-label="Close"
           >
             <CloseIcon />
@@ -155,10 +155,10 @@ export function ResonanceDrawer({
         </div>
 
         {/* Divider */}
-        <div className="mx-5 border-t border-fog/20" />
+        <div className="mx-sys-6 border-t border-fog/20" />
 
         {/* Body */}
-        <div className="flex-1 p-5 pt-4">
+        <div className="flex-1 p-sys-6 pt-sys-5">
           <SlotIndicator used={usedSlots} total={SLOT_COUNT} />
 
           {success ? (
@@ -196,15 +196,15 @@ function CloseIcon() {
 
 function SlotIndicator({ used, total }: { used: number; total: number }) {
   return (
-    <div className="flex flex-col items-center gap-1.5 mb-5">
-      <div className="flex gap-1.5">
+    <div className="flex flex-col items-center gap-sys-2 mb-sys-6">
+      <div className="flex gap-sys-2">
         {Array.from({ length: total }, (_, i) => (
-          <span key={i} className={`text-sm ${i < used ? 'text-gold' : 'text-fog'}`}>
+          <span key={i} className={`text-sys-caption ${i < used ? 'text-gold' : 'text-fog'}`}>
             ◆
           </span>
         ))}
       </div>
-      <span className="text-mist text-xs">{used} of {total} resonances</span>
+      <span className="text-mist text-sys-micro">{used} of {total} resonances</span>
     </div>
   );
 }
@@ -228,9 +228,9 @@ function DrawerForm({
   return (
     <>
       {quote && <QuotePreview quote={quote} />}
-      <div className="mb-4">
+      <div className="mb-sys-5">
         <label htmlFor="resonanceNote"
-          className="block text-sm font-medium text-foreground/80 mb-2">
+          className="block text-sys-caption font-sys-accent text-foreground/80 mb-sys-3">
           Your resonance note <span className="text-primary">*</span>
         </label>
         <textarea
@@ -238,29 +238,29 @@ function DrawerForm({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What truth did this reveal to you?"
-          className="w-full px-3 py-2.5 bg-background border border-fog rounded-lg
-                     text-foreground placeholder-mist/50 text-sm
+          className="w-full px-sys-4 py-sys-3 bg-background border border-fog rounded-sys-medium
+                     text-foreground placeholder-mist/50 text-sys-caption
                      focus:outline-none focus:ring-2 focus:ring-primary
                      focus:border-transparent resize-none"
           rows={4}
           maxLength={MAX_CHARS}
           disabled={isLoading}
         />
-        <div className="flex justify-end mt-1">
-          <span className={`text-xs ${charColor}`}>{charCount}/{MAX_CHARS}</span>
+        <div className="flex justify-end mt-sys-1">
+          <span className={`text-sys-micro ${charColor}`}>{charCount}/{MAX_CHARS}</span>
         </div>
       </div>
       {error && <ErrorBanner message={error} />}
-      <div className="flex gap-3 mt-2">
+      <div className="flex gap-sys-4 mt-sys-3">
         <button onClick={onCancel} disabled={isLoading}
-          className="flex-1 px-3 py-2 bg-background text-mist rounded-lg
-                     text-sm hover:bg-fog transition-colors disabled:opacity-50">
+          className="flex-1 px-sys-4 py-sys-3 bg-background text-mist rounded-sys-medium
+                     text-sys-caption hover:bg-fog transition-colors disabled:opacity-50">
           Cancel
         </button>
         <button onClick={onSubmit}
           disabled={isLoading || !note.trim()}
-          className="flex-1 px-3 py-2 bg-primary text-foreground rounded-lg
-                     text-sm font-medium hover:bg-secondary transition-colors
+          className="flex-1 px-sys-4 py-sys-3 bg-primary text-foreground rounded-sys-medium
+                     text-sys-caption font-sys-accent hover:bg-secondary transition-colors
                      disabled:opacity-50 disabled:cursor-not-allowed">
           {isLoading ? 'Saving...' : 'Save Resonance'}
         </button>
@@ -271,8 +271,8 @@ function DrawerForm({
 
 function QuotePreview({ quote }: { quote: string }) {
   return (
-    <div className="mb-4 bg-background/60 border-l-2 border-rose/40 rounded-lg p-3">
-      <p className="text-foreground/70 italic text-sm leading-relaxed">
+    <div className="mb-sys-5 bg-background/60 border-l-2 border-rose/40 rounded-sys-medium p-sys-4">
+      <p className="text-foreground/70 italic text-sys-caption leading-relaxed">
         &ldquo;{quote}&rdquo;
       </p>
     </div>
@@ -281,20 +281,20 @@ function QuotePreview({ quote }: { quote: string }) {
 
 function ErrorBanner({ message }: { message: string }) {
   return (
-    <div className="mb-4 p-3 bg-rose/10 border border-rose/30 rounded-lg">
-      <p className="text-rose text-sm">{message}</p>
+    <div className="mb-sys-5 p-sys-4 bg-rose/10 border border-rose/30 rounded-sys-medium">
+      <p className="text-rose text-sys-caption">{message}</p>
     </div>
   );
 }
 
 function SuccessMessage() {
   return (
-    <div className="py-6 text-center">
+    <div className="py-sys-7 text-center">
       <div className="inline-block animate-bounce-subtle">
-        <GemIcon className="text-gold mx-auto mb-3" />
+        <GemIcon className="text-gold mx-auto mb-sys-4" />
       </div>
-      <p className="text-gold text-lg font-display font-bold">Saved.</p>
-      <p className="text-mist text-sm mt-2 italic">
+      <p className="text-gold text-sys-lg font-display font-sys-display">Saved.</p>
+      <p className="text-mist text-sys-caption mt-sys-3 italic">
         It&apos;s alive for 30 days. Come back to keep it breathing.
       </p>
     </div>
@@ -303,11 +303,11 @@ function SuccessMessage() {
 
 function SlotsFullMessage() {
   return (
-    <div className="py-6 text-center">
-      <p className="text-mist text-sm">
+    <div className="py-sys-7 text-center">
+      <p className="text-mist text-sys-caption">
         All resonance slots are filled.
       </p>
-      <p className="text-mist text-xs mt-2 italic">
+      <p className="text-mist text-sys-micro mt-sys-3 italic">
         Visit <a href="/resonances" className="text-gold hover:underline">The Book of You</a> to revisit your saved resonances.
       </p>
     </div>

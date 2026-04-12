@@ -46,7 +46,7 @@ export function AmbientNav() {
     <nav
       className="fixed bottom-0 inset-x-0 z-20 bg-void/80 backdrop-blur-sm border-t border-fog/20 animate-fade-in"
     >
-      <div className="flex items-center justify-center gap-8 h-12">
+      <div className="flex items-center justify-center gap-sys-8 h-sys-12">
         {NAV_ITEMS.map(({ href, label, accent }) => {
           const active = pathname === href;
           return (
@@ -54,7 +54,7 @@ export function AmbientNav() {
               key={href}
               href={href}
               aria-current={active ? 'page' : undefined}
-              className={`text-xs tracking-wide transition-colors duration-[1500ms] ease-out ${
+              className={`text-sys-micro tracking-wide transition-colors duration-[1500ms] ease-out ${
                 active
                   ? 'nav-active-link'
                   : `text-mist/50 ${accent}`

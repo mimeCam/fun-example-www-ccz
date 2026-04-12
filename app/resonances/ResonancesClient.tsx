@@ -108,14 +108,14 @@ function buildClosingCtx(r: ResonanceWithArticle): ClosingLineContext {
 function SlotIndicator({ used, total }: { used: number; total: number }) {
   return (
     <div className="text-center">
-      <p className="text-xs text-mist">
+      <p className="text-sys-micro text-mist">
         {Array.from({ length: total }, (_, i) =>
           i < used ? '◆' : '◇'
         ).join('')}
         <span className="ml-2">{used} of {total} resonances</span>
       </p>
       {used >= total && (
-        <p className="text-xs text-gold/70 mt-1">
+        <p className="text-sys-micro text-gold/70 mt-sys-1">
           Your resonance slots are full. Return to keep them breathing.
         </p>
       )}
@@ -153,7 +153,7 @@ export default function ResonancesClient() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="w-80 h-48 rounded-lg bg-gradient-to-b from-rose/10 to-surface/20 border border-rose/10 animate-pulse" />
+      <div className="w-80 h-48 rounded-sys-medium bg-gradient-to-b from-rose/10 to-surface/20 border border-rose/10 animate-pulse" />
     </div>
   );
 
@@ -164,17 +164,17 @@ export default function ResonancesClient() {
 
   // Empty state — no resonances captured yet
   if (isEmpty) return (
-    <div className="max-w-md mx-auto pt-20 text-center">
+    <div className="max-w-md mx-auto pt-sys-11 text-center">
       <GemHome />
-      <GemIcon size="lg" className="mx-auto text-mist/30 mb-8" />
-      <h1 className="text-2xl font-display font-bold text-foreground mb-3">
+      <GemIcon size="lg" className="mx-auto text-mist/30 mb-sys-8" />
+      <h1 className="text-2xl font-display font-sys-display text-foreground mb-sys-4">
         Your chapter hasn&apos;t been written yet.
       </h1>
-      <p className="text-mist text-sm mb-8 max-w-sm mx-auto leading-relaxed">
+      <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
         Read something that stops you. Capture it. Tell it why it matters.
       </p>
       <Link href="/"
-        className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold rounded-lg transition-colors">
+        className="inline-block px-sys-7 py-sys-4 border border-gold/40 text-gold hover:bg-gold/10 font-sys-display rounded-sys-medium transition-colors">
         Browse Articles →
       </Link>
     </div>
@@ -182,27 +182,27 @@ export default function ResonancesClient() {
 
   // Active state — render the Book of You
   return (
-    <div className="max-w-2xl mx-auto pt-8">
+    <div className="max-w-2xl mx-auto pt-sys-8">
       <GemHome />
       {/* Header */}
-      <div className="flex justify-between items-center mb-10">
+      <div className="flex justify-between items-center mb-sys-9">
         <div />
-        <Link href="/mirror" className="text-mist text-sm hover:text-primary transition-colors">
+        <Link href="/mirror" className="text-mist text-sys-caption hover:text-primary transition-colors">
           Your Mirror →
         </Link>
       </div>
 
       {/* Page title */}
-      <div className="mb-10">
-        <h1 className="text-[var(--token-accent)] text-3xl font-display font-light lowercase">
+      <div className="mb-sys-9">
+        <h1 className="text-[var(--token-accent)] text-3xl font-display font-sys-body lowercase">
           the book of you
         </h1>
-        <p className="text-mist text-md italic mt-1">What you&apos;re still carrying</p>
+        <p className="text-mist text-md italic mt-sys-1">What you&apos;re still carrying</p>
       </div>
 
       {/* Carrying section — alive resonances */}
       {carrying.length > 0 && (
-        <section className="mb-10">
+        <section className="mb-sys-9">
           {carrying.map((r, i) => {
             const ctx = contexts[i];
             // Detect chapter break before this entry
@@ -218,9 +218,9 @@ export default function ResonancesClient() {
               <div key={r.id}>
                 {/* Chapter break marker */}
                 {brk?.isBreak && (
-                  <div className="my-10 text-center">
+                  <div className="my-sys-9 text-center">
                     <div className="h-px bg-gold/20 max-w-divider mx-auto" />
-                    <p className="text-mist/50 text-xs italic mt-2">
+                    <p className="text-mist/50 text-sys-micro italic mt-sys-3">
                       {brk.label}
                     </p>
                   </div>
@@ -238,13 +238,13 @@ export default function ResonancesClient() {
 
       {/* Divider between sections — spacing, no line */}
       {carrying.length > 0 && shaped.length > 0 && (
-        <div className="my-16" />
+        <div className="my-sys-11" />
       )}
 
       {/* Shaped section — faded resonances with closing lines */}
       {shaped.length > 0 && (
-        <section className="mb-10">
-          <p className="text-xs uppercase tracking-widest text-gold/40 mb-6">
+        <section className="mb-sys-9">
+          <p className="text-sys-micro uppercase tracking-widest text-gold/40 mb-sys-7">
             what shaped you
           </p>
           {shaped.map((r) => {
@@ -265,14 +265,14 @@ export default function ResonancesClient() {
 
       {/* Slot indicator */}
       {slots && (
-        <div className="my-10">
+        <div className="my-sys-9">
           <SlotIndicator used={slots.usedSlots} total={slots.currentSlots} />
         </div>
       )}
 
       {/* Export */}
       {resonances.length > 0 && (
-        <div className="mb-10">
+        <div className="mb-sys-9">
           <ResonanceExport resonances={resonances} />
         </div>
       )}

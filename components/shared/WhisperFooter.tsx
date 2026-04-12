@@ -15,9 +15,9 @@ const FOOTER_LINKS = [
 
 export default function WhisperFooter() {
   return (
-    <footer className="text-center py-12 space-y-2 thermal-drift">
-      <p className="text-mist/40 text-sm">No algorithms. No feeds.</p>
-      <nav className="flex justify-center items-center gap-4 text-xs">
+    <footer className="text-center py-sys-10 space-y-sys-2 thermal-drift">
+      <p className="text-mist/40 text-sys-caption">No algorithms. No feeds.</p>
+      <nav className="flex justify-center items-center gap-sys-5 text-sys-micro">
         {FOOTER_LINKS.map((link, i) => (
           <FooterLink key={link.href} link={link} showDot={i > 0} />
         ))}

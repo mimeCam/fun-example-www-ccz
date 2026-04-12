@@ -40,7 +40,7 @@ export default function Home({
     <main className="min-h-screen flex flex-col">
       <GemHome />
       <div className="flex-1 flex flex-col justify-center max-w-3xl
-        mx-auto px-4 md:px-6 py-16 md:py-24">
+        mx-auto px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">
 
         <ReturningPortal />
         {via && <ViaWhisper via={via} />}
