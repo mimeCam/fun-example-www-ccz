@@ -46,7 +46,7 @@ const GREETINGS: Record<ArchetypeKey, string> = {
 
 function CompactGreeting({ archetype }: { archetype: ArchetypeKey }) {
   return (
-    <p className="text-mist/60 text-base max-w-2xl mx-auto mt-2 font-display italic">
+    <p className="text-mist/60 text-sys-md max-w-prose-ch mx-auto mt-sys-2 font-display italic">
       {GREETINGS[archetype] ?? GREETINGS['explorer']}
     </p>
   );
@@ -161,52 +161,52 @@ function LetterCard({
   const dividerScale = phase === 'approach' ? 'scaleX(0)' : 'scaleX(1)';
 
   return (
-    <div className={`relative max-w-lg mx-auto my-12 p-8 md:p-10
+    <div className={`relative max-w-[32rem] mx-auto my-sys-10 p-sys-8 md:p-sys-9
       max-h-[40vh] overflow-y-auto
       bg-gradient-to-b from-surface to-background
-      rounded-lg thermal-radius border transition-all duration-reveal
+      rounded-sys-medium thermal-radius border transition-all duration-reveal
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss */}
       {visible && (
         <button onClick={onDismiss}
-          className="absolute top-3 right-3 text-mist/40 hover:text-mist/70 transition-opacity text-lg leading-none"
+          className="absolute top-sys-4 right-sys-4 text-mist/40 hover:text-mist/70 transition-opacity text-sys-lg leading-none"
           aria-label="Dismiss">&times;</button>
       )}
       {/* Label */}
-      <p className="text-xs uppercase tracking-widest text-accent/60 text-center">
+      <p className="text-sys-micro uppercase tracking-widest text-accent/60 text-center">
         Because you came back&hellip;
       </p>
       {/* Salutation */}
-      <p className="text-accent text-lg font-display font-semibold mt-4 text-center">
+      <p className="text-accent text-sys-lg font-display font-sys-heading mt-sys-5 text-center">
         {letter.salutation}
       </p>
       {/* Opening */}
-      <p className="text-foreground/90 text-base leading-[1.9] mt-4 text-center">
+      <p className="text-foreground/90 text-sys-md thermal-typography mt-sys-5 text-center">
         {letter.opening}
       </p>
       {/* Body */}
       {letter.body.map((para, i) => (
-        <p key={i} className="text-foreground/90 text-base leading-[1.9] mt-4 text-center">
+        <p key={i} className="text-foreground/90 text-sys-md thermal-typography mt-sys-5 text-center">
           {para}
         </p>
       ))}
       {/* Divider */}
-      <div className="my-6 flex justify-center">
+      <div className="my-sys-7 flex justify-center">
         <div className={`h-px max-w-divider bg-accent/20 transition-transform duration-500 ${dividerScale}`} />
       </div>
       {/* Closing */}
-      <p className="text-foreground/80 text-base italic text-center">{letter.closing}</p>
+      <p className="text-foreground/80 text-sys-md italic text-center">{letter.closing}</p>
       {/* Sign-off */}
-      <p className="text-mist text-sm italic text-center mt-3">{letter.signOff}</p>
+      <p className="text-mist text-sys-caption italic text-center mt-sys-4">{letter.signOff}</p>
       {/* Actions */}
       {visible && (
-        <div className="mt-6 flex justify-center gap-3">
+        <div className="mt-sys-7 flex justify-center gap-sys-4">
           <button onClick={handleCopy}
-            className="px-5 py-2 rounded-lg border border-accent/40 text-accent text-sm hover:bg-accent/10 transition-colors">
+            className="px-sys-6 py-sys-3 rounded-sys-medium border border-accent/40 text-accent text-sys-caption hover:bg-accent/10 transition-colors">
             {copied ? 'Copied!' : 'Copy & Share'}
           </button>
           <button onClick={handleImage}
-            className="px-5 py-2 rounded-lg text-mist text-sm hover:text-foreground/80 transition-colors">
+            className="px-sys-6 py-sys-3 rounded-sys-medium text-mist text-sys-caption hover:text-foreground/80 transition-colors">
             Save as Image
           </button>
         </div>

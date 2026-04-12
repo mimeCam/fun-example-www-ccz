@@ -62,7 +62,7 @@ export default function MirrorPage() {
 
   const data = mirror ?? quickMirror;
   if (data) return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-sys-8">
       <GemHome />
       <div className="flex flex-col items-center justify-center min-h-[85vh]">
         {mirror
@@ -85,18 +85,18 @@ export default function MirrorPage() {
   );
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-sys-8">
       <GemHome />
-      <div className="max-w-md mx-auto pt-20 text-center">
-        <GemIcon size="lg" className="mx-auto text-mist/30 mb-8" />
-        <h1 className="text-2xl font-display font-bold text-foreground mb-3">
+      <div className="max-w-card mx-auto pt-sys-10 text-center">
+        <GemIcon size="lg" className="mx-auto text-mist/30 mb-sys-8" />
+        <h1 className="text-sys-h3 font-display font-sys-display text-foreground mb-sys-4">
           Your reflection hasn&apos;t formed yet.
         </h1>
-        <p className="text-mist text-sm mb-8 max-w-sm mx-auto leading-relaxed">
+        <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
           Read an article to the end and the Mirror will find you.
         </p>
         <Link href="/articles"
-          className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold thermal-radius transition-colors">
+          className="inline-block px-sys-7 py-sys-4 border border-gold/40 text-gold hover:bg-gold/10 font-sys-heading thermal-radius transition-colors">
           Browse Articles →
         </Link>
       </div>
@@ -127,7 +127,7 @@ function MetaLine({ articlesRead, firstDetected }: {
   const parts = [`${articlesRead} article${articlesRead !== 1 ? 's' : ''}`];
   if (firstDetected) parts.push(`since ${formatDate(firstDetected)}`);
   return (
-    <p className="text-xs text-mist/40 text-center mt-8">
+    <p className="text-sys-micro text-mist/40 text-center mt-sys-8">
       {parts.join(' · ')}
     </p>
   );

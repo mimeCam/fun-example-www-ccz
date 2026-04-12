@@ -43,12 +43,12 @@ export default function ArticlesPageClient({ articles }: Props) {
     : [];
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-12">
-      <header className="mb-10">
-        <h1 className="font-display text-foreground text-2xl md:text-3xl font-bold">
+    <div className="max-w-[48rem] mx-auto px-sys-7 py-sys-10">
+      <header className="mb-sys-9">
+        <h1 className="font-display text-foreground text-sys-h3 md:text-sys-h2 font-sys-display">
           Articles
         </h1>
-        <p className="text-mist text-sm italic mt-1">
+        <p className="text-mist text-sys-caption italic mt-sys-1">
           Writing that pays attention back.
         </p>
       </header>
@@ -57,7 +57,7 @@ export default function ArticlesPageClient({ articles }: Props) {
         <CuratedRow curated={curated} archetype={archetype!} />
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-sys-7">
         {articles.map(article => (
           <ExploreArticleCard
             key={article.id}
@@ -77,15 +77,15 @@ function CuratedRow({
   archetype: ArchetypeKey;
 }) {
   return (
-    <section className="mb-12">
-      <div className="flex items-center gap-3 mb-6">
-        <h2 className="font-display text-gold text-xl font-semibold">
+    <section className="mb-sys-10">
+      <div className="flex items-center gap-sys-4 mb-sys-7">
+        <h2 className="font-display text-gold text-sys-xl font-sys-heading">
           {getExtensionLabel(archetype)}
         </h2>
         <div className="flex-1 h-px bg-gold/20" />
       </div>
-      <p className="text-mist/60 text-xs mb-4">Matches your reading pattern</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <p className="text-mist/60 text-sys-micro mb-sys-5">Matches your reading pattern</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-sys-5">
         {curated.map(article => (
           <ExploreArticleCard
             key={article.id}
