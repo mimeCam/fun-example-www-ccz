@@ -80,6 +80,10 @@ export function ThermalProvider({ children }: { children: ReactNode }) {
       for (const [key, value] of colorEntries) el.style.setProperty(key, value);
       for (const [key, value] of animEntries) el.style.setProperty(key, value);
       el.setAttribute('data-thermal', thermal.result.state);
+      // Returning readers warm to remembered temperature faster (2s vs 4s)
+      const history = loadHistory();
+      const isReturning = history.visitDays.length > 1;
+      el.setAttribute('data-returning', isReturning ? 'true' : 'false');
     }, 100);
     return () => clearTimeout(timer);
   }, [thermal]);

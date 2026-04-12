@@ -22,25 +22,30 @@ interface BreathConfig { cycleSec: number; scalePeak: number }
 interface GlowConfig { cycleSec: number; minOpacity: number; maxOpacity: number }
 interface DriftConfig { cycleSec: number; rangePx: number }
 
+// Inverted speed curves: early relationship = nervous energy (fast).
+// Deep intimacy = settled comfort (slow). At peak warmth, the room is calm.
+// Magnitudes raised above human just-noticeable-difference thresholds:
+//   size JND ≈ 1%, opacity JND ≈ 5-8%, position JND ≈ 2-3px.
+
 const BREATH: Record<string, BreathConfig> = {
   dormant:  { cycleSec: 0, scalePeak: 0 },
-  stirring: { cycleSec: 8, scalePeak: 0.003 },
-  warm:     { cycleSec: 5, scalePeak: 0.005 },
-  luminous: { cycleSec: 3.5, scalePeak: 0.008 },
+  stirring: { cycleSec: 4, scalePeak: 0.015 },
+  warm:     { cycleSec: 6, scalePeak: 0.020 },
+  luminous: { cycleSec: 8, scalePeak: 0.025 },
 };
 
 const GLOW: Record<string, GlowConfig> = {
   dormant:  { cycleSec: 0, minOpacity: 0, maxOpacity: 0 },
-  stirring: { cycleSec: 7, minOpacity: 0.08, maxOpacity: 0.18 },
-  warm:     { cycleSec: 4, minOpacity: 0.12, maxOpacity: 0.25 },
-  luminous: { cycleSec: 3, minOpacity: 0.18, maxOpacity: 0.35 },
+  stirring: { cycleSec: 5, minOpacity: 0.15, maxOpacity: 0.30 },
+  warm:     { cycleSec: 7, minOpacity: 0.20, maxOpacity: 0.40 },
+  luminous: { cycleSec: 9, minOpacity: 0.30, maxOpacity: 0.55 },
 };
 
 const DRIFT: Record<string, DriftConfig> = {
   dormant:  { cycleSec: 0, rangePx: 0 },
-  stirring: { cycleSec: 8, rangePx: 1.5 },
-  warm:     { cycleSec: 6, rangePx: 2 },
-  luminous: { cycleSec: 5, rangePx: 3 },
+  stirring: { cycleSec: 6, rangePx: 3 },
+  warm:     { cycleSec: 8, rangePx: 5 },
+  luminous: { cycleSec: 10, rangePx: 7 },
 };
 
 // ─── Helpers ─────────────────────────────────────────────

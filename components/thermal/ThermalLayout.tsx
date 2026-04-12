@@ -31,7 +31,7 @@ function ThermalClassApplier({ children }: { children: ReactNode }) {
   const animate = !reducedMotion && state !== 'dormant';
 
   return (
-    <div className={animate ? 'thermal-breath thermal-glow' : ''}>
+    <div className={animate ? 'thermal-breath thermal-glow thermal-drift' : ''}>
       {children}
     </div>
   );

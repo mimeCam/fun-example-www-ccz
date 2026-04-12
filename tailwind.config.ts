@@ -14,6 +14,8 @@ const config: Config = {
         background: 'var(--token-bg)',
         surface: 'var(--token-surface)',
         foreground: 'var(--token-foreground)',
+        // Thermal-interpolated accent — shifts violet→gold with warmth
+        'thermal-accent': 'var(--token-accent)',
         // Static tokens — never change with thermal state
         primary: "var(--primary)",
         secondary: "var(--secondary)",

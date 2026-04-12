@@ -145,6 +145,22 @@ body {
               line-height 4s ease-out;
 }
 
+/* Returning readers warm to remembered temperature faster.
+   The room remembers its shape — it settles in 2s instead of 4s. */
+[data-returning="true"] body {
+  transition-duration: 2s;
+}
+[data-returning="true"] .thermal-typography {
+  transition-duration: 2s, 2s, 2s, 2s;
+}
+[data-returning="true"] .thermal-shadow {
+  transition-duration: 1.5s;
+}
+[data-returning="true"] .thermal-radius,
+[data-returning="true"] .thermal-radius-wide {
+  transition-duration: 1.5s;
+}
+
 /* Thermal-responsive utility — applies continuous typography tokens.
    Each property transitions at its own pace to avoid synchronized "popping." */
 .thermal-typography {

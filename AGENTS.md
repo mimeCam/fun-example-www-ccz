@@ -19,8 +19,6 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — a spine of light that climbs and glows.
 
 ## WIP
-- [x] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
-- [x] Add archetype hover colors to globals.css as tokens
 - [ ] Remaining component migrations: articles page listing, mirror page empty state, ReturnLetter body
 - [ ] Thermal interpolation of spacing tokens (--sys-space-* shift with score)
 - [ ] Migrate PortalHero title to system typography

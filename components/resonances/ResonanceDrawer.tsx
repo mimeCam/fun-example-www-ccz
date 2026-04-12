@@ -4,6 +4,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { createResonanceAction } from '@/app/actions/resonances';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -51,7 +52,7 @@ function saveUsedSlots(count: number): void {
 export function ResonanceDrawer({
   isOpen, onClose, articleId, articleTitle, quote,
 }: ResonanceDrawerProps) {
-  const { state: thermalState } = useThermal();
+  const { state: thermalState, refresh: thermalRefresh } = useThermal();
   const [note, setNote] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +97,9 @@ export function ResonanceDrawer({
         const next = usedSlots + 1;
         setUsedSlots(next);
         saveUsedSlots(next);
+        // Resurrect the resonance thermal dimension (15% of score)
+        saveHistory(addResonance(loadHistory()));
+        thermalRefresh();
         setSuccess(true);
         setTimeout(onClose, 2000);
       } else {
