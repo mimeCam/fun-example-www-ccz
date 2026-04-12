@@ -35,7 +35,7 @@ const config: Config = {
         'rise': '0 4px 16px rgba(0,0,0,0.4)',
         'float': '0 8px 32px rgba(0,0,0,0.5)',
         'gold': '0 8px 40px rgba(240,198,116,0.25)',
-        'gold-intense': '0 12px 60px rgba(240,198,116,0.40)',
+        'gold-intense': '0 10px 48px rgba(240,198,116,0.25)',
         'rose-glow': '0 6px 32px rgba(232,143,167,0.20)',
         'cyan-whisper': '0 2px 20px rgba(78,205,196,0.15)',
       },

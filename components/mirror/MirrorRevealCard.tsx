@@ -58,7 +58,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   return (
     <div className="flex justify-center">
       <div className={`
-        relative max-w-md w-full rounded-xl p-8 text-center
+        relative max-w-md w-full thermal-radius-wide p-8 text-center
         bg-gradient-to-b from-surface to-background overflow-hidden
         transition-all duration-reveal ease-out
         ${phaseStyle(phase)}

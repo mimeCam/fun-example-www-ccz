@@ -45,7 +45,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
     ? Object.keys(JSON.parse(localStorage.getItem('reading_memory') || '{}')).length
     : 0;
 
-  // Quick Mirror fires at 30% scroll — archetype from behavioral signals
+  // Quick Mirror fires after reader engagement — archetype from behavioral signals
   const quickMirror = useQuickMirror(params.id, readTime, topics);
 
   // Use QuickMirror archetype (localStorage-persisted, refreshed on detection)
@@ -70,34 +70,21 @@ function ArticleContent({ params }: { params: { id: string } }) {
     return insertResonanceBlocks(stratifiedBlocks, resonanceBlocks, coreParagraphs);
   }, [stratifiedBlocks, resonanceBlocks, coreParagraphs]);
 
-  // When QuickMirror triggers, inject the card at the ~30% position in the content
-  // so it appears between paragraphs, not appended after all prose.
+  // When QuickMirror triggers, inject the card after all content blocks
+  // so it appears as a reward at the end, not an interruption mid-article.
   const { displayBlocks, hasInlineMirror } = useMemo(() => {
     if (!quickMirror.triggered || !quickMirror.result) {
       return { displayBlocks: mergedBlocks, hasInlineMirror: false };
     }
-    // Find the insertion point: after the core block at ~30% of total core blocks
-    const coreCount = mergedBlocks.filter(b => b.layer === 'core').length;
-    const targetIdx = Math.max(1, Math.floor(coreCount * 0.3));
-    let coreSeen = 0;
-    let insertAt = -1;
-
-    for (let i = 0; i < mergedBlocks.length; i++) {
-      if (mergedBlocks[i].layer === 'core') {
-        coreSeen++;
-        if (coreSeen >= targetIdx) { insertAt = i + 1; break; }
-      }
-    }
-    if (insertAt < 0) return { displayBlocks: mergedBlocks, hasInlineMirror: false };
-
     const mirrorBlock: ContentBlock = {
       layer: 'quick-mirror',
       paragraphs: [],
       isNew: false,
     };
-    const out = [...mergedBlocks];
-    out.splice(insertAt, 0, mirrorBlock);
-    return { displayBlocks: out, hasInlineMirror: true };
+    return {
+      displayBlocks: [...mergedBlocks, mirrorBlock],
+      hasInlineMirror: true,
+    };
   }, [mergedBlocks, quickMirror.triggered, quickMirror.result]);
 
   // Return recognition — ambient "I know you" for returning readers
@@ -129,16 +116,16 @@ function ArticleContent({ params }: { params: { id: string } }) {
       <GoldenThread />
       <GemHome quiet />
       <article className="min-h-screen">
-        <div className="max-w-prose mx-auto px-6">
+        <div className="max-w-prose mx-auto px-sys-7">
           <TopBar articleId={params.id} title={article.title} />
           <ArticleHeader title={article.title} readTime={readTime} />
-          <hr className="border-gold/10 mb-8" />
+          <hr className="border-gold/10 mb-sys-8" />
 
-          <div className="prose prose-invert max-w-none mb-12 text-[length:var(--sys-text-prose)] thermal-typography text-foreground">
+          <div className="prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography text-foreground">
             {displayBlocks.length > 0 ? (
               <StratifiedRenderer blocks={displayBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning}
                 mirrorSlot={quickMirror.triggered && quickMirror.result ? (
-                  <div className="my-12">
+                  <div className="my-sys-8">
                     <QuickMirrorCard result={quickMirror.result} articleId={params.id} />
                   </div>
                 ) : undefined}
@@ -148,7 +135,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          <hr className="border-gold/10 my-8" />
+          <hr className="border-gold/10 my-sys-8" />
           {recommendation && (
             <NextRead
               article={recommendation.article}
@@ -165,7 +152,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
 function TopBar({ articleId, title }: { articleId: string; title: string }) {
   return (
-    <div className="flex items-center justify-end pt-6 pb-2">
+    <div className="flex items-center justify-end pt-sys-7 pb-sys-3">
       <ResonanceButton articleId={articleId} articleTitle={title} />
     </div>
   );
@@ -173,11 +160,11 @@ function TopBar({ articleId, title }: { articleId: string; title: string }) {
 
 function ArticleHeader({ title, readTime }: { title: string; readTime: number }) {
   return (
-    <header className="mb-8 text-center">
-      <h1 className="font-display text-[2.5rem] font-bold text-foreground leading-tight tracking-tight">
+    <header className="mb-sys-8 text-center">
+      <h1 className="font-display text-sys-h2 font-bold text-foreground leading-tight tracking-tight">
         {title}
       </h1>
-      <p className="text-mist text-sm mt-3">{readTime} min read</p>
+      <p className="text-mist text-sys-caption mt-sys-3">{readTime} min read</p>
     </header>
   );
 }

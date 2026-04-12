@@ -164,7 +164,7 @@ function LetterCard({
     <div className={`relative max-w-lg mx-auto my-12 p-8 md:p-10
       max-h-[40vh] overflow-y-auto
       bg-gradient-to-b from-surface to-background
-      rounded-lg border transition-all duration-reveal
+      rounded-lg thermal-radius border transition-all duration-reveal
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss */}
       {visible && (

@@ -35,11 +35,11 @@ export default function ReadingInvitation(
   const hint = pickHint(articleId);
 
   return (
-    <div className="text-center mt-12 mb-16">
+    <div className="text-center mt-sys-10 mb-sys-11">
       <Link href={`/article/${articleId}`}
-        className="inline-block px-8 py-3.5 rounded-lg
+        className="inline-block px-8 py-3.5 thermal-radius
           bg-gold/10 border border-gold/20 text-gold
-          font-display font-semibold text-lg
+          font-display font-semibold text-sys-lg
           hover:bg-gold/20 hover:border-gold/40 hover:shadow-gold
           hover:-translate-y-micro active:translate-y-0
           transition-all duration-enter
@@ -49,7 +49,7 @@ export default function ReadingInvitation(
         Begin Reading &rarr;
       </Link>
 
-      <p className="text-mist/50 text-sm mt-6 italic max-w-sm mx-auto">
+      <p className="text-mist/50 text-sys-caption mt-sys-7 italic max-w-sm mx-auto">
         {hint}
       </p>
     </div>

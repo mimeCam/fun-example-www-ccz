@@ -80,7 +80,7 @@ export default function MirrorPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="animate-mirror-pulse w-80 h-96 rounded-lg bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
+      <div className="animate-mirror-pulse w-80 h-96 thermal-radius bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
     </div>
   );
 
@@ -96,7 +96,7 @@ export default function MirrorPage() {
           Read an article to the end and the Mirror will find you.
         </p>
         <Link href="/articles"
-          className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold rounded-lg transition-colors">
+          className="inline-block px-6 py-3 border border-gold/40 text-gold hover:bg-gold/10 font-semibold thermal-radius transition-colors">
           Browse Articles →
         </Link>
       </div>

@@ -31,7 +31,7 @@ export default function ExploreArticleCard({
   return (
     <Link href={`/article/${article.id}`} className="block group">
       <article
-        className={`bg-surface rounded-lg p-5 transition-all duration-hover h-full flex flex-col group-hover:-translate-y-px ${
+        className={`bg-surface thermal-radius p-5 transition-all duration-hover h-full flex flex-col group-hover:-translate-y-px ${
           isCurated
             ? 'border border-gold/20 shadow-gold hover:shadow-gold-intense'
             : 'border border-fog/10 shadow-void hover:shadow-rise'

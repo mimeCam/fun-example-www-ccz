@@ -49,33 +49,33 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
   const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
 
   return (
-    <div className="py-6 animate-fade-in">
+    <div className="py-sys-7 animate-fade-in">
       {/* "UP NEXT" label + archetype badge */}
-      <div className="mb-3 flex items-center gap-3">
-        <span className="text-xs tracking-widest uppercase text-mist/50 font-medium">
+      <div className="mb-sys-4 flex items-center gap-sys-4">
+        <span className="text-sys-micro tracking-widest uppercase text-mist/50 font-sys-accent">
           Up Next
         </span>
         {label && (
-          <span className={`text-xs tracking-wide font-medium border rounded-full px-2.5 py-0.5 ${ARCHETYPE_ACCENT[archetype!]}`}>
+          <span className={`text-sys-micro tracking-wide font-sys-accent border rounded-sys-full px-2.5 py-0.5 ${ARCHETYPE_ACCENT[archetype!]}`}>
             For the {label}
           </span>
         )}
       </div>
 
       {/* Article title */}
-      <h3 className="text-xl font-semibold text-foreground mb-2 leading-tight">
+      <h3 className="text-sys-xl font-sys-heading text-foreground mb-sys-2 leading-tight">
         {article.title}
       </h3>
 
       {/* Context — WHY this article was recommended */}
-      <p className="text-sm text-mist/60 mb-3 leading-relaxed">
+      <p className="text-sys-caption text-mist/60 mb-sys-4 leading-relaxed">
         {context}
       </p>
 
       {/* CTA — text link, not button */}
       <Link
         href={`/article/${article.id}`}
-        className="text-gold hover:text-gold/80 transition-colors duration-hover text-sm font-medium"
+        className="text-gold hover:text-gold/80 transition-colors duration-hover text-sys-caption font-sys-accent"
       >
         Read this next →
       </Link>

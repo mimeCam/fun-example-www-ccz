@@ -122,29 +122,32 @@
   --foreground: var(--token-foreground);
 }
 
-/* Thermal transitions — smooth state changes (1.5s prevents jitter) */
+/* Thermal transitions — imperceptible in the moment, unmistakable in retrospect.
+   Color/typography ≥ 3s (slower than eye saccades).
+   Shadow/radius ≥ 2s (peripheral, can be slightly faster). */
 html {
-  transition: background-color 1.5s ease-out;
+  transition: background-color 3s ease-out;
 }
 
 body {
   color: var(--token-foreground);
   background: var(--token-bg);
   line-height: var(--token-line-height);
-  transition: color 1.5s ease-out,
-              line-height 1.5s ease-out;
+  transition: color 4s ease-out,
+              line-height 4s ease-out;
 }
 
-/* Thermal-responsive utility — applies continuous typography tokens */
+/* Thermal-responsive utility — applies continuous typography tokens.
+   Each property transitions at its own pace to avoid synchronized "popping." */
 .thermal-typography {
   line-height: var(--token-line-height);
   font-weight: var(--token-font-weight);
   letter-spacing: var(--token-letter-spacing);
   text-shadow: var(--token-text-glow);
-  transition: line-height 1.5s ease-out,
-              font-weight 1.5s ease-out,
-              letter-spacing 1.5s ease-out,
-              text-shadow 1.5s ease-out;
+  transition: line-height 4s ease-out,
+              font-weight 3.5s ease-out,
+              letter-spacing 3.5s ease-out,
+              text-shadow 3.5s ease-out;
 }
 
 /* Paragraph spacing opens up as the site warms.
@@ -159,14 +162,21 @@ body {
   box-shadow: 0 calc(1px + 7px * var(--token-shadow-depth))
               calc(2px + 30px * var(--token-shadow-depth))
               rgba(0, 0, 0, calc(0.3 + 0.2 * var(--token-shadow-depth)));
-  transition: box-shadow 1.5s ease-out;
+  transition: box-shadow 2s ease-out;
 }
 
 /* Thermal radius softening — additive bonus on top of --sys-radius-medium.
    At dormant: 0.5rem (base). At luminous: 1.0rem (base + 0.5rem bonus). */
 .thermal-radius {
   border-radius: calc(var(--sys-radius-medium) + var(--token-radius-soft));
-  transition: border-radius 1.5s ease-out;
+  transition: border-radius 2.5s ease-out;
+}
+
+/* Thermal radius softening (wide variant) — for cards that use wide radius.
+   At dormant: 0.75rem (base). At luminous: 1.25rem (base + 0.5rem bonus). */
+.thermal-radius-wide {
+  border-radius: calc(var(--sys-radius-wide) + var(--token-radius-soft));
+  transition: border-radius 2.5s ease-out;
 }
 
 /* Dormant state "lit candle" — visible gold glow on CTA elements.
