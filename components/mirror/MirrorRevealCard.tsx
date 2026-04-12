@@ -100,8 +100,8 @@ function phaseStyle(p: Phase): string {
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-80 translate-y-0 border-gold/10',
-    shimmer:   'opacity-100 translate-y-0 border-gold/25',
-    reveal:    'opacity-100 translate-y-0 border-gold/30 shadow-gold',
+    shimmer:   'opacity-100 translate-y-0 border-gold/20',
+    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-gold',
     done:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
   return map[p];

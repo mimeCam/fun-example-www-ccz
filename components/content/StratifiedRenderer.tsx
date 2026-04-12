@@ -48,7 +48,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
             key={i}
             data-paragraph-id={`${prefix}-p${offset + i}`}
             data-variant={variant?.source ?? undefined}
-            className={`text-foreground max-w-prose-ch ${variant ? 'pl-3 border-l-2 border-gold/30' : ''}`}
+            className={`text-foreground max-w-prose-ch ${variant ? 'pl-3 border-l-2 border-gold/20' : ''}`}
           >
             {p.trim()}
           </p>
@@ -64,7 +64,7 @@ function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: bool
   const shadow = warmer ? 'shadow-cyan-whisper' : '';
   return (
     <aside
-      className={`my-8 pl-4 border-l-2 ${border} bg-surface/30 rounded-r-md py-3 pr-4 ${shadow}
+      className={`my-10 pl-4 border-l-2 ${border} bg-surface/30 rounded-r-md py-3 pr-4 ${shadow}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}`}
     >
       {block.isNew && <NewContentBadge />}
@@ -86,7 +86,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
   return (
     <section
       data-layer={block.layer}
-      className={`my-8 pl-4 pr-4 py-3 rounded-r-md border-l-2 ${borderColor}
+      className={`my-12 pl-4 pr-4 py-3 rounded-r-md border-l-2 ${borderColor}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}
         bg-surface/20`}
     >
@@ -159,7 +159,7 @@ function archetypeHoverColor(key: ArchetypeKey | null): string {
     "explorer": "rgba(199, 125, 255, 0.15)",
     "faithful": "rgba(157, 78, 221, 0.15)",
     "resonator": "rgba(232, 143, 167, 0.15)",
-    "collector": "rgba(240, 198, 116, 0.15)",
+    "collector": "rgba(230, 162, 60, 0.15)",
   };
   return map[key ?? ""] ?? "rgba(34, 34, 68, 0.10)";
 }
@@ -212,12 +212,11 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
   const data = block.resonance;
   if (!data) return null;
 
-  const scale = warmer ? 'scale-[1.01]' : '';
-  const glow = warmer ? 'shadow-[0_0_25px_rgba(232,143,167,0.2)]' : '';
+  const glow = warmer ? 'shadow-[0_0_18px_rgba(232,143,167,0.2)]' : '';
 
   return (
     <aside
-      className={`my-8 p-5 bg-surface/60 border-l-4 border-rose rounded-lg shadow-rose-glow ${scale} ${glow}
+      className={`my-14 px-5 py-4 bg-surface/60 border-l-4 border-rose rounded-lg shadow-rose-glow ${glow}
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
       <p className="text-xs uppercase tracking-widest text-rose/70 mb-3">
@@ -226,7 +225,7 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
       <p className="text-[0.9375rem] text-foreground/70 italic leading-[1.7]">
         &ldquo;{data.quote}&rdquo;
       </p>
-      <div className="h-px bg-gold/30 max-w-divider my-3" />
+      <div className="h-px bg-gold/20 max-w-divider my-3" />
       <p className="text-[0.9375rem] text-rose italic leading-[1.7]">
         {data.note}
       </p>

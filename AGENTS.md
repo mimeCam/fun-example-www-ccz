@@ -4,7 +4,7 @@
 Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (better-sqlite3) · Zod · Fuse.js
 
 ## Key Paths
-- `lib/thermal/` — score engine, tokens, animation, history, dwell gate
+- `lib/thermal/` — score engine, tokens (16 CSS vars), animation, history, dwell gate
 - `lib/mirror/` — scoring, snapshots, quiet-zone logic
 - `lib/content/` — stratified paragraphs, archetype recommendations
 - `components/thermal/` — ThermalProvider, ThermalLayout
@@ -19,10 +19,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## WIP
 - [ ] QuickMirrorCard: move from mid-prose to end-of-section
-- [x] Extract shared `GemIcon` component (7 copies → 1 shared component with xs/sm/md/lg sizes)
 - [ ] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
 - [ ] Nav active state: thermal-aware dot indicator
-- [x] Threshold alignment: thermal-score thresholds now match thermal-animation constants (18/50/80)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

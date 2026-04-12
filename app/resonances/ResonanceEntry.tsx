@@ -60,7 +60,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
       )}
 
       {/* Gold divider */}
-      <div className="h-px max-w-divider bg-gold/30 mb-3" />
+      <div className="h-px max-w-divider bg-gold/20 mb-3" />
 
       {/* Reader's note */}
       <p className="text-rose italic text-[0.9375rem] leading-[1.7] mb-4">

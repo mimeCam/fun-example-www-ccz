@@ -32,7 +32,7 @@ export default function EvolutionThread({ context, position = 0, total = 1 }: Pr
     : legacyWhisper(position, total);
 
   return (
-    <div className={`mx-4 my-4 pl-4 pr-4 py-3 border-l-2 border-gold/30 bg-gold/5
+    <div className={`mx-4 my-4 pl-4 pr-4 py-3 border-l-2 border-gold/20 bg-gold/8
       rounded-r-lg transition-opacity duration-reveal
       ${visible ? 'opacity-100' : 'opacity-0'}`}>
       <p className="text-gold/70 italic text-sm leading-relaxed">

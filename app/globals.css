@@ -21,6 +21,17 @@
   --token-radius-soft: 0rem;
   --token-accent-opacity: 0.50;
 
+  /* Thermal typography depth — "the room warms, the text breathes".
+     Each token individually below JND; combined creates felt difference.
+     font-weight: variable font axis (Inter supports 100-900).
+     letter-spacing: tight/formal → open/intimate.
+     para-rhythm: additive paragraph gap (stacks on spacing-breath).
+     text-glow: peripheral warmth, not "glowing text". */
+  --token-font-weight: 400;
+  --token-letter-spacing: -0.01em;
+  --token-para-rhythm: 0px;
+  --token-text-glow: none;
+
   /* Animation tokens — ThermalProvider sets these at runtime.
      '0' = animation disabled (dormant state). */
   --token-breath-speed: 0;
@@ -33,6 +44,7 @@
 
   /* Static design tokens — never change with thermal state */
   --gold: #f0c674;
+  --amber: #e6a23c;     /* Collector archetype — distinct from thermal gold */
   --cyan: #4ecdc4;
   --rose: #e88fa7;
   --mist: #9494b8;
@@ -85,12 +97,19 @@ body {
 /* Thermal-responsive utility — applies continuous typography tokens */
 .thermal-typography {
   line-height: var(--token-line-height);
-  transition: line-height 1.5s ease-out;
+  font-weight: var(--token-font-weight);
+  letter-spacing: var(--token-letter-spacing);
+  text-shadow: var(--token-text-glow);
+  transition: line-height 1.5s ease-out,
+              font-weight 1.5s ease-out,
+              letter-spacing 1.5s ease-out,
+              text-shadow 1.5s ease-out;
 }
 
-/* Paragraph spacing opens up as the site warms (0 → 8px perceptible delta) */
+/* Paragraph spacing opens up as the site warms.
+   spacing-breath (0→8px) + para-rhythm (0→6px) = 0→14px total additive gap */
 .thermal-typography p {
-  margin-bottom: calc(0.75rem + var(--token-spacing-breath));
+  margin-bottom: calc(0.75rem + var(--token-spacing-breath) + var(--token-para-rhythm));
 }
 
 /* Thermal shadow depth — continuous alpha scaling for card surfaces */
@@ -108,15 +127,15 @@ body {
 }
 
 /* Dormant state "lit candle" — visible gold glow on CTA elements.
-   Pulse smoothed: 0.12→0.28 alpha (was 0.10→0.40, too aggressive flash). */
+   Pulse smoothed: 0.14→0.24 alpha — felt, not seen. */
 .thermal-candle {
-  box-shadow: 0 0 20px rgba(240,198,116,0.12);
+  box-shadow: 0 0 20px rgba(240,198,116,0.14);
   animation: candlePulse 3s ease-in-out infinite;
 }
 
 @keyframes candlePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.12); }
-  50% { box-shadow: 0 0 40px rgba(240,198,116,0.28); }
+  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.14); }
+  50% { box-shadow: 0 0 40px rgba(240,198,116,0.24); }
 }
 
 /* Warm state warm-spotlight — radial gradient creates perceptible "room warming" */
@@ -180,6 +199,9 @@ body {
   }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;
+  }
+  .thermal-typography {
+    text-shadow: none !important;
   }
 }
 

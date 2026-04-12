@@ -47,9 +47,14 @@ describe('computeThermalTokens — output tokens', () => {
     '--token-shadow-depth',
     '--token-radius-soft',
     '--token-accent-opacity',
+    // Typography depth tokens — thermal typography
+    '--token-font-weight',
+    '--token-letter-spacing',
+    '--token-para-rhythm',
+    '--token-text-glow',
   ];
 
-  it('returns 12 CSS custom property keys', () => {
+  it('returns 16 CSS custom property keys', () => {
     for (const key of TOKEN_KEYS) {
       expect(SRC).toContain(`'${key}'`);
     }
@@ -129,5 +134,62 @@ describe('glowValue and shadowValue', () => {
   it('shadow interpolates alpha from depth anchors', () => {
     expect(SRC).toContain('SHADOW_DEPTH.dormant');
     expect(SRC).toContain('SHADOW_DEPTH.warm');
+  });
+});
+
+// ─── Typography depth token tests ──────────────────────────
+
+describe('thermal-tokens — typography depth anchors', () => {
+  it('has FONT_WEIGHT anchors (400 → 420, one grade shift)', () => {
+    expect(SRC).toContain('FONT_WEIGHT');
+    expect(SRC).toContain('dormant: 400');
+    expect(SRC).toContain('warm: 420');
+  });
+
+  it('has LETTER_SPACING anchors (-0.01em → +0.01em)', () => {
+    expect(SRC).toContain('LETTER_SPACING');
+    expect(SRC).toContain('dormant: -0.01');
+    expect(SRC).toContain('warm: 0.01');
+  });
+
+  it('has PARA_RHYTHM anchors (0px → 6px)', () => {
+    expect(SRC).toContain('PARA_RHYTHM');
+    expect(SRC).toContain('dormant: 0');
+    expect(SRC).toContain('warm: 6');
+  });
+
+  it('emits --token-font-weight using lerp', () => {
+    expect(SRC).toContain("'--token-font-weight'");
+    expect(SRC).toContain('FONT_WEIGHT.dormant');
+    expect(SRC).toContain('FONT_WEIGHT.warm');
+  });
+
+  it('emits --token-letter-spacing with em unit', () => {
+    expect(SRC).toContain("'--token-letter-spacing'");
+    expect(SRC).toContain('}em`');
+  });
+
+  it('emits --token-para-rhythm with px unit', () => {
+    expect(SRC).toContain("'--token-para-rhythm'");
+    expect(SRC).toContain('}px`');
+  });
+
+  it('emits --token-text-glow via textGlowValue function', () => {
+    expect(SRC).toContain("'--token-text-glow'");
+    expect(SRC).toContain('function textGlowValue');
+  });
+});
+
+describe('textGlowValue — warm-only text glow', () => {
+  it('returns "none" below 50% score (warm threshold)', () => {
+    expect(SRC).toContain("if (t < 0.5) return 'none'");
+  });
+
+  it('caps alpha at 0.05 — peripheral warmth', () => {
+    expect(SRC).toContain('0.05');
+  });
+
+  it('uses gold rgba for text glow', () => {
+    expect(SRC).toContain('rgba(240,198,116,');
   });
 });

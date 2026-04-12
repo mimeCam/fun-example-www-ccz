@@ -33,7 +33,7 @@ export default function ExploreArticleCard({
       <article
         className={`bg-surface rounded-lg p-5 transition-all duration-hover h-full flex flex-col group-hover:-translate-y-px ${
           isCurated
-            ? 'border border-gold/30 shadow-gold hover:shadow-gold-intense'
+            ? 'border border-gold/20 shadow-gold hover:shadow-gold-intense'
             : 'border border-fog/10 shadow-void hover:shadow-rise'
         }`}
       >

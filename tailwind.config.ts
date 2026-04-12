@@ -21,6 +21,7 @@ const config: Config = {
         fog: "var(--fog)",
         mist: "var(--mist)",
         gold: "var(--gold)",
+        amber: "var(--amber)",
         cyan: "var(--cyan)",
         rose: "var(--rose)",
         void: "var(--void-deep)",
@@ -123,8 +124,8 @@ const config: Config = {
           '50%': { boxShadow: '0 12px 60px rgba(240, 198, 116, 0.40)' },
         },
         discoveryShimmer: {
-          '0%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 16px rgba(240, 198, 116, 0.25)' },
-          '60%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 8px rgba(240, 198, 116, 0.1)' },
+          '0%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 16px rgba(240, 198, 116, 0.20)' },
+          '60%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 8px rgba(240, 198, 116, 0.08)' },
           '100%': { borderLeftColor: '#4ecdc4', boxShadow: 'none' },
         },
         fadeOut: {

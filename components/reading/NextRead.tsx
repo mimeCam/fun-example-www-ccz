@@ -28,7 +28,7 @@ const ARCHETYPE_ACCENT: Record<ArchetypeKey, string> = {
   'explorer': 'border-accent/30 text-accent',
   'faithful': 'border-secondary/30 text-secondary',
   'resonator': 'border-rose/30 text-rose',
-  'collector': 'border-gold/30 text-gold',
+  'collector': 'border-amber/30 text-amber',
 };
 
 /** Human-readable archetype labels for the "For the ..." badge. */

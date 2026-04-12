@@ -44,7 +44,7 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
   }, []);
 
   if (dismissed) return (
-    <div className="my-12 mx-auto max-w-divider h-px bg-gold/30 rounded-full" />
+    <div className="my-12 mx-auto max-w-divider h-px bg-gold/20 rounded-full" />
   );
 
   const showContent = phase === 'reveal' || phase === 'rest';
@@ -128,8 +128,8 @@ function phaseClass(p: Phase, colors: { shimmerFrom: string; shimmerTo: string }
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-80 translate-y-0 border-gold/10',
-    shimmer:   `opacity-100 translate-y-0 border-gold/25 shadow-gold-intense`,
-    reveal:    'opacity-100 translate-y-0 border-gold/30 shadow-gold',
+    shimmer:   `opacity-100 translate-y-0 border-gold/20 shadow-gold-intense`,
+    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-gold',
     rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
   };
   return map[p];

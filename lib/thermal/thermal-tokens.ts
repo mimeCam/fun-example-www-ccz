@@ -35,6 +35,13 @@ const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
 // Accent opacity — raised from 0.30 to make accent visible from the start.
 const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
 
+// Typography depth anchors — "the room warms, the text breathes".
+// Each delta is individually below the Just Noticeable Difference (JND).
+// Combined, they create a cumulative felt difference (Jason Fried test).
+const FONT_WEIGHT = { dormant: 400, warm: 420 };          // one grade shift
+const LETTER_SPACING = { dormant: -0.01, warm: 0.01 };    // em — tight→open
+const PARA_RHYTHM = { dormant: 0, warm: 6 };              // px — additive para gap
+
 // ─── HSL interpolation ────────────────────────────────────
 
 interface HSL { h: number; s: number; l: number }
@@ -114,6 +121,11 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-radius-soft': `${lerp(RADIUS_SOFT.dormant, RADIUS_SOFT.warm, t).toFixed(2)}rem`,
     // Accent opacity — controls visibility of accent elements
     '--token-accent-opacity': lerp(ACCENT_OPACITY.dormant, ACCENT_OPACITY.warm, t).toFixed(2),
+    // Typography depth — font-weight, letter-spacing, paragraph rhythm, text glow
+    '--token-font-weight': lerp(FONT_WEIGHT.dormant, FONT_WEIGHT.warm, t).toFixed(1),
+    '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, t).toFixed(3)}em`,
+    '--token-para-rhythm': `${Math.round(lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, t))}px`,
+    '--token-text-glow': textGlowValue(t),
   };
 }
 
@@ -130,4 +142,12 @@ function glowValue(t: number): string {
 function shadowValue(t: number): string {
   const alpha = lerp(SHADOW_DEPTH.dormant, SHADOW_DEPTH.warm, t).toFixed(2);
   return `0 ${Math.round(1 + t * 7)}px ${Math.round(2 + t * 30)}px rgba(0,0,0,${alpha})`;
+}
+
+/** Text glow — warm gold shadow on .thermal-typography, only at warm+.
+ *  Alpha capped at 0.05 — peripheral warmth, not "glowing text". */
+function textGlowValue(t: number): string {
+  if (t < 0.5) return 'none';
+  const alpha = Math.min(0.05, t * 0.06).toFixed(3);
+  return `0 0 40px rgba(240,198,116,${alpha})`;
 }

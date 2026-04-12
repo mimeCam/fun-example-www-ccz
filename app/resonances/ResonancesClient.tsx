@@ -194,7 +194,7 @@ export default function ResonancesClient() {
 
       {/* Page title */}
       <div className="mb-10">
-        <h1 className="text-gold text-3xl font-display font-light lowercase">
+        <h1 className="text-[var(--token-accent)] text-3xl font-display font-light lowercase">
           the book of you
         </h1>
         <p className="text-mist text-md italic mt-1">What you&apos;re still carrying</p>
