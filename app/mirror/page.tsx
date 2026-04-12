@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { GemHome } from '@/components/navigation/GemHome';
+import { GemIcon } from '@/components/shared/GemIcon';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
@@ -87,7 +88,7 @@ export default function MirrorPage() {
     <div className="min-h-screen p-8">
       <GemHome />
       <div className="max-w-md mx-auto pt-20 text-center">
-        <GemOutline />
+        <GemIcon size="lg" className="mx-auto text-mist/30 mb-8" />
         <h1 className="text-2xl font-display font-bold text-foreground mb-3">
           Your reflection hasn&apos;t formed yet.
         </h1>
@@ -129,18 +130,6 @@ function MetaLine({ articlesRead, firstDetected }: {
     <p className="text-xs text-mist/40 text-center mt-8">
       {parts.join(' · ')}
     </p>
-  );
-}
-
-function GemOutline() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
-      className="mx-auto text-mist/30 mb-8">
-      <path d="M6 3h12l4 6-10 13L2 9z" />
-      <path d="M12 3l4 6-4 13-4-13z" />
-    </svg>
   );
 }
 

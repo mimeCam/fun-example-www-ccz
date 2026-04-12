@@ -31,7 +31,7 @@ export interface ThermalResult {
 const STATE_THRESHOLDS: [number, ThermalState][] = [
   [80, 'luminous'],
   [50, 'warm'],
-  [25, 'stirring'],
+  [18, 'stirring'],
   [0, 'dormant'],
 ];
 

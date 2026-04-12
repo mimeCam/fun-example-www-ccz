@@ -16,6 +16,7 @@
 
 import Link from 'next/link';
 import { useThermal } from '@/components/thermal/ThermalProvider';
+import { GemIcon } from '@/components/shared/GemIcon';
 
 function gemColor(state: string, quiet: boolean): string {
   if (quiet) return 'text-mist/20';
@@ -48,9 +49,7 @@ export function GemHome({ quiet = false }: GemHomeProps) {
         ${gemColor(state, quiet)} ${gemShadow(state, quiet)}`}
       aria-label="Home"
     >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-        <path d="M12 2L2 9l10 13L22 9L12 2z" />
-      </svg>
+      <GemIcon />
     </Link>
   );
 }

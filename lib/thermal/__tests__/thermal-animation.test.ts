@@ -31,8 +31,8 @@ describe('thermal-animation source structure', () => {
     expect(SRC).not.toContain('import');
   });
 
-  it('uses state thresholds matching thermal-score (25/50/80)', () => {
-    expect(SRC).toContain('DORMANT = 25');
+  it('uses state thresholds matching thermal-score (18/50/80)', () => {
+    expect(SRC).toContain('DORMANT = 18');
     expect(SRC).toContain('STIRRING = 50');
     expect(SRC).toContain('WARM = 80');
   });
@@ -62,21 +62,21 @@ describe('computeAnimationTokens — output tokens', () => {
     expect(SRC).toContain("drift.cycleSec === 0\n      ? '0'");
   });
 
-  it('stirring state (score 30) activates breath with 6s cycle', () => {
+  it('stirring state (score 30) activates breath with 8s cycle', () => {
     // Check the stirring breath config
-    expect(SRC).toContain("stirring: { cycleSec: 6, scalePeak: 0.002 }");
+    expect(SRC).toContain("stirring: { cycleSec: 8, scalePeak: 0.003 }");
   });
 
-  it('warm state (score 60) uses 4.5s breath cycle', () => {
-    expect(SRC).toContain("warm:     { cycleSec: 4.5, scalePeak: 0.003 }");
+  it('warm state (score 60) uses 5s breath cycle', () => {
+    expect(SRC).toContain("warm:     { cycleSec: 5, scalePeak: 0.005 }");
   });
 
   it('luminous state (score 90) uses 3.5s breath cycle', () => {
-    expect(SRC).toContain("luminous: { cycleSec: 3.5, scalePeak: 0.005 }");
+    expect(SRC).toContain("luminous: { cycleSec: 3.5, scalePeak: 0.008 }");
   });
 
   it('glow opacity ranges are correct for warm state', () => {
-    expect(SRC).toContain("warm:     { cycleSec: 4, minOpacity: 0.08, maxOpacity: 0.18 }");
+    expect(SRC).toContain("warm:     { cycleSec: 4, minOpacity: 0.12, maxOpacity: 0.25 }");
   });
 
   it('drift range is correct for luminous state', () => {

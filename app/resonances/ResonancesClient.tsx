@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { GemHome } from '@/components/navigation/GemHome';
+import { GemIcon } from '@/components/shared/GemIcon';
 import {
   getResonancesWithArticleAction,
   getDepthMetricsAction,
@@ -103,19 +104,6 @@ function buildClosingCtx(r: ResonanceWithArticle): ClosingLineContext {
   };
 }
 
-/** Gem outline SVG — matches mirror page empty state icon. */
-function GemIcon({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
-      className={className}>
-      <path d="M6 3h12l4 6-10 13L2 9z" />
-      <path d="M12 3l4 6-4 13-4-13z" />
-    </svg>
-  );
-}
-
 /** Slot indicator: filled ◆ and empty ◇ diamonds. */
 function SlotIndicator({ used, total }: { used: number; total: number }) {
   return (
@@ -178,7 +166,7 @@ export default function ResonancesClient() {
   if (isEmpty) return (
     <div className="max-w-md mx-auto pt-20 text-center">
       <GemHome />
-      <GemIcon className="mx-auto text-mist/30 mb-8" />
+      <GemIcon size="lg" className="mx-auto text-mist/30 mb-8" />
       <h1 className="text-2xl font-display font-bold text-foreground mb-3">
         Your chapter hasn&apos;t been written yet.
       </h1>

@@ -12,7 +12,7 @@
 
 // ─── State thresholds (must match thermal-score.ts) ──────
 
-const DORMANT = 25;
+const DORMANT = 18;
 const STIRRING = 50;
 const WARM = 80;
 
@@ -24,16 +24,16 @@ interface DriftConfig { cycleSec: number; rangePx: number }
 
 const BREATH: Record<string, BreathConfig> = {
   dormant:  { cycleSec: 0, scalePeak: 0 },
-  stirring: { cycleSec: 8, scalePeak: 0.002 },
-  warm:     { cycleSec: 4.5, scalePeak: 0.003 },
-  luminous: { cycleSec: 3.5, scalePeak: 0.005 },
+  stirring: { cycleSec: 8, scalePeak: 0.003 },
+  warm:     { cycleSec: 5, scalePeak: 0.005 },
+  luminous: { cycleSec: 3.5, scalePeak: 0.008 },
 };
 
 const GLOW: Record<string, GlowConfig> = {
   dormant:  { cycleSec: 0, minOpacity: 0, maxOpacity: 0 },
-  stirring: { cycleSec: 7, minOpacity: 0.05, maxOpacity: 0.12 },
-  warm:     { cycleSec: 4, minOpacity: 0.08, maxOpacity: 0.18 },
-  luminous: { cycleSec: 3, minOpacity: 0.12, maxOpacity: 0.25 },
+  stirring: { cycleSec: 7, minOpacity: 0.08, maxOpacity: 0.18 },
+  warm:     { cycleSec: 4, minOpacity: 0.12, maxOpacity: 0.25 },
+  luminous: { cycleSec: 3, minOpacity: 0.18, maxOpacity: 0.35 },
 };
 
 const DRIFT: Record<string, DriftConfig> = {

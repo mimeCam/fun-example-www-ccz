@@ -19,7 +19,7 @@
   --token-line-height: 1.75;
   --token-shadow-depth: 0.30;
   --token-radius-soft: 0rem;
-  --token-accent-opacity: 0.30;
+  --token-accent-opacity: 0.50;
 
   /* Animation tokens — ThermalProvider sets these at runtime.
      '0' = animation disabled (dormant state). */
@@ -88,7 +88,7 @@ body {
   transition: line-height 1.5s ease-out;
 }
 
-/* Paragraph spacing opens up as the site warms (0 → 4px perceptible delta) */
+/* Paragraph spacing opens up as the site warms (0 → 8px perceptible delta) */
 .thermal-typography p {
   margin-bottom: calc(0.75rem + var(--token-spacing-breath));
 }
@@ -107,22 +107,28 @@ body {
   transition: border-radius 1.5s ease-out;
 }
 
-/* Dormant state "lit candle" — visible gold glow on CTA elements */
+/* Dormant state "lit candle" — visible gold glow on CTA elements.
+   Pulse smoothed: 0.12→0.28 alpha (was 0.10→0.40, too aggressive flash). */
 .thermal-candle {
-  box-shadow: 0 0 20px rgba(240,198,116,0.10);
+  box-shadow: 0 0 20px rgba(240,198,116,0.12);
   animation: candlePulse 3s ease-in-out infinite;
 }
 
 @keyframes candlePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.10); }
-  50% { box-shadow: 0 0 40px rgba(240,198,116,0.40); }
+  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.12); }
+  50% { box-shadow: 0 0 40px rgba(240,198,116,0.28); }
 }
 
-/* Warm state warm-spotlight — subtle radial gradient on bg */
-[data-thermal="warm"] body,
+/* Warm state warm-spotlight — radial gradient creates perceptible "room warming" */
+[data-thermal="warm"] body {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(240,198,116,0.08), transparent 70%),
+    var(--token-bg);
+}
+
 [data-thermal="luminous"] body {
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(240,198,116,0.03), transparent 70%),
+    radial-gradient(ellipse at 50% 30%, rgba(240,198,116,0.12), transparent 70%),
     var(--token-bg);
 }
 

@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { createResonanceAction } from '@/app/actions/resonances';
 import { useThermal } from '@/components/thermal/ThermalProvider';
+import { GemIcon } from '@/components/shared/GemIcon';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -290,13 +291,7 @@ function SuccessMessage() {
   return (
     <div className="py-6 text-center">
       <div className="inline-block animate-bounce-subtle">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-          viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-          className="text-gold mx-auto mb-3">
-          <path d="M6 3h12l4 6-10 13L2 9z" />
-          <path d="M12 3l4 6-4 13-4-13z" />
-        </svg>
+        <GemIcon className="text-gold mx-auto mb-3" />
       </div>
       <p className="text-gold text-lg font-display font-bold">Saved.</p>
       <p className="text-mist text-sm mt-2 italic">

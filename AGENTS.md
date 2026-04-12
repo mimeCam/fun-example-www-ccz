@@ -8,6 +8,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/mirror/` — scoring, snapshots, quiet-zone logic
 - `lib/content/` — stratified paragraphs, archetype recommendations
 - `components/thermal/` — ThermalProvider, ThermalLayout
+- `components/shared/GemIcon.tsx` — unified gem diamond (xs/sm/md/lg sizes)
 - `components/content/StratifiedRenderer.tsx` — archetype variant renderer
 - `components/reading/GoldenThread.tsx` — vertical reading spine
 - `components/navigation/GemHome.tsx` — thermal-aware home link (quiet on article pages)
@@ -18,10 +19,10 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## WIP
 - [ ] QuickMirrorCard: move from mid-prose to end-of-section
-- [ ] Extract shared `GemIcon` component (3 copies of same SVG — ResonanceDrawer added another)
+- [x] Extract shared `GemIcon` component (7 copies → 1 shared component with xs/sm/md/lg sizes)
 - [ ] Extract `useMirrorPhases` hook from QuickMirrorCard + MirrorRevealCard
 - [ ] Nav active state: thermal-aware dot indicator
-- [ ] Threshold duplication: thermal-score thresholds vs thermal-animation constants
+- [x] Threshold alignment: thermal-score thresholds now match thermal-animation constants (18/50/80)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

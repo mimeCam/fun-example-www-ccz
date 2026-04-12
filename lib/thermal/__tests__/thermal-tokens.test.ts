@@ -56,10 +56,10 @@ describe('computeThermalTokens — output tokens', () => {
   });
 
   it('has typography anchors matching spec', () => {
-    // Line-height: 1.75 (dormant) to 1.90 (warm) — 2.4px total delta
+    // Line-height: 1.75 (dormant) to 1.95 (warm) — 3.5px total delta
     expect(SRC).toContain('LINE_HEIGHT');
     expect(SRC).toContain('dormant: 1.75');
-    expect(SRC).toContain('warm: 1.90');
+    expect(SRC).toContain('warm: 1.95');
   });
 
   it('has shadow depth anchors', () => {
@@ -76,7 +76,7 @@ describe('computeThermalTokens — output tokens', () => {
 
   it('has accent opacity anchors', () => {
     expect(SRC).toContain('ACCENT_OPACITY');
-    expect(SRC).toContain('dormant: 0.3');
+    expect(SRC).toContain('dormant: 0.5');
     expect(SRC).toContain('warm: 1.0');
   });
 
@@ -118,8 +118,8 @@ describe('thermal-tokens — anchor values match CSS :root defaults', () => {
 // ─── Glow/shadow function tests ────────────────────────────
 
 describe('glowValue and shadowValue', () => {
-  it('glow returns "none" below 25% score', () => {
-    expect(SRC).toContain("if (t < 0.25) return 'none'");
+  it('glow returns "none" below 18% score', () => {
+    expect(SRC).toContain("if (t < 0.18) return 'none'");
   });
 
   it('glow uses rgba(240,198,116,...) — gold color', () => {

@@ -8,6 +8,7 @@
 
 import Link from 'next/link';
 import { GemHome } from '@/components/navigation/GemHome';
+import { GemIcon } from '@/components/shared/GemIcon';
 
 export default function NotFound() {
   return (
@@ -15,7 +16,7 @@ export default function NotFound() {
       <GemHome />
 
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <GemOutline />
+        <GemIcon size="lg" className="text-mist/20 mb-8" />
         <Title />
         <Subtitle />
         <div className="mt-8 flex flex-col items-center gap-4">
@@ -28,18 +29,6 @@ export default function NotFound() {
 }
 
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
-
-function GemOutline() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"
-      className="text-mist/20 mb-8">
-      <path d="M6 3h12l4 6-10 13L2 9z" />
-      <path d="M12 3l4 6-4 13-4-13z" />
-    </svg>
-  );
-}
 
 function Title() {
   return (

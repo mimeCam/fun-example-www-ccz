@@ -5,6 +5,7 @@
 'use client';
 
 import Link from 'next/link';
+import { GemIcon } from '@/components/shared/GemIcon';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 
 interface Props {
@@ -17,15 +18,7 @@ interface Props {
 /** Small gem icon for the card label. */
 function CardGem({ faded }: { faded?: boolean }) {
   const color = faded ? 'text-mist/30' : 'text-rose/70';
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
-      className={color}>
-      <path d="M6 3h12l4 6-10 13L2 9z" />
-      <path d="M12 3l4 6-4 13-4-13z" />
-    </svg>
-  );
+  return <GemIcon size="xs" className={color} />;
 }
 
 /** Vitality bar — rose gradient for alive, empty for faded. */

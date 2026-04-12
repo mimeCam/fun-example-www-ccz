@@ -14,16 +14,17 @@ export type ThermalTokens = Record<string, string>;
 
 // ─── Anchor values per state ──────────────────────────────
 
-const BG = { dormant: '#1a1a2e', warm: '#1e1a38' };
-const SURFACE = { dormant: '#16213e', warm: '#1e284c' };
-const FOREGROUND = { dormant: '#e8e8f0', warm: '#f0f0f5' };
+// Color endpoints — dormant is cool navy, warm shifts hue toward magenta + raises lightness.
+// Delta: 60° hue (240→300), 4% lightness (14→18) — crosses JND threshold on dark surfaces.
+const BG = { dormant: '#1a1a2e', warm: '#382238' };
+const SURFACE = { dormant: '#16213e', warm: '#1e2a3e' };
+const FOREGROUND = { dormant: '#e8e8f0', warm: '#f5ede0' };
 const ACCENT = { dormant: '#7b2cbf', warm: '#f0c674' };
-const BORDER = { dormant: '#222244', warm: '#2e2e60' };
+const BORDER = { dormant: '#222244', warm: '#2e2e50' };
 
-// Typography anchors — line-height breathes with score.
-// Letter-spacing removed: 0→0.01em delta was imperceptible (0.16px).
-// Line-height range increased to cross the 1px perceptibility threshold.
-const LINE_HEIGHT = { dormant: 1.75, warm: 1.90 };      // unitless
+// Typography anchors — line-height is the PRIMARY thermal signal (per Tanya's spec).
+// Felt even when not consciously seen; color on dark backgrounds is invisible.
+const LINE_HEIGHT = { dormant: 1.75, warm: 1.95 };      // unitless — 3.5px total delta
 
 // Shadow depth anchor — alpha multiplier for shadow intensity.
 const SHADOW_DEPTH = { dormant: 0.3, warm: 0.5 };
@@ -31,8 +32,8 @@ const SHADOW_DEPTH = { dormant: 0.3, warm: 0.5 };
 // Radius softening bonus — additive to base rounded-lg in warm state.
 const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
 
-// Accent opacity — controls accent element visibility.
-const ACCENT_OPACITY = { dormant: 0.3, warm: 1.0 };     // 0-1
+// Accent opacity — raised from 0.30 to make accent visible from the start.
+const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
 
 // ─── HSL interpolation ────────────────────────────────────
 
@@ -104,8 +105,8 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-glow': glowValue(t),
     '--token-shadow': shadowValue(t),
     '--token-border': lerpColor(BORDER.dormant, BORDER.warm, t),
-    '--token-spacing-breath': `${Math.round(t * 4)}px`,
-    // Typography — line-height breathing (perceptible 2.4px total delta)
+    '--token-spacing-breath': `${Math.round(t * 8)}px`,
+    // Typography — line-height breathing (perceptible 3.5px total delta)
     '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, t).toFixed(3),
     // Shadow depth — continuous alpha scaling
     '--token-shadow-depth': lerp(SHADOW_DEPTH.dormant, SHADOW_DEPTH.warm, t).toFixed(2),
@@ -121,9 +122,9 @@ function lerp(a: number, b: number, t: number): number {
 }
 
 function glowValue(t: number): string {
-  if (t < 0.25) return 'none';
-  const alpha = (t * 0.10).toFixed(3);
-  return `0 0 ${Math.round(40 + t * 40)}px rgba(240,198,116,${alpha})`;
+  if (t < 0.18) return 'none';
+  const alpha = (t * 0.18).toFixed(3);
+  return `0 0 ${Math.round(40 + t * 60)}px rgba(240,198,116,${alpha})`;
 }
 
 function shadowValue(t: number): string {
