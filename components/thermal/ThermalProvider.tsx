@@ -1,12 +1,9 @@
 /**
  * ThermalProvider — React Context distributing thermal state to the component tree.
  *
- * Loads history from localStorage on mount, computes score + state + tokens,
- * applies CSS vars to <html> via useEffect with 100ms debounce.
- * Provides { score, state, tokens, refresh } to consumers.
- *
- * V1: binary cold/warm based on reading_memory existence.
- * V2: continuous 0-100 interpolation (engine already supports it).
+ * On mount: reuses inline script's CSS vars if present (no cold flash).
+ * Ongoing: refreshes tokens from localStorage when reading activity changes.
+ * Provides { score, state, tokens, animation, refresh } to consumers.
  */
 
 'use client';
@@ -15,10 +12,10 @@ import {
   createContext, useContext, useState, useEffect, useCallback,
   useMemo, type ReactNode,
 } from 'react';
-import { computeThermalScore, type ThermalState, type ThermalResult } from '@/lib/thermal/thermal-score';
-import { computeThermalTokens, type ThermalTokens } from '@/lib/thermal/thermal-tokens';
-import { computeAnimationTokens, type AnimationTokens } from '@/lib/thermal/thermal-animation';
-import { loadHistory, toThermalInput } from '@/lib/thermal/thermal-history';
+import { type ThermalState, type ThermalResult } from '@/lib/thermal/thermal-score';
+import { type ThermalTokens } from '@/lib/thermal/thermal-tokens';
+import { type AnimationTokens } from '@/lib/thermal/thermal-animation';
+import { computeFull, applyToDOM, type AppliedThermal } from '@/lib/thermal/apply-tokens';
 
 interface ThermalContextValue {
   score: number;
@@ -30,63 +27,42 @@ interface ThermalContextValue {
   refresh: () => void;
 }
 
+const FALLBACK_ANIMATION: AnimationTokens = {
+  '--token-breath-speed': '0', '--token-breath-scale': '0',
+  '--token-glow-speed': '0', '--token-glow-min': '0', '--token-glow-max': '0',
+  '--token-drift-speed': '0', '--token-drift-range': '0',
+};
+
 const ThermalContext = createContext<ThermalContextValue | null>(null);
 
 export function useThermal(): ThermalContextValue {
   const ctx = useContext(ThermalContext);
   if (!ctx) {
-    // Safe fallback for SSR or when provider is absent — site renders at dormant defaults
     return {
       score: 0, state: 'dormant', confidence: 0,
-      tokens: {}, animation: computeAnimationTokens(0),
+      tokens: {}, animation: FALLBACK_ANIMATION,
       isEngaged: false, refresh: () => {},
     };
   }
   return ctx;
 }
 
-function computeFromHistory(): { result: ThermalResult; tokens: ThermalTokens; animation: AnimationTokens } {
-  const history = loadHistory();
-  const input = toThermalInput(history);
-  const result = computeThermalScore(input);
-  const tokens = computeThermalTokens(result.score, result.state);
-  const animation = computeAnimationTokens(result.score);
-  return { result, tokens, animation };
-}
-
 export function ThermalProvider({ children }: { children: ReactNode }) {
-  const [thermal, setThermal] = useState<{
-    result: ThermalResult; tokens: ThermalTokens; animation: AnimationTokens;
-  }>({
+  const [thermal, setThermal] = useState<AppliedThermal>(() => ({
     result: { score: 0, state: 'dormant', confidence: 0 },
     tokens: {},
-    animation: computeAnimationTokens(0),
-  });
+    animation: FALLBACK_ANIMATION,
+  }));
 
   const refresh = useCallback(() => {
-    setThermal(computeFromHistory());
+    const applied = computeFull();
+    applyToDOM(applied);
+    setThermal(applied);
   }, []);
 
-  // Compute on mount
+  // Compute + apply on mount. Inline script already set CSS vars —
+  // this call reconciles React state with the DOM and handles live updates.
   useEffect(() => { refresh(); }, [refresh]);
-
-  // Apply CSS custom properties to <html> — debounced to avoid thrashing
-  useEffect(() => {
-    const el = document.documentElement;
-    const colorEntries = Object.entries(thermal.tokens);
-    const animEntries = Object.entries(thermal.animation);
-    if (!colorEntries.length && !animEntries.length) return;
-    const timer = setTimeout(() => {
-      for (const [key, value] of colorEntries) el.style.setProperty(key, value);
-      for (const [key, value] of animEntries) el.style.setProperty(key, value);
-      el.setAttribute('data-thermal', thermal.result.state);
-      // Returning readers warm to remembered temperature faster (2s vs 4s)
-      const history = loadHistory();
-      const isReturning = history.visitDays.length > 1;
-      el.setAttribute('data-returning', isReturning ? 'true' : 'false');
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [thermal]);
 
   const value = useMemo<ThermalContextValue>(() => ({
     score: thermal.result.score,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { AmbientNav } from "@/components/navigation/AmbientNav";
 import { ThermalLayout } from "@/components/thermal/ThermalLayout";
+import { INLINE_RESTORE_SCRIPT } from "@/lib/thermal/inline-restore";
 import "./globals.css";
 
 const inter = Inter({
@@ -28,6 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: INLINE_RESTORE_SCRIPT }} />
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased bg-background`}>
         <ThermalLayout>
           {children}
