@@ -107,34 +107,47 @@ function lerpColor(cold: string, warm: string, t: number): string {
   return hslToHex(lerpHsl(hexToHsl(cold), hexToHsl(warm), t));
 }
 
+// ─── Perceptual boost ─────────────────────────────────────
+// Power curve (t^0.66) front-loads the dormant→stirring shift.
+// At t=0.25 → output ~0.40: first 25% of range = 40% of total shift.
+// Applied to color + typography only; glow/shadow/radius keep linear t.
+const BOOST_EXPONENT = 0.66;
+
+function perceptualBoost(t: number): number {
+  return Math.pow(t, BOOST_EXPONENT);
+}
+
 // ─── Public API ───────────────────────────────────────────
 
 /** Compute thermal CSS tokens from a 0-100 score. */
 export function computeThermalTokens(score: number, _state: ThermalState): ThermalTokens {
   const t = Math.max(0, Math.min(1, score / 100));
+  const tp = perceptualBoost(t);
   return {
-    '--token-bg': lerpColor(BG.dormant, BG.warm, t),
-    '--token-surface': lerpColor(SURFACE.dormant, SURFACE.warm, t),
-    '--token-foreground': lerpColor(FOREGROUND.dormant, FOREGROUND.warm, t),
-    '--token-accent': lerpColor(ACCENT.dormant, ACCENT.warm, t),
+    // Colors — boosted: biggest jump at dormant→stirring boundary
+    '--token-bg': lerpColor(BG.dormant, BG.warm, tp),
+    '--token-surface': lerpColor(SURFACE.dormant, SURFACE.warm, tp),
+    '--token-foreground': lerpColor(FOREGROUND.dormant, FOREGROUND.warm, tp),
+    '--token-accent': lerpColor(ACCENT.dormant, ACCENT.warm, tp),
+    '--token-border': lerpColor(BORDER.dormant, BORDER.warm, tp),
+    // Glow/shadow — linear: own thresholds and gating
     '--token-glow': glowValue(t),
     '--token-shadow': shadowValue(t),
-    '--token-border': lerpColor(BORDER.dormant, BORDER.warm, t),
     '--token-spacing-breath': `${Math.round(t * 14)}px`,
-    // Typography — line-height breathing (perceptible 3.5px total delta)
-    '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, t).toFixed(3),
-    // Shadow depth — continuous alpha scaling
+    // Typography — boosted: crosses JND faster at low scores
+    '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, tp).toFixed(3),
+    // Shadow depth — linear: continuous alpha scaling
     '--token-shadow-depth': lerp(SHADOW_DEPTH.dormant, SHADOW_DEPTH.warm, t).toFixed(2),
-    // Radius softening — additive bonus on top of base rounded-lg
+    // Radius — linear: additive bonus on top of base rounded-lg
     '--token-radius-soft': `${lerp(RADIUS_SOFT.dormant, RADIUS_SOFT.warm, t).toFixed(2)}rem`,
-    // Accent opacity — controls visibility of accent elements
+    // Accent opacity — linear: controls visibility of accent elements
     '--token-accent-opacity': lerp(ACCENT_OPACITY.dormant, ACCENT_OPACITY.warm, t).toFixed(2),
-    // Typography depth — font-weight, letter-spacing, paragraph offset, text glow
-    '--token-font-weight': lerp(FONT_WEIGHT.dormant, FONT_WEIGHT.warm, t).toFixed(1),
-    '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, t).toFixed(3)}em`,
-    '--token-para-rhythm': `${Math.round(lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, t))}px`,
+    // Typography depth — boosted: font-weight, letter-spacing cross JND sooner
+    '--token-font-weight': lerp(FONT_WEIGHT.dormant, FONT_WEIGHT.warm, tp).toFixed(1),
+    '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, tp).toFixed(3)}em`,
+    '--token-para-rhythm': `${Math.round(lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, tp))}px`,
     '--para-offset': `${Math.round(
-      lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, t) +
+      lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, tp) +
       t * 14
     )}px`,
     '--token-text-glow': textGlowValue(t),

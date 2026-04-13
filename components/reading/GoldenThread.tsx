@@ -45,8 +45,8 @@ export function GoldenThread() {
       aria-label={`Reading progress: ${Math.round(depth)}%`}
       aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(depth)}
     >
-      {/* Track — faint background line */}
-      <div className="absolute inset-y-0 left-0 w-[var(--sys-thread-width)] bg-fog/20 rounded-sys-full" />
+      {/* Track — fog/30 for dormant visibility (3:1 contrast on dark bg) */}
+      <div className="absolute inset-y-0 left-0 w-[var(--sys-thread-width)] bg-fog/30 rounded-sys-full" />
       {/* Fill — climbs with scroll, thermal color + glow */}
       <div
         className="absolute top-0 left-0 w-[var(--sys-thread-width)] rounded-sys-full golden-thread-glow"

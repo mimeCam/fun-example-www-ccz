@@ -12,7 +12,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `app/globals.css` + `tailwind.config.ts` — design system (`sys-*` tokens)
 
 ## Core Feature
-"The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible.
+"The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible. Perceptual boost curve (t^0.66) front-loads the dormant→stirring color shift so first-time readers feel the warmth sooner.
 
 ## WIP
 _None_

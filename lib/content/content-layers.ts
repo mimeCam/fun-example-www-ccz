@@ -95,14 +95,14 @@ export const ARCHETYPE_COLORS: Record<ArchetypeKey, {
   'faithful': {
     hex: '#9d4edd',
     border: 'border-l-secondary',
-    shimmerFrom: 'rgba(157, 78, 221, 0.3)',
-    shimmerTo: 'rgba(157, 78, 221, 0.5)',
+    shimmerFrom: 'rgba(179, 102, 255, 0.3)',  // brightened 15% for shimmer contrast on dark bg
+    shimmerTo: 'rgba(179, 102, 255, 0.5)',
   },
   'resonator': {
     hex: '#e88fa7',
     border: 'border-l-rose',
-    shimmerFrom: 'rgba(232, 143, 167, 0.3)',
-    shimmerTo: 'rgba(232, 143, 167, 0.5)',
+    shimmerFrom: 'rgba(240, 160, 184, 0.3)',  // brightened 12% for shimmer contrast on dark bg
+    shimmerTo: 'rgba(240, 160, 184, 0.5)',
   },
   'collector': {
     hex: '#d4922a',

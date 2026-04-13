@@ -296,6 +296,12 @@ body {
 }
 
 /* Warm state warm-spotlight — radial gradient creates perceptible "room warming" */
+[data-thermal="stirring"] body {
+  background:
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 3%, transparent), transparent 70%),
+    var(--token-bg);
+}
+
 [data-thermal="warm"] body {
   background:
     radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
@@ -423,9 +429,11 @@ body {
 
 /* ─── Golden Thread ─────────────────────────────────── */
 
-/* Base glow — subtle even at dormant */
+/* Base glow — visible at dormant (3px passes 3:1 contrast on dark bg).
+   Transition smooths onset when thermal state changes to stirring+. */
 .golden-thread-glow {
-  box-shadow: 0 0 2px var(--token-accent);
+  box-shadow: 0 0 3px var(--token-accent);
+  transition: box-shadow 2s ease-out;
 }
 
 @keyframes goldenThreadGlow {
@@ -439,11 +447,14 @@ body {
   }
 }
 
-/* Thermal-gated: glow only at stirring+ */
+/* Thermal-gated: glow only at stirring+.
+   2s delay lets the base transition smooth the onset before the animation pulses. */
 [data-thermal="stirring"] .golden-thread-glow,
 [data-thermal="warm"] .golden-thread-glow,
 [data-thermal="luminous"] .golden-thread-glow {
-  animation: goldenThreadGlow var(--token-glow-speed) ease-in-out infinite;
+  box-shadow: 0 0 4px var(--token-accent),
+              0 0 8px color-mix(in srgb, var(--gold) 8%, transparent);
+  animation: goldenThreadGlow var(--token-glow-speed) ease-in-out 2s infinite;
   will-change: box-shadow;
 }
 
