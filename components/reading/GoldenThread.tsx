@@ -13,7 +13,7 @@ import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
  * Phases: hidden → active → settled → fading
  *   hidden:  not reading yet
  *   active:  reading, thread tracks scroll depth
- *   settled: finished reading, hold for 2s
+ *   settled: finished reading, brief gold glow burst, hold for 2s
  *   fading:  settle complete, thin gold line at 0.3 opacity
  */
 type Phase = 'hidden' | 'active' | 'settled' | 'fading';
@@ -38,6 +38,9 @@ export function GoldenThread() {
 
   if (phase === 'hidden') return null;
 
+  // Settled phase: brief gold glow burst before fading
+  const isSettled = phase === 'settled';
+
   return (
     <div
       className="fixed top-0 bottom-0 left-[var(--sys-thread-offset)] z-sys-thread pointer-events-none"
@@ -49,7 +52,7 @@ export function GoldenThread() {
       <div className="absolute inset-y-0 left-0 w-[var(--sys-thread-width)] bg-fog/30 rounded-sys-full" />
       {/* Fill — climbs with scroll, thermal color + glow */}
       <div
-        className="absolute top-0 left-0 w-[var(--sys-thread-width)] rounded-sys-full golden-thread-glow"
+        className={`absolute top-0 left-0 w-[var(--sys-thread-width)] rounded-sys-full golden-thread-glow ${isSettled ? 'golden-thread-settled' : ''}`}
         style={{
           height: `${depth}%`,
           backgroundColor: 'var(--token-accent)',

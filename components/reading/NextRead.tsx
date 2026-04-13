@@ -12,6 +12,7 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import Link from 'next/link';
@@ -20,6 +21,8 @@ interface NextReadProps {
   article: Article;
   context: string;
   archetype?: ArchetypeKey | null;
+  /** Delay before revealing (ms). 0 = immediate. Used by completion ceremony. */
+  revealDelay?: number;
 }
 
 /** Archetype accent colors — matches content-layers extension borders. */
@@ -43,10 +46,19 @@ const ARCHETYPE_LABEL: Record<ArchetypeKey, string> = {
 /**
  * Context-Aware "Next Read" — whisper-weight recommendation.
  */
-export function NextRead({ article, context, archetype }: NextReadProps) {
+export function NextRead({ article, context, archetype, revealDelay = 0 }: NextReadProps) {
   if (!article) return null;
 
   const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
+  const [visible, setVisible] = useState(revealDelay === 0);
+
+  useEffect(() => {
+    if (revealDelay <= 0 || visible) return;
+    const t = setTimeout(() => setVisible(true), revealDelay);
+    return () => clearTimeout(t);
+  }, [revealDelay, visible]);
+
+  if (!visible) return null;
 
   return (
     <div className="py-sys-7 animate-fade-in">

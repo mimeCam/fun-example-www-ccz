@@ -24,6 +24,8 @@ import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvide
 import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
 import { safeGetItem } from '@/lib/utils/storage';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
+import { useGenuineCompletion } from '@/lib/hooks/useGenuineCompletion';
+import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -93,6 +95,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
   // Thermal state from ThermalProvider
   const { isEngaged, refresh: refreshThermal } = useThermal();
   const { maxDepth } = useScrollDepth();
+  const completion = useGenuineCompletion(readTime);
   const startTime = useRef(Date.now());
   const maxDepthRef = useRef(maxDepth);
   maxDepthRef.current = maxDepth;
@@ -105,6 +108,11 @@ function ArticleContent({ params }: { params: { id: string } }) {
       saveHistory(h);
     };
   }, [params.id]);
+
+  // Thermal refresh on genuine completion — the room acknowledges the read
+  useEffect(() => {
+    if (completion.isComplete) refreshThermal();
+  }, [completion.isComplete, refreshThermal]);
 
   // Archetype-aware next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
@@ -135,12 +143,13 @@ function ArticleContent({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          <hr className="border-gold/10 my-sys-8" />
+          <CompletionShimmer active={completion.isComplete} />
           {recommendation && (
             <NextRead
               article={recommendation.article}
               context={recommendation.reason}
               archetype={archetype}
+              revealDelay={completion.isComplete ? 700 : 0}
             />
           )}
         </div>

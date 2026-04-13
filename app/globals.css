@@ -458,6 +458,76 @@ body {
   will-change: box-shadow;
 }
 
+/* Golden Thread settled burst — brief gold glow acknowledging completion.
+   One-shot: plays once then holds. Matches T_LINGER (2s) in the component. */
+.golden-thread-settled {
+  box-shadow:
+    0 0 6px var(--token-accent),
+    0 0 18px color-mix(in srgb, var(--gold) 35%, transparent) !important;
+  transition: box-shadow var(--sys-time-reveal) var(--sys-ease-out) !important;
+}
+
+/* ─── Completion Shimmer ───────────────────────────── */
+
+/* Container — matches <hr> height (1px border). */
+.completion-shimmer {
+  height: 1px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Track — the visible line + animated gold sweep. */
+.completion-shimmer-track {
+  height: 100%;
+  background: transparent;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Gold sweep pseudo-element — one-shot left-to-right. */
+.completion-shimmer-track::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold) 60%, transparent) 50%,
+    transparent 100%
+  );
+  animation: completionShimmer var(--sys-time-reveal) var(--sys-ease-out) forwards;
+}
+
+@keyframes completionShimmer {
+  0%   { transform: translateX(-100%); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+/* Thermal-gated: warm glow around the shimmer at stirring+. */
+[data-thermal="stirring"] .completion-shimmer,
+[data-thermal="warm"] .completion-shimmer,
+[data-thermal="luminous"] .completion-shimmer {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--gold) 15%, transparent);
+}
+
+/* Luminous: intensified warm glow radiating outward. */
+[data-thermal="luminous"] .completion-shimmer {
+  box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 25%, transparent);
+}
+
+/* Respect reduced motion — static acknowledgment instead of animation. */
+@media (prefers-reduced-motion: reduce) {
+  .completion-shimmer-track::after {
+    animation: none;
+    background: color-mix(in srgb, var(--gold) 30%, transparent);
+    inset: 0;
+    transform: none;
+    opacity: 1;
+  }
+}
+
 /* ─── Resonance Drawer ─────────────────────────────── */
 
 @keyframes slideInRight {
