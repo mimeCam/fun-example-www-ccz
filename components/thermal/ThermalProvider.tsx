@@ -16,6 +16,7 @@ import { type ThermalState, type ThermalResult } from '@/lib/thermal/thermal-sco
 import { type ThermalTokens } from '@/lib/thermal/thermal-tokens';
 import { type AnimationTokens } from '@/lib/thermal/thermal-animation';
 import { computeFull, applyToDOM, type AppliedThermal } from '@/lib/thermal/apply-tokens';
+import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
 
 interface ThermalContextValue {
   score: number;
@@ -24,7 +25,7 @@ interface ThermalContextValue {
   tokens: ThermalTokens;
   animation: AnimationTokens;
   isEngaged: boolean;
-  refresh: () => void;
+  refresh: (plan?: TransitionPlan) => void;
 }
 
 const FALLBACK_ANIMATION: AnimationTokens = {
@@ -57,9 +58,9 @@ export function ThermalProvider({ children }: { children: ReactNode }) {
     animation: FALLBACK_ANIMATION,
   }));
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback((plan?: TransitionPlan) => {
     const applied = computeFull();
-    applyToDOM(applied);
+    applyToDOM(applied, plan);
     setThermal(applied);
   }, []);
 

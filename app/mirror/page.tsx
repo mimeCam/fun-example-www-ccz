@@ -127,7 +127,7 @@ function MetaLine({ articlesRead, firstDetected }: {
   const parts = [`${articlesRead} article${articlesRead !== 1 ? 's' : ''}`];
   if (firstDetected) parts.push(`since ${formatDate(firstDetected)}`);
   return (
-    <p className="text-sys-micro text-mist/40 text-center mt-sys-8">
+    <p className="text-sys-micro text-mist/60 text-center mt-sys-8">
       {parts.join(' · ')}
     </p>
   );

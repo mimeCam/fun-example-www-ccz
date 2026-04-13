@@ -12,6 +12,7 @@ import { computeThermalScore, type ThermalResult, type ThermalState } from './th
 import { computeThermalTokens, type ThermalTokens } from './thermal-tokens';
 import { computeAnimationTokens, type AnimationTokens } from './thermal-animation';
 import { loadHistory, toThermalInput } from './thermal-history';
+import { defaultPlan, returningPlan, type TransitionPlan } from './transition-choreography';
 
 export interface AppliedThermal {
   result: ThermalResult;
@@ -30,7 +31,7 @@ export function computeFull(): AppliedThermal {
 }
 
 /** Write all thermal CSS vars + data attributes to <html>. */
-export function applyToDOM(applied: AppliedThermal): void {
+export function applyToDOM(applied: AppliedThermal, plan?: TransitionPlan): void {
   if (typeof document === 'undefined') return;
   const el = document.documentElement;
 
@@ -44,7 +45,13 @@ export function applyToDOM(applied: AppliedThermal): void {
   el.setAttribute('data-thermal', applied.result.state);
 
   const history = loadHistory();
-  el.setAttribute('data-returning', history.visitDays.length > 1 ? 'true' : 'false');
+  const isReturning = history.visitDays.length > 1;
+  el.setAttribute('data-returning', isReturning ? 'true' : 'false');
+
+  // Apply transition choreography plan as CSS custom properties.
+  // Allows CSS to use dynamic transition durations/delays per context.
+  const resolved = plan ?? (isReturning ? returningPlan() : defaultPlan());
+  applyChoreographyPlan(el, resolved);
 }
 
 /** Read the state already set by the inline blocking script. */
@@ -55,4 +62,18 @@ export function readInlineState(): { state: ThermalState; score: number } | null
   const raw = document.documentElement.getAttribute('data-thermal-score');
   const score = raw ? Math.max(0, Math.min(100, parseInt(raw, 10) || 0)) : 0;
   return { state, score };
+}
+
+/** Write choreography plan durations/delays as CSS custom properties. */
+function applyChoreographyPlan(el: HTMLElement, p: TransitionPlan): void {
+  const ms = (v: number) => `${v}ms`;
+  el.style.setProperty('--ch-color-dur', ms(p.colorDuration));
+  el.style.setProperty('--ch-color-delay', ms(p.colorDelay));
+  el.style.setProperty('--ch-space-dur', ms(p.spaceDuration));
+  el.style.setProperty('--ch-space-delay', ms(p.spaceDelay));
+  el.style.setProperty('--ch-typo-dur', ms(p.typoDuration));
+  el.style.setProperty('--ch-typo-delay', ms(p.typoDelay));
+  el.style.setProperty('--ch-shadow-dur', ms(p.shadowDuration));
+  el.style.setProperty('--ch-shadow-delay', ms(p.shadowDelay));
+  el.style.setProperty('--ch-easing', p.easing);
 }

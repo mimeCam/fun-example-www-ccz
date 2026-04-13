@@ -58,6 +58,19 @@
   --token-drift-speed: 0;
   --token-drift-range: 0;
 
+  /* Transition choreography tokens — ThermalProvider sets these per plan.
+     Default values match defaultPlan() in transition-choreography.ts.
+     ceremonyPlan() adds delays for staggered cascade. */
+  --ch-color-dur: 4000ms;
+  --ch-color-delay: 0ms;
+  --ch-space-dur: 1000ms;
+  --ch-space-delay: 0ms;
+  --ch-typo-dur: 3500ms;
+  --ch-typo-delay: 0ms;
+  --ch-shadow-dur: 2000ms;
+  --ch-shadow-delay: 0ms;
+  --ch-easing: cubic-bezier(0.0, 0.0, 0.2, 1);
+
   /* Static design tokens — never change with thermal state */
   --gold: #f0c674;
   --amber: #d4922a;     /* Collector archetype — shifted from #e6a23c to separate from gold */
@@ -208,25 +221,13 @@ body {
   color: var(--token-foreground);
   background: var(--token-bg);
   line-height: var(--token-line-height);
-  transition: color 4s ease-out,
-              line-height 4s ease-out;
+  transition: color var(--ch-color-dur) var(--ch-color-delay) var(--ch-easing),
+              line-height var(--ch-color-dur) var(--ch-color-delay) var(--ch-easing);
 }
 
-/* Returning readers warm to remembered temperature faster.
-   The room remembers its shape — it settles in 2s instead of 4s. */
-[data-returning="true"] body {
-  transition-duration: 2s;
-}
-[data-returning="true"] .thermal-typography {
-  transition-duration: 2s, 2s, 2s;
-}
-[data-returning="true"] .thermal-shadow {
-  transition-duration: 1.5s;
-}
-[data-returning="true"] .thermal-radius,
-[data-returning="true"] .thermal-radius-wide {
-  transition-duration: 1.5s;
-}
+/* Returning-reader overrides are now handled by the returningPlan()
+   choreography, which sets --ch-* custom properties via applyToDOM().
+   The CSS reads these vars — no hardcoded overrides needed. */
 
 /* Thermal-responsive typography — compositing-only transitions.
    Layout-triggering properties (line-height, letter-spacing, margin) are
@@ -239,9 +240,9 @@ body {
   line-height: var(--token-line-height);
   font-weight: var(--token-font-weight);
   text-shadow: var(--token-text-glow);
-  transition: line-height 4s ease-out,
-              font-weight 3.5s ease-out,
-              text-shadow 3.5s ease-out;
+  transition: line-height var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing),
+              font-weight var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing),
+              text-shadow var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing);
 }
 
 /* Paragraph spacing via compositing — translateY instead of margin-bottom.
@@ -251,7 +252,7 @@ body {
   --para-offset: 0px;
   margin-bottom: 0.75rem;
   transform: translateY(var(--para-offset));
-  transition: transform 4s ease-out;
+  transition: transform var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing);
 }
 
 /* Thermal shadow depth — continuous alpha scaling for card surfaces */
@@ -259,21 +260,21 @@ body {
   box-shadow: 0 calc(1px + 7px * var(--token-shadow-depth))
               calc(2px + 30px * var(--token-shadow-depth))
               rgba(0, 0, 0, calc(0.3 + 0.2 * var(--token-shadow-depth)));
-  transition: box-shadow 2s ease-out;
+  transition: box-shadow var(--ch-shadow-dur) var(--ch-shadow-delay) var(--ch-easing);
 }
 
 /* Thermal radius softening — additive bonus on top of --sys-radius-medium.
    At dormant: 0.5rem (base). At luminous: 1.0rem (base + 0.5rem bonus). */
 .thermal-radius {
   border-radius: calc(var(--sys-radius-medium) + var(--token-radius-soft));
-  transition: border-radius 2.5s ease-out;
+  transition: border-radius var(--ch-shadow-dur) var(--ch-shadow-delay) var(--ch-easing);
 }
 
 /* Thermal radius softening (wide variant) — for cards that use wide radius.
    At dormant: 0.75rem (base). At luminous: 1.25rem (base + 0.5rem bonus). */
 .thermal-radius-wide {
   border-radius: calc(var(--sys-radius-wide) + var(--token-radius-soft));
-  transition: border-radius 2.5s ease-out;
+  transition: border-radius var(--ch-shadow-dur) var(--ch-shadow-delay) var(--ch-easing);
 }
 
 /* Thermal space transition — spacing properties settle smoothly.

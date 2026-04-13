@@ -169,7 +169,7 @@ function LetterCard({
       {/* Dismiss */}
       {visible && (
         <button onClick={onDismiss}
-          className="absolute top-sys-4 right-sys-4 text-mist/40 hover:text-mist/70 transition-opacity text-sys-lg leading-none"
+          className="absolute top-sys-4 right-sys-4 text-mist/60 hover:text-mist/80 transition-opacity text-sys-lg leading-none"
           aria-label="Dismiss">&times;</button>
       )}
       {/* Label */}

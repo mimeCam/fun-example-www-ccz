@@ -13,7 +13,7 @@
 
 'use client';
 
-import { Fragment, type ReactNode } from 'react';
+import { Fragment } from 'react';
 import type { ArchetypeKey, ResolvedParagraph } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import {
@@ -28,8 +28,6 @@ interface StratifiedRendererProps {
   articleId: string;
   /** Warm mode: intensified marginalia for returning readers */
   warmer?: boolean;
-  /** Optional ReactNode to inject at the block with layer='quick-mirror' */
-  mirrorSlot?: ReactNode;
 }
 
 /** Core paragraphs — plain body text with paragraph tracking IDs */
@@ -165,7 +163,7 @@ function archetypeHoverColor(key: ArchetypeKey | null): string {
 }
 
 /** Main renderer — iterates blocks, tracks core paragraph offset for IDs */
-export function StratifiedRenderer({ blocks, archetype, articleId, warmer, mirrorSlot }: StratifiedRendererProps) {
+export function StratifiedRenderer({ blocks, archetype, articleId, warmer }: StratifiedRendererProps) {
   if (!blocks.length) return null;
 
   const filtered = enforceMarginaliaLimit(blocks);
@@ -174,9 +172,6 @@ export function StratifiedRenderer({ blocks, archetype, articleId, warmer, mirro
   return (
     <article className="stratified-content" style={{ "--archetype-hover-color": archetypeHoverColor(archetype) } as React.CSSProperties}>
       {filtered.map((block, i) => {
-        if (block.layer === 'quick-mirror') {
-          return <Fragment key={`mirror-${i}`}>{mirrorSlot ?? null}</Fragment>;
-        }
         if (block.layer === 'core') {
           const el = (
             <Fragment key={`core-${i}`}>

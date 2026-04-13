@@ -16,7 +16,7 @@ const FOOTER_LINKS = [
 export default function WhisperFooter() {
   return (
     <footer className="text-center py-sys-10 pb-sys-12 space-y-sys-2 thermal-drift">
-      <p className="text-mist/40 text-sys-caption">No algorithms. No feeds.</p>
+      <p className="text-mist/60 text-sys-caption">No algorithms. No feeds.</p>
       <nav className="flex justify-center items-center gap-sys-5 text-sys-micro"
            aria-label="Footer navigation">
         {FOOTER_LINKS.map((link, i) => (

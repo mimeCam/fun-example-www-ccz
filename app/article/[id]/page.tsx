@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation';
 import { GoldenThread } from '@/components/reading/GoldenThread';
 import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
-import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
 import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
@@ -14,7 +13,6 @@ import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
-import { useQuickMirror } from '@/lib/hooks/useQuickMirror';
 import { useResonanceMarginalia, extractCoreParagraphs } from '@/lib/hooks/useResonanceMarginalia';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { getLayeredContent, getArticleById, getAllArticles } from '@/lib/content/articleData';
@@ -41,17 +39,14 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
   const layeredContent = getLayeredContent(params.id);
   const readTime = estimateReadingTime(article.content);
-  const topics = article.tags ?? [];
 
   const { mirror } = useMirror();
   const history = useMemo(() => loadHistory(), []);
   const readCount = history.articleIds.length;
 
-  const quickMirror = useQuickMirror(params.id, readTime, topics);
-
-  const archetype = (quickMirror.result?.archetype as ArchetypeKey)
-    ?? (mirror?.archetype as ArchetypeKey)
-    ?? null;
+  // Archetype from mirror only — QuickMirror removed from reading flow.
+  // Identity revelation belongs on /mirror, not mid-article.
+  const archetype = (mirror?.archetype as ArchetypeKey) ?? null;
 
   const stratifiedBlocks = useStratifiedContent(params.id, layeredContent, archetype, readCount);
 
@@ -65,21 +60,6 @@ function ArticleContent({ params }: { params: { id: string } }) {
     if (!resonanceBlocks.length) return stratifiedBlocks;
     return insertResonanceBlocks(stratifiedBlocks, resonanceBlocks, coreParagraphs);
   }, [stratifiedBlocks, resonanceBlocks, coreParagraphs]);
-
-  const { displayBlocks, hasInlineMirror } = useMemo(() => {
-    if (!quickMirror.triggered || !quickMirror.result) {
-      return { displayBlocks: mergedBlocks, hasInlineMirror: false };
-    }
-    const mirrorBlock: ContentBlock = {
-      layer: 'quick-mirror',
-      paragraphs: [],
-      isNew: false,
-    };
-    return {
-      displayBlocks: [...mergedBlocks, mirrorBlock],
-      hasInlineMirror: true,
-    };
-  }, [mergedBlocks, quickMirror.triggered, quickMirror.result]);
 
   const recognition = useReturnRecognition();
 
@@ -119,14 +99,8 @@ function ArticleContent({ params }: { params: { id: string } }) {
           <hr className="border-gold/10 mb-sys-8" />
 
           <div className="prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography text-foreground">
-            {displayBlocks.length > 0 ? (
-              <StratifiedRenderer blocks={displayBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning}
-                mirrorSlot={quickMirror.triggered && quickMirror.result ? (
-                  <div className="my-sys-8">
-                    <QuickMirrorCard result={quickMirror.result} articleId={params.id} />
-                  </div>
-                ) : undefined}
-              />
+            {mergedBlocks.length > 0 ? (
+              <StratifiedRenderer blocks={mergedBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning} />
             ) : (
               <p className="text-mist">Article content not available.</p>
             )}

@@ -31,10 +31,11 @@ export default function ExploreArticleCard({
   return (
     <Link href={`/article/${article.id}`} className="block group">
       <article
-        className={`bg-surface thermal-radius p-sys-6 transition-all duration-hover h-full flex flex-col group-hover:-translate-y-px ${
+        className={`bg-surface thermal-radius thermal-shadow p-sys-6 transition-all duration-hover h-full flex flex-col
+          group-hover:-translate-y-0.5 ${
           isCurated
-            ? 'border border-gold/20 shadow-gold hover:shadow-gold-intense'
-            : 'border border-fog/10 shadow-void hover:shadow-rise'
+            ? 'border border-gold/20 hover:border-gold/30 hover:shadow-gold'
+            : 'border border-fog/10 hover:border-fog/20'
         }`}
       >
         <h3 className="font-display text-foreground font-sys-display text-sys-lg mb-sys-3 group-hover:text-gold transition-colors">

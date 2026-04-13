@@ -14,6 +14,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback, createContext, useContext, type ReactNode } from 'react';
+import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
 
 /** Ceremony phases — each maps to a specific visual response. */
 export type CeremonyPhase =
@@ -58,7 +59,7 @@ interface SequencerProps {
   /** Confidence score (70-100). Drives intensity tier. */
   confidence: number;
   /** Callback to fire thermal refresh during warming phase. */
-  onRefresh: () => void;
+  onRefresh: (plan?: TransitionPlan) => void;
   children: ReactNode;
 }
 
@@ -98,10 +99,12 @@ export function CeremonySequencer({ triggered, confidence, onRefresh, children }
     // Phase 3: golden thread glows (overlaps with shimmer end)
     const t2 = setTimeout(() => setPhase('glowing'), T_BREATH);
 
-    // Phase 4: thermal refresh — room warms
+    // Phase 4: thermal refresh — room warms with ceremony choreography.
+    // The ceremony plan adds staggered delays (200ms, 300ms, 500ms)
+    // creating the "room settling in stages" effect.
     const t3 = setTimeout(() => {
       setPhase('warming');
-      onRefreshRef.current();
+      onRefreshRef.current(ceremonyPlan());
     }, T_BREATH + shimmerDuration);
 
     // Phase 5: NextRead gift appears
