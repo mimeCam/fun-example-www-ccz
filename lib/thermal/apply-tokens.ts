@@ -52,5 +52,7 @@ export function readInlineState(): { state: ThermalState; score: number } | null
   if (typeof document === 'undefined') return null;
   const state = document.documentElement.getAttribute('data-thermal') as ThermalState | null;
   if (!state) return null;
-  return { state, score: 0 };
+  const raw = document.documentElement.getAttribute('data-thermal-score');
+  const score = raw ? Math.max(0, Math.min(100, parseInt(raw, 10) || 0)) : 0;
+  return { state, score };
 }

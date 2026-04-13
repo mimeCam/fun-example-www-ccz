@@ -47,7 +47,7 @@ export function AmbientNav() {
       className="fixed bottom-0 inset-x-0 z-sys-nav bg-void/80 backdrop-blur-sm border-t border-fog/20 animate-fade-in"
       aria-label="Site navigation"
     >
-      <div className="flex items-center justify-center gap-sys-8 h-sys-12">
+      <div className="flex items-center justify-center gap-sys-8 h-14">
         {NAV_ITEMS.map(({ href, label, accent }) => {
           const active = pathname === href;
           return (

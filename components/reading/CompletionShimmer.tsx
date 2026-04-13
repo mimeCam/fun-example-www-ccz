@@ -3,26 +3,31 @@
  *
  * Replaces the static divider when the reader genuinely finishes.
  * Gold shimmer sweeps left-to-right, one cycle, then stops.
- * Thermal-aware: subtle at dormant, full gold at stirring+.
+ * Intensity varies by confidence: subtle / present / radiant.
  * Respects reduced-motion: static gold/30 border instead.
  */
 
 'use client';
 
-interface CompletionShimmerProps {
-  /** True when genuine reading completion is detected. */
-  active: boolean;
-}
+import { useCeremony, type CeremonyIntensity } from './CeremonySequencer';
 
-export function CompletionShimmer({ active }: CompletionShimmerProps) {
-  if (!active) {
-    // Pre-ceremony: static divider, no animation
+/** Map intensity tier to CSS class. */
+const INTENSITY_CLASS: Record<CeremonyIntensity, string> = {
+  subtle: 'ceremony-subtle',
+  present: 'ceremony-present',
+  radiant: 'ceremony-radiant',
+};
+
+export function CompletionShimmer() {
+  const { phase, intensity } = useCeremony();
+
+  if (phase === 'idle' || phase === 'breathing') {
     return <hr className="border-gold/10 my-sys-8" />;
   }
 
   return (
     <div
-      className="my-sys-8 completion-shimmer"
+      className={`my-sys-8 completion-shimmer ${INTENSITY_CLASS[intensity]}`}
       role="separator"
       aria-label="Article complete"
     >

@@ -53,15 +53,22 @@ export function useBehavioralSignals({ articleId, estimatedReadTime }: Props) {
   const prevTime = useRef(Date.now());
   const reReads = useRef(0);
   const vel = useRef(0);
+  const wasDescending = useRef(false);
   const [bag, setBag] = useState<BehavioralSignalBag>(emptyBag);
 
   useEffect(() => {
     const now = Date.now();
     const dt = (now - prevTime.current) / 1000;
-    const instant = dt > 0 ? (depth - prevDepth.current) / dt : 0;
+    const delta = depth - prevDepth.current;
+    const instant = dt > 0 ? delta / dt : 0;
     vel.current = ALPHA * instant + (1 - ALPHA) * vel.current;
 
-    if (depth < maxDepth - REREAD_THRESHOLD) reReads.current += 1;
+    // Guard: only count re-read on directional reversal (forward→backward)
+    const descending = delta > 0;
+    if (wasDescending.current && !descending && delta < -REREAD_THRESHOLD) {
+      reReads.current += 1;
+    }
+    if (descending) wasDescending.current = true;
 
     prevDepth.current = depth;
     prevTime.current = now;

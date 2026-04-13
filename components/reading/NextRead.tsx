@@ -1,13 +1,9 @@
 /**
  * NextRead — Archetype-Aware "Next Read" Recommendation
  *
- * Design Philosophy (from Tanya Donska's UX spec):
- * - Whisper, not billboard — gentle suggestion at the article's end
- * - Shows ONE recommendation with context about WHY
- * - Text link CTA, no heavy card chrome
- * - Archetype badge is the only visual flourish (small)
- *
- * Placement: Bottom of article, after conclusion, before footer
+ * Whisper, not billboard — gentle suggestion at the article's end.
+ * Ceremony-aware: defers visibility to the CeremonySequencer.
+ * Shows ONE recommendation with context about WHY.
  */
 
 'use client';
@@ -15,15 +11,8 @@
 import { useState, useEffect } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
+import { useCeremony } from './CeremonySequencer';
 import Link from 'next/link';
-
-interface NextReadProps {
-  article: Article;
-  context: string;
-  archetype?: ArchetypeKey | null;
-  /** Delay before revealing (ms). 0 = immediate. Used by completion ceremony. */
-  revealDelay?: number;
-}
 
 /** Archetype accent colors — matches content-layers extension borders. */
 const ARCHETYPE_ACCENT: Record<ArchetypeKey, string> = {
@@ -43,22 +32,27 @@ const ARCHETYPE_LABEL: Record<ArchetypeKey, string> = {
   'collector': 'Collector',
 };
 
-/**
- * Context-Aware "Next Read" — whisper-weight recommendation.
- */
-export function NextRead({ article, context, archetype, revealDelay = 0 }: NextReadProps) {
+interface NextReadProps {
+  article: Article;
+  context: string;
+  archetype?: ArchetypeKey | null;
+}
+
+export function NextRead({ article, context, archetype }: NextReadProps) {
   if (!article) return null;
 
-  const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
-  const [visible, setVisible] = useState(revealDelay === 0);
+  const { phase } = useCeremony();
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (revealDelay <= 0 || visible) return;
-    const t = setTimeout(() => setVisible(true), revealDelay);
-    return () => clearTimeout(t);
-  }, [revealDelay, visible]);
+    if (phase === 'gifting' || phase === 'settled') {
+      setVisible(true);
+    }
+  }, [phase]);
 
   if (!visible) return null;
+
+  const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
 
   return (
     <div className="py-sys-7 animate-fade-in">

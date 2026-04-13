@@ -505,16 +505,53 @@ body {
   100% { transform: translateX(100%); opacity: 0; }
 }
 
-/* Thermal-gated: warm glow around the shimmer at stirring+. */
-[data-thermal="stirring"] .completion-shimmer,
-[data-thermal="warm"] .completion-shimmer,
-[data-thermal="luminous"] .completion-shimmer {
-  box-shadow: 0 0 16px color-mix(in srgb, var(--gold) 15%, transparent);
+/* ─── Ceremony Intensity Tiers ──────────────────────── */
+/* Confidence-based shimmer: the room's acknowledgment matches the reader's depth.
+   subtle (70-79%): narrow sweep, dim glow, quick
+   present (80-89%): medium sweep, warm glow
+   radiant (90-99%): wide sweep, bright glow, slow burn */
+
+.ceremony-subtle .completion-shimmer-track::after {
+  opacity: 0.4;
+  animation-duration: 500ms;
+}
+.ceremony-subtle {
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 8%, transparent);
 }
 
-/* Luminous: intensified warm glow radiating outward. */
-[data-thermal="luminous"] .completion-shimmer {
-  box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 25%, transparent);
+.ceremony-present .completion-shimmer-track::after {
+  opacity: 0.6;
+  animation-duration: 700ms;
+}
+.ceremony-present {
+  box-shadow: 0 0 14px color-mix(in srgb, var(--gold) 15%, transparent);
+}
+
+.ceremony-radiant .completion-shimmer-track::after {
+  opacity: 0.85;
+  animation-duration: 900ms;
+}
+.ceremony-radiant {
+  box-shadow: 0 0 22px color-mix(in srgb, var(--gold) 25%, transparent);
+}
+
+/* Thermal-gated: warm glow around the shimmer at stirring+. */
+[data-thermal="stirring"] .ceremony-subtle,
+[data-thermal="warm"] .ceremony-subtle,
+[data-thermal="luminous"] .ceremony-subtle {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent);
+}
+
+[data-thermal="stirring"] .ceremony-present,
+[data-thermal="warm"] .ceremony-present,
+[data-thermal="luminous"] .ceremony-present {
+  box-shadow: 0 0 18px color-mix(in srgb, var(--gold) 20%, transparent);
+}
+
+[data-thermal="stirring"] .ceremony-radiant,
+[data-thermal="warm"] .ceremony-radiant,
+[data-thermal="luminous"] .ceremony-radiant {
+  box-shadow: 0 0 28px color-mix(in srgb, var(--gold) 30%, transparent);
 }
 
 /* Respect reduced motion — static acknowledgment instead of animation. */
@@ -525,6 +562,12 @@ body {
     inset: 0;
     transform: none;
     opacity: 1;
+  }
+  .ceremony-subtle,
+  .ceremony-present,
+  .ceremony-radiant {
+    box-shadow: none;
+    border-top: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
   }
 }
 

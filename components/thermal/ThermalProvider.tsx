@@ -38,6 +38,9 @@ const ThermalContext = createContext<ThermalContextValue | null>(null);
 export function useThermal(): ThermalContextValue {
   const ctx = useContext(ThermalContext);
   if (!ctx) {
+    if (process.env.NODE_ENV === 'development') {
+      throw new Error('useThermal() must be used within a <ThermalProvider>');
+    }
     return {
       score: 0, state: 'dormant', confidence: 0,
       tokens: {}, animation: FALLBACK_ANIMATION,

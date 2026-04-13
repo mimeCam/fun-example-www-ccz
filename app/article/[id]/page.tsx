@@ -8,6 +8,8 @@ import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import QuickMirrorCard from '@/components/mirror/QuickMirrorCard';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
+import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
+import { CeremonySequencer } from '@/components/reading/CeremonySequencer';
 import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
@@ -22,10 +24,8 @@ import type { ContentBlock } from '@/lib/content/content-layers';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvider';
 import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
-import { safeGetItem } from '@/lib/utils/storage';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useGenuineCompletion } from '@/lib/hooks/useGenuineCompletion';
-import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -47,33 +47,25 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const history = useMemo(() => loadHistory(), []);
   const readCount = history.articleIds.length;
 
-  // Quick Mirror fires after reader engagement — archetype from behavioral signals
   const quickMirror = useQuickMirror(params.id, readTime, topics);
 
-  // Use QuickMirror archetype (localStorage-persisted, refreshed on detection)
-  // Falls back to email-based mirror archetype for returning readers
   const archetype = (quickMirror.result?.archetype as ArchetypeKey)
     ?? (mirror?.archetype as ArchetypeKey)
     ?? null;
 
-  // Stratified content: resolve visible layers with paragraph variants
   const stratifiedBlocks = useStratifiedContent(params.id, layeredContent, archetype, readCount);
 
-  // Resonance marginalia: fetch reader's resonances for this article
   const coreParagraphs = useMemo(
     () => extractCoreParagraphs(stratifiedBlocks),
     [stratifiedBlocks]
   );
   const resonanceBlocks = useResonanceMarginalia(params.id, coreParagraphs);
 
-  // Merge resonance blocks into stratified content
   const mergedBlocks = useMemo(() => {
     if (!resonanceBlocks.length) return stratifiedBlocks;
     return insertResonanceBlocks(stratifiedBlocks, resonanceBlocks, coreParagraphs);
   }, [stratifiedBlocks, resonanceBlocks, coreParagraphs]);
 
-  // When QuickMirror triggers, inject the card after all content blocks
-  // so it appears as a reward at the end, not an interruption mid-article.
   const { displayBlocks, hasInlineMirror } = useMemo(() => {
     if (!quickMirror.triggered || !quickMirror.result) {
       return { displayBlocks: mergedBlocks, hasInlineMirror: false };
@@ -89,13 +81,12 @@ function ArticleContent({ params }: { params: { id: string } }) {
     };
   }, [mergedBlocks, quickMirror.triggered, quickMirror.result]);
 
-  // Return recognition — ambient "I know you" for returning readers
   const recognition = useReturnRecognition();
 
-  // Thermal state from ThermalProvider
-  const { isEngaged, refresh: refreshThermal } = useThermal();
-  const { maxDepth } = useScrollDepth();
+  const { refresh: refreshThermal } = useThermal();
   const completion = useGenuineCompletion(readTime);
+
+  const { maxDepth } = useScrollDepth();
   const startTime = useRef(Date.now());
   const maxDepthRef = useRef(maxDepth);
   maxDepthRef.current = maxDepth;
@@ -109,18 +100,16 @@ function ArticleContent({ params }: { params: { id: string } }) {
     };
   }, [params.id]);
 
-  // Thermal refresh on genuine completion — the room acknowledges the read
-  useEffect(() => {
-    if (completion.isComplete) refreshThermal();
-  }, [completion.isComplete, refreshThermal]);
-
-  // Archetype-aware next read recommendation
   const allArticles = getAllArticles().filter(a => a.id !== params.id);
   const readArticleIds = history.articleIds;
   const recommendation = bestRecommendation(article, allArticles, archetype, readArticleIds);
 
   return (
-    <>
+    <CeremonySequencer
+      triggered={completion.isComplete}
+      confidence={completion.confidence}
+      onRefresh={refreshThermal}
+    >
       <GoldenThread />
       <GemHome quiet />
       <article className="min-h-screen">
@@ -143,19 +132,18 @@ function ArticleContent({ params }: { params: { id: string } }) {
             )}
           </div>
 
-          <CompletionShimmer active={completion.isComplete} />
+          <CompletionShimmer />
           {recommendation && (
             <NextRead
               article={recommendation.article}
               context={recommendation.reason}
               archetype={archetype}
-              revealDelay={completion.isComplete ? 700 : 0}
             />
           )}
         </div>
         <WhisperFooter />
       </article>
-    </>
+    </CeremonySequencer>
   );
 }
 
