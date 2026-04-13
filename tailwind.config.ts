@@ -36,10 +36,10 @@ const config: Config = {
         'void': '0 1px 2px rgba(0,0,0,0.3)',
         'rise': '0 4px 16px rgba(0,0,0,0.4)',
         'float': '0 8px 32px rgba(0,0,0,0.5)',
-        'gold': '0 8px 40px rgba(240,198,116,0.25)',
-        'gold-intense': '0 10px 48px rgba(240,198,116,0.25)',
-        'rose-glow': '0 6px 32px rgba(232,143,167,0.20)',
-        'cyan-whisper': '0 2px 20px rgba(78,205,196,0.15)',
+        'gold': '0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent)',
+        'gold-intense': '0 10px 48px color-mix(in srgb, var(--gold) 25%, transparent)',
+        'rose-glow': '0 6px 32px color-mix(in srgb, var(--rose) 20%, transparent)',
+        'cyan-whisper': '0 2px 20px color-mix(in srgb, var(--cyan) 15%, transparent)',
       },
       maxWidth: {
         'prose': 'var(--sys-maxw-prose)',
@@ -93,6 +93,18 @@ const config: Config = {
         'sys-medium': 'var(--sys-radius-medium)',
         'sys-wide':   'var(--sys-radius-wide)',
         'sys-full':   'var(--sys-radius-full)',
+      },
+      /* Z-index scale — ordered stacking layers, no ad-hoc z-values.
+         Thread < Nav < Gem < Backdrop < Drawer < Overlay < Toast. */
+      zIndex: {
+        'sys-base':     'var(--sys-z-base)',
+        'sys-thread':   'var(--sys-z-thread)',
+        'sys-nav':      'var(--sys-z-nav)',
+        'sys-gem':      'var(--sys-z-gem)',
+        'sys-backdrop': 'var(--sys-z-backdrop)',
+        'sys-drawer':   'var(--sys-z-drawer)',
+        'sys-overlay':  'var(--sys-z-overlay)',
+        'sys-toast':    'var(--sys-z-toast)',
       },
       transitionDuration: {
         'hover': '200ms',
@@ -154,29 +166,29 @@ const config: Config = {
         },
         'contentLockBreath': {
           '0%, 100%': { borderColor: '#222244' },
-          '50%': { borderColor: 'rgba(240, 198, 116, 0.2)' },
+          '50%': { borderColor: 'color-mix(in srgb, var(--gold) 20%, transparent)' },
         },
         'resonanceRemembered': {
           '0%': { opacity: '0', transform: 'translateY(6px)', borderLeftColor: 'transparent' },
           '40%': { opacity: '1', transform: 'translateY(0)' },
-          '70%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px rgba(232,143,167,0.25)' },
-          '100%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px rgba(232,143,167,0.12)' },
+          '70%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px color-mix(in srgb, var(--rose) 25%, transparent)' },
+          '100%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px color-mix(in srgb, var(--rose) 12%, transparent)' },
         },
         'portalGlow': {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(240,198,116,0.08)' },
-          '50%': { boxShadow: '0 0 40px rgba(240,198,116,0.18)' },
+          '0%, 100%': { boxShadow: '0 0 20px color-mix(in srgb, var(--gold) 8%, transparent)' },
+          '50%': { boxShadow: '0 0 40px color-mix(in srgb, var(--gold) 18%, transparent)' },
         },
         mirrorGlow: {
-          '0%, 100%': { boxShadow: '0 0 20px rgba(123, 44, 191, 0.3)' },
-          '50%': { boxShadow: '0 0 50px rgba(199, 125, 255, 0.5)' },
+          '0%, 100%': { boxShadow: '0 0 20px color-mix(in srgb, var(--primary) 30%, transparent)' },
+          '50%': { boxShadow: '0 0 50px color-mix(in srgb, var(--accent-violet) 50%, transparent)' },
         },
         quickMirrorPulse: {
-          '0%, 100%': { boxShadow: '0 8px 40px rgba(240, 198, 116, 0.25)' },
-          '50%': { boxShadow: '0 12px 60px rgba(240, 198, 116, 0.40)' },
+          '0%, 100%': { boxShadow: '0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent)' },
+          '50%': { boxShadow: '0 12px 60px color-mix(in srgb, var(--gold) 40%, transparent)' },
         },
         discoveryShimmer: {
-          '0%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 16px rgba(240, 198, 116, 0.20)' },
-          '60%': { borderLeftColor: '#f0c674', boxShadow: '-4px 0 8px rgba(240, 198, 116, 0.08)' },
+          '0%': { borderLeftColor: '#f0c674', boxShadow: `-4px 0 16px color-mix(in srgb, var(--gold) 20%, transparent)` },
+          '60%': { borderLeftColor: '#f0c674', boxShadow: `-4px 0 8px color-mix(in srgb, var(--gold) 8%, transparent)` },
           '100%': { borderLeftColor: '#4ecdc4', boxShadow: 'none' },
         },
         fadeOut: {
@@ -193,7 +205,7 @@ const config: Config = {
         },
         whisperShadow: {
           from: { boxShadow: 'none' },
-          to: { boxShadow: '0 2px 20px rgba(78,205,196,0.15)' },
+          to: { boxShadow: '0 2px 20px color-mix(in srgb, var(--cyan) 15%, transparent)' },
         },
         // Thermal breathing — duration/intensity driven by CSS custom properties
         thermalBreath: {
@@ -221,8 +233,8 @@ const config: Config = {
         },
         // Share confirm — brief gold flash
         shareConfirmFlash: {
-          '0%': { boxShadow: '0 0 0 0 rgba(240, 198, 116, 0.4)' },
-          '100%': { boxShadow: '0 0 12px 4px rgba(240, 198, 116, 0)' },
+          '0%': { boxShadow: `0 0 0 0 color-mix(in srgb, var(--gold) 40%, transparent)` },
+          '100%': { boxShadow: '0 0 12px 4px transparent' },
         },
       },
     },

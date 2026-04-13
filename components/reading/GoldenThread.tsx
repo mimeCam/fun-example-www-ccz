@@ -40,16 +40,16 @@ export function GoldenThread() {
 
   return (
     <div
-      className="fixed top-0 bottom-0 left-[3px] z-10 pointer-events-none"
+      className="fixed top-0 bottom-0 left-[var(--sys-thread-offset)] z-sys-thread pointer-events-none"
       role="progressbar"
       aria-label={`Reading progress: ${Math.round(depth)}%`}
       aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(depth)}
     >
       {/* Track — faint background line */}
-      <div className="absolute inset-y-0 left-0 w-[2px] bg-fog/20 rounded-sys-full" />
+      <div className="absolute inset-y-0 left-0 w-[var(--sys-thread-width)] bg-fog/20 rounded-sys-full" />
       {/* Fill — climbs with scroll, thermal color + glow */}
       <div
-        className="absolute top-0 left-0 w-[2px] rounded-sys-full golden-thread-glow"
+        className="absolute top-0 left-0 w-[var(--sys-thread-width)] rounded-sys-full golden-thread-glow"
         style={{
           height: `${depth}%`,
           backgroundColor: 'var(--token-accent)',

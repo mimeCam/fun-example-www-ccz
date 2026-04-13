@@ -30,7 +30,7 @@ function gemColor(state: string, quiet: boolean): string {
 
 function gemShadow(state: string, quiet: boolean): string {
   if (quiet) return '';
-  return state === 'luminous' ? 'drop-shadow-[0_0_6px_rgba(240,198,116,0.4)]' : '';
+  return state === 'luminous' ? 'drop-shadow-[0_0_6px_color-mix(in_srgb,var(--gold)_40%,transparent)]' : '';
 }
 
 interface GemHomeProps {
@@ -44,7 +44,7 @@ export function GemHome({ quiet = false }: GemHomeProps) {
   return (
     <Link
       href="/"
-      className={`fixed top-sys-4 left-sys-6 z-30 hover:text-gold
+      className={`fixed top-sys-4 left-sys-6 z-sys-gem hover:text-gold
         transition-colors duration-linger ease-out
         ${gemColor(state, quiet)} ${gemShadow(state, quiet)}`}
       aria-label="Home"

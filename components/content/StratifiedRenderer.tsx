@@ -212,7 +212,7 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
   const data = block.resonance;
   if (!data) return null;
 
-  const glow = warmer ? 'shadow-[0_0_18px_rgba(232,143,167,0.2)]' : '';
+  const glow = warmer ? 'shadow-rose-glow' : '';
 
   return (
     <aside

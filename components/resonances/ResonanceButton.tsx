@@ -61,7 +61,7 @@ export function ResonanceButton({ articleId, articleTitle }: {
       >
         <GemIcon size="sm" />
         {slotsAvailable && (
-          <span className="absolute -top-0.5 -right-0.5 text-[9px] text-gold/70 font-mono">
+          <span className="absolute -top-0.5 -right-0.5 text-sys-micro text-gold/70 font-mono">
             {usedSlots}/{SLOT_COUNT}
           </span>
         )}

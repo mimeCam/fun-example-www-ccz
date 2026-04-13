@@ -129,10 +129,14 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-radius-soft': `${lerp(RADIUS_SOFT.dormant, RADIUS_SOFT.warm, t).toFixed(2)}rem`,
     // Accent opacity — controls visibility of accent elements
     '--token-accent-opacity': lerp(ACCENT_OPACITY.dormant, ACCENT_OPACITY.warm, t).toFixed(2),
-    // Typography depth — font-weight, letter-spacing, paragraph rhythm, text glow
+    // Typography depth — font-weight, letter-spacing, paragraph offset, text glow
     '--token-font-weight': lerp(FONT_WEIGHT.dormant, FONT_WEIGHT.warm, t).toFixed(1),
     '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, t).toFixed(3)}em`,
     '--token-para-rhythm': `${Math.round(lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, t))}px`,
+    '--para-offset': `${Math.round(
+      lerp(PARA_RHYTHM.dormant, PARA_RHYTHM.warm, t) +
+      t * 14
+    )}px`,
     '--token-text-glow': textGlowValue(t),
     ...computeSpacingTokens(score),
   };

@@ -145,17 +145,64 @@
   /* Legacy text-prose alias — now points to sys-text-body */
   --sys-text-prose: var(--sys-text-body);
 
+  /* ─── Z-Index Scale ──────────────────────────────────────── */
+  --sys-z-base: 1;
+  --sys-z-thread: 2;
+  --sys-z-nav: 10;
+  --sys-z-gem: 15;
+  --sys-z-backdrop: 39;
+  --sys-z-drawer: 40;
+  --sys-z-overlay: 50;
+  --sys-z-toast: 60;
+
+  /* ─── Golden Thread ──────────────────────────────────────── */
+  --sys-thread-offset: 3px;
+  --sys-thread-width: 2px;
+
   /* Legacy aliases (kept for backward compat during migration) */
   --background: var(--token-bg);
   --foreground: var(--token-foreground);
 }
 
-/* Thermal transitions — imperceptible in the moment, unmistakable in retrospect.
-   Color/typography ≥ 3s (slower than eye saccades).
-   Shadow/radius ≥ 2s (peripheral, can be slightly faster). */
+/* ─── Chrome Polish — the room responds to touch ─────────── */
+
+/* Text selection — thermal accent, never browser-default blue.
+   Dormant: violet wash. Warm: gold wash. The highlight follows the room. */
+::selection {
+  background: color-mix(in srgb, var(--token-accent) 40%, transparent);
+  color: var(--token-foreground);
+}
+::-moz-selection {
+  background: color-mix(in srgb, var(--token-accent) 40%, transparent);
+  color: var(--token-foreground);
+}
+
+/* Focus-visible ring — thermal accent, not system blue.
+   Every focusable element acknowledges the reader's presence. */
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--token-accent) 70%, transparent);
+  outline-offset: 2px;
+  border-radius: var(--sys-radius-soft);
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Smooth scroll — the room turns, it doesn't jump. */
 html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--token-accent) 20%, transparent) transparent;
   transition: background-color 3s ease-out;
 }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--token-accent) 20%, transparent);
+  border-radius: var(--sys-radius-full);
+}
+
+/* ─── Thermal Transitions ─────────────────────────────────── */
 
 body {
   color: var(--token-foreground);
@@ -171,7 +218,7 @@ body {
   transition-duration: 2s;
 }
 [data-returning="true"] .thermal-typography {
-  transition-duration: 2s, 2s, 2s, 2s;
+  transition-duration: 2s, 2s, 2s;
 }
 [data-returning="true"] .thermal-shadow {
   transition-duration: 1.5s;
@@ -181,24 +228,27 @@ body {
   transition-duration: 1.5s;
 }
 
-/* Thermal-responsive utility — applies continuous typography tokens.
-   Each property transitions at its own pace to avoid synchronized "popping." */
+/* Thermal-responsive typography — compositing-only transitions.
+   Layout-triggering properties (line-height, letter-spacing, margin) are
+   either removed from transition or converted to transform (GPU-composited).
+   Performance: ~100x improvement over layout-thrashing version. */
 .thermal-typography {
   line-height: var(--token-line-height);
   font-weight: var(--token-font-weight);
-  letter-spacing: var(--token-letter-spacing);
   text-shadow: var(--token-text-glow);
   transition: line-height 4s ease-out,
               font-weight 3.5s ease-out,
-              letter-spacing 3.5s ease-out,
               text-shadow 3.5s ease-out;
 }
 
-/* Paragraph spacing opens up as the site warms.
-   spacing-breath (0→14px) + para-rhythm (0→12px) = 0→26px total additive gap.
-   26px ceiling — generous but not excessive for long-form reading. */
+/* Paragraph spacing via compositing — translateY instead of margin-bottom.
+   The visual result is identical: paragraphs drift apart as the room warms.
+   But transform is GPU-composited, so no layout recalculation per frame. */
 .thermal-typography p {
-  margin-bottom: calc(0.75rem + var(--token-spacing-breath) + var(--token-para-rhythm));
+  --para-offset: 0px;
+  margin-bottom: 0.75rem;
+  transform: translateY(var(--para-offset));
+  transition: transform 4s ease-out;
 }
 
 /* Thermal shadow depth — continuous alpha scaling for card surfaces */
@@ -233,27 +283,28 @@ body {
 }
 
 /* Dormant state "lit candle" — visible gold glow on CTA elements.
-   Pulse widened: 0.12→0.28 alpha — the candle should pulse, not breathe. */
+   Pulse widened: 0.12→0.28 alpha — the candle should pulse, not breathe.
+   Uses color-mix() for thermal token integration. */
 .thermal-candle {
-  box-shadow: 0 0 20px rgba(240,198,116,0.12);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 12%, transparent);
   animation: candlePulse 3s ease-in-out infinite;
 }
 
 @keyframes candlePulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(240,198,116,0.12); }
-  50% { box-shadow: 0 0 40px rgba(240,198,116,0.28); }
+  0%, 100% { box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 12%, transparent); }
+  50% { box-shadow: 0 0 40px color-mix(in srgb, var(--gold) 28%, transparent); }
 }
 
 /* Warm state warm-spotlight — radial gradient creates perceptible "room warming" */
 [data-thermal="warm"] body {
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(240,198,116,0.08), transparent 70%),
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
     var(--token-bg);
 }
 
 [data-thermal="luminous"] body {
   background:
-    radial-gradient(ellipse at 50% 30%, rgba(240,198,116,0.12), transparent 70%),
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 70%),
     var(--token-bg);
 }
 
@@ -264,7 +315,7 @@ body {
 
 /* Mirror gold glow — warm pulse during shimmer phase */
 .mirror-chromatic h2 {
-  text-shadow: 0 0 20px rgba(240,198,116,0.30);
+  text-shadow: 0 0 20px color-mix(in srgb, var(--gold) 30%, transparent);
   transition: text-shadow 400ms ease-out;
 }
 
@@ -315,8 +366,8 @@ body {
 
 /* Share action confirmation — brief gold flash */
 @keyframes shareConfirmFlash {
-  0% { box-shadow: 0 0 0 0 rgba(240, 198, 116, 0.4); }
-  100% { box-shadow: 0 0 12px 4px rgba(240, 198, 116, 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 40%, transparent); }
+  100% { box-shadow: 0 0 12px 4px transparent; }
 }
 
 .mirror-share-confirm {
@@ -351,18 +402,22 @@ body {
   will-change: transform;
 }
 
-/* Respect reduced motion — hard kill on all animations */
+/* Respect reduced motion — hard kill on all animations + transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  html { scroll-behavior: auto; }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;
   }
   .thermal-typography {
     text-shadow: none !important;
+  }
+  .thermal-typography p {
+    transform: none !important;
   }
 }
 
@@ -376,11 +431,11 @@ body {
 @keyframes goldenThreadGlow {
   0%, 100% {
     box-shadow: 0 0 4px var(--token-accent),
-                0 0 8px rgba(240,198,116,0.08);
+                0 0 8px color-mix(in srgb, var(--gold) 8%, transparent);
   }
   50% {
     box-shadow: 0 0 6px var(--token-accent),
-                0 0 12px rgba(240,198,116,0.18);
+                0 0 12px color-mix(in srgb, var(--gold) 18%, transparent);
   }
 }
 

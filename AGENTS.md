@@ -12,19 +12,14 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `components/reading/` — GoldenThread (reading spine)
 - `components/navigation/` — AmbientNav, GemHome
 - `components/resonances/` — ResonanceDrawer, ResonanceButton
-- `app/globals.css` — design token system (spacing, typography, radius, weight scales)
-- `tailwind.config.ts` — Tailwind mappings (`p-sys-*`, `text-sys-*`, `font-sys-*`, `rounded-sys-*`)
+- `app/globals.css` — design token system (spacing, typography, radius, weight, z-index scales)
+- `tailwind.config.ts` — Tailwind mappings (`p-sys-*`, `text-sys-*`, `font-sys-*`, `rounded-sys-*`, `z-sys-*`)
 
 ## Core Feature
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — a spine of light that climbs and glows.
 
 ## WIP
 _None_
-
-## Recent Changes
-- Design Token Compliance Pass (100% adoption): all radius, weight, typography, spacing tokens migrated from raw Tailwind to `sys-*` system tokens
-- Canvas generators (3 files) deduplicated: hardcoded hex → runtime CSS custom property reads
-- UX fixes: GoldenThread → `left-[3px]`, WhisperFooter → `pb-sys-12` to clear AmbientNav
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -120,7 +120,7 @@ export function ResonanceDrawer({
     <>
       {/* Backdrop — dims article area, no blur (reader keeps visual anchor) */}
       <div
-        className="fixed inset-0 z-[39] bg-black/30 transition-opacity duration-enter"
+        className="fixed inset-0 z-sys-backdrop bg-void/60 backdrop-blur-sm transition-opacity duration-enter"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -130,7 +130,7 @@ export function ResonanceDrawer({
         role="dialog"
         aria-modal="true"
         aria-label={`Save resonance for ${articleTitle}`}
-        className="fixed top-0 right-0 bottom-0 z-40 w-full max-w-sm
+        className="fixed top-0 right-0 bottom-0 z-sys-drawer w-full max-w-sm
                    bg-surface/95 backdrop-blur-sm
                    border-l border-fog/20 shadow-float
                    animate-slide-in-right
