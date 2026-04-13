@@ -192,7 +192,7 @@ function LetterCard({
       ))}
       {/* Divider */}
       <div className="my-sys-7 flex justify-center">
-        <div className={`h-px max-w-divider bg-accent/20 transition-transform duration-500 ${dividerScale}`} />
+        <div className={`h-px max-w-divider bg-accent/20 transition-transform duration-fade ${dividerScale}`} />
       </div>
       {/* Closing */}
       <p className="text-foreground/80 text-sys-md italic text-center">{letter.closing}</p>

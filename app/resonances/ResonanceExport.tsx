@@ -8,6 +8,7 @@
 
 import { useCallback } from 'react';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
+import { THERMAL, BRAND, cssOr } from '@/lib/design/color-constants';
 
 const W = 1080;
 const H = 1350;
@@ -22,18 +23,14 @@ interface Colors {
   gold: string;
 }
 
-function cssToken(name: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 function resolveColors(): Colors {
   return {
-    rose: cssToken('--rose') || '#e88fa7',
-    text: cssToken('--token-foreground') || '#f0f0f5',
-    muted: cssToken('--mist') || '#9494b8',
-    bgStart: cssToken('--token-bg') || '#1a1a2e',
-    bgEnd: cssToken('--token-surface') || '#16213e',
-    gold: cssToken('--gold') || '#f0c674',
+    rose: cssOr('--rose', BRAND.rose),
+    text: cssOr('--token-foreground', THERMAL.foreground),
+    muted: cssOr('--mist', BRAND.mist),
+    bgStart: cssOr('--token-bg', THERMAL.bg),
+    bgEnd: cssOr('--token-surface', THERMAL.surface),
+    gold: cssOr('--gold', BRAND.gold),
   };
 }
 

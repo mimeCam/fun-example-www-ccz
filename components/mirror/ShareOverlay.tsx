@@ -79,7 +79,7 @@ function IconBtn({ onClick, label, icon, confirm }: {
       {icon}
       <span className="pointer-events-none absolute -bottom-8 left-1/2
         -translate-x-1/2 rounded-sys-medium bg-void text-mist text-sys-micro px-sys-2 py-sys-1
-        opacity-0 group-hover:opacity-100 transition-opacity duration-150 whitespace-nowrap">
+        opacity-0 group-hover:opacity-100 transition-opacity duration-instant whitespace-nowrap">
         {label}
       </span>
     </button>

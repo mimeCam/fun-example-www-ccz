@@ -2,13 +2,11 @@
  * Smart Quote Card Generator
  * Uses Canvas API to generate beautiful shareable quote cards.
  *
- * Features:
- * - Browser-native Canvas API (no dependencies)
- * - Auto-sizing text measurement
- * - SVG-to-Canvas conversion for crisp rendering
- * - Multiple template styles
- * - High-DPI/Retina display support
+ * Colors flow through design tokens — consistent with the thermal system.
+ * No hardcoded hex values in templates.
  */
+
+import { THERMAL, BRAND, cssOr } from '@/lib/design/color-constants';
 
 export interface QuoteCardData {
   quote: string;
@@ -28,25 +26,23 @@ export interface CardTemplate {
   style: 'minimal' | 'bold' | 'elegant' | 'modern';
 }
 
-/**
- * Predefined card templates
- */
+/** Predefined card templates — all colors from design tokens. */
 export const TEMPLATES: CardTemplate[] = [
   {
     id: 'minimal-dark',
     name: 'Minimal Dark',
-    backgroundColor: '#1a1a1a',
-    textColor: '#ffffff',
-    accentColor: '#f59e0b',
+    backgroundColor: THERMAL.bg,
+    textColor: THERMAL.foreground,
+    accentColor: BRAND.gold,
     font: 'system-ui, -apple-system, sans-serif',
     style: 'minimal',
   },
   {
     id: 'bold-gradient',
     name: 'Bold Gradient',
-    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    backgroundColor: `linear-gradient(135deg, ${BRAND.primary} 0%, ${BRAND.secondary} 100%)`,
     textColor: '#ffffff',
-    accentColor: '#fbbf24',
+    accentColor: BRAND.gold,
     font: 'Georgia, serif',
     style: 'bold',
   },
@@ -54,37 +50,30 @@ export const TEMPLATES: CardTemplate[] = [
     id: 'elegant-white',
     name: 'Elegant White',
     backgroundColor: '#ffffff',
-    textColor: '#1a1a1a',
-    accentColor: '#f59e0b',
+    textColor: THERMAL.bg,
+    accentColor: BRAND.gold,
     font: 'Georgia, serif',
     style: 'elegant',
   },
   {
     id: 'modern-dark',
     name: 'Modern Dark',
-    backgroundColor: '#0f172a',
-    textColor: '#f1f5f9',
-    accentColor: '#38bdf8',
+    backgroundColor: cssOr('--token-surface', THERMAL.surface),
+    textColor: THERMAL.foreground,
+    accentColor: BRAND.cyan,
     font: 'system-ui, -apple-system, sans-serif',
     style: 'modern',
   },
 ];
 
-/**
- * Generate a quote card using Canvas API
- */
 export async function generateQuoteCard(
   data: QuoteCardData,
   template: CardTemplate = TEMPLATES[0]
 ): Promise<string> {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Failed to create canvas context');
 
-  if (!ctx) {
-    throw new Error('Failed to create canvas context');
-  }
-
-  // Set canvas size (high-DPI support)
   const dpr = window.devicePixelRatio || 1;
   const width = 1080;
   const height = 1080;
@@ -94,204 +83,91 @@ export async function generateQuoteCard(
   canvas.style.height = `${height}px`;
   ctx.scale(dpr, dpr);
 
-  // Draw background
   drawBackground(ctx, template, width, height);
-
-  // Draw quote text
   drawQuote(ctx, data.quote, template, width, height);
-
-  // Draw attribution
   drawAttribution(ctx, data.author, data.articleTitle, template, width, height);
-
-  // Draw branding
   if (data.blogName || data.url) {
     drawBranding(ctx, data.blogName || 'Blog', data.url || '', template, width, height);
   }
-
-  // Return data URL
   return canvas.toDataURL('image/png');
 }
 
-/**
- * Draw background with gradient or solid color
- */
-function drawBackground(
-  ctx: CanvasRenderingContext2D,
-  template: CardTemplate,
-  width: number,
-  height: number
-): void {
-  ctx.fillStyle = template.backgroundColor;
-
-  // Check if it's a gradient
-  if (template.backgroundColor.includes('gradient')) {
-    const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, '#667eea');
-    gradient.addColorStop(1, '#764ba2');
-    ctx.fillStyle = gradient;
+function drawBackground(ctx: CanvasRenderingContext2D, t: CardTemplate, w: number, h: number): void {
+  if (t.backgroundColor.includes('gradient')) {
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, BRAND.primary);
+    g.addColorStop(1, BRAND.secondary);
+    ctx.fillStyle = g;
+  } else {
+    ctx.fillStyle = t.backgroundColor;
   }
-
-  ctx.fillRect(0, 0, width, height);
+  ctx.fillRect(0, 0, w, h);
 }
 
-/**
- * Draw quote text with auto-sizing and wrapping
- */
-function drawQuote(
-  ctx: CanvasRenderingContext2D,
-  quote: string,
-  template: CardTemplate,
-  width: number,
-  height: number
-): void {
+function drawQuote(ctx: CanvasRenderingContext2D, quote: string, t: CardTemplate, w: number, h: number): void {
   const fontSize = 48;
   const lineHeight = fontSize * 1.4;
-  const maxWidth = width - 160; // 80px padding on each side
-  const x = 80;
-  const y = 200;
-
-  ctx.font = `${template.style === 'bold' ? 'bold' : ''} ${fontSize}px ${template.font}`;
-  ctx.fillStyle = template.textColor;
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'top';
-
-  // Add quotation mark
-  ctx.font = `bold 120px ${template.font}`;
-  ctx.fillStyle = template.accentColor;
+  const maxWidth = w - 160;
+  ctx.font = `bold 120px ${t.font}`;
+  ctx.fillStyle = t.accentColor;
   ctx.globalAlpha = 0.3;
   ctx.fillText('"', 60, 100);
   ctx.globalAlpha = 1.0;
-
-  // Wrap and draw text
-  const lines = wrapText(ctx, quote, maxWidth);
-  ctx.font = `${template.style === 'bold' ? 'bold' : ''} ${fontSize}px ${template.font}`;
-  ctx.fillStyle = template.textColor;
-
-  lines.forEach((line, index) => {
-    ctx.fillText(line, x, y + index * lineHeight);
-  });
+  const lines = wrapText(ctx, quote, maxWidth, fontSize, t);
+  ctx.font = `${t.style === 'bold' ? 'bold' : ''} ${fontSize}px ${t.font}`;
+  ctx.fillStyle = t.textColor;
+  lines.forEach((line, i) => ctx.fillText(line, 80, 200 + i * lineHeight));
 }
 
-/**
- * Draw attribution (author and article title)
- */
-function drawAttribution(
-  ctx: CanvasRenderingContext2D,
-  author: string,
-  articleTitle: string,
-  template: CardTemplate,
-  width: number,
-  height: number
-): void {
-  const fontSize = 28;
-  const y = height - 280;
-
-  // Author
-  ctx.font = `bold ${fontSize}px ${template.font}`;
-  ctx.fillStyle = template.accentColor;
+function drawAttribution(ctx: CanvasRenderingContext2D, author: string, title: string, t: CardTemplate, w: number, h: number): void {
+  const y = h - 280;
+  ctx.font = `bold 28px ${t.font}`;
+  ctx.fillStyle = t.accentColor;
   ctx.textAlign = 'center';
-  ctx.fillText(`— ${author}`, width / 2, y);
-
-  // Article title
-  ctx.font = `${fontSize}px ${template.font}`;
-  ctx.fillStyle = template.textColor;
+  ctx.fillText(`\u2014 ${author}`, w / 2, y);
+  ctx.font = '28px ' + t.font;
+  ctx.fillStyle = t.textColor;
   ctx.globalAlpha = 0.8;
-  ctx.fillText(articleTitle, width / 2, y + 40);
+  ctx.fillText(title, w / 2, y + 40);
   ctx.globalAlpha = 1.0;
 }
 
-/**
- * Draw branding at bottom
- */
-function drawBranding(
-  ctx: CanvasRenderingContext2D,
-  blogName: string,
-  url: string,
-  template: CardTemplate,
-  width: number,
-  height: number
-): void {
-  const fontSize = 20;
-  const y = height - 60;
-
-  ctx.font = `${fontSize}px ${template.font}`;
-  ctx.fillStyle = template.textColor;
+function drawBranding(ctx: CanvasRenderingContext2D, name: string, url: string, t: CardTemplate, w: number, h: number): void {
+  const y = h - 60;
+  ctx.font = `20px ${t.font}`;
+  ctx.fillStyle = t.textColor;
   ctx.globalAlpha = 0.6;
   ctx.textAlign = 'center';
-  ctx.fillText(`📸 ${blogName}`, width / 2, y);
-
-  if (url) {
-    ctx.font = `16px ${template.font}`;
-    ctx.fillText(url, width / 2, y + 24);
-  }
-
+  ctx.fillText(name, w / 2, y);
+  if (url) { ctx.font = '16px ' + t.font; ctx.fillText(url, w / 2, y + 24); }
   ctx.globalAlpha = 1.0;
 }
 
-/**
- * Wrap text to fit within max width
- */
-function wrapText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number
-): string[] {
+function wrapText(ctx: CanvasRenderingContext2D, text: string, max: number, size: number, t: CardTemplate): string[] {
+  ctx.font = `${t.style === 'bold' ? 'bold' : ''} ${size}px ${t.font}`;
   const words = text.split(' ');
   const lines: string[] = [];
-  let currentLine = '';
-
+  let cur = '';
   for (const word of words) {
-    const testLine = currentLine + (currentLine ? ' ' : '') + word;
-    const metrics = ctx.measureText(testLine);
-
-    if (metrics.width > maxWidth && currentLine) {
-      lines.push(currentLine);
-      currentLine = word;
-    } else {
-      currentLine = testLine;
-    }
+    const test = cur + (cur ? ' ' : '') + word;
+    if (ctx.measureText(test).width > max && cur) { lines.push(cur); cur = word; }
+    else cur = test;
   }
-
-  if (currentLine) {
-    lines.push(currentLine);
-  }
-
+  if (cur) lines.push(cur);
   return lines;
 }
 
-/**
- * Validate color contrast for accessibility
- */
-export function validateContrast(
-  backgroundColor: string,
-  textColor: string
-): boolean {
-  // Simple contrast check (would use proper WCAG calculation in production)
-  const bgIsDark = backgroundColor.toLowerCase() === '#1a1a1a' ||
-                   backgroundColor.toLowerCase() === '#0f172a';
-  const textIsLight = textColor.toLowerCase() === '#ffffff' ||
-                      textColor.toLowerCase() === '#f1f5f9';
-
-  return bgIsDark === textIsLight;
+export function validateContrast(bg: string, text: string): boolean {
+  const darkBgs = new Set([THERMAL.bg, THERMAL.surface, '#1a1a1a', '#0f172a']);
+  const lightTexts = new Set(['#ffffff', THERMAL.foreground]);
+  return darkBgs.has(bg.toLowerCase()) === lightTexts.has(text.toLowerCase());
 }
 
-/**
- * Generate multiple card variants
- */
-export async function generateCardVariants(
-  data: QuoteCardData,
-  templates: CardTemplate[] = TEMPLATES
-): Promise<Map<string, string>> {
+export async function generateCardVariants(data: QuoteCardData, templates: CardTemplate[] = TEMPLATES): Promise<Map<string, string>> {
   const variants = new Map<string, string>();
-
-  for (const template of templates) {
-    try {
-      const dataUrl = await generateQuoteCard(data, template);
-      variants.set(template.id, dataUrl);
-    } catch (error) {
-      console.error(`Failed to generate ${template.id}:`, error);
-    }
+  for (const t of templates) {
+    try { variants.set(t.id, await generateQuoteCard(data, t)); }
+    catch (e) { console.error(`Failed to generate ${t.id}:`, e); }
   }
-
   return variants;
 }

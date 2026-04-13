@@ -133,7 +133,6 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     // Glow/shadow — linear: own thresholds and gating
     '--token-glow': glowValue(t),
     '--token-shadow': shadowValue(t),
-    '--token-spacing-breath': `${Math.round(t * 14)}px`,
     // Typography — boosted: crosses JND faster at low scores
     '--token-line-height': lerp(LINE_HEIGHT.dormant, LINE_HEIGHT.warm, tp).toFixed(3),
     // Shadow depth — linear: continuous alpha scaling

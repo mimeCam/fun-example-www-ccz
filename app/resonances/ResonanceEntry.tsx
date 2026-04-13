@@ -30,7 +30,7 @@ function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean })
   const pct = Math.min(100, Math.round((vitality / 30) * 100));
   return (
     <div className="h-1.5 rounded-sys-full bg-fog/30 w-full overflow-hidden">
-      <div className="h-full rounded-sys-full bg-gradient-to-r from-rose to-rose/60 transition-all duration-500"
+      <div className="h-full rounded-sys-full bg-gradient-to-r from-rose to-rose/60 transition-all duration-fade"
         style={{ width: `${pct}%` }} />
     </div>
   );

@@ -13,7 +13,6 @@
   --token-glow: none;
   --token-shadow: 0 1px 2px rgba(0,0,0,0.3);
   --token-border: #222244;
-  --token-spacing-breath: 0px;
 
   /* Continuous thermal tokens — shadow, radius, accent */
   --token-line-height: 1.75;
@@ -94,6 +93,7 @@
   --sys-time-linger: 1000ms;
   --sys-time-fade: 500ms;
   --sys-time-instant: 150ms;
+  --sys-time-settle: 1500ms;
 
   --sys-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -231,8 +231,11 @@ body {
 /* Thermal-responsive typography — compositing-only transitions.
    Layout-triggering properties (line-height, letter-spacing, margin) are
    either removed from transition or converted to transform (GPU-composited).
-   Performance: ~100x improvement over layout-thrashing version. */
-.thermal-typography {
+   Performance: ~100x improvement over layout-thrashing version.
+   The .prose.thermal-typography rule has higher specificity to win over
+   Tailwind Typography's prose class if ever installed. */
+.thermal-typography,
+.prose.thermal-typography {
   line-height: var(--token-line-height);
   font-weight: var(--token-font-weight);
   text-shadow: var(--token-text-glow);

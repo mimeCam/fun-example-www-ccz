@@ -41,7 +41,6 @@ describe('computeThermalTokens — output tokens', () => {
     '--token-glow',
     '--token-shadow',
     '--token-border',
-    '--token-spacing-breath',
     // Continuous tokens
     '--token-line-height',
     '--token-shadow-depth',
@@ -54,7 +53,7 @@ describe('computeThermalTokens — output tokens', () => {
     '--token-text-glow',
   ];
 
-  it('returns 16 CSS custom property keys', () => {
+  it('returns 15 CSS custom property keys', () => {
     for (const key of TOKEN_KEYS) {
       expect(SRC).toContain(`'${key}'`);
     }
@@ -297,9 +296,5 @@ describe('thermal-tokens — spacing constants in source', () => {
   it('uses sqrt scale for proportional growth', () => {
     expect(SRC).toContain('Math.sqrt');
     expect(SRC).toContain('SPACING_SCALE_REF');
-  });
-
-  it('spacing-breath max is 14px', () => {
-    expect(SRC).toContain('t * 14');
   });
 });

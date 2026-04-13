@@ -5,6 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, inline restore, apply-tokens, transition-choreography
+- `lib/design/` — shared color constants for canvas contexts (single source of truth for hex values)
 - `lib/mirror/` — scoring, snapshots
 - `lib/content/` — stratified paragraphs, archetype recommendations
 - `lib/detection/completion-detector.ts` — genuine read detection (confidence scoring)
@@ -26,8 +27,6 @@ _None_
 ## TODOs for Tomorrow
 - Resonance ceremony (4.3 in UX spec): gold shimmer on quote border after saving, extended drawer auto-close
 - Slot indicator (4.4 in UX spec): replace text diamonds with archetype-colored circles
-- Verify `prose prose-invert` vs `thermal-typography` CSS specificity (Tanya #27 Tier 1 item #2)
-- Scan for hardcoded colors (`#` in components) — Tanya #27 Tier 4 item #10
 - Consider `display: 'optional'` for Space Grotesk font loading
 
 ## Deployment

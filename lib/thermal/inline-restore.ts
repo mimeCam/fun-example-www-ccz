@@ -47,7 +47,6 @@ el.setProperty('--token-letter-spacing',lerp(-.01,.02,tp).toFixed(3)+'em');
 el.setProperty('--token-para-rhythm',Math.round(lerp(0,12,tp))+'px');
 el.setProperty('--para-offset',Math.round(lerp(0,12,tp)+t*14)+'px');
 el.setProperty('--token-text-glow',t<.5?'none':'0 0 40px rgba(240,198,116,'+Math.min(.12,t*.10).toFixed(3)+')');
-el.setProperty('--token-spacing-breath',Math.round(t*14)+'px');
 var thr=18,t2=sc<thr?0:(sc-thr)/(100-thr);
 for(var n=1;n<=12;n++){var lift=t2*5.66*Math.sqrt(n/6);el.setProperty('--token-space-lift-'+n,lift.toFixed(2)+'px');}
 document.documentElement.setAttribute('data-thermal',st);

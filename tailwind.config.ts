@@ -113,6 +113,7 @@ const config: Config = {
         'linger': '1000ms',
         'fade': '500ms',
         'instant': '150ms',
+        'settle': '1500ms',
       },
       transitionTimingFunction: {
         'out': 'cubic-bezier(0.0, 0.0, 0.2, 1)',
@@ -165,14 +166,14 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'contentLockBreath': {
-          '0%, 100%': { borderColor: '#222244' },
+          '0%, 100%': { borderColor: 'var(--fog)' },
           '50%': { borderColor: 'color-mix(in srgb, var(--gold) 20%, transparent)' },
         },
         'resonanceRemembered': {
           '0%': { opacity: '0', transform: 'translateY(6px)', borderLeftColor: 'transparent' },
           '40%': { opacity: '1', transform: 'translateY(0)' },
-          '70%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px color-mix(in srgb, var(--rose) 25%, transparent)' },
-          '100%': { borderLeftColor: '#e88fa7', boxShadow: '0 6px 32px color-mix(in srgb, var(--rose) 12%, transparent)' },
+          '70%': { borderLeftColor: 'var(--rose)', boxShadow: '0 6px 32px color-mix(in srgb, var(--rose) 25%, transparent)' },
+          '100%': { borderLeftColor: 'var(--rose)', boxShadow: '0 6px 32px color-mix(in srgb, var(--rose) 12%, transparent)' },
         },
         'portalGlow': {
           '0%, 100%': { boxShadow: '0 0 20px color-mix(in srgb, var(--gold) 8%, transparent)' },
@@ -187,9 +188,9 @@ const config: Config = {
           '50%': { boxShadow: '0 12px 60px color-mix(in srgb, var(--gold) 40%, transparent)' },
         },
         discoveryShimmer: {
-          '0%': { borderLeftColor: '#f0c674', boxShadow: `-4px 0 16px color-mix(in srgb, var(--gold) 20%, transparent)` },
-          '60%': { borderLeftColor: '#f0c674', boxShadow: `-4px 0 8px color-mix(in srgb, var(--gold) 8%, transparent)` },
-          '100%': { borderLeftColor: '#4ecdc4', boxShadow: 'none' },
+          '0%': { borderLeftColor: 'var(--gold)', boxShadow: `-4px 0 16px color-mix(in srgb, var(--gold) 20%, transparent)` },
+          '60%': { borderLeftColor: 'var(--gold)', boxShadow: `-4px 0 8px color-mix(in srgb, var(--gold) 8%, transparent)` },
+          '100%': { borderLeftColor: 'var(--cyan)', boxShadow: 'none' },
         },
         fadeOut: {
           from: { opacity: '1' },

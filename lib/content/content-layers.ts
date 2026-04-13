@@ -8,6 +8,7 @@
 
 import type { ArchetypeKey, LayeredArticleContent, ResolvedParagraph, VisibleLayer } from '@/types/content';
 import { resolveStratifiedParagraphs } from './stratified-paragraphs';
+import { ARCHETYPE as ARCHETYPE_HEX } from '@/lib/design/color-constants';
 
 /** Check if a reader counts as "returning" (≥2 articles in their history) */
 export function isReturningReader(readCount: number): boolean {
@@ -81,31 +82,31 @@ export const ARCHETYPE_COLORS: Record<ArchetypeKey, {
   shimmerTo: string;
 }> = {
   'deep-diver': {
-    hex: '#4ecdc4',
+    hex: ARCHETYPE_HEX['deep-diver'],
     border: 'border-l-cyan',
     shimmerFrom: 'rgba(78, 205, 196, 0.3)',
     shimmerTo: 'rgba(78, 205, 196, 0.5)',
   },
   'explorer': {
-    hex: '#c77dff',
+    hex: ARCHETYPE_HEX['explorer'],
     border: 'border-l-accent',
     shimmerFrom: 'rgba(199, 125, 255, 0.3)',
     shimmerTo: 'rgba(199, 125, 255, 0.5)',
   },
   'faithful': {
-    hex: '#9d4edd',
+    hex: ARCHETYPE_HEX['faithful'],
     border: 'border-l-secondary',
-    shimmerFrom: 'rgba(179, 102, 255, 0.3)',  // brightened 15% for shimmer contrast on dark bg
+    shimmerFrom: 'rgba(179, 102, 255, 0.3)',
     shimmerTo: 'rgba(179, 102, 255, 0.5)',
   },
   'resonator': {
-    hex: '#e88fa7',
+    hex: ARCHETYPE_HEX['resonator'],
     border: 'border-l-rose',
-    shimmerFrom: 'rgba(240, 160, 184, 0.3)',  // brightened 12% for shimmer contrast on dark bg
+    shimmerFrom: 'rgba(240, 160, 184, 0.3)',
     shimmerTo: 'rgba(240, 160, 184, 0.5)',
   },
   'collector': {
-    hex: '#d4922a',
+    hex: ARCHETYPE_HEX['collector'],
     border: 'border-l-amber',
     shimmerFrom: 'rgba(212, 146, 42, 0.3)',
     shimmerTo: 'rgba(212, 146, 42, 0.5)',

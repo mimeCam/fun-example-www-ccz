@@ -1,11 +1,11 @@
 /**
  * Letter Card Generator — renders a Letter as 1080×1080 branded PNG via Canvas API.
  * Same pattern as quick-mirror-card-generator.ts but for Return Letters.
- * No external deps — pure client-side Canvas.
  * Colors resolved from CSS design tokens at runtime — single source of truth.
  */
 
 import type { Letter } from '@/types/book-narration';
+import { THERMAL, BRAND, cssOr } from '@/lib/design/color-constants';
 
 const W = 1080;
 const H = 1080;
@@ -19,21 +19,15 @@ interface CanvasColors {
   bgEnd: string;
 }
 
-function cssToken(name: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 function resolveColors(): CanvasColors {
   return {
-    gold: cssToken('--gold') || '#f0c674',
-    text: cssToken('--token-foreground') || '#f0f0f5',
-    muted: cssToken('--mist') || '#9494b8',
-    bgStart: cssToken('--token-surface') || '#16213e',
-    bgEnd: cssToken('--token-bg') || '#1a1a2e',
+    gold: cssOr('--gold', BRAND.gold),
+    text: cssOr('--token-foreground', THERMAL.foreground),
+    muted: cssOr('--mist', BRAND.mist),
+    bgStart: cssOr('--token-surface', THERMAL.surface),
+    bgEnd: cssOr('--token-bg', THERMAL.bg),
   };
 }
-
-/* ─── Public API ─────────────────────────────────────────── */
 
 export function generateLetterCard(letter: Letter): string {
   const { ctx, canvas } = initCanvas();
@@ -50,8 +44,6 @@ export function generateLetterCard(letter: Letter): string {
   return canvas.toDataURL('image/png');
 }
 
-/* ─── Canvas bootstrap ──────────────────────────────────── */
-
 function initCanvas(): { ctx: CanvasRenderingContext2D; canvas: HTMLCanvasElement } {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -62,8 +54,6 @@ function initCanvas(): { ctx: CanvasRenderingContext2D; canvas: HTMLCanvasElemen
   ctx.scale(dpr, dpr);
   return { ctx, canvas };
 }
-
-/* ─── Drawing helpers (each ≤ 10 lines) ─────────────────── */
 
 function drawBackground(ctx: CanvasRenderingContext2D, c: CanvasColors): number {
   const g = ctx.createLinearGradient(0, 0, 0, H);
@@ -76,7 +66,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, c: CanvasColors): number 
 
 function drawLabel(ctx: CanvasRenderingContext2D, c: CanvasColors, y: number): number {
   ctx.font = '18px system-ui, sans-serif';
-  ctx.fillStyle = hexToRgba(c.gold, 0.6);
+  ctx.fillStyle = hexAlpha(c.gold, 0.6);
   ctx.textAlign = 'center';
   ctx.fillText('BASED ON HOW YOU READ\u2026', W / 2, y);
   return y + 60;
@@ -92,7 +82,7 @@ function drawSalutation(ctx: CanvasRenderingContext2D, c: CanvasColors, text: st
 
 function drawParagraph(ctx: CanvasRenderingContext2D, c: CanvasColors, text: string, y: number): number {
   ctx.font = '26px Georgia, serif';
-  ctx.fillStyle = hexToRgba(c.text, 0.9);
+  ctx.fillStyle = hexAlpha(c.text, 0.9);
   ctx.textAlign = 'center';
   const lines = wrapLines(ctx, text, W - PAD * 2);
   lines.forEach((line, i) => ctx.fillText(line, W / 2, y + i * 40));
@@ -101,7 +91,7 @@ function drawParagraph(ctx: CanvasRenderingContext2D, c: CanvasColors, text: str
 
 function drawDivider(ctx: CanvasRenderingContext2D, c: CanvasColors, y: number): number {
   const hw = 60;
-  ctx.strokeStyle = hexToRgba(c.gold, 0.3);
+  ctx.strokeStyle = hexAlpha(c.gold, 0.3);
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(W / 2 - hw, y);
@@ -112,7 +102,7 @@ function drawDivider(ctx: CanvasRenderingContext2D, c: CanvasColors, y: number):
 
 function drawClosing(ctx: CanvasRenderingContext2D, c: CanvasColors, text: string, y: number): void {
   ctx.font = 'italic 22px Georgia, serif';
-  ctx.fillStyle = hexToRgba(c.text, 0.8);
+  ctx.fillStyle = hexAlpha(c.text, 0.8);
   ctx.textAlign = 'center';
   ctx.fillText(text, W / 2, y);
 }
@@ -126,12 +116,10 @@ function drawSignOff(ctx: CanvasRenderingContext2D, c: CanvasColors, text: strin
 
 function drawBranding(ctx: CanvasRenderingContext2D, c: CanvasColors): void {
   ctx.font = '14px system-ui, sans-serif';
-  ctx.fillStyle = hexToRgba(c.muted, 0.5);
+  ctx.fillStyle = hexAlpha(c.muted, 0.5);
   ctx.textAlign = 'center';
   ctx.fillText('theanti.blog', W / 2, H - 80);
 }
-
-/* ─── Text/color utility ─────────────────────────────────── */
 
 function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number): string[] {
   const words = text.split(' ');
@@ -146,7 +134,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number): st
   return lines;
 }
 
-function hexToRgba(hex: string, alpha: number): string {
+function hexAlpha(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);

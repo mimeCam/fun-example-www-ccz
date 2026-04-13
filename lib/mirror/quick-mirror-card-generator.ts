@@ -1,8 +1,6 @@
 /**
  * Quick Mirror Card Generator
  * Renders a QuickMirrorResult as a 1080×1080 branded PNG via Canvas API.
- * Archetype-specific colors flow through: text, bars, dividers, glow.
- * No external deps — pure client-side Canvas.
  * Colors resolved from CSS design tokens at runtime — single source of truth.
  */
 
@@ -10,6 +8,7 @@ import type { QuickMirrorResult } from './quick-synthesize';
 import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import type { ArchetypeKey } from '@/types/content';
 import { initCanvas, wrapLines } from '@/lib/utils/canvas';
+import { THERMAL, BRAND, cssOr } from '@/lib/design/color-constants';
 
 const W = 1080;
 const H = 1080;
@@ -24,22 +23,16 @@ interface CanvasColors {
   bgEnd: string;
 }
 
-function cssToken(name: string): string {
-  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-}
-
 function resolveColors(): CanvasColors {
   return {
-    text: cssToken('--token-foreground') || '#f0f0f5',
-    muted: cssToken('--mist') || '#94a3b8',
-    barBg: '#334155',
-    brand: '#4b5563',
-    bgStart: '#0f172a',
-    bgEnd: cssToken('--token-bg') || '#1a1a2e',
+    text: cssOr('--token-foreground', THERMAL.foreground),
+    muted: cssOr('--mist', BRAND.mist),
+    barBg: hexAlpha(BRAND.fog, 0.6),
+    brand: hexAlpha(BRAND.mist, 0.5),
+    bgStart: cssOr('--token-surface', THERMAL.surface),
+    bgEnd: cssOr('--token-bg', THERMAL.bg),
   };
 }
-
-/* ─── Public API ─────────────────────────────────────────── */
 
 export function generateQuickMirrorCard(result: QuickMirrorResult): string {
   const { ctx, canvas } = initCanvas(W, H);
@@ -57,8 +50,6 @@ export function generateQuickMirrorCard(result: QuickMirrorResult): string {
   return canvas.toDataURL('image/png');
 }
 
-/* ─── Drawing helpers (each ≤ 8 lines) ──────────────────── */
-
 function drawBackground(ctx: CanvasRenderingContext2D, c: CanvasColors, ac: { hex: string }): void {
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, c.bgStart);
@@ -70,7 +61,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, c: CanvasColors, ac: { he
 
 function drawCornerGlow(ctx: CanvasRenderingContext2D, ac: { hex: string }): void {
   const g = ctx.createRadialGradient(W / 2, H * 0.3, 0, W / 2, H * 0.3, 400);
-  g.addColorStop(0, hexToRgba(ac.hex, 0.08));
+  g.addColorStop(0, hexAlpha(ac.hex, 0.08));
   g.addColorStop(1, 'transparent');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
@@ -78,7 +69,7 @@ function drawCornerGlow(ctx: CanvasRenderingContext2D, ac: { hex: string }): voi
 
 function drawLabel(ctx: CanvasRenderingContext2D, ac: { hex: string }): void {
   ctx.font = '18px system-ui, sans-serif';
-  ctx.fillStyle = hexToRgba(ac.hex, 0.7);
+  ctx.fillStyle = hexAlpha(ac.hex, 0.7);
   ctx.textAlign = 'center';
   ctx.fillText('BASED ON HOW YOU READ\u2026', W / 2, 200);
 }
@@ -100,7 +91,7 @@ function drawWhisper(ctx: CanvasRenderingContext2D, c: CanvasColors, whisper: st
 
 function drawDivider(ctx: CanvasRenderingContext2D, y: number, ac: { hex: string }): void {
   const hw = 120;
-  ctx.strokeStyle = hexToRgba(ac.hex, 0.35);
+  ctx.strokeStyle = hexAlpha(ac.hex, 0.35);
   ctx.lineWidth = 1;
   ctx.beginPath();
   ctx.moveTo(W / 2 - hw, y);
@@ -123,7 +114,7 @@ function drawOneBar(ctx: CanvasRenderingContext2D, c: CanvasColors, label: strin
   ctx.fillStyle = c.barBg;
   ctx.fillRect(PAD, y + 10, barW, barH);
   const g = ctx.createLinearGradient(PAD, 0, PAD + barW, 0);
-  g.addColorStop(0, hexToRgba(ac.hex, 0.7));
+  g.addColorStop(0, hexAlpha(ac.hex, 0.7));
   g.addColorStop(1, ac.hex);
   ctx.fillStyle = g;
   ctx.fillRect(PAD, y + 10, barW * (val / 100), barH);
@@ -147,13 +138,11 @@ function drawBranding(ctx: CanvasRenderingContext2D, c: CanvasColors): void {
   ctx.fillText('theanti.blog', W / 2, H - 40);
 }
 
-/* ─── Text/color utility ─────────────────────────────────── */
-
 function cap(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function hexToRgba(hex: string, alpha: number): string {
+function hexAlpha(hex: string, alpha: number): string {
   const r = parseInt(hex.slice(1, 3), 16);
   const g = parseInt(hex.slice(3, 5), 16);
   const b = parseInt(hex.slice(5, 7), 16);
