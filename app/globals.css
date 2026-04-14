@@ -299,22 +299,25 @@ body {
   50% { box-shadow: 0 0 40px color-mix(in srgb, var(--gold) 28%, transparent); }
 }
 
-/* Warm state warm-spotlight — radial gradient creates perceptible "room warming" */
+/* Warm state warm-spotlight — radial gradient creates perceptible "room warming".
+   Opacities amplified per Tanya's spec: the room must WARM, not hint.
+   Stirring 8%: marginal but present when combined with accent shift.
+   Warm 14%: warm centre clearly visible. Luminous 20%: unmistakable. */
 [data-thermal="stirring"] body {
-  background:
-    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 3%, transparent), transparent 70%),
-    var(--token-bg);
-}
-
-[data-thermal="warm"] body {
   background:
     radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
     var(--token-bg);
 }
 
+[data-thermal="warm"] body {
+  background:
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 14%, transparent), transparent 70%),
+    var(--token-bg);
+}
+
 [data-thermal="luminous"] body {
   background:
-    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 70%),
+    radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 20%, transparent), transparent 70%),
     var(--token-bg);
 }
 
@@ -412,6 +415,59 @@ body {
   will-change: transform;
 }
 
+/* ─── Card Alive-State ──────────────────────────────── */
+/* Perceptible hover: the card feels like picking up a book.
+   4px lift crosses spatial perception on any display density.
+   1.5% scale reinforces "picking up" metaphor compositively.
+   Shadow width (not opacity) creates visible halo on dark surfaces. */
+.card-alive {
+  transition: transform var(--sys-time-hover) var(--sys-ease-out),
+              box-shadow var(--sys-time-hover) var(--sys-ease-out),
+              border-color var(--sys-time-hover) var(--sys-ease-out);
+}
+.card-alive:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  transition-timing-function: var(--sys-ease-out);
+  transition-duration: var(--sys-time-hover);
+}
+.card-alive:not(:hover) {
+  transition-timing-function: var(--sys-ease-settle);
+  transition-duration: 300ms; /* leave: gentle settle-down */
+}
+
+/* Curated card alive-state — gold-tinted shadow on hover */
+.card-alive-curated:hover {
+  box-shadow: 0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent);
+}
+
+/* ─── CTA Physical Press ────────────────────────────── */
+/* Hover: button lifts off surface (3px + scale).
+   Active: button depresses INTO surface (1px down + shrink).
+   The active state is the key — it completes the physical metaphor.
+   Timings: enter 200ms, press 80ms (must feel immediate), leave 250ms */
+.cta-physical {
+  transition: transform var(--sys-time-hover) var(--sys-ease-out),
+              box-shadow var(--sys-time-hover) var(--sys-ease-out),
+              border-color var(--sys-time-hover) var(--sys-ease-out),
+              background-color var(--sys-time-hover) var(--sys-ease-out);
+}
+.cta-physical:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--gold) 20%, transparent);
+  transition-timing-function: var(--sys-ease-out);
+  transition-duration: var(--sys-time-hover);
+}
+.cta-physical:active {
+  transform: translateY(1px) scale(0.98);
+  transition-duration: var(--sys-time-instant); /* 80ms — immediate press response */
+  transition-timing-function: var(--sys-ease-out);
+}
+.cta-physical:not(:hover) {
+  transition-timing-function: var(--sys-ease-settle);
+  transition-duration: 250ms; /* leave: gentle release */
+}
+
 /* Respect reduced motion — hard kill on all animations + transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -429,53 +485,81 @@ body {
   .thermal-typography p {
     transform: none !important;
   }
+  /* Reduced-motion spotlight boost — color compensates for lost animation */
+  [data-thermal="stirring"] body {
+    background:
+      radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 12%, transparent), transparent 70%),
+      var(--token-bg) !important;
+  }
+  [data-thermal="warm"] body {
+    background:
+      radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 20%, transparent), transparent 70%),
+      var(--token-bg) !important;
+  }
+  [data-thermal="luminous"] body {
+    background:
+      radial-gradient(ellipse at 50% 30%, color-mix(in srgb, var(--gold) 28%, transparent), transparent 70%),
+      var(--token-bg) !important;
+  }
 }
 
 /* ─── Golden Thread ─────────────────────────────────── */
 
-/* Base glow — visible at dormant (3px passes 3:1 contrast on dark bg).
+/* Base glow — visible at dormant (4px glow, slightly wider for perceptibility).
    Transition smooths onset when thermal state changes to stirring+. */
 .golden-thread-glow {
-  box-shadow: 0 0 3px var(--token-accent);
+  box-shadow: 0 0 4px var(--token-accent);
   transition: box-shadow 2s ease-out;
 }
 
 @keyframes goldenThreadGlow {
   0%, 100% {
-    box-shadow: 0 0 4px var(--token-accent),
-                0 0 8px color-mix(in srgb, var(--gold) 8%, transparent);
+    box-shadow: 0 0 6px var(--token-accent),
+                0 0 14px color-mix(in srgb, var(--gold) 15%, transparent);
   }
   50% {
-    box-shadow: 0 0 6px var(--token-accent),
-                0 0 12px color-mix(in srgb, var(--gold) 18%, transparent);
+    box-shadow: 0 0 8px var(--token-accent),
+                0 0 20px color-mix(in srgb, var(--gold) 25%, transparent);
   }
 }
 
 /* Thermal-gated: glow only at stirring+.
+   Wider halo creates visible glow ring on the left edge.
    2s delay lets the base transition smooth the onset before the animation pulses. */
 [data-thermal="stirring"] .golden-thread-glow,
 [data-thermal="warm"] .golden-thread-glow,
 [data-thermal="luminous"] .golden-thread-glow {
-  box-shadow: 0 0 4px var(--token-accent),
-              0 0 8px color-mix(in srgb, var(--gold) 8%, transparent);
+  box-shadow: 0 0 6px var(--token-accent),
+              0 0 14px color-mix(in srgb, var(--gold) 15%, transparent);
   animation: goldenThreadGlow var(--token-glow-speed) ease-in-out 2s infinite;
   will-change: box-shadow;
 }
 
+/* Thread width step — discrete 2px→3px at warm+.
+   Categorical changes are easier to perceive than continuous color shifts.
+   This binary step says "you crossed a threshold" at the warm boundary. */
+[data-thermal="warm"] .golden-thread-fill,
+[data-thermal="luminous"] .golden-thread-fill,
+[data-thermal="warm"] .golden-thread-track,
+[data-thermal="luminous"] .golden-thread-track {
+  width: 3px !important;
+}
+
 /* Golden Thread settled burst — brief gold glow acknowledging completion.
-   One-shot: plays once then holds. Matches T_LINGER (2s) in the component. */
+   One-shot: plays once then holds. Matches T_LINGER (2s) in the component.
+   Amplified: 10px inner + 45% outer = celebration moment, unmistakable. */
 .golden-thread-settled {
   box-shadow:
-    0 0 6px var(--token-accent),
-    0 0 18px color-mix(in srgb, var(--gold) 35%, transparent) !important;
+    0 0 10px var(--token-accent),
+    0 0 28px color-mix(in srgb, var(--gold) 45%, transparent) !important;
   transition: box-shadow var(--sys-time-reveal) var(--sys-ease-out) !important;
 }
 
 /* ─── Completion Shimmer ───────────────────────────── */
 
-/* Container — matches <hr> height (1px border). */
+/* Container — 3px height for visible sweep surface area (was 1px). */
 .completion-shimmer {
-  height: 1px;
+  height: 3px;
   position: relative;
   overflow: visible;
 }
@@ -516,27 +600,27 @@ body {
    radiant (90-99%): wide sweep, bright glow, slow burn */
 
 .ceremony-subtle .completion-shimmer-track::after {
-  opacity: 0.4;
-  animation-duration: 500ms;
-}
-.ceremony-subtle {
-  box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 8%, transparent);
-}
-
-.ceremony-present .completion-shimmer-track::after {
   opacity: 0.6;
   animation-duration: 700ms;
 }
+.ceremony-subtle {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--gold) 15%, transparent);
+}
+
+.ceremony-present .completion-shimmer-track::after {
+  opacity: 0.75;
+  animation-duration: 700ms;
+}
 .ceremony-present {
-  box-shadow: 0 0 14px color-mix(in srgb, var(--gold) 15%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--gold) 22%, transparent);
 }
 
 .ceremony-radiant .completion-shimmer-track::after {
-  opacity: 0.85;
+  opacity: 0.9;
   animation-duration: 900ms;
 }
 .ceremony-radiant {
-  box-shadow: 0 0 22px color-mix(in srgb, var(--gold) 25%, transparent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--gold) 30%, transparent);
 }
 
 /* Thermal-gated: warm glow around the shimmer at stirring+. */
@@ -756,7 +840,7 @@ body {
   .stratified-content p[data-paragraph-id]:not([data-variant]):hover {
     padding-left: 0.75rem;
     border-left: 2px solid var(--archetype-hover-color, var(--fog));
-    border-left-color: color-mix(in srgb, var(--archetype-hover-color, var(--fog)) 15%, transparent);
+    border-left-color: color-mix(in srgb, var(--archetype-hover-color, var(--fog)) 25%, transparent);
   }
 }
 
@@ -790,13 +874,14 @@ body {
   flex-shrink: 0;
 }
 
-/* Core dot — 6px circle, mist at dormant, thermal accent at stirring+ */
+/* Core dot — 6px circle, mist at dormant (0.5 = present but not alive),
+   thermal accent at stirring+ (fully visible, wakes up). */
 .nav-pulse-core {
   width: 100%;
   height: 100%;
   border-radius: 50%;
   background-color: var(--mist);
-  opacity: 0.3;
+  opacity: 0.5;
   position: relative;
   z-index: 1;
   transition: background-color 1.5s ease-out, opacity 1.5s ease-out;

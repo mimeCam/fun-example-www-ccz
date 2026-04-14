@@ -57,16 +57,16 @@ export function GoldenThread() {
       aria-label={`Reading progress: ${Math.round(depth)}%`}
       aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(depth)}
     >
-      {/* Track — fog/30 for dormant visibility */}
-      <div className="absolute inset-y-0 left-0 w-[var(--sys-thread-width)] bg-fog/30 rounded-sys-full" />
-      {/* Fill — climbs with scroll, thermal color + glow */}
+      {/* Track — fog/30 for dormant visibility, golden-thread-track for width step */}
+      <div className="absolute inset-y-0 left-0 w-[var(--sys-thread-width)] bg-fog/30 rounded-sys-full golden-thread-track" />
+      {/* Fill — climbs with scroll, thermal color + glow, golden-thread-fill for width step */}
       <div
-        className={`absolute top-0 left-0 w-[var(--sys-thread-width)] rounded-sys-full golden-thread-glow ${isSettled ? 'golden-thread-settled' : ''}`}
+        className={`absolute top-0 left-0 w-[var(--sys-thread-width)] rounded-sys-full golden-thread-glow golden-thread-fill ${isSettled ? 'golden-thread-settled' : ''}`}
         style={{
           height: `${depth}%`,
           backgroundColor: 'var(--token-accent)',
           opacity: phase === 'fading' ? 0.3 : 1,
-          transition: 'height var(--sys-time-enter) var(--sys-ease-out), opacity var(--sys-time-settle) var(--sys-ease-out)',
+          transition: 'height var(--sys-time-enter) var(--sys-ease-out), opacity var(--sys-time-settle) var(--sys-ease-out), width var(--sys-time-settle) var(--sys-ease-out)',
         }}
       />
     </div>

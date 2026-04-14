@@ -40,9 +40,8 @@ export default function ReadingInvitation(
         className="inline-block px-sys-8 py-sys-4 thermal-radius
           bg-gold/10 border border-gold/20 text-gold
           font-display font-sys-heading text-sys-lg
-          hover:bg-gold/20 hover:border-gold/40 hover:shadow-gold
-          hover:-translate-y-micro active:translate-y-0
-          transition-all duration-enter
+          hover:bg-gold/25 hover:border-gold/50
+          cta-physical
           focus:ring-2 focus:ring-gold/40 focus:ring-offset-2
           focus:ring-offset-background outline-none
           thermal-candle">
