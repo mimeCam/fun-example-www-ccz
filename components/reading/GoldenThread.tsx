@@ -66,7 +66,7 @@ export function GoldenThread() {
           height: `${depth}%`,
           backgroundColor: 'var(--token-accent)',
           opacity: phase === 'fading' ? 0.3 : 1,
-          transition: 'height 300ms var(--sys-ease-out), opacity 1.5s ease-out',
+          transition: 'height var(--sys-time-enter) var(--sys-ease-out), opacity var(--sys-time-settle) var(--sys-ease-out)',
         }}
       />
     </div>

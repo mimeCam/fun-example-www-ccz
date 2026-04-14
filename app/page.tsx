@@ -53,7 +53,7 @@ export default function Home({
         mx-auto px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">
 
         <Suspense fallback={<ThermalSkeleton className="h-40 max-w-3xl mb-sys-6" />}>
-          <ReturningPortal />
+          <ReturningPortal suppress={!!via} />
         </Suspense>
 
         {via && (

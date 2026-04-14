@@ -30,8 +30,9 @@ COPY components ./components
 COPY lib ./lib
 COPY types ./types
 COPY public ./public
+COPY scripts ./scripts
 
-# Build Next.js application
+# Build Next.js application (prebuild runs tsx to generate inline-restore.ts)
 RUN npm run build
 
 # Set environment to production

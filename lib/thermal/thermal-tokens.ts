@@ -16,39 +16,39 @@ export type ThermalTokens = Record<string, string>;
 
 // Color endpoints — dormant is cool navy, warm shifts hue toward magenta + raises lightness.
 // Delta: 60° hue (240→300), 4% lightness (14→18) — crosses JND threshold on dark surfaces.
-const BG = { dormant: '#1a1a2e', warm: '#382238' };
-const SURFACE = { dormant: '#16213e', warm: '#1e2a3e' };
-const FOREGROUND = { dormant: '#e8e8f0', warm: '#f5ede0' };
-const ACCENT = { dormant: '#7b2cbf', warm: '#f0c674' };
-const BORDER = { dormant: '#222244', warm: '#2e2e50' };
+export const BG = { dormant: '#1a1a2e', warm: '#382238' };
+export const SURFACE = { dormant: '#16213e', warm: '#1e2a3e' };
+export const FOREGROUND = { dormant: '#e8e8f0', warm: '#f5ede0' };
+export const ACCENT = { dormant: '#7b2cbf', warm: '#f0c674' };
+export const BORDER = { dormant: '#222244', warm: '#2e2e50' };
 
 // Typography anchors — line-height is the PRIMARY thermal signal (per Tanya's spec).
 // Felt even when not consciously seen; color on dark backgrounds is invisible.
-const LINE_HEIGHT = { dormant: 1.75, warm: 1.95 };      // unitless — 3.5px total delta
+export const LINE_HEIGHT = { dormant: 1.75, warm: 1.95 };      // unitless — 3.5px total delta
 
 // Shadow depth anchor — alpha multiplier for shadow intensity.
-const SHADOW_DEPTH = { dormant: 0.3, warm: 0.5 };
+export const SHADOW_DEPTH = { dormant: 0.3, warm: 0.5 };
 
 // Radius softening bonus — additive to base rounded-lg in warm state.
-const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
+export const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
 
 // Accent opacity — raised from 0.30 to make accent visible from the start.
-const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
+export const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
 
 // Typography depth anchors — "the room warms, the text breathes".
 // Font-weight crosses JND: 400→450 is one grade shift that the reader feels
 // as "the text gained confidence". 400→420 was literally imperceptible.
 // Combined with letter-spacing and para-rhythm, creates cumulative warmth.
-const FONT_WEIGHT = { dormant: 400, warm: 500 };          // crosses JND — text gains confidence
-const LETTER_SPACING = { dormant: -0.01, warm: 0.02 };    // em — wider opening, visible relaxation
-const PARA_RHYTHM = { dormant: 0, warm: 12 };             // px — paragraphs breathe open
+export const FONT_WEIGHT = { dormant: 400, warm: 500 };          // crosses JND — text gains confidence
+export const LETTER_SPACING = { dormant: -0.01, warm: 0.02 };    // em — wider opening, visible relaxation
+export const PARA_RHYTHM = { dormant: 0, warm: 12 };             // px — paragraphs breathe open
 
 // Spacing lift — scale-aware thermal interpolation for --sys-space-* tokens.
 // Larger spacing steps get proportionally more lift via sqrt(N/6).
 // Dormant (score < 18) = zero lift. The room doesn't expand for strangers.
-const SPACING_LIFT_MAX = 5.66;   // calibrates to 8px max lift at step 12
-const SPACING_SCALE_REF = 6;     // normalization reference step
-const SPACING_THRESHOLD = 18;    // dormant cutoff — zero lift below this
+export const SPACING_LIFT_MAX = 5.66;   // calibrates to 8px max lift at step 12
+export const SPACING_SCALE_REF = 6;     // normalization reference step
+export const SPACING_THRESHOLD = 18;    // dormant cutoff — zero lift below this
 
 // ─── HSL interpolation ────────────────────────────────────
 

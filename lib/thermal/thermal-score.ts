@@ -28,7 +28,7 @@ export interface ThermalResult {
   confidence: number;           // 0-1 (gap between top dimensions)
 }
 
-const STATE_THRESHOLDS: [number, ThermalState][] = [
+export const STATE_THRESHOLDS: [number, ThermalState][] = [
   [80, 'luminous'],
   [50, 'warm'],
   [18, 'stirring'],
@@ -42,6 +42,15 @@ function clamp(value: number, min: number, max: number): number {
 function dimension(raw: number, divisor: number, weight: number): number {
   return Math.min(raw / divisor, 1) * weight;
 }
+
+/** Scoring dimensions — divisors and weights. Exported for code generation. */
+export const DIMENSIONS = [
+  { divisor: 6, weight: 25 },     // breadth
+  { divisor: 100, weight: 30 },   // depth
+  { divisor: 7, weight: 20 },     // consistency
+  { divisor: 3, weight: 15 },     // resonance
+  { divisor: 30, weight: 10 },    // dwell (minutes)
+] as const;
 
 export function computeThermalScore(input: ThermalInput): ThermalResult {
   const dims = [

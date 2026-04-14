@@ -112,7 +112,7 @@ export function createTemporaryHighlight(element: HTMLElement): () => void {
 
   // Apply highlight styles
   element.style.transition = 'background-color 0.3s ease, transform 0.3s ease';
-  element.style.backgroundColor = 'rgba(59, 130, 246, 0.2)';
+  element.style.backgroundColor = 'rgba(240, 198, 116, 0.15)';
 
   // Add a subtle pulse animation
   element.style.animation = 'pulse-highlight 1s ease-in-out 2';

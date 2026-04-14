@@ -151,6 +151,10 @@ const config: Config = {
         // Resonance drawer — ceremony, not form
         'slide-in-right': 'slideInRight 300ms var(--sys-ease-out)',
         'slide-out-right': 'slideInRight 150ms var(--sys-ease-settle) reverse',
+        // Resonance shimmer — gold border sweep on save
+        'resonance-shimmer-sweep': 'resonanceBorderSweep 800ms var(--sys-ease-out) forwards',
+        'resonance-success-enter': 'resonanceSuccessFade 600ms var(--sys-ease-out) both',
+        'slot-dot-pulse': 'slotDotPulse 400ms var(--sys-ease-out)',
         // Mirror reveal — archetype label blur-to-sharp
         'archetype-reveal': 'archetypeReveal 600ms cubic-bezier(0.0, 0.0, 0.2, 1) both',
         'mirror-radius-breathe': 'mirrorRadiusBreathe 0.8s ease-in-out',
@@ -236,6 +240,23 @@ const config: Config = {
         shareConfirmFlash: {
           '0%': { boxShadow: `0 0 0 0 color-mix(in srgb, var(--gold) 40%, transparent)` },
           '100%': { boxShadow: '0 0 12px 4px transparent' },
+        },
+        // Resonance shimmer — gold border sweep on quote card
+        resonanceBorderSweep: {
+          '0%': { transform: 'translateX(-120%)', opacity: '0' },
+          '15%': { opacity: '1' },
+          '100%': { transform: 'translateX(120%)', opacity: '0' },
+        },
+        // Resonance success message — warm gold fade-in
+        resonanceSuccessFade: {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        // Slot dot — 3-layer gold glow pulse on newest save
+        slotDotPulse: {
+          '0%': { boxShadow: 'none' },
+          '50%': { boxShadow: '0 0 6px var(--gold), 0 0 12px color-mix(in srgb, var(--gold) 30%, transparent), 0 0 18px color-mix(in srgb, var(--gold) 10%, transparent)' },
+          '100%': { boxShadow: '0 0 6px var(--gold), 0 0 8px color-mix(in srgb, var(--gold) 15%, transparent), 0 0 12px color-mix(in srgb, var(--gold) 5%, transparent)' },
         },
       },
     },

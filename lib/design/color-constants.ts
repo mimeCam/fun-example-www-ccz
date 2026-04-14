@@ -51,7 +51,7 @@ export const BRAND = {
 
 export const ARCHETYPE = {
   'deep-diver': '#4ecdc4',
-  'explorer':   '#c77dff',
+  'explorer':   '#7fdbda',
   'faithful':   '#9d4edd',
   'resonator':  '#e88fa7',
   'collector':  '#d4922a',

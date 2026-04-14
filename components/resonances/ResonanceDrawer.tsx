@@ -4,6 +4,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { createResonanceAction } from '@/app/actions/resonances';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { ResonanceShimmer } from '@/components/resonances/ResonanceShimmer';
+import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceCeremony';
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
 
 const SLOT_COUNT = 5;
@@ -46,8 +48,8 @@ function saveUsedSlots(count: number): void {
 /**
  * ResonanceDrawer — slide-in side panel for resonance capture.
  *
- * Replaces the old modal. Article remains visible underneath.
  * The "Pressed Flower" moment: deliberate, ceremonial, never interrupting.
+ * On save, fires a gold shimmer ceremony before choreographed auto-close.
  */
 export function ResonanceDrawer({
   isOpen, onClose, articleId, articleTitle, quote,
@@ -58,6 +60,8 @@ export function ResonanceDrawer({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [usedSlots, setUsedSlots] = useState(0);
+
+  const { phase, intensity } = useResonanceCeremony(thermalState, success);
 
   useEffect(() => { setUsedSlots(loadUsedSlots()); }, []);
 
@@ -70,15 +74,22 @@ export function ResonanceDrawer({
     }
   }, [isOpen]);
 
-  // Escape key closes
+  // Escape key closes (only before ceremony)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || success) return;
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
     document.addEventListener('keydown', handleKey);
     return () => document.removeEventListener('keydown', handleKey);
-  }, [isOpen, onClose]);
+  }, [isOpen, success, onClose]);
+
+  // Auto-close after ceremony completes — extended pause (2.6s, was 2.0s)
+  useEffect(() => {
+    if (!success) return;
+    const closeTimer = setTimeout(onClose, CEREMONY_TIMING.T_CLOSE);
+    return () => clearTimeout(closeTimer);
+  }, [success, onClose]);
 
   const handleSubmit = useCallback(async () => {
     if (!note.trim()) {
@@ -97,11 +108,10 @@ export function ResonanceDrawer({
         const next = usedSlots + 1;
         setUsedSlots(next);
         saveUsedSlots(next);
-        // Resurrect the resonance thermal dimension (15% of score)
         saveHistory(addResonance(loadHistory()));
         thermalRefresh();
         setSuccess(true);
-        setTimeout(onClose, 2000);
+        // Auto-close handled by ceremony effect above
       } else {
         setError(result.error || 'Failed to save resonance');
       }
@@ -110,63 +120,47 @@ export function ResonanceDrawer({
     } finally {
       setIsLoading(false);
     }
-  }, [note, quote, articleId, usedSlots, onClose]);
+  }, [note, quote, articleId, usedSlots, thermalRefresh]);
 
   if (!isOpen) return null;
 
   const slotsAvailable = usedSlots < SLOT_COUNT;
+  const showShimmer = success && (phase === 'shimmering' || phase === 'settled');
 
   return (
     <>
-      {/* Backdrop — dims article area, no blur (reader keeps visual anchor) */}
+      {/* Backdrop — dims article area */}
       <div
         className="fixed inset-0 z-sys-backdrop bg-void/60 backdrop-blur-sm transition-opacity duration-enter"
         onClick={onClose}
         aria-hidden="true"
       />
 
-      {/* Drawer panel — slides in from right */}
+      {/* Drawer panel */}
       <aside
         role="dialog"
         aria-modal="true"
         aria-label={`Save resonance for ${articleTitle}`}
         className="fixed top-0 right-0 bottom-0 z-sys-drawer w-full max-w-sm
                    bg-surface/95 backdrop-blur-sm
-                   border-l border-fog/20 shadow-float
+                   border-l border-fog/20 thermal-shadow thermal-radius
                    animate-slide-in-right
                    flex flex-col overflow-y-auto"
-        style={{
-          // Thermal-aware left border accent — gold color, thermal opacity
-          borderLeftColor: 'var(--token-accent)',
-        }}
+        style={{ borderLeftColor: 'var(--token-accent)' }}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-sys-6 pb-sys-4">
-          <div>
-            <h3 className="text-sys-lg font-display font-sys-display text-foreground">
-              Save Resonance
-            </h3>
-            <p className="text-mist text-sys-caption mt-sys-1">Why does this matter to you?</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
-                       transition-colors rounded-sys-medium hover:bg-fog/20"
-            aria-label="Close"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        {/* Divider */}
+        <DrawerHeader onClose={onClose} />
         <div className="mx-sys-6 border-t border-fog/20" />
 
-        {/* Body */}
         <div className="flex-1 p-sys-6 pt-sys-5">
-          <SlotIndicator used={usedSlots} total={SLOT_COUNT} />
+          <SlotIndicator used={usedSlots} total={SLOT_COUNT} pulsing={success} />
 
           {success ? (
-            <SuccessMessage />
+            <CeremonyContent
+              quote={quote}
+              shimmerIntensity={intensity}
+              showShimmer={showShimmer}
+              shimmerSettled={phase === 'settled'}
+            />
           ) : slotsAvailable ? (
             <DrawerForm
               note={note}
@@ -188,6 +182,27 @@ export function ResonanceDrawer({
 
 /* ─── Sub-components ─────────────────────────────── */
 
+function DrawerHeader({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="flex items-center justify-between p-sys-6 pb-sys-4">
+      <div>
+        <h3 className="text-sys-lg font-display font-sys-display text-foreground">
+          Save Resonance
+        </h3>
+        <p className="text-mist text-sys-caption mt-sys-1">Why does this matter to you?</p>
+      </div>
+      <button
+        onClick={onClose}
+        className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
+                   transition-colors rounded-sys-medium hover:bg-fog/20"
+        aria-label="Close"
+      >
+        <CloseIcon />
+      </button>
+    </div>
+  );
+}
+
 function CloseIcon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
@@ -198,17 +213,48 @@ function CloseIcon() {
   );
 }
 
-function SlotIndicator({ used, total }: { used: number; total: number }) {
+function SlotIndicator({ used, total, pulsing }: {
+  used: number; total: number; pulsing: boolean;
+}) {
   return (
     <div className="flex flex-col items-center gap-sys-2 mb-sys-6">
-      <div className="flex gap-sys-2">
+      <div className="flex gap-sys-3">
         {Array.from({ length: total }, (_, i) => (
-          <span key={i} className={`text-sys-caption ${i < used ? 'text-gold' : 'text-fog'}`}>
-            ◆
-          </span>
+          <span
+            key={i}
+            className={`slot-dot ${
+              i < used ? 'slot-dot--filled' : ''
+            } ${
+              pulsing && i === used - 1 ? 'slot-dot--pulse' : ''
+            }`}
+          />
         ))}
       </div>
       <span className="text-mist text-sys-micro">{used} of {total} resonances</span>
+    </div>
+  );
+}
+
+function CeremonyContent({ quote, shimmerIntensity, showShimmer, shimmerSettled }: {
+  quote: string;
+  shimmerIntensity: 'subtle' | 'warm' | 'rich';
+  showShimmer: boolean;
+  shimmerSettled: boolean;
+}) {
+  const settledClass = shimmerSettled ? 'resonance-shimmer--settled' : '';
+
+  return (
+    <div className="resonance-success-enter">
+      {quote && (
+        <ResonanceShimmer intensity={shimmerIntensity} active={showShimmer}>
+          <div className={`mb-sys-5 bg-background/60 border-l-2 border-rose/40 rounded-sys-medium p-sys-4 ${settledClass}`}>
+            <p className="text-foreground/70 italic text-sys-caption leading-relaxed">
+              &ldquo;{quote}&rdquo;
+            </p>
+          </div>
+        </ResonanceShimmer>
+      )}
+      <SuccessMessage />
     </div>
   );
 }
@@ -255,20 +301,7 @@ function DrawerForm({
         </div>
       </div>
       {error && <ErrorBanner message={error} />}
-      <div className="flex gap-sys-4 mt-sys-3">
-        <button onClick={onCancel} disabled={isLoading}
-          className="flex-1 px-sys-4 py-sys-3 bg-background text-mist rounded-sys-medium
-                     text-sys-caption hover:bg-fog transition-colors disabled:opacity-50">
-          Cancel
-        </button>
-        <button onClick={onSubmit}
-          disabled={isLoading || !note.trim()}
-          className="flex-1 px-sys-4 py-sys-3 bg-primary text-foreground rounded-sys-medium
-                     text-sys-caption font-sys-accent hover:bg-secondary transition-colors
-                     disabled:opacity-50 disabled:cursor-not-allowed">
-          {isLoading ? 'Saving...' : 'Save Resonance'}
-        </button>
-      </div>
+      <ActionButtons onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} disabled={!note.trim()} />
     </>
   );
 }
@@ -294,13 +327,34 @@ function ErrorBanner({ message }: { message: string }) {
 function SuccessMessage() {
   return (
     <div className="py-sys-7 text-center">
-      <div className="inline-block animate-bounce-subtle">
-        <GemIcon className="text-gold mx-auto mb-sys-4" />
-      </div>
-      <p className="text-gold text-sys-lg font-display font-sys-display">Saved.</p>
+      <GemIcon className="text-gold mx-auto mb-sys-4" size="lg" />
+      <p className="text-gold text-sys-lg font-display font-sys-display">
+        The room remembers this.
+      </p>
       <p className="text-mist text-sys-caption mt-sys-3 italic">
         It&apos;s alive for 30 days. Come back to keep it breathing.
       </p>
+    </div>
+  );
+}
+
+function ActionButtons({ onSubmit, onCancel, isLoading, disabled }: {
+  onSubmit: () => void; onCancel: () => void; isLoading: boolean; disabled: boolean;
+}) {
+  return (
+    <div className="flex gap-sys-4 mt-sys-3">
+      <button onClick={onCancel} disabled={isLoading}
+        className="flex-1 px-sys-4 py-sys-3 bg-background text-mist rounded-sys-medium
+                   text-sys-caption hover:bg-fog transition-colors disabled:opacity-50">
+        Cancel
+      </button>
+      <button onClick={onSubmit}
+        disabled={isLoading || disabled}
+        className="flex-1 px-sys-4 py-sys-3 bg-primary text-foreground rounded-sys-medium
+                   text-sys-caption font-sys-accent hover:bg-secondary transition-colors
+                   disabled:opacity-50 disabled:cursor-not-allowed">
+        {isLoading ? 'Saving...' : 'Save Resonance'}
+      </button>
     </div>
   );
 }

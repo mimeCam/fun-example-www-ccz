@@ -86,7 +86,7 @@
   /* Archetype identity tokens — single source of truth for all archetype colors.
      Used by paragraph hover, mirror cards, extensions, and share cards. */
   --arch-deep-diver: #4ecdc4;
-  --arch-explorer: #c77dff;
+  --arch-explorer: #7fdbda;
   --arch-faithful: #9d4edd;
   --arch-resonator: #e88fa7;
   --arch-collector: #d4922a;    /* shifted from #e6a23c — separates from thermal gold */
@@ -575,11 +575,171 @@ body {
   }
 }
 
+/* ─── Resonance Shimmer ─────────────────────────────── */
+/* Gold border sweep on the quote card after saving a resonance.
+   Three intensity tiers: subtle (dormant), warm (stirring), rich (warm+).
+   Respects reduced-motion: static gold border, no animation. */
+
+.resonance-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+/* The child content (quote card) — border transitions from rose to gold. */
+.resonance-shimmer > :first-child {
+  border-color: color-mix(in srgb, var(--gold) 60%, transparent) !important;
+  border-radius: var(--sys-radius-wide);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 15%, transparent);
+  transition: border-color 800ms var(--sys-ease-out),
+              border-radius 400ms var(--sys-ease-out),
+              box-shadow 800ms var(--sys-ease-out);
+}
+
+/* Gold sweep pseudo-element — one-shot left-to-right. */
+.resonance-shimmer-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--gold) 40%, transparent) 40%,
+    color-mix(in srgb, var(--gold) 70%, transparent) 50%,
+    color-mix(in srgb, var(--gold) 40%, transparent) 60%,
+    transparent 100%
+  );
+  animation: resonanceBorderSweep 800ms var(--sys-ease-out) forwards;
+}
+
+@keyframes resonanceBorderSweep {
+  0%   { transform: translateX(-120%); opacity: 0; }
+  15%  { opacity: 1; }
+  100% { transform: translateX(120%); opacity: 0; }
+}
+
+/* Quote text glow during shimmer — warm gold text-shadow. */
+.resonance-shimmer > :first-child p {
+  text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 20%, transparent);
+  animation: resonanceTextGlow 800ms var(--sys-ease-out) forwards;
+}
+
+@keyframes resonanceTextGlow {
+  0%   { text-shadow: none; }
+  30%  { text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 20%, transparent); }
+  100% { text-shadow: none; }
+}
+
+/* ─── Resonance Shimmer Intensity Tiers ──────────────── */
+
+.resonance-shimmer--subtle .resonance-shimmer-sweep {
+  opacity: 0.35;
+  animation-duration: 600ms;
+}
+.resonance-shimmer--subtle > :first-child {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--gold) 8%, transparent);
+}
+
+.resonance-shimmer--warm .resonance-shimmer-sweep {
+  opacity: 0.6;
+  animation-duration: 800ms;
+}
+.resonance-shimmer--warm > :first-child {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--gold) 15%, transparent);
+}
+
+.resonance-shimmer--rich .resonance-shimmer-sweep {
+  opacity: 0.85;
+  animation-duration: 1000ms;
+}
+.resonance-shimmer--rich > :first-child {
+  box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 25%, transparent);
+}
+
+/* Settled state — border stays gold/40, glow fades. */
+.resonance-shimmer--settled > :first-child {
+  border-color: color-mix(in srgb, var(--gold) 40%, transparent) !important;
+  box-shadow: none;
+}
+.resonance-shimmer--settled .resonance-shimmer-sweep {
+  display: none;
+}
+
+/* Respect reduced motion — static gold border, no sweep, no text glow. */
+@media (prefers-reduced-motion: reduce) {
+  .resonance-shimmer-sweep {
+    animation: none;
+    display: none;
+  }
+  .resonance-shimmer > :first-child {
+    border-color: color-mix(in srgb, var(--gold) 40%, transparent) !important;
+    box-shadow: none;
+  }
+  .resonance-shimmer > :first-child p {
+    animation: none;
+    text-shadow: none;
+  }
+}
+
 /* ─── Resonance Drawer ─────────────────────────────── */
 
 @keyframes slideInRight {
   from { transform: translateX(100%); }
   to   { transform: translateX(0); }
+}
+
+/* Success message — warm gold fade-in replaces bounce. */
+.resonance-success-enter {
+  animation: resonanceSuccessFade 600ms var(--sys-ease-out) both;
+}
+
+@keyframes resonanceSuccessFade {
+  0%   { opacity: 0; transform: translateY(4px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Slot dot indicators — gold dot with thermal glow. */
+.slot-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--sys-radius-full);
+  background: color-mix(in srgb, var(--fog) 30%, transparent);
+  transition: background-color var(--sys-time-enter) var(--sys-ease-out),
+              box-shadow var(--sys-time-settle) var(--sys-ease-out);
+  display: inline-block;
+}
+
+.slot-dot--filled {
+  background: color-mix(in srgb, var(--gold) 80%, transparent);
+}
+
+/* Thermal glow on filled dots at stirring+. */
+[data-thermal="stirring"] .slot-dot--filled,
+[data-thermal="warm"] .slot-dot--filled,
+[data-thermal="luminous"] .slot-dot--filled {
+  background: color-mix(in srgb, var(--gold) 90%, transparent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--gold) 25%, transparent);
+}
+
+/* Newest slot pulse during save ceremony — 3-layer glow. */
+.slot-dot--pulse {
+  background: var(--gold);
+  box-shadow:
+    0 0 6px var(--gold),
+    -2px 0 8px color-mix(in srgb, var(--gold) 40%, transparent),
+    -5px 0 12px color-mix(in srgb, var(--gold) 15%, transparent);
+  animation: slotDotPulse 400ms var(--sys-ease-out);
+}
+
+@keyframes slotDotPulse {
+  0%   { box-shadow: none; }
+  50%  { box-shadow: 0 0 6px var(--gold), 0 0 12px color-mix(in srgb, var(--gold) 30%, transparent), 0 0 18px color-mix(in srgb, var(--gold) 10%, transparent); }
+  100% { box-shadow: 0 0 6px var(--gold), 0 0 8px color-mix(in srgb, var(--gold) 15%, transparent), 0 0 12px color-mix(in srgb, var(--gold) 5%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slot-dot--pulse {
+    animation: none;
+  }
 }
 
 /* ─── Paragraph Hover Micro-Feedback ────────────────── */

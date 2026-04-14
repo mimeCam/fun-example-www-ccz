@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "generate:inline-restore": "tsx scripts/generate-inline-restore.ts",
+    "prebuild": "tsx scripts/generate-inline-restore.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -32,6 +34,7 @@
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "ts-jest": "^29.4.9",
+    "tsx": "^4.21.0",
     "typescript": "^5.4.5"
   }
 }
