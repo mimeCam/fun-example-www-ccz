@@ -12,8 +12,8 @@
 
 // ─── State thresholds (must match thermal-score.ts) ──────
 
-const DORMANT = 18;
-const STIRRING = 50;
+const DORMANT = 25;
+const STIRRING = 55;
 const WARM = 80;
 
 // ─── Animation anchor values per state boundary ──────────

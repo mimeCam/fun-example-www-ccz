@@ -53,8 +53,8 @@ export function ResonanceButton({ articleId, articleTitle }: {
         onClick={slotsAvailable ? handleOpen : undefined}
         className={`relative p-sys-3 rounded-sys-medium transition-colors ${
           slotsAvailable
-            ? 'text-mist hover:text-primary hover:bg-surface'
-            : 'text-fog cursor-default'
+            ? 'text-fog/60 hover:text-mist/90'
+            : 'text-fog/40 cursor-default'
         }`}
         aria-label="Save resonance"
         title={!slotsAvailable ? 'Resonance slots full' : 'Save resonance'}

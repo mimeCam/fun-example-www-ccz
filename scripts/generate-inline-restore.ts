@@ -60,8 +60,8 @@ function generate(): string {
 
   // State thresholds
   const lumThr = STATE_THRESHOLDS[0][0];  // 80
-  const warmThr = STATE_THRESHOLDS[1][0]; // 50
-  const stirThr = STATE_THRESHOLDS[2][0]; // 18
+  const warmThr = STATE_THRESHOLDS[1][0]; // 55
+  const stirThr = STATE_THRESHOLDS[2][0]; // 25
 
   const boostExp = '0.66';
   const spacingThr = SPACING_THRESHOLD;
@@ -100,8 +100,8 @@ function generate(): string {
   + `el.setProperty('--token-foreground',col(FG,FGW,tp));`
   + `el.setProperty('--token-accent',col(AC,ACW,tp));`
   + `el.setProperty('--token-border',col(BD,BDW,tp));`
-  // Glow — gold, only above threshold
-  + `var ga=t<.18?'none':'0 0 '+Math.round(40+t*60)+'px rgba(240,198,116,'+(t*.18).toFixed(3)+')';`
+  // Glow — gold, only above threshold (matches SPACING_THRESHOLD / 100)
+  + `var ga=t<.25?'none':'0 0 '+Math.round(40+t*60)+'px rgba(240,198,116,'+(t*.18).toFixed(3)+')';`
   + `el.setProperty('--token-glow',ga);`
   // Shadow — alpha interpolation
   + `var sa=(lerp(${SHADOW_DEPTH.dormant},${SHADOW_DEPTH.warm},t)).toFixed(2);`

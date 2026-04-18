@@ -101,6 +101,7 @@ const config: Config = {
         'sys-thread':   'var(--sys-z-thread)',
         'sys-nav':      'var(--sys-z-nav)',
         'sys-gem':      'var(--sys-z-gem)',
+        'sys-popover':  'var(--sys-z-popover)',  // SelectionPopover slot
         'sys-backdrop': 'var(--sys-z-backdrop)',
         'sys-drawer':   'var(--sys-z-drawer)',
         'sys-overlay':  'var(--sys-z-overlay)',
@@ -159,6 +160,9 @@ const config: Config = {
         'archetype-reveal': 'archetypeReveal 600ms cubic-bezier(0.0, 0.0, 0.2, 1) both',
         'mirror-radius-breathe': 'mirrorRadiusBreathe 0.8s ease-in-out',
         'share-confirm': 'shareConfirmFlash 300ms ease-out',
+        // SelectionPopover — spring bloom on entry, quick retreat on exit
+        'popover-enter': 'popoverEnter 180ms cubic-bezier(0.16, 1, 0.3, 1) both',
+        'popover-exit':  'popoverExit 120ms ease-in both',
       },
       keyframes: {
         'bounce-subtle': {
@@ -235,6 +239,15 @@ const config: Config = {
         mirrorRadiusBreathe: {
           '0%, 100%': { borderRadius: 'calc(var(--sys-radius-wide) + var(--token-radius-soft))' },
           '50%': { borderRadius: 'calc(var(--sys-radius-wide) + var(--token-radius-soft) + 4px)' },
+        },
+        // SelectionPopover — entry bloom (spring) and exit retreat
+        popoverEnter: {
+          from: { opacity: '0', transform: 'scale(0.85)' },
+          to:   { opacity: '1', transform: 'scale(1)' },
+        },
+        popoverExit: {
+          from: { opacity: '1', transform: 'scale(1)' },
+          to:   { opacity: '0', transform: 'scale(0.85)' },
         },
         // Share confirm — brief gold flash
         shareConfirmFlash: {

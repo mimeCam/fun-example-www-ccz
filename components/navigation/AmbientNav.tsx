@@ -55,7 +55,7 @@ export function AmbientNav() {
               key={href}
               href={href}
               aria-current={active ? 'page' : undefined}
-              className={`text-sys-micro tracking-wide transition-colors duration-settle ease-out ${
+              className={`text-sys-caption tracking-wide transition-colors duration-settle ease-out ${
                 active
                   ? 'nav-active-link'
                   : `text-mist/50 ${accent}`

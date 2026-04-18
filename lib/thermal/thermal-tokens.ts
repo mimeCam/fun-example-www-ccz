@@ -45,10 +45,10 @@ export const PARA_RHYTHM = { dormant: 0, warm: 12 };             // px — parag
 
 // Spacing lift — scale-aware thermal interpolation for --sys-space-* tokens.
 // Larger spacing steps get proportionally more lift via sqrt(N/6).
-// Dormant (score < 18) = zero lift. The room doesn't expand for strangers.
+// Dormant (score < 25) = zero lift. The room doesn't expand for strangers.
 export const SPACING_LIFT_MAX = 5.66;   // calibrates to 8px max lift at step 12
 export const SPACING_SCALE_REF = 6;     // normalization reference step
-export const SPACING_THRESHOLD = 18;    // dormant cutoff — zero lift below this
+export const SPACING_THRESHOLD = 25;    // dormant cutoff — zero lift below this
 
 // ─── HSL interpolation ────────────────────────────────────
 
@@ -159,7 +159,7 @@ function lerp(a: number, b: number, t: number): number {
 }
 
 function glowValue(t: number): string {
-  if (t < 0.18) return 'none';
+  if (t < 0.25) return 'none';
   const alpha = (t * 0.18).toFixed(3);
   return `0 0 ${Math.round(40 + t * 60)}px rgba(240,198,116,${alpha})`;
 }

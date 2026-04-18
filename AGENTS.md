@@ -9,7 +9,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/mirror/` — scoring, snapshots
 - `lib/hooks/useResonanceCeremony.ts` — resonance save ceremony sequencing
 - `components/reading/` — GoldenThread, NextRead, CompletionShimmer, CeremonySequencer
-- `components/resonances/` — ResonanceDrawer, ResonanceShimmer
+- `components/resonances/` — ResonanceDrawer, ResonanceShimmer, SelectionPopover
+- `lib/hooks/useEntranceChoreography.ts` — article page staggered fade-up (thermal-adaptive)
 - `scripts/generate-inline-restore.ts` — build-time codegen for inline restore (runs as `prebuild`)
 
 ## Core Feature

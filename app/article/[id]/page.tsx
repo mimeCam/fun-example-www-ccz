@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { GoldenThread } from '@/components/reading/GoldenThread';
 import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
+import { SelectionPopover } from '@/components/resonances/SelectionPopover';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
 import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
@@ -15,6 +16,8 @@ import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { useResonanceMarginalia, extractCoreParagraphs } from '@/lib/hooks/useResonanceMarginalia';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
+import { useEntranceChoreography } from '@/lib/hooks/useEntranceChoreography';
+import type { EntranceStep } from '@/lib/hooks/useEntranceChoreography';
 import { getLayeredContent, getArticleById, getAllArticles } from '@/lib/content/articleData';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
@@ -62,6 +65,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
   }, [stratifiedBlocks, resonanceBlocks, coreParagraphs]);
 
   const recognition = useReturnRecognition();
+  const entrance = useEntranceChoreography();
 
   const { refresh: refreshThermal } = useThermal();
   const completion = useGenuineCompletion(readTime);
@@ -92,13 +96,25 @@ function ArticleContent({ params }: { params: { id: string } }) {
     >
       <GoldenThread />
       <GemHome quiet />
+      {/* Selection popover — gem blooms above highlighted text (pointer devices only) */}
+      <SelectionPopover articleId={params.id} articleTitle={article.title} />
       <article className="min-h-screen">
         <div className="max-w-prose mx-auto px-sys-7">
-          <TopBar articleId={params.id} title={article.title} />
-          <ArticleHeader title={article.title} readTime={readTime} />
-          <hr className="border-gold/10 mb-sys-8" />
+          <div className={entrance.disabled ? '' : 'entrance-fade-up'} style={entranceStyle(entrance.topbar)}>
+            <TopBar articleId={params.id} title={article.title} />
+          </div>
+          <div className={entrance.disabled ? '' : 'entrance-fade-up'} style={entranceStyle(entrance.header)}>
+            <ArticleHeader title={article.title} readTime={readTime} />
+          </div>
+          <hr
+            className={`border-gold/10 mb-sys-8 origin-center${entrance.disabled ? '' : ' entrance-divider-draw'}`}
+            style={entranceStyle(entrance.divider)}
+          />
 
-          <div className="prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography text-foreground">
+          <div
+            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
+            style={entranceStyle(entrance.prose)}
+          >
             {mergedBlocks.length > 0 ? (
               <StratifiedRenderer blocks={mergedBlocks} archetype={archetype} articleId={params.id} warmer={recognition.isReturning} />
             ) : (
@@ -119,6 +135,15 @@ function ArticleContent({ params }: { params: { id: string } }) {
       </article>
     </CeremonySequencer>
   );
+}
+
+/** Build inline style dict for entrance CSS custom properties. */
+function entranceStyle(step: EntranceStep): React.CSSProperties {
+  if (step.duration === 0) return {};
+  return {
+    '--entrance-delay': `${step.delay}ms`,
+    '--entrance-duration': `${step.duration}ms`,
+  } as React.CSSProperties;
 }
 
 function TopBar({ articleId, title }: { articleId: string; title: string }) {

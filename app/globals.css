@@ -163,6 +163,7 @@
   --sys-z-thread: 2;
   --sys-z-nav: 10;
   --sys-z-gem: 15;
+  --sys-z-popover: 20;   /* SelectionPopover — above gem, below drawer backdrop */
   --sys-z-backdrop: 39;
   --sys-z-drawer: 40;
   --sys-z-overlay: 50;
@@ -929,4 +930,36 @@ body {
 [data-thermal="luminous"] .nav-pulse-aura {
   animation: navPulse var(--token-glow-speed) ease-in-out infinite;
   will-change: opacity;
+}
+
+/* ─── Article Entrance Choreography ─────────────────── */
+
+/* Staggered fade-up on article page arrival. Content is in DOM
+   at frame 0; animation-delay creates the "settling" feeling.
+   No setTimeout, no JS delays — pure CSS composition.
+
+   data-entrance-step is set by useEntranceChoreography().
+   --entrance-delay and --entrance-duration are inline styles. */
+
+/* Fade-up: opacity 0→1, translateY 4px→0 (reuses existing fade-in pattern) */
+.entrance-fade-up {
+  opacity: 0;
+  transform: translateY(4px);
+  animation: entranceFadeUp var(--entrance-duration, 200ms) var(--sys-ease-settle) var(--entrance-delay, 0ms) both;
+}
+
+/* Divider draw: scaleX 0→1 from center — the room drawing its first breath */
+.entrance-divider-draw {
+  transform: scaleX(0);
+  animation: entranceDividerDraw var(--entrance-duration, 200ms) var(--sys-ease-settle) var(--entrance-delay, 0ms) both;
+}
+
+@keyframes entranceFadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes entranceDividerDraw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
