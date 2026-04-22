@@ -133,14 +133,18 @@ export function resolveVariantClass(variant: PressVariant): string {
   return VARIANT_ICON;
 }
 
+/* Solid hover halo: `whisper` (gold-tinted glow). The token-accent
+   tint at warm+ states resolves to gold via ThermalProvider, so the
+   accent-flavored hover is preserved without an arbitrary shadow string.
+   Rest depth: `rise` (was the legacy `shadow-void`). */
 const VARIANT_SOLID =
   'border text-foreground ' +
   '[background-color:color-mix(in_srgb,var(--token-accent)_14%,var(--token-surface))] ' +
   '[border-color:color-mix(in_srgb,var(--token-accent)_40%,transparent)] ' +
   'hover:[background-color:color-mix(in_srgb,var(--token-accent)_22%,var(--token-surface))] ' +
   'hover:-translate-y-micro ' +
-  'hover:[box-shadow:0_6px_24px_color-mix(in_srgb,var(--token-accent)_18%,transparent)] ' +
-  'shadow-void';
+  'hover:shadow-sys-whisper ' +
+  'shadow-sys-rise';
 
 const VARIANT_GHOST =
   'bg-transparent text-mist border ' +

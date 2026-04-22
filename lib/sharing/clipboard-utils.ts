@@ -90,6 +90,10 @@ export function showCopyFeedback(message: string = 'Copied to clipboard!', durat
   toast.id = 'copy-feedback-toast';
   toast.textContent = message;
   toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-surface text-white px-4 py-2 rounded-xl shadow-float z-50 animate-fade-in';
+  // elevation-ledger:exempt — toast is a JS-injected float over body chrome,
+  // appears before React/Tailwind CSS may have processed --sys-elev-* vars
+  // for unmounted state. Inline shadow is the safe default. See
+  // ELEVATION_LEDGER_EXEMPT_TOKEN in lib/design/elevation.ts.
   toast.style.cssText = `
     position: fixed;
     bottom: 1rem;

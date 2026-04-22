@@ -32,13 +32,32 @@ const config: Config = {
         sans: ['Inter', 'sans-serif'],
         display: ['Space Grotesk', 'sans-serif'],
       },
+      /* Elevation Ledger — drop-shadow variants for non-rectangular SVG icons.
+         The shadow follows the alpha silhouette (filter), unlike box-shadow
+         which paints a rectangular halo. Same beat names, different CSS axis.
+         Used by GemIcon and other glyph chrome. */
+      dropShadow: {
+        'sys-whisper': '0 0 6px color-mix(in srgb, var(--gold) 40%, transparent)',
+        'sys-bloom':   '0 0 10px color-mix(in srgb, var(--gold) 50%, transparent)',
+      },
       boxShadow: {
-        'void': '0 1px 2px rgba(0,0,0,0.3)',
-        'rise': '0 4px 16px rgba(0,0,0,0.4)',
-        'float': '0 8px 32px rgba(0,0,0,0.5)',
-        'gold': '0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent)',
+        /* Elevation Ledger — six beats, mirror of --sys-elev-* in globals.css.
+           Source of truth: lib/design/elevation.ts. Sync test guards drift. */
+        'sys-rest':     'var(--sys-elev-rest)',
+        'sys-rise':     'var(--sys-elev-rise)',
+        'sys-float':    'var(--sys-elev-float)',
+        'sys-whisper':  'var(--sys-elev-whisper)',
+        'sys-bloom':    'var(--sys-elev-bloom)',
+        'sys-radiance': 'var(--sys-elev-radiance)',
+        /* Legacy aliases — kept until call-sites migrate to sys-* beats.
+           TODO: migrate `shadow-void/rise/float/gold/*` callers to
+           `shadow-sys-*` and delete these in a follow-up sprint. */
+        'void':         '0 1px 2px rgba(0,0,0,0.3)',
+        'rise':         '0 4px 16px rgba(0,0,0,0.4)',
+        'float':        '0 8px 32px rgba(0,0,0,0.5)',
+        'gold':         '0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent)',
         'gold-intense': '0 10px 48px color-mix(in srgb, var(--gold) 25%, transparent)',
-        'rose-glow': '0 6px 32px color-mix(in srgb, var(--rose) 20%, transparent)',
+        'rose-glow':    '0 6px 32px color-mix(in srgb, var(--rose) 20%, transparent)',
         'cyan-whisper': '0 2px 20px color-mix(in srgb, var(--cyan) 15%, transparent)',
       },
       maxWidth: {

@@ -113,6 +113,20 @@
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
   --sys-ease-settle: cubic-bezier(0.0, 0.0, 0.2, 0.5);
 
+  /* ─── Elevation Ledger ───────────────────────────────────
+     Six depth-beats, ordered low → high. Two families:
+       depth (black, honest):  rest · rise · float
+       glow  (gold, alive):    whisper · bloom · radiance
+     Mirror is in lib/design/elevation.ts. The sync test in
+     lib/design/__tests__/elevation-sync.test.ts catches drift.
+     Adoption test enforces no raw box-shadow elsewhere. */
+  --sys-elev-rest:     none;
+  --sys-elev-rise:     0 1px 2px 0 rgba(0,0,0,0.20);
+  --sys-elev-float:    0 4px 14px 0 rgba(0,0,0,0.32);
+  --sys-elev-whisper:  0 0 12px 0 color-mix(in srgb, var(--gold) 12%, transparent);
+  --sys-elev-bloom:    0 0 18px 0 color-mix(in srgb, var(--gold) 22%, transparent);
+  --sys-elev-radiance: 0 0 28px 0 color-mix(in srgb, var(--gold) 30%, transparent);
+
   /* ─── Spacing Scale (12 steps, thermal-interpolated) ─── */
   /* Base values + thermal lift. The lift grows with warmth score:
      dormant = base only. Luminous = base + up to 8px (macro steps).
@@ -279,6 +293,10 @@ body {
 /* Dormant state "lit candle" — visible gold glow on CTA elements.
    Pulse widened: 0.12→0.28 alpha — the candle should pulse, not breathe.
    Uses color-mix() for thermal token integration. */
+/* Candle pulse uses an animated 20→40px gradient that does NOT fit the
+   six-beat ledger. Kept inline by design — its keyframes are the atom,
+   not a static elevation token. The ledger owns values, not tweens.
+   See `--sys-elev-whisper` for the static low-alpha gold halo. */
 .thermal-candle {
   box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 12%, transparent);
   animation: candlePulse 3s ease-in-out infinite;
@@ -589,12 +607,19 @@ body {
    present (80-89%): medium sweep, warm glow
    radiant (90-99%): wide sweep, bright glow, slow burn */
 
+/* Ceremony tiers — collapsed onto the elevation ledger.
+   subtle  → whisper   (12px gold glow, dim)
+   present → bloom     (18px gold glow, warm)
+   radiant → radiance  (28px gold glow, bright)
+   The thermal-gated overrides folded in too — same beat, different
+   intensity — because the ledger values now ARE the per-thermal targets.
+   Net deletion: 6 rules → 3, plus the per-thermal overrides drop entirely. */
 .ceremony-subtle .completion-shimmer-track::after {
   opacity: 0.6;
   animation-duration: 700ms;
 }
 .ceremony-subtle {
-  box-shadow: 0 0 12px color-mix(in srgb, var(--gold) 15%, transparent);
+  box-shadow: var(--sys-elev-whisper);
 }
 
 .ceremony-present .completion-shimmer-track::after {
@@ -602,7 +627,7 @@ body {
   animation-duration: 700ms;
 }
 .ceremony-present {
-  box-shadow: 0 0 18px color-mix(in srgb, var(--gold) 22%, transparent);
+  box-shadow: var(--sys-elev-bloom);
 }
 
 .ceremony-radiant .completion-shimmer-track::after {
@@ -610,26 +635,7 @@ body {
   animation-duration: 900ms;
 }
 .ceremony-radiant {
-  box-shadow: 0 0 28px color-mix(in srgb, var(--gold) 30%, transparent);
-}
-
-/* Thermal-gated: warm glow around the shimmer at stirring+. */
-[data-thermal="stirring"] .ceremony-subtle,
-[data-thermal="warm"] .ceremony-subtle,
-[data-thermal="luminous"] .ceremony-subtle {
-  box-shadow: 0 0 12px color-mix(in srgb, var(--gold) 12%, transparent);
-}
-
-[data-thermal="stirring"] .ceremony-present,
-[data-thermal="warm"] .ceremony-present,
-[data-thermal="luminous"] .ceremony-present {
-  box-shadow: 0 0 18px color-mix(in srgb, var(--gold) 20%, transparent);
-}
-
-[data-thermal="stirring"] .ceremony-radiant,
-[data-thermal="warm"] .ceremony-radiant,
-[data-thermal="luminous"] .ceremony-radiant {
-  box-shadow: 0 0 28px color-mix(in srgb, var(--gold) 30%, transparent);
+  box-shadow: var(--sys-elev-radiance);
 }
 
 /* Respect reduced motion — static acknowledgment instead of animation. */

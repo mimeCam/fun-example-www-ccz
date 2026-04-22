@@ -18,10 +18,10 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — and the Thread Keepsake lets readers share a unique artifact of *their* read.
 
 ## Design System
-Four shared primitives with phase machines, reduced-motion branches, and adoption guards: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. Timing owned by `lib/design/motion.ts` (8 beats: crossfade→settle + ceremony namespace). Gesture chrome in `lib/design/ambient-surfaces.css`. WCAG helpers in `lib/design/contrast.ts`.
+Four shared primitives with phase machines, reduced-motion branches, and adoption guards: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. Timing owned by `lib/design/motion.ts` (8 beats: crossfade→settle + ceremony namespace). Depth owned by `lib/design/elevation.ts` (6 beats: rest · rise · float · whisper · bloom · radiance — depth/glow split). Gesture chrome in `lib/design/ambient-surfaces.css`. WCAG helpers in `lib/design/contrast.ts`.
 
 ## WIP
-_None_
+- **Elevation Ledger** — guard live, six high-traffic surfaces migrated. Legacy `shadow-void/rise/float/gold/*` Tailwind aliases pending migration; keyframe tweens stay inline by design.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

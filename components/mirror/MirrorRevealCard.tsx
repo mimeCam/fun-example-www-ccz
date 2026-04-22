@@ -100,6 +100,8 @@ function phaseClass(p: Phase): string {
   return map[p];
 }
 
+/* elevation-ledger:exempt — Tanya §5 mirror-card archetype-tint carve-out.
+   Shape mirrors `bloom`; color is archetype-driven instead of gold. */
 function shimmerStyle(p: Phase, colors: { shimmerTo: string }): React.CSSProperties {
   if (p !== 'shimmer') return {};
   return { boxShadow: `0 12px 60px ${colors.shimmerTo}` };

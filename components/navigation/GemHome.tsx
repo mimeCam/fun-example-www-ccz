@@ -28,9 +28,13 @@ function gemColor(state: string, quiet: boolean): string {
   }
 }
 
+/* Luminous gem halo routes through the Elevation Ledger's `whisper` beat —
+   gold-tinted, low-alpha — using the filter-based drop-shadow variant so
+   the halo follows the SVG silhouette instead of painting a rectangle.
+   Quiet article-page state stays bare (no halo). */
 function gemShadow(state: string, quiet: boolean): string {
   if (quiet) return '';
-  return state === 'luminous' ? 'drop-shadow-[0_0_6px_color-mix(in_srgb,var(--gold)_40%,transparent)]' : '';
+  return state === 'luminous' ? 'drop-shadow-sys-whisper' : '';
 }
 
 interface GemHomeProps {

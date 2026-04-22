@@ -117,7 +117,11 @@ function phaseClass(p: Phase): string {
   return map[p];
 }
 
-/** Archetype-colored box-shadow during shimmer — each archetype glows its own color. */
+/* Archetype-colored shimmer — Tanya §5 carve-out: mirror cards mid-shimmer
+   may tint the bloom beat with the active archetype color. ONE exception.
+   Shape mirrors `bloom` (12px offset + wide blur), color is archetype-tinted
+   instead of gold. Other beats stay strictly ledger-bound.
+   elevation-ledger:exempt — archetype-tint carve-out per Tanya §5. */
 function shimmerStyle(p: Phase, colors: { shimmerTo: string }): React.CSSProperties {
   if (p !== 'shimmer') return {};
   return { boxShadow: `0 12px 60px ${colors.shimmerTo}` };
