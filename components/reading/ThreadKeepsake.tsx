@@ -10,11 +10,12 @@
  *  - Preview SVG is the SAME buildThreadSVG used by /api/og/thread.
  *  - All actions gracefully fall back (no navigator.share → share-links;
  *    no ClipboardItem → download).
- *  - Escape closes; backdrop click closes; focus trap TODO (see below).
+ *  - Modal mechanics (ESC, backdrop, focus trap, scroll-lock, focus return)
+ *    live in the shared `<Threshold>` primitive — see components/shared/Threshold.tsx.
  */
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   buildThreadSVG,
   KEEPSAKE_DIMENSIONS,
@@ -23,6 +24,7 @@ import {
 import { buildKeepsakeHref, buildUnfurlUrl } from '@/lib/sharing/thread-snapshot';
 import { copyWithFeedback, showCopyFeedback } from '@/lib/sharing/clipboard-utils';
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
+import { Threshold } from '@/components/shared/Threshold';
 
 interface ThreadKeepsakeProps {
   isOpen: boolean;
@@ -35,22 +37,12 @@ function filenameFor(snapshot: ThreadSnapshot): string {
   return `thread-${safeSlug}.png`;
 }
 
-function useKeyboardClose(isOpen: boolean, onClose: () => void): void {
-  useEffect(() => {
-    if (!isOpen) return;
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('keydown', handler);
-    return () => document.removeEventListener('keydown', handler);
-  }, [isOpen, onClose]);
-}
-
 function absoluteHref(relative: string): string {
   if (typeof window === 'undefined') return relative;
   return `${window.location.origin}${relative}`;
 }
 
-export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProps) {
-  useKeyboardClose(isOpen, onClose);
+function useKeepsakeDerivations(snapshot: ThreadSnapshot | null) {
   const svg = useMemo(() => (snapshot ? buildThreadSVG(snapshot) : ''), [snapshot]);
   const deepLink = useMemo(
     () => (snapshot ? absoluteHref(buildKeepsakeHref(snapshot)) : ''),
@@ -61,37 +53,28 @@ export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProp
       ? buildUnfurlUrl(window.location.origin, snapshot) : ''),
     [snapshot],
   );
+  return { svg, deepLink, unfurlUrl };
+}
 
-  if (!isOpen || !snapshot) return null;
-
+export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProps) {
+  const { svg, deepLink, unfurlUrl } = useKeepsakeDerivations(snapshot);
+  if (!snapshot) return null;
   return (
-    <>
-      <div
-        className="fixed inset-0 z-sys-backdrop bg-void/70 backdrop-blur-sm animate-fade-in"
-        onClick={onClose}
-        aria-hidden="true"
+    <Threshold
+      isOpen={isOpen}
+      onClose={onClose}
+      labelledBy="keepsake-title"
+      variant="center"
+    >
+      <KeepsakeHeader onClose={onClose} />
+      <KeepsakePreview svg={svg} title={snapshot.title} />
+      <KeepsakeActions
+        svg={svg}
+        snapshot={snapshot}
+        deepLink={deepLink}
+        unfurlUrl={unfurlUrl}
       />
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="keepsake-title"
-        className="fixed inset-0 z-sys-drawer flex items-center justify-center
-                   p-sys-6 pointer-events-none"
-      >
-        <div className="pointer-events-auto w-full max-w-2xl bg-surface/95 backdrop-blur-sm
-                        border border-fog/30 rounded-sys-medium thermal-shadow
-                        overflow-hidden animate-fade-in">
-          <KeepsakeHeader onClose={onClose} />
-          <KeepsakePreview svg={svg} title={snapshot.title} />
-          <KeepsakeActions
-            svg={svg}
-            snapshot={snapshot}
-            deepLink={deepLink}
-            unfurlUrl={unfurlUrl}
-          />
-        </div>
-      </div>
-    </>
+    </Threshold>
   );
 }
 
@@ -111,7 +94,10 @@ function KeepsakeHeader({ onClose }: { onClose: () => void }) {
       </div>
       <button onClick={onClose}
         className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
-                   transition-colors rounded-sys-medium hover:bg-fog/20"
+                   transition-colors rounded-sys-medium hover:bg-fog/20
+                   focus-visible:outline-none focus-visible:ring-2
+                   focus-visible:ring-primary focus-visible:ring-offset-2
+                   focus-visible:ring-offset-surface"
         aria-label="Close keepsake">
         <CloseIcon />
       </button>

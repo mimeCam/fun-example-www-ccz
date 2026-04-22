@@ -8,6 +8,7 @@ import { ResonanceShimmer } from '@/components/resonances/ResonanceShimmer';
 import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceCeremony';
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
 import { KeepsakeLauncher } from '@/components/reading/KeepsakeLauncher';
+import { Threshold } from '@/components/shared/Threshold';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -75,15 +76,8 @@ export function ResonanceDrawer({
     }
   }, [isOpen]);
 
-  // Escape key closes (only before ceremony)
-  useEffect(() => {
-    if (!isOpen || success) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', handleKey);
-    return () => document.removeEventListener('keydown', handleKey);
-  }, [isOpen, success, onClose]);
+  // ESC + backdrop dismiss are owned by <Threshold>; we just gate them
+  // during the ceremony via dismissOnEscape/dismissOnBackdrop props.
 
   // Auto-close after ceremony completes — extended pause (2.6s, was 2.0s)
   useEffect(() => {
@@ -123,81 +117,74 @@ export function ResonanceDrawer({
     }
   }, [note, quote, articleId, usedSlots, thermalRefresh]);
 
-  if (!isOpen) return null;
-
   const slotsAvailable = usedSlots < SLOT_COUNT;
   const showShimmer = success && (phase === 'shimmering' || phase === 'settled');
 
   return (
-    <>
-      {/* Backdrop — dims article area */}
-      <div
-        className="fixed inset-0 z-sys-backdrop bg-void/60 backdrop-blur-sm transition-opacity duration-enter"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <Threshold
+      isOpen={isOpen}
+      onClose={onClose}
+      variant="drawer-right"
+      labelledBy="resonance-drawer-title"
+      dismissOnBackdrop={!success}
+      dismissOnEscape={!success}
+    >
+      <DrawerHeader onClose={onClose} articleTitle={articleTitle} />
+      <div className="mx-sys-6 border-t border-fog/20" />
 
-      {/* Drawer panel */}
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Save resonance for ${articleTitle}`}
-        className="fixed top-0 right-0 bottom-0 z-sys-drawer w-full max-w-sm
-                   bg-surface/95 backdrop-blur-sm
-                   border-l border-fog/20 thermal-shadow thermal-radius
-                   animate-slide-in-right
-                   flex flex-col overflow-y-auto"
-        style={{ borderLeftColor: 'var(--token-accent)' }}
-      >
-        <DrawerHeader onClose={onClose} />
-        <div className="mx-sys-6 border-t border-fog/20" />
+      <div className="flex-1 p-sys-6 pt-sys-5">
+        <SlotIndicator used={usedSlots} total={SLOT_COUNT} pulsing={success} />
 
-        <div className="flex-1 p-sys-6 pt-sys-5">
-          <SlotIndicator used={usedSlots} total={SLOT_COUNT} pulsing={success} />
-
-          {success ? (
-            <CeremonyContent
-              quote={quote}
-              shimmerIntensity={intensity}
-              showShimmer={showShimmer}
-              shimmerSettled={phase === 'settled'}
-              articleId={articleId}
-              articleTitle={articleTitle}
-            />
-          ) : slotsAvailable ? (
-            <DrawerForm
-              note={note}
-              setNote={setNote}
-              quote={quote}
-              error={error}
-              isLoading={isLoading}
-              onSubmit={handleSubmit}
-              onCancel={onClose}
-            />
-          ) : (
-            <SlotsFullMessage />
-          )}
-        </div>
-      </aside>
-    </>
+        {success ? (
+          <CeremonyContent
+            quote={quote}
+            shimmerIntensity={intensity}
+            showShimmer={showShimmer}
+            shimmerSettled={phase === 'settled'}
+            articleId={articleId}
+            articleTitle={articleTitle}
+          />
+        ) : slotsAvailable ? (
+          <DrawerForm
+            note={note}
+            setNote={setNote}
+            quote={quote}
+            error={error}
+            isLoading={isLoading}
+            onSubmit={handleSubmit}
+            onCancel={onClose}
+          />
+        ) : (
+          <SlotsFullMessage />
+        )}
+      </div>
+    </Threshold>
   );
 }
 
 /* ─── Sub-components ─────────────────────────────── */
 
-function DrawerHeader({ onClose }: { onClose: () => void }) {
+function DrawerHeader({
+  onClose, articleTitle,
+}: { onClose: () => void; articleTitle: string }) {
   return (
     <div className="flex items-center justify-between p-sys-6 pb-sys-4">
       <div>
-        <h3 className="text-sys-lg font-display font-sys-display text-foreground">
+        <h3 id="resonance-drawer-title"
+          className="text-sys-lg font-display font-sys-display text-foreground">
           Save Resonance
         </h3>
-        <p className="text-mist text-sys-caption mt-sys-1">Why does this matter to you?</p>
+        <p className="text-mist text-sys-caption mt-sys-1">
+          Why does <span className="sr-only">{articleTitle} </span>this matter to you?
+        </p>
       </div>
       <button
         onClick={onClose}
         className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
-                   transition-colors rounded-sys-medium hover:bg-fog/20"
+                   transition-colors rounded-sys-medium hover:bg-fog/20
+                   focus-visible:outline-none focus-visible:ring-2
+                   focus-visible:ring-primary focus-visible:ring-offset-2
+                   focus-visible:ring-offset-surface"
         aria-label="Close"
       >
         <CloseIcon />
