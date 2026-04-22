@@ -15,6 +15,7 @@ import { GemHome } from '@/components/navigation/GemHome';
 import { GemIcon } from '@/components/shared/GemIcon';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
 import WhisperFooter from '@/components/shared/WhisperFooter';
+import { Pressable } from '@/components/shared/Pressable';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import type { ReaderMirror } from '@/types/mirror';
 
@@ -95,10 +96,9 @@ export default function MirrorPage() {
         <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
           Read an article to the end and the Mirror will find you.
         </p>
-        <Link href="/articles"
-          className="inline-block px-sys-7 py-sys-4 border border-gold/40 text-gold hover:bg-gold/10 font-sys-heading thermal-radius transition-colors">
-          Browse Articles →
-        </Link>
+        <Pressable asChild variant="ghost" size="md">
+          <Link href="/articles">Browse Articles →</Link>
+        </Pressable>
       </div>
     </div>
   );

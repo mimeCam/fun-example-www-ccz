@@ -337,18 +337,20 @@ function ActionButtons({ onSubmit, onCancel, isLoading, disabled }: {
 }) {
   return (
     <div className="flex gap-sys-4 mt-sys-3">
-      <button onClick={onCancel} disabled={isLoading}
-        className="flex-1 px-sys-4 py-sys-3 bg-background text-mist rounded-sys-medium
-                   text-sys-caption hover:bg-fog transition-colors disabled:opacity-50">
+      <Pressable
+        variant="ghost" size="md"
+        onClick={onCancel} disabled={isLoading}
+        className="flex-1"
+      >
         Cancel
-      </button>
-      <button onClick={onSubmit}
-        disabled={isLoading || disabled}
-        className="flex-1 px-sys-4 py-sys-3 bg-primary text-foreground rounded-sys-medium
-                   text-sys-caption font-sys-accent hover:bg-secondary transition-colors
-                   disabled:opacity-50 disabled:cursor-not-allowed">
+      </Pressable>
+      <Pressable
+        variant="solid" size="md"
+        onClick={onSubmit} disabled={isLoading || disabled}
+        className="flex-1"
+      >
         {isLoading ? 'Saving...' : 'Save Resonance'}
-      </button>
+      </Pressable>
     </div>
   );
 }

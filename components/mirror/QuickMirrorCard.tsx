@@ -14,6 +14,7 @@ import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import type { ArchetypeKey } from '@/types/content';
 import { useMirrorPhases, QUICK_TIMINGS, type Phase } from '@/lib/hooks/useMirrorPhases';
 import ShareOverlay from './ShareOverlay';
+import { Pressable } from '@/components/shared/Pressable';
 
 interface Props {
   result: QuickMirrorResult;
@@ -46,11 +47,15 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
 
 function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
   return (
-    <button onClick={onDismiss}
-      className="absolute top-sys-3 right-sys-3 text-mist/30 hover:text-mist/60
-        transition-colors duration-hover text-sys-lg leading-none min-w-[48px] min-h-[48px]
-        flex items-center justify-center"
-      aria-label="Dismiss">×</button>
+    <Pressable
+      variant="icon"
+      size="sm"
+      onClick={onDismiss}
+      aria-label="Dismiss"
+      className="absolute top-sys-3 right-sys-3 text-sys-lg leading-none"
+    >
+      ×
+    </Pressable>
   );
 }
 

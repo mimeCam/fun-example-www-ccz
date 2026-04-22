@@ -28,6 +28,7 @@ import { detectChapterBreak } from '@/lib/mirror/book-whisper-engine';
 import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import ResonanceExport from './ResonanceExport';
+import { Pressable } from '@/components/shared/Pressable';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 
 const ANON_KEY = 'anon-reader-id';
@@ -173,10 +174,9 @@ export default function ResonancesClient() {
       <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
         Read something that stops you. Capture it. Tell it why it matters.
       </p>
-      <Link href="/"
-        className="inline-block px-sys-7 py-sys-4 border border-gold/40 text-gold hover:bg-gold/10 font-sys-display rounded-sys-medium transition-colors">
-        Browse Articles →
-      </Link>
+      <Pressable asChild variant="ghost" size="md">
+        <Link href="/">Browse Articles →</Link>
+      </Pressable>
     </div>
   );
 

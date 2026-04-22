@@ -18,6 +18,7 @@ import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { getSeason } from '@/lib/mirror/season-engine';
 import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
+import { Pressable } from '@/components/shared/Pressable';
 
 // ─── Phase animation ─────────────────────────────────────
 
@@ -168,9 +169,15 @@ function LetterCard({
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss */}
       {visible && (
-        <button onClick={onDismiss}
-          className="absolute top-sys-4 right-sys-4 text-mist/60 hover:text-mist/80 transition-opacity text-sys-lg leading-none"
-          aria-label="Dismiss">&times;</button>
+        <Pressable
+          variant="icon"
+          size="sm"
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="absolute top-sys-4 right-sys-4 text-sys-lg leading-none"
+        >
+          &times;
+        </Pressable>
       )}
       {/* Label */}
       <p className="text-sys-micro uppercase tracking-widest text-accent/60 text-center">
@@ -201,14 +208,12 @@ function LetterCard({
       {/* Actions */}
       {visible && (
         <div className="mt-sys-7 flex justify-center gap-sys-4">
-          <button onClick={handleCopy}
-            className="px-sys-6 py-sys-3 rounded-sys-medium border border-accent/40 text-accent text-sys-caption hover:bg-accent/10 transition-colors">
+          <Pressable variant="ghost" size="md" onClick={handleCopy}>
             {copied ? 'Copied!' : 'Copy & Share'}
-          </button>
-          <button onClick={handleImage}
-            className="px-sys-6 py-sys-3 rounded-sys-medium text-mist text-sys-caption hover:text-foreground/80 transition-colors">
+          </Pressable>
+          <Pressable variant="ghost" size="md" onClick={handleImage}>
             Save as Image
-          </button>
+          </Pressable>
         </div>
       )}
     </div>

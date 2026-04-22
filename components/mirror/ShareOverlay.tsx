@@ -18,6 +18,7 @@ import {
   downloadDataURL,
 } from '@/lib/sharing/share-card';
 import { encodeDeepLink } from '@/lib/sharing/deep-link';
+import { Pressable } from '@/components/shared/Pressable';
 
 interface Props {
   result: QuickMirrorResult;
@@ -67,14 +68,12 @@ function IconBtn({ onClick, label, icon, confirm }: {
   onClick: () => void; label: string; icon: React.ReactNode; confirm?: boolean;
 }) {
   return (
-    <button
+    <Pressable
+      variant="icon"
+      size="sm"
       onClick={onClick}
-      className={`group relative w-12 h-12 rounded-sys-medium
-        border border-gold/20 text-gold/70
-        hover:text-gold hover:bg-gold/10 hover:border-gold/40
-        flex items-center justify-center transition-all duration-hover
-        ${confirm ? 'mirror-share-confirm' : ''}`}
       aria-label={label}
+      className={`group ${confirm ? 'mirror-share-confirm' : ''}`}
     >
       {icon}
       <span className="pointer-events-none absolute -bottom-8 left-1/2
@@ -82,7 +81,7 @@ function IconBtn({ onClick, label, icon, confirm }: {
         opacity-0 group-hover:opacity-100 transition-opacity duration-instant whitespace-nowrap">
         {label}
       </span>
-    </button>
+    </Pressable>
   );
 }
 

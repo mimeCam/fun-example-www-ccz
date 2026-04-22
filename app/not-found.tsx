@@ -9,6 +9,7 @@
 import Link from 'next/link';
 import { GemHome } from '@/components/navigation/GemHome';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { Pressable } from '@/components/shared/Pressable';
 
 export default function NotFound() {
   return (
@@ -49,11 +50,9 @@ function Subtitle() {
 
 function ThresholdLink() {
   return (
-    <Link href="/"
-      className="px-sys-6 py-sys-3 rounded-sys-medium border border-gold/30 text-gold text-sys-caption
-        hover:bg-gold/10 transition-colors duration-hover">
-      Return to the Threshold →
-    </Link>
+    <Pressable asChild variant="ghost" size="md">
+      <Link href="/">Return to the Threshold →</Link>
+    </Pressable>
   );
 }
 

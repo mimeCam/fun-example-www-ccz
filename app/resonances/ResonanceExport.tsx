@@ -9,6 +9,7 @@
 import { useCallback } from 'react';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 import { THERMAL, BRAND, cssOr } from '@/lib/design/color-constants';
+import { Pressable } from '@/components/shared/Pressable';
 
 const W = 1080;
 const H = 1350;
@@ -133,11 +134,9 @@ export default function ResonanceExport({ resonances }: Props) {
 
   return (
     <div className="text-center">
-      <button onClick={handleExport}
-        className="px-sys-5 py-sys-3 bg-surface border border-fog/40 text-mist text-sys-caption
-          rounded-sys-medium hover:border-rose/40 hover:text-rose transition-all duration-enter">
+      <Pressable variant="ghost" size="md" onClick={handleExport}>
         Export as Image
-      </button>
+      </Pressable>
     </div>
   );
 }

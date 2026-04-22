@@ -1,17 +1,15 @@
 /**
  * ReadingInvitation — "Begin Reading" CTA with behavioral hint.
  *
- * A single focused call-to-action that bridges the Portal hero
- * to the article page. Uses gold token (ties homepage invitation
- * to the eventual archetype reveal on the article page).
- *
- * The "lit candle" in dormant state — thermal-candle provides a
- * subtle gold pulse that says "this page is alive" even when cold.
+ * The primary consent surface on the homepage. The `thermal-candle`
+ * pulse (dormant-state gold glow) sits on the child <Link> — layer
+ * ceremony, not press feedback.
  *
  * Server component — no hooks, no state.
  */
 
 import Link from 'next/link';
+import { Pressable } from '@/components/shared/Pressable';
 
 // ─── Social proof hints ───────────────────────────────────
 
@@ -36,17 +34,11 @@ export default function ReadingInvitation(
 
   return (
     <div className="text-center mt-sys-10 mb-sys-11">
-      <Link href={`/article/${articleId}`}
-        className="inline-block px-sys-8 py-sys-4 thermal-radius
-          bg-gold/10 border border-gold/20 text-gold
-          font-display font-sys-heading text-sys-lg
-          hover:bg-gold/25 hover:border-gold/50
-          cta-physical
-          focus:ring-2 focus:ring-gold/40 focus:ring-offset-2
-          focus:ring-offset-background outline-none
-          thermal-candle">
-        Begin Reading &rarr;
-      </Link>
+      <Pressable asChild variant="solid" size="md" className="thermal-candle">
+        <Link href={`/article/${articleId}`}>
+          Begin Reading &rarr;
+        </Link>
+      </Pressable>
 
       <p className="text-mist/50 text-sys-caption mt-sys-7 italic max-w-sm mx-auto">
         {hint}

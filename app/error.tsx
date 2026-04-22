@@ -12,6 +12,7 @@
 
 import { GemHome } from '@/components/navigation/GemHome';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { Pressable } from '@/components/shared/Pressable';
 
 export default function ErrorPage({
   reset,
@@ -31,11 +32,9 @@ export default function ErrorPage({
           The room is still here. Try going back.
         </p>
         <div className="mt-sys-8 flex flex-col items-center gap-sys-4">
-          <button onClick={reset}
-            className="px-sys-6 py-sys-3 rounded-sys-medium border border-gold/30 text-gold text-sys-caption
-              hover:bg-gold/10 transition-colors duration-hover">
+          <Pressable variant="ghost" size="md" onClick={reset}>
             Try again →
-          </button>
+          </Pressable>
           <a href="/"
             className="text-mist/50 text-sys-caption hover:text-mist transition-colors">
             Return to the Threshold

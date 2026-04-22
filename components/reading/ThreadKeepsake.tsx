@@ -194,13 +194,14 @@ interface ActionButtonProps {
 }
 
 function ActionButton({ onClick, label, busy, ghost }: ActionButtonProps) {
-  const base = 'px-sys-4 py-sys-3 rounded-sys-medium text-sys-caption transition-colors';
-  const solid = 'bg-primary text-foreground hover:bg-secondary disabled:opacity-50';
-  const soft  = 'bg-background text-mist hover:bg-fog disabled:opacity-50';
   return (
-    <button onClick={onClick} disabled={!!busy}
-      className={`${base} ${ghost ? soft : solid}`}>
+    <Pressable
+      variant={ghost ? 'ghost' : 'solid'}
+      size="md"
+      onClick={onClick}
+      disabled={!!busy}
+    >
       {busy ? '…' : label}
-    </button>
+    </Pressable>
   );
 }
