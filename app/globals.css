@@ -192,9 +192,11 @@
 }
 
 /* Focus-visible ring — thermal accent, not system blue.
-   Every focusable element acknowledges the reader's presence. */
+   Every focusable element acknowledges the reader's presence.
+   80% (was 70%): Tanya §4 prescribed mitigation — midpoints were dipping
+   under WCAG 1.4.11 non-text (3:1). See lib/utils/__tests__/contrast.test.ts. */
 :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--token-accent) 70%, transparent);
+  outline: 2px solid color-mix(in srgb, var(--token-accent) 80%, transparent);
   outline-offset: 2px;
   border-radius: var(--sys-radius-soft);
 }

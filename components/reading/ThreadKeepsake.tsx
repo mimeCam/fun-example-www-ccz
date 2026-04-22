@@ -25,6 +25,7 @@ import { buildKeepsakeHref, buildUnfurlUrl } from '@/lib/sharing/thread-snapshot
 import { copyWithFeedback, showCopyFeedback } from '@/lib/sharing/clipboard-utils';
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
 import { Threshold } from '@/components/shared/Threshold';
+import { Pressable } from '@/components/shared/Pressable';
 
 interface ThreadKeepsakeProps {
   isOpen: boolean;
@@ -92,15 +93,13 @@ function KeepsakeHeader({ onClose }: { onClose: () => void }) {
           A mirror of what you just read, made shareable.
         </p>
       </div>
-      <button onClick={onClose}
-        className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
-                   transition-colors rounded-sys-medium hover:bg-fog/20
-                   focus-visible:outline-none focus-visible:ring-2
-                   focus-visible:ring-primary focus-visible:ring-offset-2
-                   focus-visible:ring-offset-surface"
+      <Pressable
+        variant="icon"
+        onClick={onClose}
+        className="-mr-sys-3"
         aria-label="Close keepsake">
         <CloseIcon />
-      </button>
+      </Pressable>
     </div>
   );
 }

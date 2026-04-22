@@ -9,6 +9,7 @@ import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceC
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
 import { KeepsakeLauncher } from '@/components/reading/KeepsakeLauncher';
 import { Threshold } from '@/components/shared/Threshold';
+import { Pressable } from '@/components/shared/Pressable';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -178,17 +179,14 @@ function DrawerHeader({
           Why does <span className="sr-only">{articleTitle} </span>this matter to you?
         </p>
       </div>
-      <button
+      <Pressable
+        variant="icon"
         onClick={onClose}
-        className="p-sys-3 -mr-sys-3 text-mist hover:text-foreground
-                   transition-colors rounded-sys-medium hover:bg-fog/20
-                   focus-visible:outline-none focus-visible:ring-2
-                   focus-visible:ring-primary focus-visible:ring-offset-2
-                   focus-visible:ring-offset-surface"
+        className="-mr-sys-3"
         aria-label="Close"
       >
         <CloseIcon />
-      </button>
+      </Pressable>
     </div>
   );
 }

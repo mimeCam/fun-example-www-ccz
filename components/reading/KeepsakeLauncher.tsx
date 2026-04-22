@@ -14,6 +14,7 @@ import { captureThreadSnapshot } from '@/lib/hooks/useThreadSnapshot';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 import { useMirror } from '@/lib/hooks/useMirror';
+import { Pressable } from '@/components/shared/Pressable';
 import type { ArchetypeKey } from '@/types/content';
 import type { ThreadSnapshot } from '@/lib/sharing/thread-render';
 
@@ -41,15 +42,9 @@ export function KeepsakeLauncher({ articleId, articleTitle }: KeepsakeLauncherPr
   return (
     <>
       <div className="mt-sys-5 flex justify-center">
-        <button
-          onClick={onOpen}
-          className="px-sys-5 py-sys-3 rounded-sys-medium border border-gold/40 text-gold
-                     text-sys-caption hover:bg-gold/10 transition-colors
-                     focus:outline-none focus:ring-2 focus:ring-gold/50 focus:ring-offset-2
-                     focus:ring-offset-surface"
-        >
+        <Pressable variant="solid" onClick={onOpen}>
           Keep this thread →
-        </button>
+        </Pressable>
       </div>
       <ThreadKeepsake isOpen={!!snapshot} onClose={onClose} snapshot={snapshot} />
     </>

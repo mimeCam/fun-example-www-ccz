@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react';
 import { useTextSelection } from '@/lib/hooks/useTextSelection';
 import { ResonanceDrawer } from './ResonanceDrawer';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { Pressable } from '@/components/shared/Pressable';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -49,13 +50,10 @@ export function ResonanceButton({ articleId, articleTitle }: {
 
   return (
     <>
-      <button
+      <Pressable
+        variant="icon"
         onClick={slotsAvailable ? handleOpen : undefined}
-        className={`relative p-sys-3 rounded-sys-medium transition-colors ${
-          slotsAvailable
-            ? 'text-fog/60 hover:text-mist/90'
-            : 'text-fog/40 cursor-default'
-        }`}
+        disabled={!slotsAvailable}
         aria-label="Save resonance"
         title={!slotsAvailable ? 'Resonance slots full' : 'Save resonance'}
       >
@@ -65,7 +63,7 @@ export function ResonanceButton({ articleId, articleTitle }: {
             {usedSlots}/{SLOT_COUNT}
           </span>
         )}
-      </button>
+      </Pressable>
 
       <ResonanceDrawer
         isOpen={isOpen}
