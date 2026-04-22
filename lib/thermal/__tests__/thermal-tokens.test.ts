@@ -46,6 +46,7 @@ describe('computeThermalTokens — output tokens', () => {
     '--token-shadow-depth',
     '--token-radius-soft',
     '--token-accent-opacity',
+    '--token-gesture-mix',
     // Typography depth tokens — thermal typography
     '--token-font-weight',
     '--token-letter-spacing',
@@ -53,7 +54,7 @@ describe('computeThermalTokens — output tokens', () => {
     '--token-text-glow',
   ];
 
-  it('returns 15 CSS custom property keys', () => {
+  it('returns 16 CSS custom property keys', () => {
     for (const key of TOKEN_KEYS) {
       expect(SRC).toContain(`'${key}'`);
     }
@@ -83,6 +84,12 @@ describe('computeThermalTokens — output tokens', () => {
     expect(SRC).toContain('ACCENT_OPACITY');
     expect(SRC).toContain('dormant: 0.5');
     expect(SRC).toContain('warm: 1.0');
+  });
+
+  it('has gesture-mix anchors (Ambient Surfaces — 28% → 36%)', () => {
+    expect(SRC).toContain('GESTURE_MIX');
+    expect(SRC).toContain('dormant: 0.28');
+    expect(SRC).toContain('warm: 0.36');
   });
 
   it('uses HSL interpolation for color tokens', () => {
@@ -123,8 +130,8 @@ describe('thermal-tokens — anchor values match CSS :root defaults', () => {
 // ─── Glow/shadow function tests ────────────────────────────
 
 describe('glowValue and shadowValue', () => {
-  it('glow returns "none" below 18% score', () => {
-    expect(SRC).toContain("if (t < 0.18) return 'none'");
+  it('glow returns "none" below 25% score (stirring threshold)', () => {
+    expect(SRC).toContain("if (t < 0.25) return 'none'");
   });
 
   it('glow uses rgba(240,198,116,...) — gold color', () => {
@@ -221,8 +228,10 @@ describe('computeSpacingTokens', () => {
     }
   });
 
-  it('stirring score (25) produces non-zero lifts for larger steps', () => {
-    const tokens = computeSpacingTokens(25);
+  it('just-above-threshold score (30) produces non-zero lifts for larger steps', () => {
+    // SPACING_THRESHOLD is 25 — at score === 25, t === 0 (boundary behaviour).
+    // Pick a score just above the threshold to assert the curve has left zero.
+    const tokens = computeSpacingTokens(30);
     // Small steps should have minimal lift
     expect(parseFloat(tokens['--token-space-lift-2'])).toBeLessThan(1.5);
     // Large steps should have noticeable lift
@@ -284,9 +293,8 @@ describe('thermal-tokens — spacing constants in source', () => {
     expect(SRC).toContain('5.66');
   });
 
-  it('defines SPACING_THRESHOLD at 18 (dormant cutoff)', () => {
-    expect(SRC).toContain('SPACING_THRESHOLD');
-    expect(SRC).toContain('18');
+  it('defines SPACING_THRESHOLD at 25 (dormant→stirring boundary)', () => {
+    expect(SRC).toContain('SPACING_THRESHOLD = 25');
   });
 
   it('exports computeSpacingTokens function', () => {

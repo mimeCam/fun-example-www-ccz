@@ -131,8 +131,13 @@ describe('composeFieldClass — deterministic ordering + shared disabled math', 
     expect(out).not.toContain('hover:[border-color:color-mix');
   });
 
-  it('base always reads --token-accent for caret (Jason F. / Tanya §3)', () => {
-    expect(FIELD_BASE).toContain('caret-color:var(--token-accent)');
+  it('base delegates caret/placeholder/selection to ambient-surfaces.css', () => {
+    // Gesture-chrome is cascade-root territory (Jason F. / Tanya §3).
+    // Per-field overrides would drift from the thermal band — the
+    // adoption guard blocks that on purpose.
+    expect(FIELD_BASE).not.toContain('caret-color');
+    expect(FIELD_BASE).not.toContain('placeholder-');
+    expect(FIELD_BASE).not.toContain('selection:');
   });
 
   it('multiline disables resize (autogrow is out of v1 scope per Tanya §6)', () => {

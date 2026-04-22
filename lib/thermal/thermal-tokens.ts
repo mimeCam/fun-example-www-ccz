@@ -35,6 +35,12 @@ export const RADIUS_SOFT = { dormant: 0, warm: 0.5 };          // rem
 // Accent opacity — raised from 0.30 to make accent visible from the start.
 export const ACCENT_OPACITY = { dormant: 0.5, warm: 1.0 };     // 0-1
 
+// Gesture-mix — alpha the reader's selection wash carries above the page.
+// 28% at dormant → 36% at radiant (Tanya §2 / Paul §6). Boosted via the same
+// tp curve as --token-accent so the highlight warms in lock-step with the room.
+// Owns `::selection`, `::-moz-selection` in lib/design/ambient-surfaces.css.
+export const GESTURE_MIX = { dormant: 0.28, warm: 0.36 };      // 0-1
+
 // Typography depth anchors — "the room warms, the text breathes".
 // Font-weight crosses JND: 400→450 is one grade shift that the reader feels
 // as "the text gained confidence". 400→420 was literally imperceptible.
@@ -141,6 +147,9 @@ export function computeThermalTokens(score: number, _state: ThermalState): Therm
     '--token-radius-soft': `${lerp(RADIUS_SOFT.dormant, RADIUS_SOFT.warm, t).toFixed(2)}rem`,
     // Accent opacity — linear: controls visibility of accent elements
     '--token-accent-opacity': lerp(ACCENT_OPACITY.dormant, ACCENT_OPACITY.warm, t).toFixed(2),
+    // Gesture-mix — boosted: the reader's own highlight flares with the room.
+    // Consumed by ::selection/::-moz-selection in ambient-surfaces.css.
+    '--token-gesture-mix': lerp(GESTURE_MIX.dormant, GESTURE_MIX.warm, tp).toFixed(3),
     // Typography depth — boosted: font-weight, letter-spacing cross JND sooner
     '--token-font-weight': lerp(FONT_WEIGHT.dormant, FONT_WEIGHT.warm, tp).toFixed(1),
     '--token-letter-spacing': `${lerp(LETTER_SPACING.dormant, LETTER_SPACING.warm, tp).toFixed(3)}em`,

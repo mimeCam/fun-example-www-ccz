@@ -26,7 +26,9 @@ Four shared primitives, each with a phase machine, reduced-motion branch, and ad
 - **`<Field>`** (`text`, `multiline` · `sm`/`md`) — inputs. Caret = accent, 120 ms border crossfade, 3-state field phase (rest → focus → rest + transient `error-held`). → `components/shared/Field.tsx`, resolvers in `lib/utils/field-phase.ts`, hook in `lib/hooks/useFieldPhase.ts`
 - **`<TextLink>`** (`inline`, `passage`, `quiet`) — links. Internal = `next/link`, external = `<a target="_blank" rel="noopener noreferrer">` + tiny off-site glyph. 120 ms crossfade on `color`, `text-decoration-thickness`, `text-underline-offset`, `text-decoration-color` — one unified gesture. `passage` resolves destination accent from route (`/mirror` → gold, `/resonances` → rose) so hover previews the next room. 3-state link phase (idle → hover → idle + focus). → `components/shared/TextLink.tsx`, resolvers in `lib/utils/link-phase.ts`, hook in `lib/hooks/useLinkPhase.ts`
 
-Shared: `prefers-reduced-motion` probe in `lib/utils/reduced-motion.ts`. WCAG contrast gates in `lib/utils/__tests__/contrast.test.ts` + `link-phase.test.ts`. Adoption guards: `pressable-adoption.test.ts`, `field-adoption.test.ts`, `textlink-adoption.test.ts`.
+Shared: `prefers-reduced-motion` probe in `lib/utils/reduced-motion.ts`. WCAG contrast helpers in `lib/design/contrast.ts` (shared by focus-ring and ambient-surfaces tests). Adoption guards: `pressable-adoption.test.ts`, `field-adoption.test.ts`, `textlink-adoption.test.ts`, `ambient-surfaces-adoption.test.ts`.
+
+Gesture-driven browser chrome (`::selection`, scrollbar, `::placeholder`, `::marker`, caret) inherits `--token-accent` / `--token-mist`, intensifying with the thermal stop (28% → 36% alpha on the selection wash). Contrast ≥ 4.5:1 on the hero. See `lib/design/ambient-surfaces.css`.
 
 ## WIP
 _None_

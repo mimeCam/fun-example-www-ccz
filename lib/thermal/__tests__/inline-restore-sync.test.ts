@@ -236,6 +236,7 @@ describe('inline-restore source structure', () => {
       '--token-accent', '--token-border', '--token-glow',
       '--token-shadow', '--token-line-height', '--token-shadow-depth',
       '--token-radius-soft', '--token-accent-opacity',
+      '--token-gesture-mix',
       '--token-font-weight', '--token-letter-spacing',
       '--token-para-rhythm', '--para-offset', '--token-text-glow',
     ];

@@ -4,6 +4,7 @@ import { AmbientNav } from "@/components/navigation/AmbientNav";
 import { ThermalLayout } from "@/components/thermal/ThermalLayout";
 import { INLINE_RESTORE_SCRIPT } from "@/lib/thermal/inline-restore";
 import "./globals.css";
+import "@/lib/design/ambient-surfaces.css";
 
 const inter = Inter({
   subsets: ["latin"],

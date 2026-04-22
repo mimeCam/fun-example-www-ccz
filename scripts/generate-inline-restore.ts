@@ -17,7 +17,7 @@ import { fileURLToPath } from 'url';
 import {
   BG, SURFACE, FOREGROUND, ACCENT, BORDER,
   LINE_HEIGHT, SHADOW_DEPTH, RADIUS_SOFT, ACCENT_OPACITY,
-  FONT_WEIGHT, LETTER_SPACING, PARA_RHYTHM,
+  FONT_WEIGHT, LETTER_SPACING, PARA_RHYTHM, GESTURE_MIX,
   SPACING_LIFT_MAX, SPACING_SCALE_REF, SPACING_THRESHOLD,
 } from '../lib/thermal/thermal-tokens';
 
@@ -111,6 +111,8 @@ function generate(): string {
   + `el.setProperty('--token-shadow-depth',sa);`
   + `el.setProperty('--token-radius-soft',lerp(${RADIUS_SOFT.dormant},${RADIUS_SOFT.warm},t).toFixed(2)+'rem');`
   + `el.setProperty('--token-accent-opacity',lerp(${ACCENT_OPACITY.dormant},${ACCENT_OPACITY.warm},t).toFixed(2));`
+  // Gesture-mix — boosted; the reader's selection warms in lock-step with --token-accent.
+  + `el.setProperty('--token-gesture-mix',lerp(${GESTURE_MIX.dormant},${GESTURE_MIX.warm},tp).toFixed(3));`
   + `el.setProperty('--token-font-weight',lerp(${FONT_WEIGHT.dormant},${FONT_WEIGHT.warm},tp).toFixed(1));`
   + `el.setProperty('--token-letter-spacing',lerp(${LETTER_SPACING.dormant},${LETTER_SPACING.warm},tp).toFixed(3)+'em');`
   + `el.setProperty('--token-para-rhythm',Math.round(lerp(${PARA_RHYTHM.dormant},${PARA_RHYTHM.warm},tp))+'px');`

@@ -9,53 +9,10 @@
  * Elon §3 / Tanya §4. This runs at Jest time — no browser required.
  */
 
-import {
-  computeThermalTokens,
-} from '@/lib/thermal/thermal-tokens';
-
-/** Standard sRGB → linear luminance. Pure math, per WCAG 2.1 §1.4.3. */
-function srgbChannel(c: number): number {
-  const v = c / 255;
-  return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-}
-
-function luminance(hex: string): number {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return 0.2126 * srgbChannel(r) + 0.7152 * srgbChannel(g)
-       + 0.0722 * srgbChannel(b);
-}
-
-/** WCAG contrast ratio between two opaque colours. */
-function contrast(a: string, b: string): number {
-  const [la, lb] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-  return (la + 0.05) / (lb + 0.05);
-}
-
-/**
- * Composite sRGB colour over a background at alpha α. Pure, no canvas.
- * Used to approximate `color-mix(in srgb, accent α, transparent)` over bg.
- */
-function compositeOver(accent: string, bg: string, alpha: number): string {
-  const ac = hexToRgb(accent);
-  const bc = hexToRgb(bg);
-  const out = ac.map((v, i) => Math.round(v * alpha + bc[i] * (1 - alpha)));
-  return rgbToHex(out[0], out[1], out[2]);
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-  return [
-    parseInt(hex.slice(1, 3), 16),
-    parseInt(hex.slice(3, 5), 16),
-    parseInt(hex.slice(5, 7), 16),
-  ];
-}
-
-function rgbToHex(r: number, g: number, b: number): string {
-  const h = (n: number) => n.toString(16).padStart(2, '0');
-  return `#${h(r)}${h(g)}${h(b)}`;
-}
+import { computeThermalTokens } from '@/lib/thermal/thermal-tokens';
+import { contrast, compositeOver } from '@/lib/design/contrast';
+// Math helpers live in lib/design/contrast.ts — shared with
+// ambient-surfaces.test.ts. One implementation, two callers (Mike §3).
 
 const RING_ALPHA = 0.8; // matches globals.css :focus-visible 80%
 const MIDPOINT_MIN = 2.85; // WCAG 1.4.11 (3:1) — tiny interpolation headroom

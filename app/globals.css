@@ -180,19 +180,12 @@
 
 /* ─── Chrome Polish — the room responds to touch ─────────── */
 
-/* Text selection — thermal accent, never browser-default blue.
-   Dormant: violet wash. Warm: gold wash. The highlight follows the room. */
-::selection {
-  background: color-mix(in srgb, var(--token-accent) 40%, transparent);
-  color: var(--token-foreground);
-}
-::-moz-selection {
-  background: color-mix(in srgb, var(--token-accent) 40%, transparent);
-  color: var(--token-foreground);
-}
+/* Gesture-chrome (::selection, scrollbar-*, caret-color, ::placeholder,
+   ::marker) lives in one authoritative module — lib/design/ambient-surfaces.css.
+   Adoption guard: lib/design/__tests__/ambient-surfaces-adoption.test.ts. */
 
-/* Focus-visible ring — thermal accent, not system blue.
-   Every focusable element acknowledges the reader's presence.
+/* Focus-visible ring — author-triggered (keyboard nav), not gesture-surface.
+   Stays here by design — Tanya §7 / Mike P9. Thermal accent, not system blue.
    80% (was 70%): Tanya §4 prescribed mitigation — midpoints were dipping
    under WCAG 1.4.11 non-text (3:1). See lib/utils/__tests__/contrast.test.ts. */
 :focus-visible {
@@ -204,18 +197,11 @@
   outline: none;
 }
 
-/* Smooth scroll — the room turns, it doesn't jump. */
+/* Smooth scroll — the room turns, it doesn't jump. The scrollbar's paint
+   (width, thumb colour, track) lives in ambient-surfaces.css. */
 html {
   scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--token-accent) 20%, transparent) transparent;
   transition: background-color 3s ease-out;
-}
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--token-accent) 20%, transparent);
-  border-radius: var(--sys-radius-full);
 }
 
 /* ─── Thermal Transitions ─────────────────────────────────── */

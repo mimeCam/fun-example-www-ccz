@@ -103,15 +103,19 @@ export function resolveFieldSizeClass(
 
 // ─── Base class — the shared skeleton for every Field surface ─────────────
 
-/** Radius, typography, transition slot, caret, placeholder, focus-ring. */
+/** Radius, typography, transition slot, focus-ring.
+ *
+ *  Caret, placeholder, and selection are gesture-chrome — they live at
+ *  the cascade root in lib/design/ambient-surfaces.css. Setting them
+ *  per-field would drift from the thermal band (28% → 36% alpha on
+ *  selection, mist-tinted placeholder, `var(--token-accent)` caret).
+ *  Adoption guard blocks drift: `ambient-surfaces-adoption.test.ts`. */
 export const FIELD_BASE =
   'block w-full rounded-sys-medium border bg-background ' +
   'text-foreground text-sys-caption ' +
-  'placeholder-mist/50 [caret-color:var(--token-accent)] ' +
   'transition-[border-color,background-color,color] ' +
   'duration-[var(--sys-time-instant)] ease-out ' +
-  'focus:outline-none ' +
-  'selection:[background-color:color-mix(in_srgb,var(--token-accent)_30%,transparent)]';
+  'focus:outline-none';
 
 /** Multiline-only: disable resize (autogrow is out of scope per Tanya §6). */
 export const FIELD_MULTILINE_EXTRA = 'resize-none';

@@ -1,0 +1,125 @@
+/* ambient-surfaces.css — Reciprocal Chrome
+ *
+ * Gesture-chrome: these surfaces paint only when the reader acts
+ * (select, scroll, type, mark). They inherit --token-accent and
+ * warm with the thermal score. Author-driven decorations do not
+ * belong here.
+ *
+ * Hero: ::selection ← the receipt for engagement.
+ * Chorus: ::-webkit-scrollbar-thumb + scrollbar-color, caret-color,
+ *         ::placeholder, ::marker.
+ *
+ * Sibling: `:focus-visible` lives in globals.css. It is gesture-chrome
+ * in spirit (keyboard-triggered), but belongs to the author-owned focus
+ * ring surface. Mental bucket, not filesystem bucket.
+ *
+ * Out of scope: canvas share cards (lib/quote-cards/**, lib/sharing/**)
+ * read ARCHETYPE constants directly and never route through this file.
+ *
+ * One owner. One token anchor (--token-gesture-mix). Adoption guard
+ * at lib/design/__tests__/ambient-surfaces-adoption.test.ts blocks
+ * duplicates from slipping back in.
+ *
+ * Credits: Krystle Clear (sprint spec + 28%→36% band), Jason Fried
+ * (receipt-for-engagement framing), Paul Kim (hero-vs-chorus),
+ * Elon Musk (atom: "render only when the reader acts"),
+ * Tanya Donska (sensory spec, layout audit), Mike Koch (napkin).
+ */
+
+/* ─── Hero: ::selection ─────────────────────────────────────
+ * Alpha = var(--token-gesture-mix) — boosted 0.28 → 0.36 along the
+ * thermal curve. Foreground is --token-foreground so WCAG 4.5:1
+ * holds on every archetype × thermal stop (see ambient-surfaces.test.ts).
+ *
+ * Scope at the top of the cascade so modals/drawers inherit. */
+::selection {
+  background-color: color-mix(
+    in srgb,
+    var(--token-accent) calc(var(--token-gesture-mix, 0.28) * 100%),
+    transparent
+  );
+  color: var(--token-foreground);
+}
+::-moz-selection {
+  background-color: color-mix(
+    in srgb,
+    var(--token-accent) calc(var(--token-gesture-mix, 0.28) * 100%),
+    transparent
+  );
+  color: var(--token-foreground);
+}
+
+/* Forced-colors (high-contrast) — hand back to the OS. Non-negotiable. */
+@media (forced-colors: active) {
+  ::selection {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  ::-moz-selection {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* ─── Chorus: caret-color ───────────────────────────────────
+ * Inherited property — setting on :root propagates to every input,
+ * textarea, and contenteditable without per-surface overrides.
+ * No alpha — the reader's pen stays crisp (Tanya §6). */
+:root {
+  caret-color: var(--token-accent);
+}
+
+/* ─── Chorus: scrollbar ─────────────────────────────────────
+ * Linear (not boosted) 16% → 28% alpha — ambient, not semantic.
+ * Radius stays at --sys-radius-full at every thermal stop: the room
+ * warms, the pebble does not grow (Tanya §7). */
+html {
+  scrollbar-width: thin;
+  scrollbar-color:
+    color-mix(
+      in srgb,
+      var(--token-accent) calc((16 + (var(--token-accent-opacity, 0.5) - 0.5) * 24) * 1%),
+      transparent
+    )
+    transparent;
+}
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: color-mix(
+    in srgb,
+    var(--token-accent) calc((16 + (var(--token-accent-opacity, 0.5) - 0.5) * 24) * 1%),
+    transparent
+  );
+  border-radius: var(--sys-radius-full);
+}
+::-webkit-scrollbar-corner { background: transparent; }
+
+/* ─── Chorus: ::placeholder ─────────────────────────────────
+ * Mist tinted by --token-accent at 30% — "a whisper of the room".
+ * Sits above 4.5:1 body contrast only at larger sizes; at small sizes
+ * WCAG allows 3:1 for placeholder-class UI copy. Tested below 3:1 floor. */
+::placeholder {
+  color: color-mix(in srgb, var(--mist) 55%, var(--token-accent) 20%);
+  opacity: 1; /* Firefox defaults to 0.54 — normalise across engines */
+}
+
+/* ─── Chorus: ::marker ──────────────────────────────────────
+ * List bullets wear the room at 60%. Constant alpha — the tint
+ * shifts with --token-accent, the bullet itself does not flare. */
+::marker {
+  color: color-mix(in srgb, var(--token-accent) 60%, transparent);
+}
+
+/* ─── Motion guard ──────────────────────────────────────────
+ * Transitions on ambient surfaces inherit from globals.css (::selection
+ * uses color var(--ch-color-dur)). When reduced-motion is active, the
+ * tokens still change — the room still warms — but without easing.
+ * Colour is information; motion is decoration. */
+@media (prefers-reduced-motion: reduce) {
+  ::-webkit-scrollbar-thumb,
+  ::placeholder,
+  ::marker {
+    transition: none !important;
+  }
+}
