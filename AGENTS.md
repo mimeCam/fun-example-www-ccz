@@ -19,7 +19,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — and the Thread Keepsake lets readers share a unique artifact of *their* read.
 
 ## Design System
-Modals use the shared `<Threshold>` primitive (two variants: `center`, `drawer-right`). It owns portal, backdrop, ARIA, focus trap, focus return, scroll-lock, ESC (topmost only), reduced-motion. Callers own chrome. See `components/shared/Threshold.tsx`.
+Modals use the shared `<Threshold>` primitive (two variants: `center`, `drawer-right`). It owns portal, backdrop, ARIA, focus trap, focus return, scroll-lock, ESC (topmost only), reduced-motion, and a four-state **phase machine** (`closed → opening → open → closing → closed`) with deferred unmount — exit plays a staggered 150 ms choreography (chamber recedes; backdrop dims 60 ms later; both finish together). Callers own chrome. Phase/class/stagger constants live in `lib/utils/animation-phase.ts`. See `components/shared/Threshold.tsx`.
 
 ## WIP
 _None_

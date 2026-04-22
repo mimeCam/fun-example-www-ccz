@@ -3,22 +3,33 @@
  *
  * Owns the invariants every modal on this site needs: focus capture +
  * restore, Tab-trap, ESC (topmost only), scroll-lock with scrollbar-width
- * padding, and a `prefers-reduced-motion` flag. Caller owns chrome.
+ * padding, a `prefers-reduced-motion` flag, and — as of this sprint — a
+ * four-state **phase** machine (closed → opening → open → closing → closed)
+ * with deferred unmount. The phase is how we get a 150 ms staggered exit
+ * without slamming the reader.
  *
  * Design bible:
- *  - Mike K. (report 80): "one headless primitive, flag props, composition."
- *  - Tanya D. (report 2):  "a modal isn't a window here. it's a threshold."
+ *  - Mike K. (report 80, napkin 10): "one primitive, one phase machine."
+ *  - Tanya D. (report 2 + UX 20):    "a modal is a threshold, not a window."
+ *  - Krystle C. (report 62):         phase states + deferred unmount.
+ *  - Elon M. (report 75/99):         dismiss latency > cadence metaphor.
  *  - AGENTS.md: zero new deps, shared code, functions ≤ 10 lines.
  */
 
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback, useEffect, useReducer, useRef, useState,
+  type AnimationEventHandler,
+} from 'react';
 import { useIsomorphicLayoutEffect } from '@/lib/utils/use-isomorphic-layout-effect';
 import {
   captureOpener, restoreFocus, getFocusableElements, trapTab,
 } from '@/lib/utils/focus-utils';
 import { lockScroll, unlockScroll } from '@/lib/utils/scroll-lock';
+import {
+  type Phase, EXIT_SETTLE_BUDGET_MS,
+} from '@/lib/utils/animation-phase';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -37,6 +48,43 @@ export interface ThresholdAPI {
   containerRef: React.RefObject<HTMLDivElement>;
   backdropProps: { onClick: () => void; 'aria-hidden': true };
   prefersReducedMotion: boolean;
+  /** Phase is the render authority. `closed` ⇒ caller should unmount. */
+  phase: Phase;
+  /** Wire onto the chamber surface; advances `opening→open` / `closing→closed`. */
+  onChamberAnimationEnd: AnimationEventHandler<HTMLElement>;
+}
+
+// ─── Phase reducer — pure, trivially testable ──────────────────────────────
+
+export type PhaseAction =
+  | { type: 'OPEN' }
+  | { type: 'CLOSE' }
+  | { type: 'ANIMATION_END' }
+  | { type: 'FORCE_CLOSED' };
+
+/** Pure state transition. Cancels mid-flight close on re-open (no ghost). */
+export function phaseReducer(phase: Phase, action: PhaseAction): Phase {
+  if (action.type === 'FORCE_CLOSED') return 'closed';
+  if (action.type === 'OPEN') return openFrom(phase);
+  if (action.type === 'CLOSE') return closeFrom(phase);
+  if (action.type === 'ANIMATION_END') return settleFrom(phase);
+  return phase;
+}
+
+function openFrom(phase: Phase): Phase {
+  if (phase === 'closed' || phase === 'closing') return 'opening';
+  return phase;
+}
+
+function closeFrom(phase: Phase): Phase {
+  if (phase === 'opening' || phase === 'open') return 'closing';
+  return phase;
+}
+
+function settleFrom(phase: Phase): Phase {
+  if (phase === 'opening') return 'open';
+  if (phase === 'closing') return 'closed';
+  return phase;
 }
 
 // ─── Module-level topmost stack ────────────────────────────────────────────
@@ -102,20 +150,93 @@ function subscribeReducedMotion(cb: (v: boolean) => void): () => void {
   return () => mq.removeEventListener('change', handler);
 }
 
-// ─── Focus choreography ────────────────────────────────────────────────────
+// ─── Phase orchestration — drives the reducer from `isOpen` + effects ──────
+
+interface PhaseState {
+  phase: Phase;
+  dispatch: React.Dispatch<PhaseAction>;
+}
+
+function usePhaseOrchestration(isOpen: boolean, reduced: boolean): PhaseState {
+  const [phase, dispatch] = useReducer(phaseReducer, 'closed');
+  useSyncPhaseToOpen(isOpen, dispatch);
+  useCollapsePhaseForReducedMotion(phase, reduced, dispatch);
+  useExitSafetyNet(phase, dispatch);
+  return { phase, dispatch };
+}
+
+function useSyncPhaseToOpen(
+  isOpen: boolean,
+  dispatch: React.Dispatch<PhaseAction>,
+): void {
+  useEffect(() => {
+    dispatch({ type: isOpen ? 'OPEN' : 'CLOSE' });
+  }, [isOpen, dispatch]);
+}
+
+/** Reduced motion: skip ceremony, settle synchronously each side. */
+function useCollapsePhaseForReducedMotion(
+  phase: Phase,
+  reduced: boolean,
+  dispatch: React.Dispatch<PhaseAction>,
+): void {
+  useEffect(() => {
+    if (!reduced) return;
+    if (phase === 'opening' || phase === 'closing') {
+      dispatch({ type: 'ANIMATION_END' });
+    }
+  }, [phase, reduced, dispatch]);
+}
+
+/** Safety net: if onAnimationEnd never fires, force-settle within budget. */
+function useExitSafetyNet(
+  phase: Phase,
+  dispatch: React.Dispatch<PhaseAction>,
+): void {
+  useEffect(() => {
+    if (phase !== 'closing') return;
+    const id = setTimeout(() => dispatch({ type: 'ANIMATION_END' }),
+      EXIT_SETTLE_BUDGET_MS);
+    return () => clearTimeout(id);
+  }, [phase, dispatch]);
+}
+
+// ─── Focus choreography — capture on opening, restore on settle ────────────
 
 function useFocusChoreography(
-  isOpen: boolean,
+  phase: Phase,
   containerRef: React.RefObject<HTMLDivElement>,
   initialFocusRef?: React.RefObject<HTMLElement>,
 ): void {
   const openerRef = useRef<HTMLElement | null>(null);
+  useCapturePreOpenFocus(phase, openerRef, containerRef, initialFocusRef);
+  useRestoreFocusAfterSettle(phase, openerRef);
+}
+
+function useCapturePreOpenFocus(
+  phase: Phase,
+  openerRef: React.MutableRefObject<HTMLElement | null>,
+  containerRef: React.RefObject<HTMLDivElement>,
+  initialFocusRef?: React.RefObject<HTMLElement>,
+): void {
   useEffect(() => {
-    if (!isOpen) return;
+    if (phase !== 'opening') return;
     openerRef.current = captureOpener();
     focusInitial(containerRef.current, initialFocusRef?.current ?? null);
-    return () => restoreFocus(openerRef.current);
-  }, [isOpen, containerRef, initialFocusRef]);
+  }, [phase, containerRef, initialFocusRef, openerRef]);
+}
+
+function useRestoreFocusAfterSettle(
+  phase: Phase,
+  openerRef: React.MutableRefObject<HTMLElement | null>,
+): void {
+  const prev = useRef<Phase>('closed');
+  useEffect(() => {
+    if (prev.current === 'closing' && phase === 'closed') {
+      restoreFocus(openerRef.current);
+    }
+    prev.current = phase;
+  }, [phase, openerRef]);
 }
 
 function focusInitial(
@@ -129,7 +250,7 @@ function focusInitial(
 // ─── ESC + Tab-trap keyboard choreography ──────────────────────────────────
 
 interface KeyboardDeps {
-  isOpen: boolean;
+  phase: Phase;
   id: symbol;
   onClose: () => void;
   dismissOnEscape: boolean;
@@ -138,7 +259,7 @@ interface KeyboardDeps {
 
 function useKeyboardChoreography(deps: KeyboardDeps): void {
   useEffect(() => {
-    if (!deps.isOpen) return;
+    if (deps.phase === 'closed') return;
     const handler = (e: KeyboardEvent) => dispatchKey(e, deps);
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
@@ -146,8 +267,13 @@ function useKeyboardChoreography(deps: KeyboardDeps): void {
 }
 
 function dispatchKey(event: KeyboardEvent, deps: KeyboardDeps): void {
+  if (deps.phase === 'closing') { blockFurtherInput(event); return; }
   if (trapTab(deps.containerRef.current, event)) return;
   if (event.key === 'Escape') tryCloseOnEscape(event, deps);
+}
+
+function blockFurtherInput(event: KeyboardEvent): void {
+  if (event.key === 'Escape' || event.key === 'Tab') event.preventDefault();
 }
 
 function tryCloseOnEscape(event: KeyboardEvent, deps: KeyboardDeps): void {
@@ -157,62 +283,133 @@ function tryCloseOnEscape(event: KeyboardEvent, deps: KeyboardDeps): void {
   deps.onClose();
 }
 
-// ─── Stack lifecycle ───────────────────────────────────────────────────────
+// ─── Stack lifecycle — push while non-closed, pop on settle / teardown ─────
 
-function useStackLifecycle(isOpen: boolean): symbol {
+function useStackLifecycle(phase: Phase): symbol {
   const idRef = useRef<symbol>(Symbol('threshold'));
-  useEffect(() => {
-    if (!isOpen) return;
-    pushStack(idRef.current);
-    dispatchOpening();
-    return () => popStack(idRef.current);
-  }, [isOpen]);
+  const inStack = useRef(false);
+  useStackEdges(phase, idRef, inStack);
+  useEffect(() => teardownStack(idRef, inStack), [idRef]);
   return idRef.current;
 }
 
-// ─── Scroll lock lifecycle ─────────────────────────────────────────────────
+function useStackEdges(
+  phase: Phase,
+  idRef: React.MutableRefObject<symbol>,
+  inStack: React.MutableRefObject<boolean>,
+): void {
+  useEffect(() => {
+    if (phase !== 'closed' && !inStack.current) enterStack(idRef, inStack);
+    if (phase === 'closed' && inStack.current) leaveStack(idRef, inStack);
+  }, [phase, idRef, inStack]);
+}
 
-function useScrollLockLifecycle(isOpen: boolean): void {
+function enterStack(
+  idRef: React.MutableRefObject<symbol>,
+  inStack: React.MutableRefObject<boolean>,
+): void {
+  pushStack(idRef.current);
+  dispatchOpening();
+  inStack.current = true;
+}
+
+function leaveStack(
+  idRef: React.MutableRefObject<symbol>,
+  inStack: React.MutableRefObject<boolean>,
+): void {
+  popStack(idRef.current);
+  inStack.current = false;
+}
+
+function teardownStack(
+  idRef: React.MutableRefObject<symbol>,
+  inStack: React.MutableRefObject<boolean>,
+): () => void {
+  return () => { if (inStack.current) leaveStack(idRef, inStack); };
+}
+
+// ─── Scroll-lock lifecycle — locked on opening, released on settle ─────────
+
+function useScrollLockLifecycle(phase: Phase): void {
+  const locked = useRef(false);
   useIsomorphicLayoutEffect(() => {
-    if (!isOpen) return;
-    lockScroll();
-    return () => unlockScroll();
-  }, [isOpen]);
+    if (phase !== 'closed' && !locked.current) { lockScroll(); locked.current = true; }
+    if (phase === 'closed' && locked.current) { unlockScroll(); locked.current = false; }
+  }, [phase]);
+  useEffect(() => releaseScrollLockOnTeardown(locked), []);
+}
+
+function releaseScrollLockOnTeardown(
+  locked: React.MutableRefObject<boolean>,
+): () => void {
+  return () => { if (locked.current) { unlockScroll(); locked.current = false; } };
 }
 
 // ─── Public hook ───────────────────────────────────────────────────────────
 
 /**
  * Ceremony-aware modal primitive. ARIA role: dialog.
- * Returns ref + backdrop handlers + reduced-motion flag; nothing else.
+ * Returns phase + ref + backdrop handlers + reduced-motion flag.
  */
 export function useThreshold(options: ThresholdOptions): ThresholdAPI {
-  const {
-    isOpen, onClose,
-    dismissOnBackdrop = true,
-    dismissOnEscape = true,
-    initialFocusRef,
-  } = options;
-
-  const containerRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotionFlag();
-  const id = useStackLifecycle(isOpen);
+  const { phase, dispatch } = usePhaseOrchestration(
+    options.isOpen, prefersReducedMotion,
+  );
+  return useThresholdAPI(options, phase, dispatch, prefersReducedMotion);
+}
 
-  useFocusChoreography(isOpen, containerRef, initialFocusRef);
-  useScrollLockLifecycle(isOpen);
-  useKeyboardChoreography({ isOpen, id, onClose, dismissOnEscape, containerRef });
-
-  const onBackdrop = useBackdropHandler(dismissOnBackdrop, onClose);
+function useThresholdAPI(
+  options: ThresholdOptions,
+  phase: Phase,
+  dispatch: React.Dispatch<PhaseAction>,
+  prefersReducedMotion: boolean,
+): ThresholdAPI {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const id = useStackLifecycle(phase);
+  useLifecycleSideEffects(options, phase, id, containerRef);
+  const onBackdrop = useBackdropHandler(options, phase);
+  const onChamberAnimationEnd = useAnimationEndHandler(phase, dispatch);
   return {
-    containerRef,
+    containerRef, prefersReducedMotion, phase, onChamberAnimationEnd,
     backdropProps: { onClick: onBackdrop, 'aria-hidden': true },
-    prefersReducedMotion,
   };
 }
 
+function useLifecycleSideEffects(
+  options: ThresholdOptions,
+  phase: Phase,
+  id: symbol,
+  containerRef: React.RefObject<HTMLDivElement>,
+): void {
+  useFocusChoreography(phase, containerRef, options.initialFocusRef);
+  useScrollLockLifecycle(phase);
+  useKeyboardChoreography({
+    phase, id, onClose: options.onClose,
+    dismissOnEscape: options.dismissOnEscape ?? true,
+    containerRef,
+  });
+}
+
 function useBackdropHandler(
-  enabled: boolean,
-  onClose: () => void,
+  options: ThresholdOptions,
+  phase: Phase,
 ): () => void {
-  return useCallback(() => { if (enabled) onClose(); }, [enabled, onClose]);
+  const enabled = options.dismissOnBackdrop ?? true;
+  const { onClose } = options;
+  return useCallback(() => {
+    if (!enabled || phase !== 'open') return;
+    onClose();
+  }, [enabled, phase, onClose]);
+}
+
+function useAnimationEndHandler(
+  phase: Phase,
+  dispatch: React.Dispatch<PhaseAction>,
+): AnimationEventHandler<HTMLElement> {
+  return useCallback((event) => {
+    if (event.currentTarget !== event.target) return;
+    if (phase !== 'opening' && phase !== 'closing') return;
+    dispatch({ type: 'ANIMATION_END' });
+  }, [phase, dispatch]);
 }
