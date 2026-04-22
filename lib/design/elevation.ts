@@ -139,3 +139,33 @@ export function elevationInvariantHolds(): boolean {
  *   const inline = '0 10px 15px -3px rgba(0,0,0,0.1)';
  */
 export const ELEVATION_LEDGER_EXEMPT_TOKEN = 'elevation-ledger:exempt';
+
+// ─── Tinted accents — named semantic halos OUTSIDE the six-beat ledger ─────
+
+/**
+ * Tinted accents live **outside** the six-beat ledger by design. They are
+ * reader-authored warmth (rose = *remembered*; cyan = *discovery*) rather
+ * than site-authored room temperature (gold), so they do not sit on the
+ * rest → radiance depth axis.
+ *
+ * The adoption guard allow-lists them in exactly two files — nowhere else.
+ * A third surface using a tinted accent fails the test and forces an
+ * explicit, reviewer-visible diff on the (file, alias) allow-list.
+ *
+ * Follow-up (Tanya §3.3): unify under a `tinted(beat, tint)` helper so the
+ * six beats stay gold and the two tinted speakers parametrise off the same
+ * math. Tracked; not this sprint.
+ *
+ * Credits: Elon M. (the gap — guard cannot claim "one voice" while tints
+ * survive), Tanya D. (the tint-as-parameter direction + per-surface intent),
+ * Mike K. (the (file, alias) allow-list shape that extends the single-
+ * exemption-token rule).
+ */
+export const TINTED_ACCENTS = ['rose-glow', 'cyan-whisper'] as const;
+export type TintedAccent = (typeof TINTED_ACCENTS)[number];
+
+/** Legacy aliases the guard hard-fails against. No allow-list — just gone. */
+export const LEGACY_SHADOW_ALIASES = [
+  'void', 'rise', 'float', 'gold', 'gold-intense',
+] as const;
+export type LegacyShadowAlias = (typeof LEGACY_SHADOW_ALIASES)[number];

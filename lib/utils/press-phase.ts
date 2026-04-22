@@ -136,7 +136,7 @@ export function resolveVariantClass(variant: PressVariant): string {
 /* Solid hover halo: `whisper` (gold-tinted glow). The token-accent
    tint at warm+ states resolves to gold via ThermalProvider, so the
    accent-flavored hover is preserved without an arbitrary shadow string.
-   Rest depth: `rise` (was the legacy `shadow-void`). */
+   Rest depth: `sys-rise` — the legacy `void` Tailwind alias is gone. */
 const VARIANT_SOLID =
   'border text-foreground ' +
   '[background-color:color-mix(in_srgb,var(--token-accent)_14%,var(--token-surface))] ' +

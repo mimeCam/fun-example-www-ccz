@@ -49,14 +49,12 @@ const config: Config = {
         'sys-whisper':  'var(--sys-elev-whisper)',
         'sys-bloom':    'var(--sys-elev-bloom)',
         'sys-radiance': 'var(--sys-elev-radiance)',
-        /* Legacy aliases — kept until call-sites migrate to sys-* beats.
-           TODO: migrate `shadow-void/rise/float/gold/*` callers to
-           `shadow-sys-*` and delete these in a follow-up sprint. */
-        'void':         '0 1px 2px rgba(0,0,0,0.3)',
-        'rise':         '0 4px 16px rgba(0,0,0,0.4)',
-        'float':        '0 8px 32px rgba(0,0,0,0.5)',
-        'gold':         '0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent)',
-        'gold-intense': '0 10px 48px color-mix(in srgb, var(--gold) 25%, transparent)',
+        /* Tinted accents — OUTSIDE the six-beat ledger by design.
+           Reader-authored warmth (rose = remembered, cyan = discovery),
+           not site-authored room temperature. Allow-listed in exactly two
+           files by the adoption guard; see TINTED_ACCENTS in
+           lib/design/elevation.ts. Follow-up: fold under a `tinted(beat,
+           tint)` helper so the halo math lives in one place. */
         'rose-glow':    '0 6px 32px color-mix(in srgb, var(--rose) 20%, transparent)',
         'cyan-whisper': '0 2px 20px color-mix(in srgb, var(--cyan) 15%, transparent)',
       },

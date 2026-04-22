@@ -107,12 +107,15 @@ function cardBase(): string {
 }
 
 function phaseClass(p: Phase): string {
+  // Tanya §2.2: reveal/rest settle into the ambient gold room — flat halo,
+  // not lift. Depth's "I am a reveal" whisper belongs to the prior shimmer
+  // phase (archetype-tinted, still exempt per §5 carve-out below).
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-80 translate-y-0 border-gold/10',
     shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
-    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-gold',
-    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
+    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
+    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
   };
   return map[p];
 }

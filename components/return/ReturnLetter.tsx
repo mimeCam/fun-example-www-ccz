@@ -39,10 +39,13 @@ function phaseStyles(phase: Phase, settled: boolean): string {
     return 'opacity-0 translate-y-enter-sm';
   }
   if (phase === 'settle') {
+    // Tanya §2.1: bloom halo arrives with the copy — flat warmth, not lift.
     return `opacity-100 translate-y-0 transition-all duration-reveal ease-out
-            border-accent/20 shadow-gold`;
+            border-accent/20 shadow-sys-bloom`;
   }
-  return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-gold' : 'border-accent/10 shadow-none'}`;
+  // At rest: settled letters keep the bloom (warmth stays); un-settled
+  // drop to `sys-rest` (the letter keeps its seat; the warmth leaves).
+  return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-sys-bloom' : 'border-accent/10 shadow-sys-rest'}`;
 }
 
 // ─── Compact greeting (known readers, < 3 days) ──────────

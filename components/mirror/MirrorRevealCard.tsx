@@ -90,12 +90,14 @@ function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
 /* ─── Helpers ───────────────────────────────────────────── */
 
 function phaseClass(p: Phase): string {
+  // Tanya §2.3: same as QuickMirrorCard — the room is warming (bloom),
+  // not lifting. The reveal gesture lives in the prior shimmer phase.
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
     emergence: 'opacity-80 translate-y-0 border-gold/10',
     shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
-    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-gold',
-    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-gold',
+    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
+    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
   };
   return map[p];
 }

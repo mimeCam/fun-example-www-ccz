@@ -21,7 +21,11 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 Four shared primitives with phase machines, reduced-motion branches, and adoption guards: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. Timing owned by `lib/design/motion.ts` (8 beats: crossfade→settle + ceremony namespace). Depth owned by `lib/design/elevation.ts` (6 beats: rest · rise · float · whisper · bloom · radiance — depth/glow split). Gesture chrome in `lib/design/ambient-surfaces.css`. WCAG helpers in `lib/design/contrast.ts`.
 
 ## WIP
-- **Elevation Ledger** — guard live, six high-traffic surfaces migrated. Legacy `shadow-void/rise/float/gold/*` Tailwind aliases pending migration; keyframe tweens stay inline by design.
+- _(none — Elevation Ledger sealed; see Design System note.)_
+
+## Design notes
+- **Elevation Ledger — one voice.** Six-beat ledger is the single dialect; legacy `void/rise/float/gold/gold-intense` Tailwind aliases deleted. Tinted accents `rose-glow` (remembered) and `cyan-whisper` (discovery) live **outside** the ledger by design — reader-authored warmth, not site-authored room temperature — and are allow-listed per-file by the adoption guard (`StratifiedRenderer.tsx`, `ResonanceEntry.tsx`). Keyframe tweens stay inline by design.
+- **Intentional visual delta:** `shadow-gold` → `shadow-sys-bloom` on mirror/return surfaces is a real pixel change (y-offset 8→0, blur 40→18, α 25→22%). The cards stop *lifting* and start *haloing* — the gesture moves from "I am above the page" to "the room is warming." Review on pixels, not diction.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -30,8 +30,11 @@ export default function ExploreArticleCard({
 
   return (
     <Link href={`/article/${article.id}`} className="block group">
+      {/* Tanya §2.4: cards are surfaces, not buttons. Rest → sys-rest
+          (grid visibly quieter); hover lift is owned by .card-alive in
+          globals.css, so no hover shadow class is needed here. */}
       <article
-        className={`bg-surface thermal-radius shadow-void p-sys-6 h-full flex flex-col
+        className={`bg-surface thermal-radius shadow-sys-rest p-sys-6 h-full flex flex-col
           card-alive ${
           isCurated
             ? 'border border-gold/20 hover:border-gold/50 card-alive-curated'

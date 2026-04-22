@@ -56,7 +56,10 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
   );
 }
 
-/** Marginalia — returning-reader side notes with cyan border + shimmer */
+/** Marginalia — returning-reader side notes with cyan border + shimmer.
+ *  `shadow-cyan-whisper` is a tinted accent living OUTSIDE the six-beat
+ *  ledger by design (TINTED_ACCENTS in lib/design/elevation.ts); the
+ *  adoption guard allow-lists this file explicitly. */
 function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
   const border = warmer ? 'border-l-cyan/70' : 'border-l-cyan/40';
   const shadow = warmer ? 'shadow-cyan-whisper' : '';
@@ -202,6 +205,10 @@ export function StratifiedRenderer({ blocks, archetype, articleId, warmer }: Str
  * ResonanceMarginaliaBlock — the killer feature.
  * Renders the reader's own captured quote + note as warm-rose
  * marginalia woven into the article body on return visits.
+ *
+ * `shadow-rose-glow` is a tinted accent outside the six-beat ledger
+ * (TINTED_ACCENTS in lib/design/elevation.ts); rose = *remembered*,
+ * the reader's own voice speaking back. Allow-listed per-file.
  */
 function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
   const data = block.resonance;
