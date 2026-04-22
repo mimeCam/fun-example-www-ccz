@@ -72,7 +72,7 @@ function ArchetypeName({ label, visible, color }: {
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
     <p className={`mt-sys-3 text-sys-caption text-foreground/80 italic max-w-card-body
-      mx-auto leading-relaxed transition-all duration-fade ${fadeClass(visible)}`}
+      mx-auto typo-caption transition-all duration-fade ${fadeClass(visible)}`}
       style={fadeStyle(visible, MOTION.enter)}>
       &ldquo;{text}&rdquo;
     </p>

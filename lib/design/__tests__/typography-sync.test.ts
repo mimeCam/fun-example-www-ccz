@@ -1,0 +1,193 @@
+/**
+ * Typography Sync Test — CSS ↔ TS drift guard.
+ *
+ * Reads `app/globals.css`, parses every `--sys-lead-*` declaration plus
+ * `--sys-tick`, asserts they match `TYPOGRAPHY` / `SYS_TICK_PX` exactly.
+ * If someone edits a number in either mirror but not the other, this test
+ * fails fast and names the beat.
+ *
+ * Mirrors the strategy of `motion-sync.test.ts`, `elevation-sync.test.ts`,
+ * `color-constants-sync.test.ts`. No build step, no codegen — a plain
+ * regex read from disk at test time.
+ *
+ * Mirror discipline: every beat in CSS appears in TS, every beat in TS
+ * appears in CSS, leading values are integer multiples of `--sys-tick`,
+ * and the per-beat `text-wrap` / `font-feature-settings` declarations in
+ * the `.typo-<beat>` rules match the TS `wrap` / `kern` properties.
+ *
+ * Credits: Mike K. (the sync-test pattern, lifted from elevation/motion),
+ * Krystle C. (six-beat lock, sprint shape), Elon M. (the integer-multiple
+ * invariant — `--sys-tick * N` — that survived first principles), Tanya D.
+ * (the per-beat wrap/kern lock so the polish details cannot drift),
+ * Jason F. (the wrap+kern atoms whose presence this test enforces).
+ */
+
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
+import {
+  TYPOGRAPHY,
+  TYPOGRAPHY_ORDER,
+  SYS_TICK_PX,
+  TypographyBeatName,
+  leadingOf,
+  cssVarOf,
+  classesOf,
+  leadingClassOf,
+  isKerned,
+  isBalanced,
+  typographyInvariantHolds,
+} from '../typography';
+
+const CSS = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf-8');
+
+// ─── Parser helpers — pure, each ≤ 10 LOC ─────────────────────────────────
+
+/** Extract `--sys-tick: <n>px;` from the CSS. Returns numeric px. */
+function readTick(): number | undefined {
+  const match = CSS.match(/--sys-tick:\s*(\d+)px;/);
+  return match ? Number(match[1]) : undefined;
+}
+
+/** Extract `--sys-lead-<name>: calc(var(--sys-tick) * <n>);` — returns N. */
+function readLeadMultiplier(name: string): number | undefined {
+  const rx = new RegExp(`--sys-lead-${name}:\\s*calc\\(var\\(--sys-tick\\)\\s*\\*\\s*(\\d+)\\)`);
+  const match = CSS.match(rx);
+  return match ? Number(match[1]) : undefined;
+}
+
+/** Extract the body of a `.typo-<beat> { … }` block. */
+function readTypoBlock(beat: string): string | undefined {
+  const rx = new RegExp(`\\.typo-${beat}\\s*\\{([^}]*)\\}`);
+  const match = CSS.match(rx);
+  return match ? match[1] : undefined;
+}
+
+/** True iff a declaration block contains a given declaration. */
+function blockHas(block: string | undefined, decl: RegExp): boolean {
+  return Boolean(block && decl.test(block));
+}
+
+// ─── Tests ─────────────────────────────────────────────────────────────────
+
+describe('SYS_TICK ↔ globals.css --sys-tick sync', () => {
+  it('--sys-tick exists in CSS and is a positive integer px', () => {
+    const css = readTick();
+    expect(css).toBeDefined();
+    expect(css).toBeGreaterThan(0);
+  });
+
+  it('SYS_TICK_PX matches --sys-tick exactly', () => {
+    expect(readTick()).toBe(SYS_TICK_PX);
+  });
+});
+
+describe('TYPOGRAPHY ↔ globals.css --sys-lead-* sync', () => {
+  TYPOGRAPHY_ORDER.forEach((beat) => {
+    it(`TYPOGRAPHY.${beat}.leadN matches --sys-lead-${beat} multiplier`, () => {
+      const cssN = readLeadMultiplier(beat);
+      expect(cssN).toBeDefined();
+      expect(cssN).toBe(TYPOGRAPHY[beat].leadN);
+    });
+  });
+
+  it('every --sys-lead-* in CSS is represented in TYPOGRAPHY', () => {
+    const cssBeats = Array.from(CSS.matchAll(/--sys-lead-([a-z]+):/g)).map((m) => m[1]);
+    const tsBeats = Object.keys(TYPOGRAPHY);
+    cssBeats.forEach((b) => expect(tsBeats).toContain(b));
+  });
+
+  it('all six tokens exist in CSS', () => {
+    TYPOGRAPHY_ORDER.forEach((b) => expect(readLeadMultiplier(b)).toBeDefined());
+  });
+});
+
+describe('TYPOGRAPHY structural invariants', () => {
+  it('typographyInvariantHolds() is true', () => {
+    expect(typographyInvariantHolds()).toBe(true);
+  });
+
+  it('every leadN is a positive integer (locked to the 4px tick)', () => {
+    TYPOGRAPHY_ORDER.forEach((b) => {
+      const n = TYPOGRAPHY[b].leadN;
+      expect(Number.isInteger(n)).toBe(true);
+      expect(n).toBeGreaterThan(0);
+    });
+  });
+
+  it('order is non-decreasing tightest → loosest', () => {
+    for (let i = 1; i < TYPOGRAPHY_ORDER.length; i++) {
+      const prev = TYPOGRAPHY[TYPOGRAPHY_ORDER[i - 1]].leadN;
+      const curr = TYPOGRAPHY[TYPOGRAPHY_ORDER[i]].leadN;
+      expect(curr).toBeGreaterThanOrEqual(prev);
+    }
+  });
+
+  it('caption is the tightest beat, display is the loosest', () => {
+    expect(TYPOGRAPHY.caption.leadN).toBeLessThanOrEqual(TYPOGRAPHY.body.leadN);
+    expect(TYPOGRAPHY.display.leadN).toBeGreaterThanOrEqual(TYPOGRAPHY.heading.leadN);
+  });
+});
+
+describe('typography helpers', () => {
+  it('leadingOf returns leadN × SYS_TICK_PX (px) for each beat', () => {
+    TYPOGRAPHY_ORDER.forEach((b) => {
+      expect(leadingOf(b)).toBe(TYPOGRAPHY[b].leadN * SYS_TICK_PX);
+    });
+  });
+
+  it('cssVarOf returns the matching CSS custom-property reference', () => {
+    expect(cssVarOf('caption')).toBe('var(--sys-lead-caption)');
+    expect(cssVarOf('display')).toBe('var(--sys-lead-display)');
+  });
+
+  it('classesOf returns the typo-<beat> bundle class', () => {
+    expect(classesOf('body')).toBe('typo-body');
+    expect(classesOf('display')).toBe('typo-display');
+  });
+
+  it('leadingClassOf returns the Tailwind leading utility', () => {
+    expect(leadingClassOf('body')).toBe('leading-sys-body');
+    expect(leadingClassOf('caption')).toBe('leading-sys-caption');
+  });
+
+  it('isKerned classifies kern: auto beats correctly', () => {
+    expect(isKerned('lede')).toBe(true);
+    expect(isKerned('heading')).toBe(true);
+    expect(isKerned('display')).toBe(true);
+    expect(isKerned('caption')).toBe(false);
+    expect(isKerned('body')).toBe(false);
+    expect(isKerned('passage')).toBe(false);
+  });
+
+  it('isBalanced classifies wrap: balance beats correctly', () => {
+    expect(isBalanced('heading')).toBe(true);
+    expect(isBalanced('display')).toBe(true);
+    expect(isBalanced('body')).toBe(false);
+    expect(isBalanced('passage')).toBe(false);
+    expect(isBalanced('caption')).toBe(false);
+  });
+});
+
+describe('per-beat .typo-<beat> CSS class blocks', () => {
+  TYPOGRAPHY_ORDER.forEach((beat) => {
+    it(`.typo-${beat} declares line-height: var(--sys-lead-${beat})`, () => {
+      const block = readTypoBlock(beat);
+      const decl = new RegExp(`line-height:\\s*var\\(--sys-lead-${beat}\\)`);
+      expect(blockHas(block, decl)).toBe(true);
+    });
+
+    it(`.typo-${beat} declares the TS-specified text-wrap`, () => {
+      const block = readTypoBlock(beat);
+      const wrap = TYPOGRAPHY[beat as TypographyBeatName].wrap;
+      const decl = new RegExp(`text-wrap:\\s*${wrap}`);
+      expect(blockHas(block, decl)).toBe(true);
+    });
+
+    it(`.typo-${beat} declares font-feature-settings iff kern: auto`, () => {
+      const block = readTypoBlock(beat);
+      const wantsKern = TYPOGRAPHY[beat as TypographyBeatName].kern === 'auto';
+      const hasKern = blockHas(block, /font-feature-settings:\s*['"]kern['"]/);
+      expect(hasKern).toBe(wantsKern);
+    });
+  });
+});

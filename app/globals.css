@@ -152,6 +152,32 @@
   --sys-text-lg:     1.125rem;   /* 18px — subheadings, card titles */
   --sys-text-xl:     1.25rem;    /* 20px — emphasis text */
 
+  /* ─── Typography Ledger ───────────────────────────────────
+     Six leading-beats, ordered tightest → loosest. The ledger names
+     a *reading rhythm*, not a use-site. A card title USES `heading`;
+     a hero USES `display`. Mirror is in lib/design/typography.ts.
+     The sync test in lib/design/__tests__/typography-sync.test.ts
+     catches drift; the adoption guard keeps raw `leading-*` classes
+     from re-entering component code.
+
+     `--sys-tick: 4px` is the spatial anchor — every beat's leading
+     is `calc(var(--sys-tick) * N)` with integer N. SCOPED to typography
+     by design. Not a metronome for Motion or Elevation.
+
+     Credits: Krystle C. (six-beat scope, sprint shape), Mike K. (the
+     CSS-canonical + sync-test pattern, lifted from elevation/motion),
+     Elon M. (scoped --sys-tick, killed cross-ledger rhythm-sync), Tanya D.
+     (per-beat text-wrap/kerning as polish atoms), Jason F. (the wrap+kern
+     polish details that survive first-principles), Paul K. (guard-first
+     ordering — the Keepsake's `display` beat is the 3-second corridor). */
+  --sys-tick: 4px;
+  --sys-lead-caption: calc(var(--sys-tick) * 5);   /* 20px — metadata, labels */
+  --sys-lead-body:    calc(var(--sys-tick) * 6);   /* 24px — prose paragraphs */
+  --sys-lead-lede:    calc(var(--sys-tick) * 7);   /* 28px — final line, mirror reveal */
+  --sys-lead-passage: calc(var(--sys-tick) * 7);   /* 28px — long-form passages */
+  --sys-lead-heading: calc(var(--sys-tick) * 8);   /* 32px — card titles, section heads */
+  --sys-lead-display: calc(var(--sys-tick) * 10);  /* 40px — hero, keepsake artifact */
+
   /* ─── Heading Scale ───────────────────────────────────── */
   --sys-text-h4: 1.375rem;   /* 22px — sub-sections, article metadata */
   --sys-text-h3: 1.75rem;    /* 28px — section headings, card titles */
@@ -247,6 +273,46 @@ body {
   transition: line-height var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing),
               font-weight var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing),
               text-shadow var(--ch-typo-dur) var(--ch-typo-delay) var(--ch-easing);
+}
+
+/* ─── Typography Ledger — per-beat utility classes ─────────
+   Each `.typo-<beat>` class bundles the three properties a beat owns:
+   line-height (locked to the 4px tick), text-wrap (per-beat), and
+   font-feature-settings/text-rendering (per-beat optical kerning).
+   classesOf(beat) in lib/design/typography.ts returns one of these.
+   Keep additions reviewer-visible — every line is a beat property,
+   not a use-site decoration. */
+.typo-caption {
+  line-height: var(--sys-lead-caption);
+  text-wrap: auto;
+}
+.typo-body {
+  line-height: var(--sys-lead-body);
+  text-wrap: pretty;
+}
+.typo-lede {
+  line-height: var(--sys-lead-lede);
+  text-wrap: pretty;
+  font-feature-settings: "kern" 1, "ss01" 1;
+  text-rendering: optimizeLegibility;
+}
+.typo-passage {
+  line-height: var(--sys-lead-passage);
+  text-wrap: pretty;
+}
+.typo-heading {
+  line-height: var(--sys-lead-heading);
+  text-wrap: balance;
+  font-feature-settings: "kern" 1;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
+}
+.typo-display {
+  line-height: var(--sys-lead-display);
+  text-wrap: balance;
+  font-feature-settings: "kern" 1, "ss01" 1;
+  text-rendering: optimizeLegibility;
+  letter-spacing: -0.01em;
 }
 
 /* Paragraph spacing via compositing — translateY instead of margin-bottom.

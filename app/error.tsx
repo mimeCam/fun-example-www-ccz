@@ -29,7 +29,7 @@ export default function ErrorPage({
         <h1 className="font-display text-sys-h2 font-sys-display text-foreground text-center">
           Something came undone.
         </h1>
-        <p className="text-mist/60 text-sys-body text-center mt-sys-3 max-w-sm leading-relaxed">
+        <p className="text-mist/60 text-sys-body text-center mt-sys-3 max-w-sm typo-body">
           The room is still here. Try going back.
         </p>
         <div className="mt-sys-8 flex flex-col items-center gap-sys-4">

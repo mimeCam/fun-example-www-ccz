@@ -180,7 +180,8 @@ function LetterCard({
       bg-gradient-to-b from-surface to-background
       rounded-sys-medium thermal-radius border transition-all duration-reveal
       ${phaseStyles(phase, settled)}`}>
-      {/* Dismiss */}
+      {/* Dismiss — typography-ledger:exempt — icon glyph (&times;), no reading
+          rhythm; leading-none collapses the line-box around a single char. */}
       {visible && (
         <Pressable
           variant="icon"

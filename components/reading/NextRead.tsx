@@ -69,12 +69,12 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
       </div>
 
       {/* Article title */}
-      <h3 className="text-sys-xl font-sys-heading text-foreground mb-sys-2 leading-tight">
+      <h3 className="text-sys-xl font-sys-heading text-foreground mb-sys-2 typo-heading">
         {article.title}
       </h3>
 
       {/* Context — WHY this article was recommended */}
-      <p className="text-sys-caption text-mist/60 mb-sys-4 leading-relaxed">
+      <p className="text-sys-caption text-mist/60 mb-sys-4 typo-caption">
         {context}
       </p>
 

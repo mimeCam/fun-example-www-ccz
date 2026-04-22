@@ -172,7 +172,7 @@ export default function ResonancesClient() {
       <h1 className="text-sys-h2 font-display font-sys-display text-foreground mb-sys-4">
         Your chapter hasn&apos;t been written yet.
       </h1>
-      <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
+      <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto typo-caption">
         Read something that stops you. Capture it. Tell it why it matters.
       </p>
       <Pressable asChild variant="ghost" size="md">

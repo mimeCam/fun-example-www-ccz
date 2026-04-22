@@ -93,7 +93,7 @@ export default function MirrorPage() {
         <h1 className="text-sys-h3 font-display font-sys-display text-foreground mb-sys-4">
           Your reflection hasn&apos;t formed yet.
         </h1>
-        <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto leading-relaxed">
+        <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto typo-caption">
           Read an article to the end and the Mirror will find you.
         </p>
         <Pressable asChild variant="ghost" size="md">

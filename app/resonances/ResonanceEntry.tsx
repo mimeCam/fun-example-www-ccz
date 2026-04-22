@@ -90,7 +90,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
 
       {/* Closing line — farewell for shaped resonances */}
       {faded && closingLine && (
-        <p className="mt-sys-5 text-gold/50 italic text-sys-micro leading-relaxed">
+        <p className="mt-sys-5 text-gold/50 italic text-sys-micro typo-caption">
           {closingLine}
         </p>
       )}

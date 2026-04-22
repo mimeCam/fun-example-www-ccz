@@ -103,6 +103,20 @@ const config: Config = {
         'sys-display': 'var(--sys-weight-display)',
         'sys-accent':  'var(--sys-weight-accent)',
       },
+      /* Typography Ledger — six leading-beats, mirror of --sys-lead-* in
+         globals.css. Source of truth: lib/design/typography.ts. The sync
+         test guards drift; the adoption guard keeps raw `leading-*` out
+         of components. Use via `leading-sys-<beat>` or, preferably, the
+         all-in-one `typo-<beat>` utility class (CSS) returned by
+         classesOf(beat). */
+      lineHeight: {
+        'sys-caption': 'var(--sys-lead-caption)',
+        'sys-body':    'var(--sys-lead-body)',
+        'sys-lede':    'var(--sys-lead-lede)',
+        'sys-passage': 'var(--sys-lead-passage)',
+        'sys-heading': 'var(--sys-lead-heading)',
+        'sys-display': 'var(--sys-lead-display)',
+      },
       /* System radius scale — absorbs ad-hoc rounded-* values.
          Thermal bonus adds 0–0.5rem on top of --sys-radius-medium at warm+. */
       borderRadius: {

@@ -242,7 +242,7 @@ function CeremonyContent({
       {quote && (
         <ResonanceShimmer intensity={shimmerIntensity} active={showShimmer}>
           <div className={`mb-sys-5 bg-background/60 border-l-2 border-rose/40 rounded-sys-medium p-sys-4 ${settledClass}`}>
-            <p className="text-foreground/70 italic text-sys-caption leading-relaxed">
+            <p className="text-foreground/70 italic text-sys-caption typo-caption">
               &ldquo;{quote}&rdquo;
             </p>
           </div>
@@ -295,7 +295,7 @@ function DrawerForm({
 function QuotePreview({ quote }: { quote: string }) {
   return (
     <div className="mb-sys-5 bg-background/60 border-l-2 border-rose/40 rounded-sys-medium p-sys-4">
-      <p className="text-foreground/70 italic text-sys-caption leading-relaxed">
+      <p className="text-foreground/70 italic text-sys-caption typo-caption">
         &ldquo;{quote}&rdquo;
       </p>
     </div>

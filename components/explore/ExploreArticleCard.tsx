@@ -49,7 +49,7 @@ export default function ExploreArticleCard({
           <p className="text-gold/70 text-sys-micro italic mb-sys-3">{reason}</p>
         )}
 
-        <p className="text-mist text-sys-caption leading-relaxed mb-sys-4 flex-1 line-clamp-3">
+        <p className="text-mist text-sys-caption typo-caption mb-sys-4 flex-1 line-clamp-3">
           {excerpt}…
         </p>
 

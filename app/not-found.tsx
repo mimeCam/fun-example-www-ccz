@@ -42,7 +42,7 @@ function Title() {
 
 function Subtitle() {
   return (
-    <p className="text-mist/60 text-sys-body text-center mt-sys-3 max-w-sm leading-relaxed">
+    <p className="text-mist/60 text-sys-body text-center mt-sys-3 max-w-sm typo-body">
       The Threshold doesn&apos;t have a page here.
       But the right page is waiting for you.
     </p>

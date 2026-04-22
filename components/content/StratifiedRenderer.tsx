@@ -70,7 +70,7 @@ function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: bool
     >
       {block.isNew && <NewContentBadge />}
       {block.paragraphs.map((p, i) => (
-        <p key={i} className={`text-mist italic text-sys-caption leading-relaxed`}>
+        <p key={i} className="text-mist italic text-sys-caption typo-caption">
           {p.trim()}
         </p>
       ))}

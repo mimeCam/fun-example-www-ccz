@@ -47,6 +47,8 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
 function DismissBtn({ onDismiss }: { onDismiss: () => void }) {
+  // typography-ledger:exempt — icon glyph (×), no reading rhythm; leading-none
+  // collapses the line-box around a single character. Not a beat candidate.
   return (
     <Pressable
       variant="icon"
@@ -83,7 +85,7 @@ function ArchetypeName({ label, visible, color }: {
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
     <p className={`mt-sys-3 text-sys-caption text-foreground/80 italic max-w-card-body
-      mx-auto leading-relaxed ${fadeClass(visible)}`}
+      mx-auto typo-caption ${fadeClass(visible)}`}
       style={fadeStyle(visible, MOTION.enter)}>
       &ldquo;{text}&rdquo;
     </p>
