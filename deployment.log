@@ -1,4 +1,4 @@
-Deployment started at: Wed Apr 22 07:47:04 PM UTC 2026
+Deployment started at: Wed Apr 22 08:20:23 PM UTC 2026
 Stopping existing container (if running)...
   Removing container: persona-blog-z
 Removing old image...
@@ -11,131 +11,60 @@ Building Docker image...
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/node:20-alpine
-#2 DONE 0.4s
+#2 DONE 0.3s
 
 #3 [internal] load .dockerignore
-#3 transferring context: 648B done
+#3 transferring context: 648B 0.0s done
 #3 DONE 0.0s
 
 #4 [ 1/19] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
-#4 resolve docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 0.0s done
-#4 sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293 7.67kB / 7.67kB done
-#4 sha256:afdf98210b07b586eb71fa22ba2e432e058e4cd1304d31ed60888755b8c865fb 1.72kB / 1.72kB done
-#4 sha256:11cedc39e663e7c5d5cb9cc77a461a0d2adc25537b94e6831a6108f09cb2001b 6.52kB / 6.52kB done
-#4 DONE 0.1s
+#4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 1.25MB 0.1s done
+#5 transferring context: 68.93kB 0.0s done
 #5 DONE 0.1s
 
-#6 [ 2/19] WORKDIR /app
-#6 DONE 0.0s
+#6 [ 5/19] COPY package*.json ./
+#6 CACHED
 
-#7 [ 3/19] RUN mkdir -p /app/data /app/logs
-#7 DONE 0.2s
+#7 [ 8/19] COPY tsconfig.json ./
+#7 CACHED
 
-#8 [ 4/19] RUN apk add --no-cache python3 make g++
-#8 0.821 ( 1/29) Installing libstdc++-dev (15.2.0-r2)
-#8 1.017 ( 2/29) Installing jansson (2.14.1-r0)
-#8 1.035 ( 3/29) Installing zstd-libs (1.5.7-r2)
-#8 1.061 ( 4/29) Installing binutils (2.45.1-r0)
-#8 1.193 ( 5/29) Installing libgomp (15.2.0-r2)
-#8 1.214 ( 6/29) Installing libatomic (15.2.0-r2)
-#8 1.233 ( 7/29) Installing gmp (6.3.0-r4)
-#8 1.264 ( 8/29) Installing isl26 (0.26-r1)
-#8 1.308 ( 9/29) Installing mpfr4 (4.2.2-r0)
-#8 1.335 (10/29) Installing mpc1 (1.3.1-r1)
-#8 1.355 (11/29) Installing gcc (15.2.0-r2)
-#8 2.388 (12/29) Installing musl-dev (1.2.5-r23)
-#8 2.478 (13/29) Installing g++ (15.2.0-r2)
-#8 2.764 (14/29) Installing make (4.4.1-r3)
-#8 2.801 (15/29) Installing libbz2 (1.0.8-r6)
-#8 2.825 (16/29) Installing libexpat (2.7.5-r0)
-#8 2.846 (17/29) Installing libffi (3.5.2-r0)
-#8 2.867 (18/29) Installing gdbm (1.26-r0)
-#8 2.887 (19/29) Installing xz-libs (5.8.2-r0)
-#8 2.908 (20/29) Installing mpdecimal (4.0.1-r0)
-#8 2.928 (21/29) Installing ncurses-terminfo-base (6.5_p20251123-r0)
-#8 2.952 (22/29) Installing libncursesw (6.5_p20251123-r0)
-#8 2.973 (23/29) Installing libpanelw (6.5_p20251123-r0)
-#8 2.991 (24/29) Installing readline (8.3.1-r0)
-#8 3.013 (25/29) Installing sqlite-libs (3.51.2-r0)
-#8 3.048 (26/29) Installing python3 (3.12.13-r0)
-#8 3.282 (27/29) Installing python3-pycache-pyc0 (3.12.13-r0)
-#8 3.431 (28/29) Installing pyc (3.12.13-r0)
-#8 3.431 (29/29) Installing python3-pyc (3.12.13-r0)
-#8 3.431 Executing busybox-1.37.0-r30.trigger
-#8 3.444 OK: 301.2 MiB in 47 packages
-#8 DONE 3.7s
+#8 [12/19] COPY middleware.ts ./
+#8 CACHED
 
-#9 [ 5/19] COPY package*.json ./
-#9 DONE 0.0s
+#9 [10/19] COPY postcss.config.js ./
+#9 CACHED
 
-#10 [ 6/19] RUN npm ci && npm cache clean --force
-#10 3.771 npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
-#10 3.941 npm warn deprecated prebuild-install@7.1.3: No longer maintained. Please contact the author of the relevant native addon; alternatives are available.
-#10 4.620 npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-#10 5.452 npm warn deprecated @types/winston@2.4.4: This is a stub types definition. winston provides its own type definitions, so you do not need this installed.
-#10 6.110 npm warn deprecated @humanwhocodes/config-array@0.13.0: Use @eslint/config-array instead
-#10 6.169 npm warn deprecated @humanwhocodes/object-schema@2.0.3: Use @eslint/object-schema instead
-#10 6.496 npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 6.533 npm warn deprecated glob@7.2.3: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 6.903 npm warn deprecated glob@10.3.10: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.285 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.288 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.314 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 7.320 npm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
-#10 8.243 npm warn deprecated eslint@8.57.1: This version is no longer supported. Please see https://eslint.org/version-support for other options.
-#10 52.57 npm warn deprecated next@14.2.3: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/security-update-2025-12-11 for more details.
-#10 53.43 
-#10 53.43 added 680 packages, and audited 681 packages in 53s
-#10 53.43 
-#10 53.43 181 packages are looking for funding
-#10 53.43   run `npm fund` for details
-#10 53.73 
-#10 53.73 7 vulnerabilities (6 high, 1 critical)
-#10 53.73 
-#10 53.73 To address issues that do not require attention, run:
-#10 53.73   npm audit fix
-#10 53.73 
-#10 53.73 To address all issues (including breaking changes), run:
-#10 53.73   npm audit fix --force
-#10 53.73 
-#10 53.73 Run `npm audit` for details.
-#10 53.73 npm notice
-#10 53.73 npm notice New major version of npm available! 10.8.2 -> 11.12.1
-#10 53.73 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.12.1
-#10 53.73 npm notice To update run: npm install -g npm@11.12.1
-#10 53.73 npm notice
-#10 53.94 npm warn using --force Recommended protections disabled.
-#10 DONE 54.6s
+#10 [ 2/19] WORKDIR /app
+#10 CACHED
 
-#11 [ 7/19] COPY next.config.js ./
-#11 DONE 0.0s
+#11 [ 6/19] RUN npm ci && npm cache clean --force
+#11 CACHED
 
-#12 [ 8/19] COPY tsconfig.json ./
-#12 DONE 0.0s
+#12 [ 9/19] COPY tailwind.config.ts ./
+#12 CACHED
 
-#13 [ 9/19] COPY tailwind.config.ts ./
-#13 DONE 0.0s
+#13 [ 4/19] RUN apk add --no-cache python3 make g++
+#13 CACHED
 
-#14 [10/19] COPY postcss.config.js ./
-#14 DONE 0.0s
+#14 [11/19] COPY next-env.d.ts ./
+#14 CACHED
 
-#15 [11/19] COPY next-env.d.ts ./
-#15 DONE 0.0s
+#15 [ 7/19] COPY next.config.js ./
+#15 CACHED
 
-#16 [12/19] COPY middleware.ts ./
-#16 DONE 0.0s
+#16 [ 3/19] RUN mkdir -p /app/data /app/logs
+#16 CACHED
 
 #17 [13/19] COPY app ./app
-#17 DONE 0.0s
+#17 CACHED
 
 #18 [14/19] COPY components ./components
-#18 DONE 0.0s
+#18 DONE 0.1s
 
 #19 [15/19] COPY lib ./lib
-#19 DONE 0.0s
+#19 DONE 0.1s
 
 #20 [16/19] COPY types ./types
 #20 DONE 0.0s
@@ -147,89 +76,84 @@ Building Docker image...
 #22 DONE 0.0s
 
 #23 [19/19] RUN npm run build
-#23 0.370 
-#23 0.370 > persona-blog@0.1.0 prebuild
-#23 0.370 > tsx scripts/generate-inline-restore.ts
-#23 0.370 
-#23 0.966 Generated: /app/lib/thermal/inline-restore.ts (3718 bytes)
-#23 0.986 
-#23 0.986 > persona-blog@0.1.0 build
-#23 0.986 > next build
-#23 0.986 
-#23 1.755 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#23 1.756 This information is used to shape Next.js' roadmap and prioritize features.
-#23 1.756 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#23 1.756 https://nextjs.org/telemetry
-#23 1.756 
-#23 1.839   ▲ Next.js 14.2.3
-#23 1.840 
-#23 1.939    Creating an optimized production build ...
-#23 16.40 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=optional failed, reason: 
-#23 16.40 
-#23 16.40 Retrying 1/3...
-#23 16.40 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=optional failed, reason: 
-#23 16.40 
-#23 16.40 Retrying 1/3...
-#23 17.58 request to https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=optional failed, reason: 
-#23 17.58 
-#23 17.58 Retrying 2/3...
-#23 17.58 request to https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=optional failed, reason: 
-#23 17.58 
-#23 17.58 Retrying 2/3...
-#23 21.61  ✓ Compiled successfully
-#23 21.61    Linting and checking validity of types ...
-#23 29.21    Collecting page data ...
-#23 30.87    Generating static pages (0/12) ...
-#23 31.51    Generating static pages (3/12) 
-#23 31.53    Generating static pages (6/12) 
-#23 31.64    Generating static pages (9/12) 
-#23 31.78  ✓ Generating static pages (12/12)
-#23 32.03    Finalizing page optimization ...
-#23 32.03    Collecting build traces ...
-#23 37.83 
-#23 37.85 Route (app)                              Size     First Load JS
-#23 37.85 ┌ ƒ /                                    2.36 kB         123 kB
-#23 37.85 ├ ○ /_not-found                          145 B          87.2 kB
-#23 37.85 ├ ƒ /api/articles                        0 B                0 B
-#23 37.85 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#23 37.85 ├ ƒ /api/categories                      0 B                0 B
-#23 37.85 ├ ƒ /api/categories/[slug]               0 B                0 B
-#23 37.85 ├ ƒ /api/highlights                      0 B                0 B
-#23 37.85 ├ ○ /api/history/today                   0 B                0 B
-#23 37.85 ├ ƒ /api/mirror                          0 B                0 B
-#23 37.85 ├ ƒ /api/og/thread/[slug]                0 B                0 B
-#23 37.85 ├ ƒ /api/reading/memory                  0 B                0 B
-#23 37.85 ├ ƒ /api/reading/streak                  0 B                0 B
-#23 37.85 ├ ƒ /api/reading/topics                  0 B                0 B
-#23 37.85 ├ ƒ /api/related-posts                   0 B                0 B
-#23 37.85 ├ ƒ /api/resonances                      0 B                0 B
-#23 37.85 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#23 37.85 ├ ƒ /api/trails                          0 B                0 B
-#23 37.85 ├ ƒ /article/[id]                        26.1 kB         146 kB
-#23 37.85 ├ ○ /articles                            4.43 kB         101 kB
-#23 37.85 ├ ○ /mirror                              6.16 kB         106 kB
-#23 37.85 └ ○ /resonances                          6.09 kB         106 kB
-#23 37.85 + First Load JS shared by all            87 kB
-#23 37.85   ├ chunks/23-4af5581384132b0b.js        31.5 kB
-#23 37.85   ├ chunks/fd9d1056-fe1c5741ff8c531e.js  53.6 kB
-#23 37.85   └ other shared chunks (total)          1.93 kB
-#23 37.85 
-#23 37.85 
-#23 37.85 ƒ Middleware                             27.1 kB
-#23 37.85 
-#23 37.85 ○  (Static)   prerendered as static content
-#23 37.85 ƒ  (Dynamic)  server-rendered on demand
-#23 37.85 
-#23 DONE 38.0s
+#23 0.749 
+#23 0.749 > persona-blog@0.1.0 prebuild
+#23 0.749 > tsx scripts/generate-inline-restore.ts
+#23 0.749 
+#23 2.075 Generated: /app/lib/thermal/inline-restore.ts (3718 bytes)
+#23 2.121 
+#23 2.121 > persona-blog@0.1.0 build
+#23 2.121 > next build
+#23 2.121 
+#23 3.780 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#23 3.782 This information is used to shape Next.js' roadmap and prioritize features.
+#23 3.782 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#23 3.782 https://nextjs.org/telemetry
+#23 3.782 
+#23 3.921   ▲ Next.js 14.2.3
+#23 3.922 
+#23 4.119    Creating an optimized production build ...
+#23 36.92  ✓ Compiled successfully
+#23 36.92    Linting and checking validity of types ...
+#23 ...
+
+#10 [ 2/19] WORKDIR /app
+#10 CACHED
+
+#23 [19/19] RUN npm run build
+#23 60.08    Collecting page data ...
+#23 64.58    Generating static pages (0/12) ...
+#23 66.62    Generating static pages (3/12) 
+#23 66.62    Generating static pages (6/12) 
+#23 66.93    Generating static pages (9/12) 
+#23 67.24  ✓ Generating static pages (12/12)
+#23 67.96    Finalizing page optimization ...
+#23 67.96    Collecting build traces ...
+#23 80.57 
+#23 80.60 Route (app)                              Size     First Load JS
+#23 80.60 ┌ ƒ /                                    2.36 kB         123 kB
+#23 80.60 ├ ○ /_not-found                          145 B          87.2 kB
+#23 80.60 ├ ƒ /api/articles                        0 B                0 B
+#23 80.60 ├ ƒ /api/articles/[id]/categories        0 B                0 B
+#23 80.60 ├ ƒ /api/categories                      0 B                0 B
+#23 80.60 ├ ƒ /api/categories/[slug]               0 B                0 B
+#23 80.60 ├ ƒ /api/highlights                      0 B                0 B
+#23 80.60 ├ ○ /api/history/today                   0 B                0 B
+#23 80.60 ├ ƒ /api/mirror                          0 B                0 B
+#23 80.60 ├ ƒ /api/og/thread/[slug]                0 B                0 B
+#23 80.60 ├ ƒ /api/reading/memory                  0 B                0 B
+#23 80.60 ├ ƒ /api/reading/streak                  0 B                0 B
+#23 80.60 ├ ƒ /api/reading/topics                  0 B                0 B
+#23 80.60 ├ ƒ /api/related-posts                   0 B                0 B
+#23 80.60 ├ ƒ /api/resonances                      0 B                0 B
+#23 80.60 ├ ƒ /api/resonances/[id]                 0 B                0 B
+#23 80.60 ├ ƒ /api/trails                          0 B                0 B
+#23 80.60 ├ ƒ /article/[id]                        27.2 kB         148 kB
+#23 80.60 ├ ○ /articles                            4.43 kB         101 kB
+#23 80.60 ├ ○ /mirror                              6.16 kB         106 kB
+#23 80.60 └ ○ /resonances                          6.09 kB         106 kB
+#23 80.60 + First Load JS shared by all            87 kB
+#23 80.60   ├ chunks/23-7d31908a6c95d195.js        31.5 kB
+#23 80.60   ├ chunks/fd9d1056-3b1983c71cd51909.js  53.6 kB
+#23 80.60   └ other shared chunks (total)          1.93 kB
+#23 80.60 
+#23 80.60 
+#23 80.60 ƒ Middleware                             27.1 kB
+#23 80.60 
+#23 80.61 ○  (Static)   prerendered as static content
+#23 80.61 ƒ  (Dynamic)  server-rendered on demand
+#23 80.61 
+#23 DONE 80.8s
 
 #24 exporting to image
 #24 exporting layers
-#24 exporting layers 2.9s done
-#24 writing image sha256:71b6b05cb074bb6c3ebefa7343e5235bd1c2a2d5dd1e69b1ef0d6c886e052fd1 done
+#24 exporting layers 0.3s done
+#24 writing image sha256:212e40478340fe6f1b5d3406070288b005adbcc2bfb1895773b32a26422e53ee
+#24 writing image sha256:212e40478340fe6f1b5d3406070288b005adbcc2bfb1895773b32a26422e53ee done
 #24 naming to docker.io/library/persona-blog-image:latest done
-#24 DONE 2.9s
+#24 DONE 0.4s
 Starting container on port 7200 (log level: info)...
-e17a50bc27a8a017c9c943fdf7cc71c6a8afece54d9a399e867ba76ce334db5d
+4ef9439f9586df650492c6292384d18b831a26be32d32b17a0ebe450a111ded8
 Container is running
   Checking container health...
   Container is healthy and responding
@@ -249,6 +173,6 @@ Management:
   docker stop persona-blog-z
   docker restart persona-blog-z
 
-Deployment completed at: Wed Apr 22 07:48:53 PM UTC 2026
+Deployment completed at: Wed Apr 22 08:21:52 PM UTC 2026
 Removed dangling images
 Done.

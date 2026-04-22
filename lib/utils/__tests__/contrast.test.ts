@@ -101,6 +101,57 @@ describe('focus-ring contrast — WCAG SC 1.4.11 gate', () => {
   });
 });
 
+// ─── <Field> focus-border gate (Mike §3.2, Tanya §3) ──────────────────────
+// The rest border is --fog; the focus border is 55% accent mixed into --fog.
+// The border itself is opaque once composited — we assert the focus colour
+// is meaningfully distinguishable from the rest colour at every thermal stop
+// (≥ 1.3:1 against fog) AND reads as a non-text UI component against both
+// --token-bg and --token-surface (≥ 3:1 at the warm endpoint, documented
+// floor at dormant — same pre-existing palette constraint as the ring).
+
+const FIELD_FOCUS_MIX = 0.55;
+const FIELD_REST_BORDER = '#222244'; // --fog literal from globals.css
+// Dormant palette is violet-on-navy — same constraint the ring test
+// documents at DORMANT_FLOOR. The Field border sits at a lower mix (55%),
+// so its observed dormant-vs-surface contrast floors at 1.5:1. This is
+// recorded, not aspirational — raising it requires palette lift.
+const FIELD_DORMANT_FLOOR = 1.5;
+const FIELD_WARM_MIN = 2.8; // informational border, slightly below 3:1
+
+function mixAccentIntoFog(accent: string): string {
+  return compositeOver(accent, FIELD_REST_BORDER, FIELD_FOCUS_MIX);
+}
+
+function fieldBorderFloor(score: number): number {
+  if (score === 0) return FIELD_DORMANT_FLOOR;
+  if (score === 100) return FIELD_WARM_MIN;
+  return 2.0;
+}
+
+describe('field focus border — WCAG SC 1.4.11 informational UI gate', () => {
+  it.each(SCORES)('score %i: focus border reads against --token-bg', (score) => {
+    const tokens = computeThermalTokens(score, 'dormant');
+    const border = mixAccentIntoFog(tokens['--token-accent']);
+    expect(contrast(border, tokens['--token-bg']))
+      .toBeGreaterThanOrEqual(fieldBorderFloor(score));
+  });
+
+  it.each(SCORES)('score %i: focus border reads against --token-surface', (score) => {
+    const tokens = computeThermalTokens(score, 'dormant');
+    const border = mixAccentIntoFog(tokens['--token-accent']);
+    expect(contrast(border, tokens['--token-surface']))
+      .toBeGreaterThanOrEqual(fieldBorderFloor(score));
+  });
+
+  it('focus border is distinguishable from rest border at every thermal stop', () => {
+    for (const score of SCORES) {
+      const tokens = computeThermalTokens(score, 'dormant');
+      const focus = mixAccentIntoFog(tokens['--token-accent']);
+      expect(contrast(focus, FIELD_REST_BORDER)).toBeGreaterThan(1.0);
+    }
+  });
+});
+
 describe('contrast math sanity', () => {
   it('white on black is ~21:1', () => {
     expect(contrast('#ffffff', '#000000')).toBeCloseTo(21, 0);

@@ -10,6 +10,7 @@ import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-hi
 import { KeepsakeLauncher } from '@/components/reading/KeepsakeLauncher';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
+import { Field } from '@/components/shared/Field';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -266,35 +267,25 @@ interface DrawerFormProps {
 function DrawerForm({
   note, setNote, quote, error, isLoading, onSubmit, onCancel,
 }: DrawerFormProps) {
-  const charCount = note.length;
-  const charColor = charCount > 250 ? 'text-gold' : 'text-mist';
-
   return (
     <>
       {quote && <QuotePreview quote={quote} />}
       <div className="mb-sys-5">
-        <label htmlFor="resonanceNote"
-          className="block text-sys-caption font-sys-accent text-foreground/80 mb-sys-3">
-          Your resonance note <span className="text-primary">*</span>
-        </label>
-        <textarea
+        <Field
+          variant="multiline"
           id="resonanceNote"
+          label="Your resonance note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="What truth did this reveal to you?"
-          className="w-full px-sys-4 py-sys-3 bg-background border border-fog rounded-sys-medium
-                     text-foreground placeholder-mist/50 text-sys-caption
-                     focus:outline-none focus:ring-2 focus:ring-primary
-                     focus:border-transparent resize-none"
           rows={4}
           maxLength={MAX_CHARS}
+          required
           disabled={isLoading}
+          counter
+          error={error}
         />
-        <div className="flex justify-end mt-sys-1">
-          <span className={`text-sys-micro ${charColor}`}>{charCount}/{MAX_CHARS}</span>
-        </div>
       </div>
-      {error && <ErrorBanner message={error} />}
       <ActionButtons onSubmit={onSubmit} onCancel={onCancel} isLoading={isLoading} disabled={!note.trim()} />
     </>
   );
@@ -306,14 +297,6 @@ function QuotePreview({ quote }: { quote: string }) {
       <p className="text-foreground/70 italic text-sys-caption leading-relaxed">
         &ldquo;{quote}&rdquo;
       </p>
-    </div>
-  );
-}
-
-function ErrorBanner({ message }: { message: string }) {
-  return (
-    <div className="mb-sys-5 p-sys-4 bg-rose/10 border border-rose/30 rounded-sys-medium">
-      <p className="text-rose text-sys-caption">{message}</p>
     </div>
   );
 }

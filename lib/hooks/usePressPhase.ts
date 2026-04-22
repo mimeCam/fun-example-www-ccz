@@ -16,10 +16,10 @@
 'use client';
 
 import {
-  useEffect, useMemo, useReducer, useRef, useState,
+  useEffect, useMemo, useReducer, useRef,
   type KeyboardEvent, type PointerEvent,
 } from 'react';
-import { useIsomorphicLayoutEffect } from '@/lib/utils/use-isomorphic-layout-effect';
+import { useReducedMotionFlag } from '@/lib/utils/reduced-motion';
 import {
   type PressPhase, PRESS_SETTLE_MS, PRESS_SETTLE_BUDGET_MS,
 } from '@/lib/utils/press-phase';
@@ -41,30 +41,12 @@ export function pressReducer(phase: PressPhase, action: PressAction): PressPhase
   return phase;
 }
 
-// ─── Reduced-motion probe — same pattern as Threshold ──────────────────────
-
-function readReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
-function useReducedMotionFlag(): boolean {
-  const [flag, setFlag] = useState(false);
-  useIsomorphicLayoutEffect(() => {
-    setFlag(readReducedMotion());
-    return subscribe(setFlag);
-  }, []);
-  return flag;
-}
-
-function subscribe(cb: (v: boolean) => void): () => void {
-  const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const handler = (e: MediaQueryListEvent) => cb(e.matches);
-  mq.addEventListener('change', handler);
-  return () => mq.removeEventListener('change', handler);
-}
-
 // ─── Settle timer — decouples `settling` from its animation end ────────────
+//
+// Note: the reduced-motion probe that used to live here was promoted to
+// `lib/utils/reduced-motion.ts` so `useFieldPhase` and any future phase
+// hook share one subscription. See napkin §4.3 (Mike K.).
+
 
 function useSettleTimer(
   phase: PressPhase,
