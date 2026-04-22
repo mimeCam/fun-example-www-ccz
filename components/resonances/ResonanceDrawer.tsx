@@ -7,6 +7,7 @@ import { GemIcon } from '@/components/shared/GemIcon';
 import { ResonanceShimmer } from '@/components/resonances/ResonanceShimmer';
 import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceCeremony';
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
+import { KeepsakeLauncher } from '@/components/reading/KeepsakeLauncher';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -160,6 +161,8 @@ export function ResonanceDrawer({
               shimmerIntensity={intensity}
               showShimmer={showShimmer}
               shimmerSettled={phase === 'settled'}
+              articleId={articleId}
+              articleTitle={articleTitle}
             />
           ) : slotsAvailable ? (
             <DrawerForm
@@ -235,11 +238,15 @@ function SlotIndicator({ used, total, pulsing }: {
   );
 }
 
-function CeremonyContent({ quote, shimmerIntensity, showShimmer, shimmerSettled }: {
+function CeremonyContent({
+  quote, shimmerIntensity, showShimmer, shimmerSettled, articleId, articleTitle,
+}: {
   quote: string;
   shimmerIntensity: 'subtle' | 'warm' | 'rich';
   showShimmer: boolean;
   shimmerSettled: boolean;
+  articleId: string;
+  articleTitle: string;
 }) {
   const settledClass = shimmerSettled ? 'resonance-shimmer--settled' : '';
 
@@ -255,6 +262,8 @@ function CeremonyContent({ quote, shimmerIntensity, showShimmer, shimmerSettled 
         </ResonanceShimmer>
       )}
       <SuccessMessage />
+      {/* CTA mounts only once the ceremony settles — defers mirror fetch + keepsake code until earned. */}
+      {shimmerSettled && <KeepsakeLauncher articleId={articleId} articleTitle={articleTitle} />}
     </div>
   );
 }
