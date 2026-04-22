@@ -29,6 +29,7 @@ import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import ResonanceExport from './ResonanceExport';
 import { Pressable } from '@/components/shared/Pressable';
+import { TextLink } from '@/components/shared/TextLink';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 
 const ANON_KEY = 'anon-reader-id';
@@ -187,9 +188,9 @@ export default function ResonancesClient() {
       {/* Header */}
       <div className="flex justify-between items-center mb-sys-9">
         <div />
-        <Link href="/mirror" className="text-mist text-sys-caption hover:text-primary transition-colors">
+        <TextLink variant="passage" href="/mirror" className="text-sys-caption">
           Your Mirror →
-        </Link>
+        </TextLink>
       </div>
 
       {/* Page title */}

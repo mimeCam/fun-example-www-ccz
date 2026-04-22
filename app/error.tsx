@@ -13,6 +13,7 @@
 import { GemHome } from '@/components/navigation/GemHome';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { Pressable } from '@/components/shared/Pressable';
+import { TextLink } from '@/components/shared/TextLink';
 
 export default function ErrorPage({
   reset,
@@ -35,10 +36,9 @@ export default function ErrorPage({
           <Pressable variant="ghost" size="md" onClick={reset}>
             Try again →
           </Pressable>
-          <a href="/"
-            className="text-mist/50 text-sys-caption hover:text-mist transition-colors">
+          <TextLink variant="inline" href="/" className="text-sys-caption">
             Return to the Threshold
-          </a>
+          </TextLink>
         </div>
       </div>
     </main>

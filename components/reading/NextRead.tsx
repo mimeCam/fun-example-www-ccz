@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import { useCeremony } from './CeremonySequencer';
-import Link from 'next/link';
+import { TextLink } from '@/components/shared/TextLink';
 
 /** Archetype accent colors — matches content-layers extension borders. */
 const ARCHETYPE_ACCENT: Record<ArchetypeKey, string> = {
@@ -78,13 +78,15 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
         {context}
       </p>
 
-      {/* CTA — text link, not button */}
-      <Link
+      {/* CTA — the showcase `passage` moment: reader hovers → feels
+          the destination room's temperature before the click. */}
+      <TextLink
+        variant="passage"
         href={`/article/${article.id}`}
-        className="text-gold hover:text-gold/80 transition-colors duration-hover text-sys-caption font-sys-accent"
+        className="text-sys-caption font-sys-accent"
       >
         Read this next →
-      </Link>
+      </TextLink>
     </div>
   );
 }

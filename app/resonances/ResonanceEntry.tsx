@@ -4,7 +4,7 @@
  */
 'use client';
 
-import Link from 'next/link';
+import { TextLink } from '@/components/shared/TextLink';
 import { GemIcon } from '@/components/shared/GemIcon';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 
@@ -71,10 +71,10 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
       <div className="h-px bg-fog mb-sys-4" />
 
       {/* Article link + metadata */}
-      <Link href={`/article/${resonance.articleId}`}
-        className="text-primary hover:text-accent transition-colors text-sys-caption font-sys-accent">
+      <TextLink variant="inline" href={`/article/${resonance.articleId}`}
+        className="text-sys-caption font-sys-accent">
         {resonance.articleTitle}
-      </Link>
+      </TextLink>
 
       <p className="text-mist/50 text-sys-micro mt-sys-1">
         {timeAgo}

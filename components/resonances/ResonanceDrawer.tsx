@@ -11,6 +11,7 @@ import { KeepsakeLauncher } from '@/components/reading/KeepsakeLauncher';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
 import { Field } from '@/components/shared/Field';
+import { TextLink } from '@/components/shared/TextLink';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -345,7 +346,7 @@ function SlotsFullMessage() {
         All resonance slots are filled.
       </p>
       <p className="text-mist text-sys-micro mt-sys-3 italic">
-        Visit <a href="/resonances" className="text-gold hover:underline">The Book of You</a> to revisit your saved resonances.
+        Visit <TextLink variant="passage" href="/resonances">The Book of You</TextLink> to revisit your saved resonances.
       </p>
     </div>
   );

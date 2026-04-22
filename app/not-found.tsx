@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { GemHome } from '@/components/navigation/GemHome';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { Pressable } from '@/components/shared/Pressable';
+import { TextLink } from '@/components/shared/TextLink';
 
 export default function NotFound() {
   return (
@@ -58,9 +59,8 @@ function ThresholdLink() {
 
 function ArticlesLink() {
   return (
-    <Link href="/articles"
-      className="text-mist/50 text-sys-caption hover:text-mist transition-colors">
+    <TextLink variant="inline" href="/articles" className="text-sys-caption">
       Or browse articles →
-    </Link>
+    </TextLink>
   );
 }

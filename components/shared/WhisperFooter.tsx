@@ -4,13 +4,17 @@
  * Two links, every page, no exceptions:
  * Mirror · Articles
  * Plus the tagline "No algorithms. No feeds."
+ *
+ * Links speak through `<TextLink variant="quiet">` — the attribution
+ * register. The middle-dot separator floors at mist/35 so the comma
+ * stays legible even when the room is warm (Tanya §6.3).
  */
 
-import Link from 'next/link';
+import { TextLink } from '@/components/shared/TextLink';
 
 const FOOTER_LINKS = [
-  { href: '/mirror', label: 'Mirror', cls: 'text-gold/50 hover:text-gold' },
-  { href: '/articles', label: 'Articles', cls: 'text-mist/50 hover:text-mist' },
+  { href: '/mirror', label: 'Mirror' },
+  { href: '/articles', label: 'Articles' },
 ] as const;
 
 export default function WhisperFooter() {
@@ -27,17 +31,28 @@ export default function WhisperFooter() {
   );
 }
 
+/** Middle-dot floors at mist/35 — visible even when the room warms. */
+function FooterDot() {
+  return (
+    <span
+      aria-hidden="true"
+      style={{ color: 'color-mix(in srgb, var(--mist) 35%, transparent)' }}
+    >
+      &middot;
+    </span>
+  );
+}
+
 function FooterLink({ link, showDot }: {
   link: typeof FOOTER_LINKS[number];
   showDot: boolean;
 }) {
   return (
     <>
-      {showDot && <span className="text-mist/20">&middot;</span>}
-      <Link href={link.href}
-        className={`${link.cls} transition-colors`}>
+      {showDot && <FooterDot />}
+      <TextLink variant="quiet" href={link.href}>
         {link.label}
-      </Link>
+      </TextLink>
     </>
   );
 }
