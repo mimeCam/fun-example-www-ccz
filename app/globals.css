@@ -127,10 +127,35 @@
   --sys-elev-bloom:    0 0 18px 0 color-mix(in srgb, var(--gold) 22%, transparent);
   --sys-elev-radiance: 0 0 28px 0 color-mix(in srgb, var(--gold) 30%, transparent);
 
-  /* ─── Spacing Scale (12 steps, thermal-interpolated) ─── */
-  /* Base values + thermal lift. The lift grows with warmth score:
-     dormant = base only. Luminous = base + up to 8px (macro steps).
-     The calc() trick: constants become minimums, not absolutes. */
+  /* ─── Spacing Ledger ─────────────────────────────────────
+     Twelve numeric rungs, ordered tightest → loosest (4px → 96px).
+     The ledger names *numbers*, not literary beats — 12-rung resolution
+     preserves the 70+ live `sys-{6,9,11,12}` call-sites, and the word
+     `passage` already belongs to Typography (`leadN: 7`). Mirror is in
+     lib/design/spacing.ts. The sync test in
+     lib/design/__tests__/spacing-sync.test.ts catches drift; the
+     adoption guard keeps raw `p-4 / gap-6 / m-[16px]` from re-entering
+     component code.
+
+     `rem` is the unit space this ledger owns. Do **NOT** wire Typography's
+     `--sys-tick: 4px` into these values — different ledgers, different
+     unit spaces. Cross-ledger rhythm-sync is a category error.
+
+     Thermal carve-out: `--token-space-lift-N` is a FIRST-CLASS citizen
+     of this ledger (Mike §5.3). The `calc(<rem> + var(..., 0px))` pattern
+     means the site renders safely with ThermalProvider unmounted — the
+     0px fallback is the ledger's SSR contract.
+
+     Credits: Krystle C. (sprint shape — TS mirror + adoption guard +
+     the ~40-site migration discipline), Mike K. (napkin — five-ledger
+     isomorphism, numeric-API call, thermal-as-first-class reframing),
+     Elon M. (the kill-list — dropped the six literary beats, the 12→6
+     lossiness, the `--sys-tick-space` duplication, the `passage`
+     collision), Tanya D. (the numeric-rungs vote, the macro-rung
+     calibration across article / home / keepsake), Paul K. (the
+     "one continuous breath" outcome delivered at pixel level by the
+     adoption guard), Jason F. (the thermal-as-namespace framing that
+     survives as this header note). */
   --sys-space-1:  calc(0.25rem  + var(--token-space-lift-1,  0px));  /*  4px+ — tight */
   --sys-space-2:  calc(0.375rem + var(--token-space-lift-2,  0px));  /*  6px+ — compact */
   --sys-space-3:  calc(0.5rem   + var(--token-space-lift-3,  0px));  /*  8px+ — small */

@@ -96,6 +96,10 @@ export function showCopyFeedback(message: string = 'Copied to clipboard!', durat
   // ELEVATION_LEDGER_EXEMPT_TOKEN in lib/design/elevation.ts.
   // (Elon §4.3 fix: previously a legacy `float` Tailwind alias contradicted
   // the exempt comment; the cssText below is the single source of shadow.)
+  // spacing-ledger:exempt — same rationale for padding: the toast is minted
+  // outside React/Tailwind, so `px-4 py-2` + inline `padding: 0.5rem 1rem`
+  // are the honest literal that survives an unmounted ThermalProvider.
+  // See SPACING_LEDGER_EXEMPT_TOKEN in lib/design/spacing.ts.
   toast.style.cssText = `
     position: fixed;
     bottom: 1rem;
