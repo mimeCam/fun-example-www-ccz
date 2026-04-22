@@ -21,6 +21,7 @@
  */
 
 import type { CSSProperties } from 'react';
+import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 
 // ─── Phase vocabulary ──────────────────────────────────────────────────────
 
@@ -30,13 +31,17 @@ export type LinkPhase = 'idle' | 'hover' | 'focus';
 /** Three variants — locked. `inline` body prose, `passage` cross-room, `quiet` footnote. */
 export type LinkVariant = 'inline' | 'passage' | 'quiet';
 
-// ─── Timing & geometry constants — numeric invariants, not knobs ──────────
+// ─── Timing & geometry constants — numeric invariants, sourced from MOTION
 
-/** Hover crossfade — matches `--sys-time-hover` family (Tanya §5). */
-export const LINK_HOVER_MS = 120;
+/**
+ * Hover crossfade — shared inline-dissolve beat (`crossfade`, 120ms). This
+ * is the same beat as `<Field>` border crossfade, by design: a link and a
+ * field focus must read as the *same gesture* across the room (Tanya §3).
+ */
+export const LINK_HOVER_MS = MOTION.crossfade;
 
 /** Reduced-motion dwell — color still lands, motion does not perform. */
-export const LINK_REDUCED_MS = 10;
+export const LINK_REDUCED_MS = MOTION_REDUCED_MS;
 
 /** Underline thickness in px. `inline`/`passage` rest → hover. */
 export const LINK_UNDERLINE_REST_PX = 1;

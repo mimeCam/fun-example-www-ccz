@@ -2,7 +2,8 @@
  * ShareOverlay — icon-based share actions after mirror card reveal.
  *
  * Three icon buttons (Save PNG, Copy Link, Share on X) in a row.
- * Staggered reveal: 0ms / 100ms / 200ms delay for each button.
+ * Staggered reveal: delays sourced from `lib/design/motion.ts` so every
+ * stagger on the site reads from the same motion ledger.
  * Icons > text for instant visual parsing (Picture Superiority effect).
  */
 
@@ -19,6 +20,18 @@ import {
 } from '@/lib/sharing/share-card';
 import { encodeDeepLink } from '@/lib/sharing/deep-link';
 import { Pressable } from '@/components/shared/Pressable';
+import { MOTION } from '@/lib/design/motion';
+
+/**
+ * Stagger step between icon reveals — half the `instant` beat (75ms… but
+ * we want 100ms, which is a half-`hover` or 5x `MOTION_REDUCED_MS`).
+ * The siblings reveal at 0, STAGGER, 2×STAGGER so each button is its own
+ * held breath before landing. Sourced so every stagger on the site reads
+ * from motion tokens.
+ */
+const SHARE_STAGGER_MS = MOTION.hover / 2;              // 100
+/** Copy toast dwell — two `linger` beats; Matches ReturnLetter COPY_TOAST_MS. */
+const COPY_TOAST_MS    = MOTION.linger * 2;             // 2000
 
 interface Props {
   result: QuickMirrorResult;
@@ -35,12 +48,12 @@ export default function ShareOverlay({ result, articleId }: Props) {
         <StaggeredIconBtn delay={0}
           onClick={useSaveImage(result)}
           label="Save PNG" icon={<DownloadIcon />} />
-        <StaggeredIconBtn delay={100}
+        <StaggeredIconBtn delay={SHARE_STAGGER_MS}
           onClick={useCopyText(result.archetype, articleId, setCopied)}
           label={copied ? 'Copied!' : 'Copy Link'}
           icon={copied ? <CheckIcon /> : <ClipboardIcon />}
           confirm={copied} />
-        <StaggeredIconBtn delay={200}
+        <StaggeredIconBtn delay={SHARE_STAGGER_MS * 2}
           onClick={useXShare(result.archetype, articleId)}
           label="Share on X" icon={<XIcon />} />
       </div>
@@ -157,7 +170,7 @@ function useCopyText(
     const text = generateShareText(archetype, articleId);
     await navigator.clipboard.writeText(text);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), COPY_TOAST_MS);
   }, [archetype, articleId, setCopied]);
 }
 

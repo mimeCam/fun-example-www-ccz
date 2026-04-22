@@ -14,6 +14,7 @@ import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import { useMirrorPhases, MIRROR_PAGE_TIMINGS, type Phase } from '@/lib/hooks/useMirrorPhases';
 import ShareOverlay from './ShareOverlay';
+import { MOTION } from '@/lib/design/motion';
 
 interface Props {
   mirror: ReaderMirror;
@@ -62,7 +63,7 @@ function ArchetypeName({ label, visible, color }: {
   return (
     <h2 className={`text-sys-h3 font-display font-sys-display tracking-tight
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
-      style={{ ...fadeStyle(visible, 150), color }}>
+      style={{ ...fadeStyle(visible, MOTION.instant), color }}>
       {label}
     </h2>
   );
@@ -72,7 +73,7 @@ function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
   return (
     <p className={`mt-sys-3 text-sys-caption text-foreground/80 italic max-w-card-body
       mx-auto leading-relaxed transition-all duration-fade ${fadeClass(visible)}`}
-      style={fadeStyle(visible, 300)}>
+      style={fadeStyle(visible, MOTION.enter)}>
       &ldquo;{text}&rdquo;
     </p>
   );

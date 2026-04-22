@@ -14,6 +14,7 @@
  */
 
 import type { CSSProperties } from 'react';
+import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 
 // ─── Phase vocabulary ──────────────────────────────────────────────────────
 
@@ -26,16 +27,21 @@ export type PressVariant = 'solid' | 'ghost' | 'icon';
 /** Two sizes. `md` is default. */
 export type PressSize = 'sm' | 'md';
 
-// ─── Timing constants — numeric invariants, not knobs ──────────────────────
+// ─── Timing constants — numeric invariants, sourced from MOTION ────────────
 
-/** Tactile press dwell: long enough to feel, short enough to stay snappy. */
+/**
+ * Tactile press dwell: long enough to feel, short enough to stay snappy.
+ * Not a named beat — 80ms sits *below* `instant` (150ms) by design (press
+ * down is sub-perceptual; press release is instant). Kept as a local
+ * constant because no other surface has this same receipt-of-touch dwell.
+ */
 export const PRESS_DOWN_MS = 80;
 
 /** Release settle: halo re-blooms then fades. Tanya §6 250ms. */
 export const PRESS_SETTLE_MS = 250;
 
-/** Hover/enter duration — matches `--sys-time-hover`. */
-export const PRESS_ENTER_MS = 200;
+/** Hover/enter duration — the shared depth/scale gesture beat. */
+export const PRESS_ENTER_MS = MOTION.hover;
 
 /** Safety margin so the settle timer always clears even under GC jitter. */
 export const PRESS_SETTLE_BUDGET_MS = PRESS_SETTLE_MS + 16;
@@ -96,7 +102,7 @@ export function resolveReducedPressStyle(
   if (phase === 'idle') return undefined;
   return {
     opacity: phase === 'down' ? 0.85 : 1,
-    transitionDuration: '10ms',
+    transitionDuration: `${MOTION_REDUCED_MS}ms`,
     transitionProperty: 'opacity',
   };
 }

@@ -8,6 +8,13 @@ import { computePopoverPosition } from '@/lib/hooks/usePopoverPosition';
 import type { PopoverPosition } from '@/lib/hooks/usePopoverPosition';
 import { SelectionPopoverTrigger } from './SelectionPopoverTrigger';
 import { ResonanceDrawer } from './ResonanceDrawer';
+import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
+
+/** Enter / exit dwells for the popover. `hover` matches depth gestures
+ *  across the site; exit runs on `crossfade` plus one reduced-motion
+ *  frame so the animation finishes before the portal unmounts. */
+const POPOVER_ENTER_MS = MOTION.hover;                       // 200
+const POPOVER_EXIT_MS  = MOTION.crossfade + MOTION_REDUCED_MS; // 130
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -52,7 +59,8 @@ function usePointerCheck(): boolean {
 
 /**
  * Drives the enter/idle/exit/gone lifecycle so the portal can animate
- * both entry (180ms spring) and exit (120ms ease-in) without a library.
+ * both entry (hover beat) and exit (crossfade beat + one frame) without
+ * a library. Durations sourced from `lib/design/motion.ts`.
  */
 function usePopoverPhase(show: boolean): Phase {
   const [phase, setPhase] = useState<Phase>('gone');
@@ -62,10 +70,10 @@ function usePopoverPhase(show: boolean): Phase {
     clearTimeout(timerRef.current);
     if (show) {
       setPhase('entering');
-      timerRef.current = setTimeout(() => setPhase('idle'), 200);
+      timerRef.current = setTimeout(() => setPhase('idle'), POPOVER_ENTER_MS);
     } else {
       setPhase(p => (p === 'gone' ? 'gone' : 'exiting'));
-      timerRef.current = setTimeout(() => setPhase('gone'), 130);
+      timerRef.current = setTimeout(() => setPhase('gone'), POPOVER_EXIT_MS);
     }
     return () => clearTimeout(timerRef.current);
   }, [show]);

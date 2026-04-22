@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ThermalState } from '@/lib/thermal/thermal-score';
+import { CEREMONY } from '@/lib/design/motion';
 
 export type ResonancePhase = 'idle' | 'shimmering' | 'settled';
 
@@ -32,11 +33,15 @@ function intensityFromThermal(state: ThermalState): ResonanceIntensity {
   return 'subtle';
 }
 
-/** Ceremony timing constants for consumer choreography. */
+/**
+ * Ceremony timing constants for consumer choreography.
+ * Sourced from `lib/design/motion.ts` CEREMONY namespace so every narrative
+ * pacing on the site reads from one ledger. Names kept for call-site clarity.
+ */
 export const CEREMONY_TIMING = {
-  T_SUCCESS: 400,    // ms — success message appears after shimmer start
-  T_SETTLE: 1500,    // ms — all animations resolve
-  T_CLOSE: 2600,     // ms — drawer auto-closes (extended from 2000ms)
+  T_SUCCESS: CEREMONY.tSuccess, // success message appears after shimmer start
+  T_SETTLE:  CEREMONY.tSettle,  // all animations resolve
+  T_CLOSE:   CEREMONY.tClose,   // drawer auto-closes
 } as const;
 
 export function useResonanceCeremony(

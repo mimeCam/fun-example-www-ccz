@@ -12,6 +12,10 @@
 
 import { useEffect, useState } from 'react';
 import type { ReturnRecognitionState } from '@/lib/hooks/useReturnRecognition';
+import { MOTION } from '@/lib/design/motion';
+
+/** Whisper-settle dwell: eight `linger` breaths. A long, ambient quiet. */
+const WHISPER_SETTLE_MS = MOTION.linger * 8; // 8000ms
 
 interface Props {
   recognition: ReturnRecognitionState;
@@ -22,7 +26,7 @@ export function RecognitionWhisper({ recognition }: Props) {
 
   useEffect(() => {
     if (!recognition.isReturning) return;
-    const id = setTimeout(() => setSettled(true), 8000);
+    const id = setTimeout(() => setSettled(true), WHISPER_SETTLE_MS);
     return () => clearTimeout(id);
   }, [recognition.isReturning]);
 
@@ -33,7 +37,7 @@ export function RecognitionWhisper({ recognition }: Props) {
   return (
     <div
       className="animate-fade-in opacity-0"
-      style={{ animationDelay: '1.5s', animationFillMode: 'forwards' }}
+      style={{ animationDelay: `${MOTION.settle}ms`, animationFillMode: 'forwards' }}
     >
       <p
         className={`text-sys-caption italic font-display transition-opacity duration-linger thermal-drift

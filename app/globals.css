@@ -100,13 +100,14 @@
   --sys-maxw-card-body: 340px;
   --sys-maxw-divider: 120px;
 
-  --sys-time-hover: 200ms;
-  --sys-time-enter: 300ms;
-  --sys-time-reveal: 700ms;
-  --sys-time-linger: 1000ms;
-  --sys-time-fade: 500ms;
-  --sys-time-instant: 150ms;
-  --sys-time-settle: 1500ms;
+  --sys-time-crossfade: 120ms; /* inline color/border dissolve (links, field border) */
+  --sys-time-instant: 150ms;   /* press-down acknowledgement — receipt of touch */
+  --sys-time-hover: 200ms;     /* depth/scale gesture — card lift, shadow breath */
+  --sys-time-enter: 300ms;     /* a surface arriving into the room */
+  --sys-time-fade: 500ms;      /* neutral dissolve — content swap */
+  --sys-time-reveal: 700ms;    /* a discovery — thing becoming visible deliberately */
+  --sys-time-linger: 1000ms;   /* passage breathing — density & spacing shifts */
+  --sys-time-settle: 1500ms;   /* signature patience — the room arriving at rest */
 
   --sys-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
@@ -449,7 +450,7 @@ body {
 }
 .cta-physical:active {
   transform: translateY(1px) scale(0.98);
-  transition-duration: var(--sys-time-instant); /* 80ms — immediate press response */
+  transition-duration: var(--sys-time-instant); /* 150ms — immediate press response */
   transition-timing-function: var(--sys-ease-out);
 }
 .cta-physical:not(:hover) {

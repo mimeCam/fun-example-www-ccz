@@ -12,6 +12,8 @@
  * Krystle C. (deferred-unmount foundation), Elon M. (no-new-tokens line).
  */
 
+import { MOTION } from '@/lib/design/motion';
+
 // ─── Phase vocabulary ──────────────────────────────────────────────────────
 
 /** Four-state lifecycle. `closed` ⇒ portal unmounts. */
@@ -28,8 +30,11 @@ export const BACKDROP_EXIT_DELAY_MS = 60;
 /** Backdrop fade duration after the delay. Ends with the chamber. */
 export const BACKDROP_EXIT_MS = 90;
 
-/** Chamber exit duration — matches `animate-slide-out-right` keyframe. */
-export const CHAMBER_EXIT_MS = 150;
+/**
+ * Chamber exit duration — the room's "closing door" gesture rides the
+ * `instant` beat (150ms). Matches the `animate-slide-out-right` keyframe.
+ */
+export const CHAMBER_EXIT_MS = MOTION.instant;
 
 /** Safety margin before declaring the close "settled" (for cleanup). */
 export const EXIT_SETTLE_BUDGET_MS = CHAMBER_EXIT_MS + 16;

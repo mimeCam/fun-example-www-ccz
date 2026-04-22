@@ -15,6 +15,7 @@
 
 import { useState, useEffect, useRef, useCallback, createContext, useContext, type ReactNode } from 'react';
 import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
+import { CEREMONY, MOTION } from '@/lib/design/motion';
 
 /** Ceremony phases — each maps to a specific visual response. */
 export type CeremonyPhase =
@@ -63,11 +64,15 @@ interface SequencerProps {
   children: ReactNode;
 }
 
-/** Timing constants — the choreography. */
-const T_BREATH = 300;    // ms — anticipation pause before shimmer
-const T_SHIMMER = 700;   // ms — base shimmer duration (varies by intensity)
-const T_GLOW_HOLD = 2000; // ms — GoldenThread gold burst hold
-const T_GIFT_DELAY = 700;  // ms — after shimmer, NextRead appears
+/**
+ * Timing constants — the choreography. Sourced from `lib/design/motion.ts`
+ * CEREMONY namespace so narrative pacing reads from one ledger. Shimmer
+ * uses the `reveal` / `fade` beats scaled by intensity (see shimmerDuration).
+ * Names kept for call-site clarity.
+ */
+const T_BREATH     = CEREMONY.breath;     // anticipation pause before shimmer
+const T_GLOW_HOLD  = CEREMONY.glowHold;   // GoldenThread gold burst hold
+const T_GIFT_DELAY = CEREMONY.giftDelay;  // after shimmer, NextRead appears
 
 export function CeremonySequencer({ triggered, confidence, onRefresh, children }: SequencerProps) {
   const [phase, setPhase] = useState<CeremonyPhase>('idle');
@@ -77,8 +82,16 @@ export function CeremonySequencer({ triggered, confidence, onRefresh, children }
 
   const intensity = intensityFromConfidence(confidence);
 
-  /** Shimmer duration scales with intensity. */
-  const shimmerDuration = intensity === 'radiant' ? 900 : intensity === 'present' ? 700 : 500;
+  /**
+   * Shimmer duration scales with intensity. `present` is the canonical
+   * `reveal` beat; `subtle` backs off to `fade`; `radiant` extends the
+   * reveal by one breath so the moment sits fuller. All sourced from
+   * MOTION / CEREMONY — no bare literals.
+   */
+  const shimmerDuration =
+    intensity === 'radiant' ? MOTION.reveal + MOTION.hover   // 900 — revealed + one depth breath
+    : intensity === 'present' ? MOTION.reveal                // 700 — canonical reveal
+    : MOTION.fade;                                           // 500 — backed off to fade
 
   /** Advance to next phase with a timeout. */
   const advanceAfter = useCallback((next: CeremonyPhase, ms: number) => {

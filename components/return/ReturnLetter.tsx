@@ -19,6 +19,16 @@ import { getSeason } from '@/lib/mirror/season-engine';
 import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
+import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
+
+// ─── Timing — sourced from motion tokens ───────────────────
+
+/** Seed delay so approach → settle fires one frame after mount. */
+const RETURN_LETTER_SEED_MS = MOTION_REDUCED_MS * 5; // 50ms
+/** Settle dwell — `linger` beat plus one `hover` breath. */
+const RETURN_LETTER_SETTLE_MS = MOTION.linger + MOTION.hover; // 1200ms
+/** Copy toast dwell — two `linger` beats, long enough to read. */
+const COPY_TOAST_MS = MOTION.linger * 2; // 2000ms
 
 // ─── Phase animation ─────────────────────────────────────
 
@@ -146,7 +156,7 @@ function LetterCard({
     const text = [letter.salutation, '', letter.opening, ...letter.body, '', letter.closing, '', letter.signOff].join('\n');
     navigator.clipboard.writeText(text).then(() => {
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), COPY_TOAST_MS);
     }).catch(() => { /* noop */ });
   }, [letter]);
 
@@ -240,10 +250,11 @@ export function ReturnLetter() {
   const letter = letterCtx ? composeLetter(letterCtx) : null;
 
   // Animation timeline (approach → settle → rest)
+  // Seed a frame later than reduced-motion floor, settle on `linger + hover`.
   useEffect(() => {
     if (!showLetter || !letter) return;
-    const t1 = setTimeout(() => setPhase('settle'), 50);
-    const t2 = setTimeout(() => { setPhase('rest'); setSettled(true); }, 1200);
+    const t1 = setTimeout(() => setPhase('settle'), RETURN_LETTER_SEED_MS);
+    const t2 = setTimeout(() => { setPhase('rest'); setSettled(true); }, RETURN_LETTER_SETTLE_MS);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [showLetter, letter]);
 

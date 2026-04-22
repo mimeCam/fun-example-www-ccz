@@ -20,6 +20,7 @@
 
 import type { CSSProperties } from 'react';
 import { PRESSABLE_DISABLED } from '@/lib/utils/press-phase';
+import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 
 // ─── Phase vocabulary ──────────────────────────────────────────────────────
 
@@ -32,12 +33,16 @@ export type FieldVariant = 'text' | 'multiline';
 /** Two sizes — matches `<Pressable>`. `md` is default. */
 export type FieldSize = 'sm' | 'md';
 
-// ─── Timing constants — numeric invariants, not knobs ─────────────────────
+// ─── Timing constants — numeric invariants, sourced from MOTION ───────────
 
-/** Border crossfade on focus arrival/departure (Tanya §4). */
-export const FIELD_BORDER_MS = 120;
+/** Border crossfade on focus arrival/departure — shared inline-dissolve beat. */
+export const FIELD_BORDER_MS = MOTION.crossfade;
 
-/** Error held frame — long enough to register, short enough to forgive. */
+/**
+ * Error held frame — long enough to register, short enough to forgive.
+ * Sits between `fade` (500ms) and `reveal` (700ms); not a named beat
+ * because no other surface "holds an error" — it's a field-only dwell.
+ */
 export const FIELD_ERROR_HOLD_MS = 600;
 
 /** Safety margin so the error-clear timer always fires even under GC jitter. */
@@ -84,7 +89,7 @@ export function resolveFieldStyle(
   return {
     borderColor: resolveFieldBorderColor(phase),
     transitionProperty: 'border-color, background-color',
-    transitionDuration: reduced ? '10ms' : `${FIELD_BORDER_MS}ms`,
+    transitionDuration: reduced ? `${MOTION_REDUCED_MS}ms` : `${FIELD_BORDER_MS}ms`,
     transitionTimingFunction: 'var(--sys-ease-out)',
   };
 }
