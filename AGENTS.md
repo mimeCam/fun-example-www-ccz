@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — seven ledgers (motion, elevation, color, typography, spacing, radius, alpha) + ambient-surfaces CSS + contrast helpers
+- `lib/design/` — eight ledgers (motion, elevation, color, typography, spacing, radius, alpha, **z-index**) + ambient-surfaces CSS + contrast helpers
 - `lib/sharing/` — clipboard, share cards, thread keepsake SVG/PNG, **toast-store + reply-lexicon**
 - `lib/mirror/` — archetype scoring
 - `lib/thread/` — **ThreadPulse**: RAF-driven sub-pixel depth driver (modes / tween / driver) powering Golden Thread
@@ -20,7 +20,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — and the Thread Keepsake lets readers share a unique artifact of *their* read.
 
 ## Design System
-Six shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`, `<Skeleton>`, `<Toast>`. Seven ledgers, each owns its unit space — no cross-ledger metronome. `<Skeleton>` is a sealed composition of the Alpha (hairline↔muted) and Motion (linger) ledgers — no new rungs, three variants (`line`·`block`·`card`). `<Toast>` is a portal-mounted single-slot reply (n=1, fixed dwell, no warmth modulation, no glow); the store (`lib/sharing/toast-store.ts`) is a tiny pub/sub singleton serving both React-side (`useToast()`) and pure-TS (`toastShow(...)`) callers; the voice (`lib/sharing/reply-lexicon.ts`) folds 5 archetypes → 3 tone buckets and locks the confirm-verb invariant. Single host: `<ToastHost />` mounted once in `<ThermalLayout>`.
+Six shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`, `<Skeleton>`, `<Toast>`. Eight ledgers, each owns its unit space — no cross-ledger metronome. `<Skeleton>` is a sealed composition of the Alpha (hairline↔muted) and Motion (linger) ledgers — no new rungs, three variants (`line`·`block`·`card`). `<Toast>` is a portal-mounted single-slot reply (n=1, fixed dwell, no warmth modulation, no glow); the store (`lib/sharing/toast-store.ts`) is a tiny pub/sub singleton serving both React-side (`useToast()`) and pure-TS (`toastShow(...)`) callers; the voice (`lib/sharing/reply-lexicon.ts`) folds 5 archetypes → 3 tone buckets and locks the confirm-verb invariant. Single host: `<ToastHost />` mounted once in `<ThermalLayout>`.
 
 Pair rule: adding an 8th ledger means shipping `<ledger>-sync.test.ts` AND `<ledger>-adoption.test.ts` in the same PR — the row doesn't count until both land.
 
@@ -33,6 +33,9 @@ Pair rule: adding an 8th ledger means shipping `<ledger>-sync.test.ts` AND `<led
 | Spacing | `lib/design/spacing.ts` | 12 numeric rungs (4px→96px) | rem |
 | Radius | `lib/design/radius.ts` | 4 rungs (soft·medium·wide·full) | rem + pill |
 | Alpha | `lib/design/alpha.ts` | 4 rungs (hairline·muted·recede·quiet) + color-alpha shorthand fence | role-in-attention α |
+| Z | `lib/design/z-index.ts` | 9 named slots (base·thread·nav·gem·popover·backdrop·drawer·overlay·toast); three mirrors: `Z` const ↔ `--sys-z-*` ↔ `z-sys-*` | stack-order integer |
+
+**Elevation vs Z (orthogonal axes).** Elevation (`lib/design/elevation.ts`) = expressive lift (gold-α, shadow); it warms. Z (`lib/design/z-index.ts`) = structural stack order; it never warms. They were historically conflated under "depth," now aren't. A `drawer` lives at `Z.drawer` regardless of whether its elevation is `rest` or `radiance`; a `toast` always outranks a `drawer` in occlusion even though the drawer carries heavier shadow. The 9 rungs are *slots, not a scale* — new slots require napkin-level justification. The `backdrop:39 → drawer:40` adjacency is the deliberate seam where modal + scrim bind. Z governs siblings-in-root; nested stacking contexts are component-local.
 
 Radius does not warm with engagement — the room's constant posture. One carve-out: `mirrorRadiusBreathe` hero keyframe. Alpha does not warm either — Motion owns the `opacity-0` / `opacity-100` fade endpoints (allow-list: `lib/utils/animation-phase.ts`). Exemptions use `// <ledger-name>:exempt` comments.
 
@@ -41,7 +44,7 @@ Radius does not warm with engagement — the room's constant posture. One carve-
 Adoption guards extend the fence site-wide: `motion-adoption` now catches raw numeric `setTimeout(_, N)` literals in `components/**` / `lib/hooks/**`; `alpha-adoption` now catches inline-style `opacity: N` literals alongside the existing Tailwind `opacity-NN` sweep, **and (Phase II) the Tailwind `(bg|text|border|shadow)-<color>/N` shorthand** — only ledger rungs {10, 30, 50, 70} admitted, `/100` reserved for Motion fade endpoints. Legitimate color-alpha surfaces route through `alphaClassOf(color, rung, kind)` in `lib/design/alpha.ts` (JIT-safe literal table, one entry per (kind × family × rung) cell). Pre-Phase-II drift is absorbed by `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS` — one receipt per file, shrinks only. Flagship `GoldenThread.tsx` quotes `CEREMONY.glowHold` for the settled→fading dwell and `ALPHA.muted` for the fading posture — no magic numbers; its Thread-track `bg-fog/30` now routes through `alphaClassOf('fog','muted')`, same literal emitted.
 
 ## WIP
-- _(none — all 7 ledgers sealed with sync + adoption guards; 6 shared primitives shipped)_
+- _(none — all 8 ledgers sealed with sync + adoption guards; 6 shared primitives shipped)_
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.
