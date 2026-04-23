@@ -11,10 +11,14 @@
 
 import { computeThermalTokens } from '@/lib/thermal/thermal-tokens';
 import { contrast, compositeOver } from '@/lib/design/contrast';
+import { FOCUS } from '@/lib/design/focus';
 // Math helpers live in lib/design/contrast.ts — shared with
 // ambient-surfaces.test.ts. One implementation, two callers (Mike §3).
 
-const RING_ALPHA = 0.8; // matches globals.css :focus-visible 80%
+// reader-invariant — ring alpha sourced from FOCUS.alpha (the TS mirror of
+// the CSS-canonical `:focus-visible` 80%). Kept as a local const so the
+// reviewer-facing comment about WCAG SC 1.4.11 stays at the assertion site.
+const RING_ALPHA = FOCUS.alpha; // matches globals.css :focus-visible 80%
 const MIDPOINT_MIN = 2.85; // WCAG 1.4.11 (3:1) — tiny interpolation headroom
 const DORMANT_FLOOR = 1.8; // Known palette limit at pure violet vs navy
 const WARM_MIN = 3.0; // strict WCAG at the warm endpoint

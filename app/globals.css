@@ -296,7 +296,9 @@
 /* Focus-visible ring — author-triggered (keyboard nav), not gesture-surface.
    Stays here by design — Tanya §7 / Mike P9. Thermal accent, not system blue.
    80% (was 70%): Tanya §4 prescribed mitigation — midpoints were dipping
-   under WCAG 1.4.11 non-text (3:1). See lib/utils/__tests__/contrast.test.ts. */
+   under WCAG 1.4.11 non-text (3:1). See lib/utils/__tests__/contrast.test.ts.
+   TS mirror: lib/design/focus.ts (reader-invariant — does not warm, does not
+   personalize, does not archetype-fork). Sync guard: focus-sync.test.ts. */
 :focus-visible {
   outline: 2px solid color-mix(in srgb, var(--token-accent) 80%, transparent);
   outline-offset: 2px;
