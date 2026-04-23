@@ -32,6 +32,7 @@ export default function EvolutionThread({ context, position = 0, total = 1 }: Pr
     : legacyWhisper(position, total);
 
   return (
+    // alpha-ledger:exempt — motion fade endpoints (whisper enters via opacity transition)
     <div className={`mx-sys-5 my-sys-5 pl-sys-5 pr-sys-5 py-sys-4 border-l-2 border-gold/20 bg-gold/8
       rounded-r-sys-medium transition-opacity duration-reveal
       ${visible ? 'opacity-100' : 'opacity-0'}`}>

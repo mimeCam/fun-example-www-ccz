@@ -153,7 +153,7 @@ function ExternalGlyph(): JSX.Element {
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
-      className="inline-block align-baseline ml-[0.2em] opacity-70"
+      className="inline-block align-baseline ml-[0.2em] opacity-quiet"
       style={{ verticalAlign: '0.08em' }}
     >
       <path d="M3.5 6.5 L7 3 M4.25 3 H7 V5.75" strokeLinecap="round" strokeLinejoin="round" />

@@ -28,8 +28,9 @@ export default function ViaWhisper({ via }: Props) {
   }, []);
 
   return (
+    // alpha-ledger:exempt — motion fade endpoint (opacity-100 is the visible transition target)
     <p className={`text-center text-sys-caption transition-opacity duration-linger mb-sys-4
-      ${dimmed ? 'opacity-30' : 'opacity-100'}`}>
+      ${dimmed ? 'opacity-muted' : 'opacity-100'}`}>
       <span className="text-gold/80 italic">{text}</span>
     </p>
   );

@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — six ledgers (motion, elevation, color, typography, spacing, radius) + ambient-surfaces CSS + contrast helpers
+- `lib/design/` — seven ledgers (motion, elevation, color, typography, spacing, radius, alpha) + ambient-surfaces CSS + contrast helpers
 - `lib/sharing/` — clipboard, share cards, thread keepsake SVG/PNG
 - `lib/mirror/` — archetype scoring
 - `lib/utils/` — focus-utils, scroll-lock, reduced-motion, phase resolvers
@@ -18,7 +18,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — and the Thread Keepsake lets readers share a unique artifact of *their* read.
 
 ## Design System
-Four shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. Six ledgers, each owns its unit space — no cross-ledger metronome.
+Four shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. Seven ledgers, each owns its unit space — no cross-ledger metronome.
 
 | Ledger | File | Rungs | Unit |
 |---|---|---|---|
@@ -28,8 +28,9 @@ Four shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. S
 | Typography | `lib/design/typography.ts` | 6 beats (caption→display) | `--sys-tick` 4px |
 | Spacing | `lib/design/spacing.ts` | 12 numeric rungs (4px→96px) | rem |
 | Radius | `lib/design/radius.ts` | 4 rungs (soft·medium·wide·full) | rem + pill |
+| Alpha | `lib/design/alpha.ts` | 4 rungs (hairline·muted·recede·quiet) | role-in-attention α |
 
-Radius does not warm with engagement — the room's constant posture. One carve-out: `mirrorRadiusBreathe` hero keyframe. Exemptions use `// <ledger-name>:exempt` comments.
+Radius does not warm with engagement — the room's constant posture. One carve-out: `mirrorRadiusBreathe` hero keyframe. Alpha does not warm either — Motion owns the `opacity-0` / `opacity-100` fade endpoints (allow-list: `lib/utils/animation-phase.ts`). Exemptions use `// <ledger-name>:exempt` comments.
 
 ## WIP
 - _(none — all ledgers sealed)_

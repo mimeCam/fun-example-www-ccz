@@ -36,16 +36,17 @@ type Phase = 'approach' | 'settle' | 'rest';
 
 function phaseStyles(phase: Phase, settled: boolean): string {
   if (phase === 'approach') {
-    return 'opacity-0 translate-y-enter-sm';
+    return 'opacity-0 translate-y-enter-sm'; // alpha-ledger:exempt — motion fade endpoint
   }
   if (phase === 'settle') {
     // Tanya §2.1: bloom halo arrives with the copy — flat warmth, not lift.
+    // alpha-ledger:exempt — motion fade endpoint (transition target at full presence)
     return `opacity-100 translate-y-0 transition-all duration-reveal ease-out
             border-accent/20 shadow-sys-bloom`;
   }
   // At rest: settled letters keep the bloom (warmth stays); un-settled
   // drop to `sys-rest` (the letter keeps its seat; the warmth leaves).
-  return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-sys-bloom' : 'border-accent/10 shadow-sys-rest'}`;
+  return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-sys-bloom' : 'border-accent/10 shadow-sys-rest'}`; // alpha-ledger:exempt — motion fade endpoint
 }
 
 // ─── Compact greeting (known readers, < 3 days) ──────────

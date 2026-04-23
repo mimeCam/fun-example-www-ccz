@@ -127,6 +127,27 @@
   --sys-elev-bloom:    0 0 18px 0 color-mix(in srgb, var(--gold) 22%, transparent);
   --sys-elev-radiance: 0 0 28px 0 color-mix(in srgb, var(--gold) 30%, transparent);
 
+  /* ─── Alpha Ledger ───────────────────────────────────────
+     Four presence rungs, named by the role the element plays in the
+     reader's attention (not by volume, not by intimacy):
+       hairline (0.10) — a line, not content (dividers, ghost strokes)
+       muted    (0.30) — ambient chrome; skip past it  (skeletons, rest-state)
+       recede   (0.50) — context around the subject    (meta, attribution)
+       quiet    (0.70) — content, but not THE content (secondary copy)
+     Mirror is in lib/design/alpha.ts. The sync test in
+     lib/design/__tests__/alpha-sync.test.ts catches drift.
+     Adoption test enforces no raw opacity-NN outside the Motion carve-out
+     (`lib/utils/animation-phase.ts` owns opacity-0 / opacity-100).
+
+     Credits: Tanya D. (UIX #80 — role-based rungs, first-scroll shape test),
+     Mike K. (architect #24 — CSS-canonical pattern, scope fence, Motion
+     carve-out), Elon M. (the four-rung consolidation + endpoint split),
+     Paul K. (the body-gains-authority outcome). */
+  --sys-alpha-hairline: 0.1;
+  --sys-alpha-muted:    0.3;
+  --sys-alpha-recede:   0.5;
+  --sys-alpha-quiet:    0.7;
+
   /* ─── Spacing Ledger ─────────────────────────────────────
      Twelve numeric rungs, ordered tightest → loosest (4px → 96px).
      The ledger names *numbers*, not literary beats — 12-rung resolution

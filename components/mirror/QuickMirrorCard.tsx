@@ -112,9 +112,13 @@ function phaseClass(p: Phase): string {
   // Tanya §2.2: reveal/rest settle into the ambient gold room — flat halo,
   // not lift. Depth's "I am a reveal" whisper belongs to the prior shimmer
   // phase (archetype-tinted, still exempt per §5 carve-out below).
+  // alpha-ledger:exempt — motion fade endpoints (hidden → shimmer/reveal/rest
+  // ride Motion's opacity axis). `emergence` uses `opacity-quiet` (0.70) —
+  // the "content-but-not-the-content" rung — because the card is legible
+  // at that tier before the shimmer brings it to full presence.
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
-    emergence: 'opacity-80 translate-y-0 border-gold/10',
+    emergence: 'opacity-quiet translate-y-0 border-gold/10',
     shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
     reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
     rest:      'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
@@ -134,6 +138,7 @@ function shimmerStyle(p: Phase, colors: { shimmerTo: string }): React.CSSPropert
 
 function fadeClass(visible: boolean): string {
   const base = 'transition-all duration-fade';
+  // alpha-ledger:exempt — motion fade endpoints (visible/hidden transition pair)
   return visible ? `${base} opacity-100 translate-y-0` : `${base} opacity-0 translate-y-enter-sm`;
 }
 

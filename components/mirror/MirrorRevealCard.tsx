@@ -92,9 +92,12 @@ function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
 function phaseClass(p: Phase): string {
   // Tanya §2.3: same as QuickMirrorCard — the room is warming (bloom),
   // not lifting. The reveal gesture lives in the prior shimmer phase.
+  // alpha-ledger:exempt — motion fade endpoints (hidden → shimmer/reveal/rest).
+  // `emergence` uses `opacity-quiet` (0.70) — the "content-but-not-the-content"
+  // rung — so the card is legible at that tier before shimmer brings full presence.
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
-    emergence: 'opacity-80 translate-y-0 border-gold/10',
+    emergence: 'opacity-quiet translate-y-0 border-gold/10',
     shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
     reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
     rest:      'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
@@ -110,6 +113,7 @@ function shimmerStyle(p: Phase, colors: { shimmerTo: string }): React.CSSPropert
 }
 
 function fadeClass(visible: boolean): string {
+  // alpha-ledger:exempt — motion fade endpoints (visible/hidden transition pair)
   return visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md';
 }
 

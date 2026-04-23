@@ -40,9 +40,12 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
   // `shadow-rose-glow` is a tinted accent outside the six-beat ledger
   // (TINTED_ACCENTS in lib/design/elevation.ts); this file is one of two
   // allow-listed homes for it — the reader's own voice carrying warmth.
+  // Tanya §4.2: faded row collapses the duet — surface/30 is already stepped
+  // back; the prior bare 0.60 alpha snaps DOWN to `opacity-recede` (0.50) so
+  // the whole row speaks at one "context around the subject" tier.
   const base = 'rounded-sys-medium p-sys-7 my-sys-8 transition-all duration-enter';
   const alive = 'bg-surface/60 border-l-4 border-rose shadow-rose-glow';
-  const dimmed = 'bg-surface/30 border-l-4 border-rose/30 opacity-60';
+  const dimmed = 'bg-surface/30 border-l-4 border-rose/30 opacity-recede';
   const cls = `${base} ${faded ? dimmed : alive}`;
 
   return (

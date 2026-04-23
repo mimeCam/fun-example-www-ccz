@@ -117,6 +117,21 @@ const config: Config = {
         'sys-heading': 'var(--sys-lead-heading)',
         'sys-display': 'var(--sys-lead-display)',
       },
+      /* Alpha Ledger — four presence rungs, mirror of --sys-alpha-* in
+         globals.css. Source of truth: lib/design/alpha.ts. Applies BOTH to
+         the standalone `opacity-*` utility AND Tailwind's `/modifier` color
+         shorthand (e.g. `text-mist/recede`). Tailwind's `theme.opacity`
+         controls both surfaces from one definition.
+
+         Named by UX role in attention, not by volume. Motion owns the
+         endpoints: opacity-0 / opacity-100 live in lib/utils/animation-phase.ts.
+         Sync test guards drift; adoption test keeps raw `opacity-\d+` out. */
+      opacity: {
+        'hairline': 'var(--sys-alpha-hairline)',
+        'muted':    'var(--sys-alpha-muted)',
+        'recede':   'var(--sys-alpha-recede)',
+        'quiet':    'var(--sys-alpha-quiet)',
+      },
       /* System radius scale — absorbs ad-hoc rounded-* values.
          Thermal bonus adds 0–0.5rem on top of --sys-radius-medium at warm+. */
       borderRadius: {

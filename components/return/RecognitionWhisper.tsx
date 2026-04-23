@@ -36,12 +36,13 @@ export function RecognitionWhisper({ recognition }: Props) {
 
   return (
     <div
+      // alpha-ledger:exempt — motion fade endpoint (animate-fade-in starts at opacity-0)
       className="animate-fade-in opacity-0"
       style={{ animationDelay: `${MOTION.settle}ms`, animationFillMode: 'forwards' }}
     >
       <p
         className={`text-sys-caption italic font-display transition-opacity duration-linger thermal-drift
-          ${settled ? 'opacity-30' : 'opacity-70'}`}
+          ${settled ? 'opacity-muted' : 'opacity-quiet'}`}
         style={{ color: 'var(--mist)' }}
       >
         <span className="text-gold/60">{archetypeLabel}</span>

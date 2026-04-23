@@ -46,6 +46,7 @@ export interface ThresholdProps extends ThresholdOptions {
 
 // ─── Design-system constants (locked — do not parameterise) ────────────────
 
+// alpha-ledger:exempt — motion fade endpoint (reduced-motion baseline at full presence)
 const BACKDROP_BASE =
   'fixed inset-0 z-sys-backdrop bg-void/65 backdrop-blur-sm ' +
   'motion-reduce:opacity-100';
