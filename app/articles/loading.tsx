@@ -36,10 +36,10 @@ function Grid() {
 function CardSkeleton() {
   return (
     <div className="rounded-sys-medium thermal-radius bg-surface/30 p-sys-6 animate-pulse">
-      <div className="h-4 w-3/4 rounded bg-surface/50 mb-sys-3" />
-      <div className="h-3 w-full rounded bg-surface/40 mb-sys-2" />
-      <div className="h-3 w-5/6 rounded bg-surface/40 mb-sys-4" />
-      <div className="h-3 w-1/3 rounded bg-surface/30" />
+      <div className="h-4 w-3/4 rounded-sys-soft bg-surface/50 mb-sys-3" />
+      <div className="h-3 w-full rounded-sys-soft bg-surface/40 mb-sys-2" />
+      <div className="h-3 w-5/6 rounded-sys-soft bg-surface/40 mb-sys-4" />
+      <div className="h-3 w-1/3 rounded-sys-soft bg-surface/30" />
     </div>
   );
 }

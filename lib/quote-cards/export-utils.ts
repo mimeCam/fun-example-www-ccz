@@ -106,6 +106,16 @@ export function showExportFeedback(
 
   // Create toast element
   const toast = document.createElement('div');
+  // radius-ledger:exempt — foreign-DOM toast: `var(--sys-radius-*)` does not
+  // resolve on a DOM node appended before React/Tailwind process the custom-
+  // property cascade. `rounded-lg` ≡ 8px ≡ `--sys-radius-medium` ("held",
+  // operational confirmation per Tanya §5.2). See RADIUS_LEDGER_EXEMPT_TOKEN
+  // in lib/design/radius.ts.
+  // elevation-ledger:exempt — same rationale: `shadow-lg` is the preset
+  // whose numbers approximate `--sys-elev-float`; the DOM node is minted
+  // outside React's render pipeline.
+  // spacing-ledger:exempt — same rationale: `px-6 py-3` is the literal
+  // preset that survives an unmounted ThermalProvider.
   toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
   toast.textContent = message;
 
@@ -135,6 +145,10 @@ export function showExportError(
     : 'Failed to copy to clipboard';
 
   const toast = document.createElement('div');
+  // radius-ledger:exempt / elevation-ledger:exempt / spacing-ledger:exempt —
+  // foreign-DOM error toast, same rationale as the success toast above
+  // (Tanya §5.2). `rounded-lg` ≡ --sys-radius-medium; `shadow-lg`/`px-6
+  // py-3` preserved literally because vars do not resolve at append time.
   toast.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
   toast.textContent = message;
 

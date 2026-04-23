@@ -21,8 +21,8 @@ export default function ArticleLoading() {
 function HeaderSkeleton() {
   return (
     <header className="mb-sys-8 text-center">
-      <div className="h-8 w-3/4 mx-auto rounded bg-surface/30 animate-pulse mb-sys-3" />
-      <div className="h-4 w-20 mx-auto rounded bg-surface/20 animate-pulse" />
+      <div className="h-8 w-3/4 mx-auto rounded-sys-soft bg-surface/30 animate-pulse mb-sys-3" />
+      <div className="h-4 w-20 mx-auto rounded-sys-soft bg-surface/20 animate-pulse" />
     </header>
   );
 }
@@ -43,5 +43,5 @@ function Paragraphs() {
 
 function Line({ width }: { width: string }) {
   const w = width === 'full' ? 'w-full' : `w-${width}`;
-  return <div className={`h-3 ${w} rounded bg-surface/30`} />;
+  return <div className={`h-3 ${w} rounded-sys-soft bg-surface/30`} />;
 }

@@ -19,8 +19,8 @@ export default function ResonancesLoading() {
 function TitleSkeleton() {
   return (
     <div className="mb-sys-8">
-      <div className="h-7 w-48 rounded bg-surface/30 animate-pulse mb-sys-3" />
-      <div className="h-3 w-32 rounded bg-surface/20 animate-pulse" />
+      <div className="h-7 w-48 rounded-sys-soft bg-surface/30 animate-pulse mb-sys-3" />
+      <div className="h-3 w-32 rounded-sys-soft bg-surface/20 animate-pulse" />
     </div>
   );
 }
@@ -37,15 +37,15 @@ function Entries() {
 function EntrySkeleton() {
   return (
     <div className="rounded-sys-medium thermal-radius bg-surface/20 p-sys-5 animate-pulse">
-      <div className="h-3 w-2/3 rounded bg-surface/40 mb-sys-3" />
-      <div className="h-4 w-full rounded bg-surface/30 mb-sys-2" />
-      <div className="h-3 w-1/4 rounded bg-surface/20" />
+      <div className="h-3 w-2/3 rounded-sys-soft bg-surface/40 mb-sys-3" />
+      <div className="h-4 w-full rounded-sys-soft bg-surface/30 mb-sys-2" />
+      <div className="h-3 w-1/4 rounded-sys-soft bg-surface/20" />
     </div>
   );
 }
 
 function SlotSkeleton() {
   return (
-    <div className="h-4 w-24 rounded bg-surface/20 animate-pulse mt-sys-6" />
+    <div className="h-4 w-24 rounded-sys-soft bg-surface/20 animate-pulse mt-sys-6" />
   );
 }

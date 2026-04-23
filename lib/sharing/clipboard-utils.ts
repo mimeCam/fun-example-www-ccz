@@ -100,6 +100,11 @@ export function showCopyFeedback(message: string = 'Copied to clipboard!', durat
   // outside React/Tailwind, so `px-4 py-2` + inline `padding: 0.5rem 1rem`
   // are the honest literal that survives an unmounted ThermalProvider.
   // See SPACING_LEDGER_EXEMPT_TOKEN in lib/design/spacing.ts.
+  // radius-ledger:exempt — foreign-DOM toast: `var(--sys-radius-*)` does
+  // not resolve on a DOM node appended before React/Tailwind process the
+  // custom-property cascade. The inline `border-radius: 0.5rem` literal
+  // mirrors `--sys-radius-medium` (held, the confirmation-scale rung).
+  // See RADIUS_LEDGER_EXEMPT_TOKEN in lib/design/radius.ts (Tanya §5.1).
   toast.style.cssText = `
     position: fixed;
     bottom: 1rem;

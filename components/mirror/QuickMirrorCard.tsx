@@ -28,7 +28,7 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
   const colors = ARCHETYPE_COLORS[(result.archetype as ArchetypeKey) ?? 'collector'];
 
   if (dismissed) return (
-    <div className="my-sys-8 mx-auto max-w-divider h-px bg-gold/20 rounded-full" />
+    <div className="my-sys-8 mx-auto max-w-divider h-px bg-gold/20 rounded-sys-full" />
   );
 
   return (
