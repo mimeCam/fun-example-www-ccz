@@ -1,10 +1,13 @@
 /**
  * Loading skeleton for /article/[id] — thermal-aware article structure.
  *
- * Matches the article page layout: centered prose column with
- * title, rule, and paragraph placeholders.
- * Thermal tokens from the blocking script ensure warm tones for returning readers.
+ * Matches the article page layout: centered prose column with title, rule,
+ * and paragraph placeholders. Uses the shared `<Skeleton>` primitive so
+ * the breath cadence stays in sync with the rest of the site. Thermal
+ * tokens from the blocking script ensure warm tones for returning readers.
  */
+
+import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function ArticleLoading() {
   return (
@@ -21,8 +24,8 @@ export default function ArticleLoading() {
 function HeaderSkeleton() {
   return (
     <header className="mb-sys-8 text-center">
-      <div className="h-8 w-3/4 mx-auto rounded-sys-soft bg-surface/30 animate-pulse mb-sys-3" />
-      <div className="h-4 w-20 mx-auto rounded-sys-soft bg-surface/20 animate-pulse" />
+      <Skeleton variant="line" className="h-8 w-3/4 mx-auto mb-sys-3" />
+      <Skeleton variant="line" className="h-4 w-20 mx-auto" />
     </header>
   );
 }
@@ -30,18 +33,17 @@ function HeaderSkeleton() {
 function Paragraphs() {
   return (
     <div className="space-y-sys-5">
-      {Array.from({ length: 4 }, (_, i) => (
-        <div key={i} className="space-y-sys-2 animate-pulse">
-          <Line width="full" />
-          <Line width="5/6" />
-          <Line width="4/5" />
-        </div>
-      ))}
+      {Array.from({ length: 4 }, (_, i) => <ParagraphSkeleton key={i} />)}
     </div>
   );
 }
 
-function Line({ width }: { width: string }) {
-  const w = width === 'full' ? 'w-full' : `w-${width}`;
-  return <div className={`h-3 ${w} rounded-sys-soft bg-surface/30`} />;
+function ParagraphSkeleton() {
+  return (
+    <div className="space-y-sys-2">
+      <Skeleton variant="line" className="h-3 w-full" />
+      <Skeleton variant="line" className="h-3 w-5/6" />
+      <Skeleton variant="line" className="h-3 w-4/5" />
+    </div>
+  );
 }

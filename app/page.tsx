@@ -12,16 +12,8 @@ import dynamic from 'next/dynamic';
 import { getDefaultFeaturedArticle } from '@/lib/content/featured';
 import { GemHome } from '@/components/navigation/GemHome';
 import WhisperFooter from '@/components/shared/WhisperFooter';
+import { Skeleton } from '@/components/shared/Skeleton';
 import { decodeDeepLink } from '@/lib/sharing/deep-link';
-
-/** Loading skeleton — the shape of what's arriving.
- *  Dormant palette, no spinners, no shimmer. Just quiet expectation. */
-function ThermalSkeleton({ className }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded-sys-medium bg-surface/30 ${className ?? ''}`}
-         aria-hidden="true" />
-  );
-}
 
 const ReturningPortal = dynamic(
   () => import('@/components/home/ReturningPortal'),
@@ -52,18 +44,18 @@ export default function Home({
       <div className="flex-1 flex flex-col justify-center max-w-3xl
         mx-auto px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">
 
-        <Suspense fallback={<ThermalSkeleton className="h-40 max-w-3xl mb-sys-6" />}>
+        <Suspense fallback={<Skeleton variant="block" className="h-40 max-w-3xl mb-sys-6" />}>
           <ReturningPortal suppress={!!via} />
         </Suspense>
 
         {via && (
-          <Suspense fallback={<ThermalSkeleton className="h-8 max-w-xl mb-sys-4" />}>
+          <Suspense fallback={<Skeleton variant="block" className="h-8 max-w-xl mb-sys-4" />}>
             <ViaWhisper via={via} />
           </Suspense>
         )}
 
         {/* Server fallback — replaced client-side if returning reader */}
-        <Suspense fallback={<ThermalSkeleton className="h-64 max-w-3xl" />}>
+        <Suspense fallback={<Skeleton variant="block" className="h-64 max-w-3xl" />}>
           <FeaturedArticle defaultArticle={defaultArticle} />
         </Suspense>
 

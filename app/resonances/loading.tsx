@@ -1,9 +1,13 @@
 /**
  * Loading skeleton for /resonances — "The Book of You" structure.
  *
- * Shows the Book layout: title placeholder, entry placeholders, slot indicator.
- * Thermal tokens from the blocking script warm the skeleton for returning readers.
+ * Shows the Book layout: title placeholder, entry placeholders, slot
+ * indicator. Uses the shared `<Skeleton>` primitive so the breath
+ * cadence matches the rest of the site. Thermal tokens from the
+ * blocking script warm the skeleton for returning readers.
  */
+
+import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function ResonancesLoading() {
   return (
@@ -19,8 +23,8 @@ export default function ResonancesLoading() {
 function TitleSkeleton() {
   return (
     <div className="mb-sys-8">
-      <div className="h-7 w-48 rounded-sys-soft bg-surface/30 animate-pulse mb-sys-3" />
-      <div className="h-3 w-32 rounded-sys-soft bg-surface/20 animate-pulse" />
+      <Skeleton variant="line" className="h-7 w-48 mb-sys-3" />
+      <Skeleton variant="line" className="h-3 w-32" />
     </div>
   );
 }
@@ -36,16 +40,14 @@ function Entries() {
 
 function EntrySkeleton() {
   return (
-    <div className="rounded-sys-medium thermal-radius bg-surface/20 p-sys-5 animate-pulse">
-      <div className="h-3 w-2/3 rounded-sys-soft bg-surface/40 mb-sys-3" />
-      <div className="h-4 w-full rounded-sys-soft bg-surface/30 mb-sys-2" />
-      <div className="h-3 w-1/4 rounded-sys-soft bg-surface/20" />
-    </div>
+    <Skeleton variant="card" className="p-sys-5">
+      <Skeleton variant="line" className="h-3 w-2/3 mb-sys-3" />
+      <Skeleton variant="line" className="h-4 w-full mb-sys-2" />
+      <Skeleton variant="line" className="h-3 w-1/4" />
+    </Skeleton>
   );
 }
 
 function SlotSkeleton() {
-  return (
-    <div className="h-4 w-24 rounded-sys-soft bg-surface/20 animate-pulse mt-sys-6" />
-  );
+  return <Skeleton variant="line" className="h-4 w-24 mt-sys-6" />;
 }

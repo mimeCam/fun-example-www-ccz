@@ -148,6 +148,16 @@
   --sys-alpha-recede:   0.5;
   --sys-alpha-quiet:    0.7;
 
+  /* ─── Skeleton Breath ────────────────────────────────────
+     The 5th shared primitive's cadence. `--sys-skeleton-beat` mirrors
+     MOTION.linger (1000ms) — passage-breathing, the site-wide beat for
+     ambient absence. The oscillation itself reads from the Alpha ledger
+     (hairline ↔ muted) — no new rungs, no carve-outs. Mirror is in
+     lib/design/skeleton.ts. The sync test in
+     lib/design/__tests__/skeleton-sync.test.ts catches drift; the
+     adoption test keeps raw `animate-pulse` out of component code. */
+  --sys-skeleton-beat: 1000ms;
+
   /* ─── Spacing Ledger ─────────────────────────────────────
      Twelve numeric rungs, ordered tightest → loosest (4px → 96px).
      The ledger names *numbers*, not literary beats — 12-rung resolution
@@ -588,6 +598,32 @@ body {
   transition-duration: 250ms; /* leave: gentle release */
 }
 
+/* ─── Skeleton Breath ────────────────────────────────────
+   The 5th shared primitive's breath. Oscillates opacity between the
+   Alpha ledger's `hairline` (0.10, valley) and `muted` (0.30, peak) at
+   MOTION.linger (1000ms). No new alpha rung; no shimmer; no tint. The
+   class is applied by components/shared/Skeleton.tsx — do not hand-wire
+   it on raw <div>s (the adoption test will fail).
+
+   Nested `.sys-skeleton` elements do NOT double-animate: the parent
+   owns the cadence; children pulse with it via inherited opacity
+   compositing. One beat, one room, no polyrhythm. */
+.sys-skeleton {
+  animation: sysSkeletonBreath var(--sys-skeleton-beat, 1000ms)
+             var(--sys-ease-sustain) infinite;
+  will-change: opacity;
+}
+
+.sys-skeleton .sys-skeleton {
+  animation: none;
+  opacity: 1;
+}
+
+@keyframes sysSkeletonBreath {
+  0%, 100% { opacity: var(--sys-alpha-hairline); }
+  50%      { opacity: var(--sys-alpha-muted); }
+}
+
 /* Respect reduced motion — hard kill on all animations + transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -598,6 +634,13 @@ body {
   html { scroll-behavior: auto; }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;
+  }
+  /* Skeleton rests at α muted — the "ambient chrome" presence the ledger
+     sealed. Not hairline (would disappear) and not invisible (skeleton is
+     the signal that content is arriving). */
+  .sys-skeleton {
+    animation: none !important;
+    opacity: var(--sys-alpha-muted) !important;
   }
   .thermal-typography {
     text-shadow: none !important;

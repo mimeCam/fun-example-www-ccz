@@ -9,7 +9,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/sharing/` — clipboard, share cards, thread keepsake SVG/PNG
 - `lib/mirror/` — archetype scoring
 - `lib/utils/` — focus-utils, scroll-lock, reduced-motion, phase resolvers
-- `components/shared/` — `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`
+- `components/shared/` — `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`, `<Skeleton>`
 - `components/reading/` — Golden Thread, ceremony, keepsake
 - `components/resonances/` — resonance drawer & shimmer
 - `scripts/` — build-time codegen
@@ -18,7 +18,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — and the Thread Keepsake lets readers share a unique artifact of *their* read.
 
 ## Design System
-Four shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`. Seven ledgers, each owns its unit space — no cross-ledger metronome.
+Five shared primitives: `<Threshold>`, `<Pressable>`, `<Field>`, `<TextLink>`, `<Skeleton>`. Seven ledgers, each owns its unit space — no cross-ledger metronome. `<Skeleton>` is a sealed composition of the Alpha (hairline↔muted) and Motion (linger) ledgers — no new rungs, three variants (`line`·`block`·`card`).
 
 | Ledger | File | Rungs | Unit |
 |---|---|---|---|

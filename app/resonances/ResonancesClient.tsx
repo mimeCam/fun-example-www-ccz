@@ -30,6 +30,7 @@ import EvolutionThread from './EvolutionThread';
 import ResonanceExport from './ResonanceExport';
 import { Pressable } from '@/components/shared/Pressable';
 import { TextLink } from '@/components/shared/TextLink';
+import { Skeleton } from '@/components/shared/Skeleton';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 
 const ANON_KEY = 'anon-reader-id';
@@ -155,7 +156,10 @@ export default function ResonancesClient() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="w-80 h-48 rounded-sys-medium bg-gradient-to-b from-rose/10 to-surface/20 border border-rose/10 animate-pulse" />
+      {/* Thermal-aware card surface — rose warmth arrives ambiently via the
+          thermal system (inline blocking script at app/layout.tsx), not via
+          a hand-wired gradient. Per Mike §5 #5 — do NOT accept a tone prop. */}
+      <Skeleton variant="card" className="w-80 h-48" />
     </div>
   );
 
