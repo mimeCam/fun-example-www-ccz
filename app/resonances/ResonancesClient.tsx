@@ -249,7 +249,7 @@ export default function ResonancesClient() {
       {/* Shaped section — faded resonances with closing lines */}
       {shaped.length > 0 && (
         <section className="mb-sys-9">
-          <p className="text-sys-micro uppercase tracking-widest text-gold/40 mb-sys-7">
+          <p className="text-sys-micro uppercase tracking-sys-caption text-gold/40 mb-sys-7">
             what shaped you
           </p>
           {shaped.map((r) => {

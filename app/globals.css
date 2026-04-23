@@ -234,6 +234,18 @@
   --sys-lead-heading: calc(var(--sys-tick) * 8);   /* 32px — card titles, section heads */
   --sys-lead-display: calc(var(--sys-tick) * 10);  /* 40px — hero, keepsake artifact */
 
+  /* ─── Typography Ledger — track (letter-spacing, voice-print) ───────────
+     Fifth atom on the beat. Anchor property, unlike leading it does NOT
+     warm with engagement — the reader's voice-print refuses to breathe.
+     Body-prose `--token-letter-spacing` is the thermal carve-out.
+     Mirror: lib/design/typography.ts (TYPOGRAPHY[beat].track). */
+  --sys-track-caption:  0.08em;   /* stage-whisper — uppercase labels, kickers */
+  --sys-track-body:     0em;      /* neutral — prose paragraphs */
+  --sys-track-lede:     0em;      /* neutral — optical kerning carries polish */
+  --sys-track-passage:  0em;      /* neutral — long-form reading */
+  --sys-track-heading: -0.01em;   /* tighter — card titles, section heads */
+  --sys-track-display: -0.02em;   /* tightest — hero, keepsake artifact */
+
   /* ─── Heading Scale ───────────────────────────────────── */
   --sys-text-h4: 1.375rem;   /* 22px — sub-sections, article metadata */
   --sys-text-h3: 1.75rem;    /* 28px — section headings, card titles */
@@ -341,34 +353,38 @@ body {
 .typo-caption {
   line-height: var(--sys-lead-caption);
   text-wrap: auto;
+  letter-spacing: var(--sys-track-caption);
 }
 .typo-body {
   line-height: var(--sys-lead-body);
   text-wrap: pretty;
+  letter-spacing: var(--sys-track-body);
 }
 .typo-lede {
   line-height: var(--sys-lead-lede);
   text-wrap: pretty;
   font-feature-settings: "kern" 1, "ss01" 1;
   text-rendering: optimizeLegibility;
+  letter-spacing: var(--sys-track-lede);
 }
 .typo-passage {
   line-height: var(--sys-lead-passage);
   text-wrap: pretty;
+  letter-spacing: var(--sys-track-passage);
 }
 .typo-heading {
   line-height: var(--sys-lead-heading);
   text-wrap: balance;
   font-feature-settings: "kern" 1;
   text-rendering: optimizeLegibility;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--sys-track-heading);
 }
 .typo-display {
   line-height: var(--sys-lead-display);
   text-wrap: balance;
   font-feature-settings: "kern" 1, "ss01" 1;
   text-rendering: optimizeLegibility;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--sys-track-display);
 }
 
 /* Paragraph spacing via compositing — translateY instead of margin-bottom.
@@ -1112,4 +1128,21 @@ body {
 @keyframes entranceDividerDraw {
   from { transform: scaleX(0); }
   to   { transform: scaleX(1); }
+}
+
+/* ─── Toast (the 6th primitive) — bloom in, fade out ─────────────────────
+   Two keyframes, applied via inline `animation-name` from
+   `components/shared/Toast.tsx`. Duration is `--sys-time-enter` (300ms)
+   for `toastBloom` and `--sys-time-hover` (200ms) for `toastFade` —
+   the primitive sets `animation-duration` inline so reduced-motion can
+   collapse to `MOTION_REDUCED_MS` without forking keyframes. */
+
+@keyframes toastBloom {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes toastFade {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
 }

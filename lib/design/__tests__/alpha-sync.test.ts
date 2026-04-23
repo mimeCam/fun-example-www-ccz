@@ -29,6 +29,12 @@ import {
   snapToRung,
   alphaInvariantHolds,
   ALPHA_MOTION_ENDPOINT_PATHS,
+  ALPHA_COLOR_FAMILIES,
+  ALPHA_COLOR_SHORTHAND_LEGAL_PCTS,
+  alphaClassOf,
+  alphaPctOf,
+  snapPctToRung,
+  type ColorAlphaKind,
 } from '../alpha';
 import { compositeOver, contrast } from '../contrast';
 
@@ -187,5 +193,89 @@ describe('Motion endpoint carve-out is documented', () => {
 
   it('exactly one path is allow-listed — more is drift', () => {
     expect(ALPHA_MOTION_ENDPOINT_PATHS.length).toBe(1);
+  });
+});
+
+// ─── Tests — Phase II color-alpha helpers ─────────────────────────────────
+
+/**
+ * `alphaClassOf` must emit a LITERAL that Tailwind's JIT sees in source
+ * (no template interpolation). The round-trip below runs every
+ * (family × rung × kind) tuple through the helper and asserts the literal
+ * format: `<kind>-<family>/<pct>` with pct ∈ ledger. If a single tuple
+ * emits anything else, a future refactor is about to slip a dynamic
+ * string past the compiler — and the surface loses its color at runtime.
+ */
+describe('alphaClassOf — covers every (family × rung × kind) cell', () => {
+  const KINDS: ColorAlphaKind[] = ['bg', 'text', 'border', 'shadow'];
+
+  KINDS.forEach((kind) => {
+    ALPHA_COLOR_FAMILIES.forEach((family) => {
+      ALPHA_ORDER.forEach((rung) => {
+        it(`${kind}·${family}·${rung} emits "${kind}-${family}/${alphaPctOf(rung)}"`, () => {
+          const out = alphaClassOf(family, rung, kind);
+          expect(out).toBe(`${kind}-${family}/${alphaPctOf(rung)}`);
+        });
+      });
+    });
+  });
+
+  it('default kind is "bg"', () => {
+    expect(alphaClassOf('fog', 'muted')).toBe(alphaClassOf('fog', 'muted', 'bg'));
+  });
+});
+
+describe('ALPHA_COLOR_FAMILIES — invariants', () => {
+  it('is non-empty', () => {
+    expect(ALPHA_COLOR_FAMILIES.length).toBeGreaterThan(0);
+  });
+
+  it('every entry is lowercase kebab — no camelCase or spaces', () => {
+    ALPHA_COLOR_FAMILIES.forEach((f) => {
+      expect(f).toMatch(/^[a-z][a-z0-9-]*$/);
+    });
+  });
+
+  it('has no duplicates', () => {
+    expect(new Set(ALPHA_COLOR_FAMILIES).size).toBe(ALPHA_COLOR_FAMILIES.length);
+  });
+});
+
+describe('snapPctToRung — strict snap, rejects off-ledger', () => {
+  it('maps every ledger percent to its named rung', () => {
+    ALPHA_ORDER.forEach((r) => {
+      expect(snapPctToRung(alphaPctOf(r))).toBe(r);
+    });
+  });
+
+  it('returns null for off-ledger percents (drift, not rounding)', () => {
+    [0, 1, 5, 20, 40, 45, 60, 65, 80, 90, 99].forEach((p) => {
+      expect(snapPctToRung(p)).toBeNull();
+    });
+  });
+
+  it('returns null for non-integer inputs', () => {
+    expect(snapPctToRung(0.3)).toBeNull();
+    expect(snapPctToRung(30.5)).toBeNull();
+    expect(snapPctToRung(NaN)).toBeNull();
+  });
+
+  it('does NOT accept 100 — that is Motion, not Alpha', () => {
+    // Legal-pct set includes 100 for the guard; the rung-snap helper does not.
+    expect(ALPHA_COLOR_SHORTHAND_LEGAL_PCTS.has(100)).toBe(true);
+    expect(snapPctToRung(100)).toBeNull();
+  });
+});
+
+describe('ALPHA_COLOR_SHORTHAND_LEGAL_PCTS — mirrors ledger × 100 + Motion', () => {
+  it('contains every rung-as-percent plus 100', () => {
+    ALPHA_ORDER.forEach((r) => {
+      expect(ALPHA_COLOR_SHORTHAND_LEGAL_PCTS.has(alphaPctOf(r))).toBe(true);
+    });
+    expect(ALPHA_COLOR_SHORTHAND_LEGAL_PCTS.has(100)).toBe(true);
+  });
+
+  it('size is exactly (rungs + 1)', () => {
+    expect(ALPHA_COLOR_SHORTHAND_LEGAL_PCTS.size).toBe(ALPHA_ORDER.length + 1);
   });
 });

@@ -19,23 +19,30 @@
  * to a component file should fail on first run with a message that names
  * the four valid rungs and points at the Motion carve-out.
  *
- * Out of scope for this sprint (Mike §8, filed as follow-up):
- *   - `bg-foo/N` / `text-foo/N` / `border-foo/N` color-alpha shorthand.
- *     Lives at a different Tailwind layer; conflating doubles the risk.
+ * Phase II (Mike #38): the color-alpha shorthand `(bg|text|border|shadow)-
+ * <color>/<N>` joins the fence. Only ledger rungs (N ∈ {10, 30, 50, 70})
+ * plus the Motion carve-out (N = 100) are admitted; a path-grandfather
+ * list in `alpha.ts` absorbs the pre-Phase-II drift (one receipt per file,
+ * shrinks only), so the fence enforces *new* drift at zero cost to CI.
  *
  * Credits: Mike K. (architect #24 §7 — adoption-guard spec, scope fence,
- * path-allow-list shape lifted from elevation-adoption.test.ts),
- * Tanya D. (UIX #80 §6 — the grep-fence-is-documentation rule),
- * Paul K. (guard-first ordering, adoption-guard-as-KPI), Elon M.
- * (Motion-endpoint ownership call).
+ * path-allow-list shape lifted from elevation-adoption.test.ts; #38 §4/§5
+ * — color-alpha COLOR_ALPHA_RX, JIT-safe helper, 100-as-Motion-carve-out,
+ * widen to shadow-<color>/N), Tanya D. (UIX #80 §6 / UX #58 §2.1 — the
+ * grep-fence-is-documentation rule; "one ambient-chrome voice" is what
+ * this enforces at the surface level), Paul K. (guard-first ordering,
+ * adoption-guard-as-KPI), Elon M. (Motion-endpoint ownership call).
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import {
+  ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS,
+  ALPHA_COLOR_SHORTHAND_LEGAL_PCTS,
   ALPHA_LEDGER_EXEMPT_TOKEN,
   ALPHA_MOTION_ENDPOINT_PATHS,
   ALPHA_ORDER,
+  alphaClassOf,
 } from '../alpha';
 
 const ROOT = join(__dirname, '..', '..', '..');
@@ -84,6 +91,38 @@ function relativePath(full: string): string {
 /** Match a raw Tailwind `opacity-NN` or `motion-reduce:opacity-NN`. */
 const RAW_OPACITY_RX = /(?<![\w-])(?:motion-reduce:)?opacity-(\d+)(?![\w-])/g;
 
+/**
+ * Match an inline-style `opacity: <number>` literal in JSX — exactly the
+ * shape `style={{ opacity: 0.3 }}` drifts as. Matches:
+ *   - `opacity: 0.4`, `opacity: .4`, `opacity: 1`, `opacity: 0`
+ * Does NOT match:
+ *   - `opacity: <expr>` (ternary / variable — no numeric literal head)
+ *   - `opacity-{rung}` Tailwind utility (handled by `RAW_OPACITY_RX`)
+ *
+ * Per Mike K. §4c: `0` and `1` are Motion endpoints, permitted only when
+ * the line carries the exemption token.
+ */
+const INLINE_OPACITY_RX = /opacity\s*:\s*(0?\.\d+|\d+)\b/g;
+
+/**
+ * Match a Tailwind color-alpha shorthand: `(bg|text|border|shadow)-
+ * <color>/<N>`. Phase II (Mike #38 §4.2). The property prefixes are the
+ * four where the slash-percent syntax is a *presence* dial on a tinted
+ * surface; excluded: `from-`/`to-`/`via-` (gradient stops are a Color-ledger
+ * composition semantic, not Alpha — Mike §5.7). Excluded: `ring-` / `outline-`
+ * — no current usage; revisit when one appears.
+ *
+ * The regex is word-bounded so it won't accidentally chew `not-border-foo/30`.
+ * Capture group 2 is the percent; the guard filters by
+ * ALPHA_COLOR_SHORTHAND_LEGAL_PCTS to decide snap-vs-drift.
+ */
+const COLOR_ALPHA_RX = /(?<![\w-])(bg|text|border|shadow)-([a-z][\w-]*)\/(\d+)(?![\w-])/g;
+
+/** Files grandfathered — drift pending migration (shrinks as PRs land). */
+const COLOR_GRANDFATHER = new Set<string>(
+  ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS,
+);
+
 /** Split source on newlines so we can check exemption per line. */
 function lines(src: string): string[] {
   return src.split(/\r?\n/);
@@ -111,21 +150,57 @@ function lineIsExempt(ls: readonly string[], i: number): boolean {
 
 // ─── Violation collector ──────────────────────────────────────────────────
 
+type Kind = 'raw-tw' | 'inline-style' | 'color-alpha';
+
 interface Violation {
   file: string;
   line: number;
   match: string;
+  kind: Kind;
+}
+
+/**
+ * Collect matches for one regex on one line, honouring the per-line
+ * exempt-token convention. Pure. `≤ 10 LOC` by design.
+ */
+function collectLine(
+  rel: string,
+  ls: readonly string[],
+  i: number,
+  rx: RegExp,
+  kind: Kind,
+): Violation[] {
+  const hits = Array.from(ls[i].matchAll(rx));
+  if (hits.length === 0 || lineIsExempt(ls, i)) return [];
+  return hits.map((m) => ({ file: rel, line: i + 1, match: m[0], kind }));
+}
+
+/**
+ * Collect color-alpha shorthand violations — matches only when the percent
+ * is NOT one of the legal rungs (ledger × 100 plus the Motion carve-out
+ * `/100`). Pure, ≤ 10 LOC. Honours the same exempt-token convention.
+ */
+function collectColorAlphaLine(
+  rel: string,
+  ls: readonly string[],
+  i: number,
+): Violation[] {
+  const hits = Array.from(ls[i].matchAll(COLOR_ALPHA_RX));
+  if (hits.length === 0 || lineIsExempt(ls, i)) return [];
+  return hits
+    .filter((m) => !ALPHA_COLOR_SHORTHAND_LEGAL_PCTS.has(Number(m[3])))
+    .map((m) => ({ file: rel, line: i + 1, match: m[0], kind: 'color-alpha' as const }));
 }
 
 function scanFile(rel: string, src: string): Violation[] {
   if (ALLOW.has(rel)) return [];
-  const out: Violation[] = [];
+  const skipColor = COLOR_GRANDFATHER.has(rel);
   const ls = lines(src);
-  ls.forEach((line, i) => {
-    const hits = Array.from(line.matchAll(RAW_OPACITY_RX));
-    if (hits.length === 0) return;
-    if (lineIsExempt(ls, i)) return;
-    hits.forEach((m) => out.push({ file: rel, line: i + 1, match: m[0] }));
+  const out: Violation[] = [];
+  ls.forEach((_, i) => {
+    out.push(...collectLine(rel, ls, i, RAW_OPACITY_RX, 'raw-tw'));
+    out.push(...collectLine(rel, ls, i, INLINE_OPACITY_RX, 'inline-style'));
+    if (!skipColor) out.push(...collectColorAlphaLine(rel, ls, i));
   });
   return out;
 }
@@ -141,22 +216,97 @@ function findAllViolations(): Violation[] {
 describe('alpha adoption — every presence value goes through the ledger', () => {
   const violations = findAllViolations();
 
+  /** Human-readable fix hint — same shape for both Tailwind and inline-style. */
+  const fixHint =
+    `    → use opacity-{${ALPHA_ORDER.join('|')}} from the Alpha ledger` +
+    ` (or alphaOf('<rung>') in JS),\n` +
+    `      or mark the line with  // ${ALPHA_LEDGER_EXEMPT_TOKEN} — motion fade endpoint`;
+
   /**
    * The failure report names the file, the line, the raw match, and the
    * four valid rungs + the Motion carve-out — so the fix is obvious without
    * opening another tab. The message IS the documentation.
    */
   it('no raw `opacity-NN` outside the ledger and Motion carve-out', () => {
-    const message = violations
-      .map(
-        (v) =>
-          `  ${v.file}:${v.line} — ${v.match}\n` +
-          `    → use opacity-{${ALPHA_ORDER.join('|')}} from the Alpha ledger,\n` +
-          `      or mark the line with  // ${ALPHA_LEDGER_EXEMPT_TOKEN} — motion fade endpoint`,
-      )
+    const hits = violations.filter((v) => v.kind === 'raw-tw');
+    const message = hits
+      .map((v) => `  ${v.file}:${v.line} — ${v.match}\n${fixHint}`)
       .join('\n');
-    expect(violations.map((v) => `${v.file}:${v.line}`)).toEqual([]);
-    if (violations.length > 0) throw new Error('\n' + message);
+    expect(hits.map((v) => `${v.file}:${v.line}`)).toEqual([]);
+    if (hits.length > 0) throw new Error('\n' + message);
+  });
+
+  /**
+   * Mike K. §4c: the inline-style drift is the exact shape
+   * `opacity: phase === 'fading' ? 0.3 : 1` lived as in GoldenThread.tsx.
+   * Catch the literal-number head so a contributor can't re-introduce a
+   * raw `opacity: 0.4` under cover of `style={{ ... }}`.
+   */
+  it('no inline-style `opacity: N` literals outside the Motion carve-out', () => {
+    const hits = violations.filter((v) => v.kind === 'inline-style');
+    const message = hits
+      .map((v) => `  ${v.file}:${v.line} — style ${v.match}\n${fixHint}`)
+      .join('\n');
+    expect(hits.map((v) => `${v.file}:${v.line}`)).toEqual([]);
+    if (hits.length > 0) throw new Error('\n' + message);
+  });
+
+  /**
+   * Phase II (Mike #38 §4.2): the `(bg|text|border|shadow)-<color>/N`
+   * shorthand joins the fence. Only ledger rungs (N ∈ {10, 30, 50, 70})
+   * plus the Motion carve-out (N = 100) pass. Files on the grandfather
+   * list are skipped until migrated. The failure message names the
+   * legal rungs AND points to the helper so the fix is one import away.
+   */
+  it('no off-ledger `(bg|text|border|shadow)-<color>/N` shorthand outside grandfathered paths', () => {
+    const hits = violations.filter((v) => v.kind === 'color-alpha');
+    const rungsHint = Array.from(ALPHA_COLOR_SHORTHAND_LEGAL_PCTS)
+      .sort((a, b) => a - b).join('|');
+    const colorHint =
+      `    → snap to legal rungs {${rungsHint}} (the last is the Motion endpoint),\n` +
+      `      OR route through alphaClassOf(color, rung, kind) from lib/design/alpha.ts,\n` +
+      `      OR mark the line with // ${ALPHA_LEDGER_EXEMPT_TOKEN} — <honest reason>`;
+    const message = hits
+      .map((v) => `  ${v.file}:${v.line} — ${v.match}\n${colorHint}`)
+      .join('\n');
+    expect(hits.map((v) => `${v.file}:${v.line}`)).toEqual([]);
+    if (hits.length > 0) throw new Error('\n' + message);
+  });
+});
+
+// ─── Color-alpha helper — JIT-safe literal emission ───────────────────────
+
+describe('alphaClassOf — JIT-safe color-alpha literal factory', () => {
+  it('emits the canonical string for the flagship migration', () => {
+    // GoldenThread + ResonanceEntry both route through this exact call.
+    expect(alphaClassOf('fog', 'muted')).toBe('bg-fog/30');
+  });
+
+  it('default kind is "bg"', () => {
+    expect(alphaClassOf('fog', 'muted', 'bg')).toBe(alphaClassOf('fog', 'muted'));
+  });
+
+  it('all four kinds emit the expected property prefix', () => {
+    expect(alphaClassOf('accent', 'hairline', 'bg')).toBe('bg-accent/10');
+    expect(alphaClassOf('accent', 'recede',   'text')).toBe('text-accent/50');
+    expect(alphaClassOf('accent', 'quiet',    'border')).toBe('border-accent/70');
+    expect(alphaClassOf('accent', 'muted',    'shadow')).toBe('shadow-accent/30');
+  });
+});
+
+// ─── Grandfather list — drift receipts, shrinking ─────────────────────────
+
+describe('color-alpha grandfather list — auditable drift, shrinking', () => {
+  it('every entry is a real, scannable source path', () => {
+    ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS.forEach((p) => {
+      expect(() => readFileSync(join(ROOT, p), 'utf8')).not.toThrow();
+    });
+  });
+
+  it('no entry duplicates an existing allow-list path (Motion carve-out)', () => {
+    ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS.forEach((p) => {
+      expect(ALLOW.has(p)).toBe(false);
+    });
   });
 });
 

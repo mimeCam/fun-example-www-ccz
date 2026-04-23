@@ -6,8 +6,14 @@
  * - Download as PNG
  * - Copy to clipboard
  * - File naming with timestamps
- * - Error handling with user feedback
+ * - Error handling via the shared toast primitive
+ *
+ * Toast feedback: routed through `@/lib/sharing/toast-store` (the 6th
+ * primitive's pub/sub singleton). Three `:exempt` comments removed —
+ * the surface paints inside React's tree now (Mike §1, Tanya §0).
  */
+
+import { toastShow } from '@/lib/sharing/toast-store';
 
 export interface ExportOptions {
   filename?: string;
@@ -94,72 +100,29 @@ export function generateFilename(
 }
 
 /**
- * Show success feedback toast
+ * Surface a success confirmation through the shared toast primitive.
+ * The phrase is curated for the surface; tone defaults to neutral
+ * (kinetic). React-side callers may override via `useToast().confirm(kind)`.
  */
 export function showExportFeedback(
   method: 'download' | 'clipboard',
   onSuccess?: () => void
 ): void {
-  const message = method === 'download'
-    ? 'Quote card downloaded!'
-    : 'Copied to clipboard!';
-
-  // Create toast element
-  const toast = document.createElement('div');
-  // radius-ledger:exempt — foreign-DOM toast: `var(--sys-radius-*)` does not
-  // resolve on a DOM node appended before React/Tailwind process the custom-
-  // property cascade. `rounded-lg` ≡ 8px ≡ `--sys-radius-medium` ("held",
-  // operational confirmation per Tanya §5.2). See RADIUS_LEDGER_EXEMPT_TOKEN
-  // in lib/design/radius.ts.
-  // elevation-ledger:exempt — same rationale: `shadow-lg` is the preset
-  // whose numbers approximate `--sys-elev-float`; the DOM node is minted
-  // outside React's render pipeline.
-  // spacing-ledger:exempt — same rationale: `px-6 py-3` is the literal
-  // preset that survives an unmounted ThermalProvider.
-  toast.className = 'fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  // Remove after delay
-  setTimeout(() => {
-    toast.classList.add('animate-fade-out');
-    setTimeout(() => {
-      document.body.removeChild(toast);
-    }, 300);
-  }, 2000);
-
-  if (onSuccess) {
-    onSuccess();
-  }
+  toastShow({
+    message: method === 'download' ? 'Downloaded.' : 'Card copied.',
+    intent: 'confirm',
+  });
+  if (onSuccess) onSuccess();
 }
 
 /**
- * Show error feedback toast
+ * Surface a failure through the shared toast (warn intent, same surface).
  */
-export function showExportError(
-  method: 'download' | 'clipboard'
-): void {
-  const message = method === 'download'
-    ? 'Failed to download quote card'
-    : 'Failed to copy to clipboard';
-
-  const toast = document.createElement('div');
-  // radius-ledger:exempt / elevation-ledger:exempt / spacing-ledger:exempt —
-  // foreign-DOM error toast, same rationale as the success toast above
-  // (Tanya §5.2). `rounded-lg` ≡ --sys-radius-medium; `shadow-lg`/`px-6
-  // py-3` preserved literally because vars do not resolve at append time.
-  toast.className = 'fixed bottom-4 right-4 bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
-  toast.textContent = message;
-
-  document.body.appendChild(toast);
-
-  setTimeout(() => {
-    toast.classList.add('animate-fade-out');
-    setTimeout(() => {
-      document.body.removeChild(toast);
-    }, 300);
-  }, 3000);
+export function showExportError(method: 'download' | 'clipboard'): void {
+  toastShow({
+    message: method === 'download' ? 'Download failed.' : 'Copy failed.',
+    intent: 'warn',
+  });
 }
 
 /**

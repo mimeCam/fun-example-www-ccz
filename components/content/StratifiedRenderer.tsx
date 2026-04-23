@@ -92,7 +92,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
         bg-surface/20`}
     >
       <div className="flex items-center gap-sys-3 mb-sys-3">
-        <span className="text-sys-micro uppercase tracking-widest text-cyan font-sys-accent">
+        <span className="text-sys-micro uppercase tracking-sys-caption text-cyan font-sys-accent">
           {label}
         </span>
         {block.isNew && <NewContentBadge label="Unlocked" />}
@@ -221,7 +221,7 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
       className={`my-sys-10 px-sys-6 py-sys-5 bg-surface/60 border-l-4 border-rose rounded-sys-medium shadow-rose-glow ${glow}
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
-      <p className="text-sys-micro uppercase tracking-widest text-rose/70 mb-sys-4">
+      <p className="text-sys-micro uppercase tracking-sys-caption text-rose/70 mb-sys-4">
         Your resonance
       </p>
       <p className="text-sys-body text-foreground/70 italic leading-[var(--token-line-height)]">

@@ -117,6 +117,21 @@ const config: Config = {
         'sys-heading': 'var(--sys-lead-heading)',
         'sys-display': 'var(--sys-lead-display)',
       },
+      /* Typography Ledger — six track beats (letter-spacing), mirror of
+         --sys-track-* in globals.css. Voice-print anchor — does NOT warm
+         with engagement. The body-prose --token-letter-spacing scalar is
+         the single thermal carve-out. Source of truth:
+         lib/design/typography.ts. Use via `tracking-sys-<beat>` or the
+         all-in-one `typo-<beat>` utility class (CSS) returned by
+         classesOf(beat). */
+      letterSpacing: {
+        'sys-caption': 'var(--sys-track-caption)',
+        'sys-body':    'var(--sys-track-body)',
+        'sys-lede':    'var(--sys-track-lede)',
+        'sys-passage': 'var(--sys-track-passage)',
+        'sys-heading': 'var(--sys-track-heading)',
+        'sys-display': 'var(--sys-track-display)',
+      },
       /* Alpha Ledger — four presence rungs, mirror of --sys-alpha-* in
          globals.css. Source of truth: lib/design/alpha.ts. Applies BOTH to
          the standalone `opacity-*` utility AND Tailwind's `/modifier` color

@@ -49,7 +49,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
 
 function RevealLabel({ visible, color }: { visible: boolean; color: string }) {
   return (
-    <p className={`text-sys-micro uppercase tracking-widest mb-sys-2
+    <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-2
       transition-all duration-fade ${fadeClass(visible)}`}
       style={{ ...fadeStyle(visible, 0), color, opacity: visible ? 0.7 : 0 }}>
       Because you stayed…
@@ -61,7 +61,7 @@ function ArchetypeName({ label, visible, color }: {
   label: string; visible: boolean; color: string;
 }) {
   return (
-    <h2 className={`text-sys-h3 font-display font-sys-display tracking-tight
+    <h2 className={`text-sys-h3 font-display font-sys-display tracking-sys-heading
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
       style={{ ...fadeStyle(visible, MOTION.instant), color }}>
       {label}
@@ -80,10 +80,12 @@ function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
 }
 
 function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
+  // Alpha ledger: `muted` (0.30) — "ambient chrome; skip past it."
+  // Same rung as the QuickMirrorCard divider and the GoldenThread fading posture.
   return (
-    <div className={`my-sys-6 h-px max-w-divider mx-auto transition-transform duration-fade
+    <div className={`my-sys-6 h-px max-w-divider mx-auto transition-transform duration-fade opacity-muted
       ${visible ? 'scale-x-100' : 'scale-x-0'}`}
-      style={{ backgroundColor: color, opacity: 0.4 }} />
+      style={{ backgroundColor: color }} />
   );
 }
 

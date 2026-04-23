@@ -74,7 +74,7 @@ function ArchetypeName({ label, visible, color }: {
   label: string; visible: boolean; color: string;
 }) {
   return (
-    <h2 className={`mt-sys-3 text-sys-h2 font-display font-sys-display tracking-tight
+    <h2 className={`mt-sys-3 text-sys-h2 font-display font-sys-display tracking-sys-heading
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
       style={{ ...fadeStyle(visible, MOTION.instant), color: visible ? color : undefined }}>
       {label}
@@ -93,10 +93,13 @@ function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
 }
 
 function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
+  // Alpha ledger rung `muted` — "ambient chrome; skip past it."
+  // The divider is chrome between mirror sections, not subject; the Tailwind
+  // `opacity-muted` bridge replaces the prior raw inline-style literal.
   return (
-    <div className={`my-sys-7 h-px max-w-divider mx-auto transition-transform duration-fade
+    <div className={`my-sys-7 h-px max-w-divider mx-auto transition-transform duration-fade opacity-muted
       ${visible ? 'scale-x-100' : 'scale-x-0'}`}
-      style={{ backgroundColor: visible ? color : undefined, opacity: 0.4 }} />
+      style={{ backgroundColor: visible ? color : undefined }} />
   );
 }
 

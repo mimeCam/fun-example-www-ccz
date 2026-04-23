@@ -259,12 +259,36 @@ describe('elevation adoption — elevation.ts is the one legitimate home', () =>
     expect(src).toMatch(/color-mix.*--gold.*12%/);
   });
 
-  it('the exempt token has at least one well-known consumer', () => {
-    const clipboardSrc = readFileSync(
-      join(ROOT, 'lib/sharing/clipboard-utils.ts'),
+  it('the exempt token is documented in elevation.ts (no consumers required)', () => {
+    // Sprint exit gate: after the 6th-primitive `<Toast>` migration
+    // (Mike §8 / Tanya §11), `lib/sharing/clipboard-utils.ts` and
+    // `lib/quote-cards/export-utils.ts` no longer mint foreign-DOM
+    // toasts, so they no longer need elevation exemptions. The token
+    // itself remains, ready for a future legitimate exemption — but
+    // the canonical proof of life is now in the module that defines it.
+    const elevationSrc = readFileSync(
+      join(ROOT, 'lib/design/elevation.ts'),
       'utf8',
     );
-    expect(clipboardSrc).toContain(ELEVATION_LEDGER_EXEMPT_TOKEN);
+    expect(elevationSrc).toContain(ELEVATION_LEDGER_EXEMPT_TOKEN);
+  });
+
+  it('post-migration: lib/sharing & lib/quote-cards have ZERO ledger exempts', () => {
+    // The "receipt" for the 6th-primitive sprint (Mike §8, Tanya §11.2):
+    // 6 → 0 exempt tokens across the two foreign-DOM toast call sites.
+    const FILES = [
+      'lib/sharing/clipboard-utils.ts',
+      'lib/quote-cards/export-utils.ts',
+    ];
+    const TOKENS = [
+      'elevation-ledger:exempt',
+      'radius-ledger:exempt',
+      'spacing-ledger:exempt',
+    ];
+    for (const file of FILES) {
+      const src = readFileSync(join(ROOT, file), 'utf8');
+      for (const token of TOKENS) expect(src).not.toContain(token);
+    }
   });
 
   it('every beat name appears in the module exports', () => {

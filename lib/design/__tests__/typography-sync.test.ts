@@ -33,6 +33,9 @@ import {
   cssVarOf,
   classesOf,
   leadingClassOf,
+  trackOf,
+  cssTrackVarOf,
+  trackingClassOf,
   isKerned,
   isBalanced,
   typographyInvariantHolds,
@@ -53,6 +56,13 @@ function readLeadMultiplier(name: string): number | undefined {
   const rx = new RegExp(`--sys-lead-${name}:\\s*calc\\(var\\(--sys-tick\\)\\s*\\*\\s*(\\d+)\\)`);
   const match = CSS.match(rx);
   return match ? Number(match[1]) : undefined;
+}
+
+/** Extract `--sys-track-<name>: <n>em;` — returns em as a number. */
+function readTrackEm(name: string): number | undefined {
+  const rx = new RegExp(`--sys-track-${name}:\\s*(-?\\d*\\.?\\d+)em`);
+  const match = CSS.match(rx);
+  return match ? Number(Number(match[1]).toFixed(3)) : undefined;
 }
 
 /** Extract the body of a `.typo-<beat> { … }` block. */
@@ -98,6 +108,26 @@ describe('TYPOGRAPHY ↔ globals.css --sys-lead-* sync', () => {
 
   it('all six tokens exist in CSS', () => {
     TYPOGRAPHY_ORDER.forEach((b) => expect(readLeadMultiplier(b)).toBeDefined());
+  });
+});
+
+describe('TYPOGRAPHY ↔ globals.css --sys-track-* sync', () => {
+  TYPOGRAPHY_ORDER.forEach((beat) => {
+    it(`TYPOGRAPHY.${beat}.track matches --sys-track-${beat} (em)`, () => {
+      const cssEm = readTrackEm(beat);
+      expect(cssEm).toBeDefined();
+      expect(cssEm).toBe(Number(TYPOGRAPHY[beat].track.toFixed(3)));
+    });
+  });
+
+  it('every --sys-track-* in CSS is represented in TYPOGRAPHY', () => {
+    const cssBeats = Array.from(CSS.matchAll(/--sys-track-([a-z]+):/g)).map((m) => m[1]);
+    const tsBeats = Object.keys(TYPOGRAPHY);
+    cssBeats.forEach((b) => expect(tsBeats).toContain(b));
+  });
+
+  it('all six track tokens exist in CSS', () => {
+    TYPOGRAPHY_ORDER.forEach((b) => expect(readTrackEm(b)).toBeDefined());
   });
 });
 
@@ -150,6 +180,22 @@ describe('typography helpers', () => {
     expect(leadingClassOf('caption')).toBe('leading-sys-caption');
   });
 
+  it('trackOf returns TYPOGRAPHY[beat].track verbatim', () => {
+    TYPOGRAPHY_ORDER.forEach((b) => {
+      expect(trackOf(b)).toBe(TYPOGRAPHY[b].track);
+    });
+  });
+
+  it('cssTrackVarOf returns the matching CSS custom-property reference', () => {
+    expect(cssTrackVarOf('caption')).toBe('var(--sys-track-caption)');
+    expect(cssTrackVarOf('display')).toBe('var(--sys-track-display)');
+  });
+
+  it('trackingClassOf returns the Tailwind tracking utility', () => {
+    expect(trackingClassOf('caption')).toBe('tracking-sys-caption');
+    expect(trackingClassOf('display')).toBe('tracking-sys-display');
+  });
+
   it('isKerned classifies kern: auto beats correctly', () => {
     expect(isKerned('lede')).toBe(true);
     expect(isKerned('heading')).toBe(true);
@@ -188,6 +234,18 @@ describe('per-beat .typo-<beat> CSS class blocks', () => {
       const wantsKern = TYPOGRAPHY[beat as TypographyBeatName].kern === 'auto';
       const hasKern = blockHas(block, /font-feature-settings:\s*['"]kern['"]/);
       expect(hasKern).toBe(wantsKern);
+    });
+
+    it(`.typo-${beat} declares letter-spacing: var(--sys-track-${beat})`, () => {
+      const block = readTypoBlock(beat);
+      const decl = new RegExp(`letter-spacing:\\s*var\\(--sys-track-${beat}\\)`);
+      expect(blockHas(block, decl)).toBe(true);
+    });
+
+    it(`.typo-${beat} has no hardcoded letter-spacing literal (must use var)`, () => {
+      const block = readTypoBlock(beat);
+      const literal = /letter-spacing:\s*-?\d*\.?\d+(em|px|rem)/;
+      expect(blockHas(block, literal)).toBe(false);
     });
   });
 });

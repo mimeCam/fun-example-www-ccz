@@ -14,6 +14,7 @@
 'use client';
 
 import { useThermal, ThermalProvider } from './ThermalProvider';
+import { ToastHost } from '@/components/shared/ToastHost';
 import { useEffect, useState, type ReactNode } from 'react';
 
 function ThermalClassApplier({ children }: { children: ReactNode }) {
@@ -41,6 +42,10 @@ export function ThermalLayout({ children }: { children: ReactNode }) {
   return (
     <ThermalProvider>
       <ThermalClassApplier>{children}</ThermalClassApplier>
+      {/* The 6th primitive's mount — single-host, single-slot. The store is
+          a singleton, but the surface lives inside React so every
+          `var(--sys-*)` resolves at paint time (Mike §6.1, Tanya §0). */}
+      <ToastHost />
     </ThermalProvider>
   );
 }

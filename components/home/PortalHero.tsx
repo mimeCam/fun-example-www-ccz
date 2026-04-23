@@ -26,11 +26,11 @@ export default function PortalHero({ article }: { article: Article }) {
 
   return (
     <div className="text-center max-w-2xl mx-auto animate-fade-in thermal-space">
-      <h1 className="text-sys-h1 text-foreground tracking-tight thermal-typography">
+      <h1 className="text-sys-h1 text-foreground tracking-sys-display thermal-typography">
         {article.title}
       </h1>
 
-      <p className="text-mist text-sys-caption mt-sys-4 tracking-wide">
+      <p className="text-mist text-sys-caption mt-sys-4 tracking-sys-caption">
         {readTime} min read
       </p>
 

@@ -1,8 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { MOTION } from '@/lib/design/motion';
 
 const STORAGE_KEY_PREFIX = 'reading_position_';
+
+/**
+ * DOM settle beat — one `crossfade` (120ms) is enough for the browser to
+ * finish initial layout before we call `scrollTo()`. Quoted through the
+ * Motion ledger so it shares a dialect with the rest of the site.
+ */
+const DOM_READY_WAIT_MS = MOTION.crossfade;
 
 interface ReadingPosition {
   scrollY: number;
@@ -89,8 +97,8 @@ export function useReadingPosition(
       }
     };
 
-    // Small delay to ensure DOM is ready
-    setTimeout(restorePosition, 100);
+    // Small delay to ensure DOM is ready (Motion ledger: crossfade beat).
+    setTimeout(restorePosition, DOM_READY_WAIT_MS);
   }, [storageKey, enabled]);
 
   // Track scroll position

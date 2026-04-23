@@ -6,6 +6,7 @@
 
 import { TextLink } from '@/components/shared/TextLink';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { alphaClassOf } from '@/lib/design/alpha';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 
 interface Props {
@@ -23,13 +24,14 @@ function CardGem({ faded }: { faded?: boolean }) {
 
 /** Vitality bar — rose gradient for alive, empty for faded. */
 function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean }) {
-  if (faded) return (
-    <div className="h-1.5 rounded-sys-full bg-fog/30 w-full" />
-  );
+  // Track is ambient chrome — Alpha rung `muted` via the ledger helper,
+  // same string emitted as before ("bg-fog/30"), now ledger-sourced.
+  const trackClass = `h-1.5 rounded-sys-full ${alphaClassOf('fog', 'muted')} w-full`;
+  if (faded) return <div className={trackClass} />;
 
   const pct = Math.min(100, Math.round((vitality / 30) * 100));
   return (
-    <div className="h-1.5 rounded-sys-full bg-fog/30 w-full overflow-hidden">
+    <div className={`${trackClass} overflow-hidden`}>
       <div className="h-full rounded-sys-full bg-gradient-to-r from-rose to-rose/60 transition-all duration-fade"
         style={{ width: `${pct}%` }} />
     </div>
@@ -53,7 +55,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine 
       {/* Label */}
       <div className="flex items-center gap-sys-3 mb-sys-4">
         <CardGem faded={faded} />
-        <span className="text-sys-micro uppercase tracking-widest text-mist">
+        <span className="text-sys-micro uppercase tracking-sys-caption text-mist">
           {faded ? 'Faded' : 'Something that stayed with you'}
         </span>
       </div>

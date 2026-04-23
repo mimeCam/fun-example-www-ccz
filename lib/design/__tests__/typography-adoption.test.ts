@@ -35,6 +35,7 @@ import {
   TYPOGRAPHY_LEDGER_EXEMPT_TOKEN,
   TYPOGRAPHY_ORDER,
   THERMAL_LEADING_VAR,
+  THERMAL_TRACK_VAR,
 } from '../typography';
 
 const ROOT = join(__dirname, '..', '..', '..');
@@ -135,9 +136,53 @@ function isAllowedInlineValue(value: string): boolean {
   return v.startsWith('var(--');
 }
 
+/** Match a Tailwind preset tracking class — tighter/tight/normal/wide/wider/widest. */
+function hasTailwindPresetTracking(src: string): boolean {
+  return /\btracking-(tighter|tight|normal|wide|wider|widest)\b/.test(src);
+}
+
+/**
+ * Match a Tailwind arbitrary `tracking-[…]` class whose contents are NOT
+ * one of the allow-listed CSS vars (`--sys-track-*` or the thermal
+ * `--token-letter-spacing`).
+ */
+function hasTailwindArbitraryTracking(src: string): boolean {
+  const matches = src.matchAll(/\btracking-\[([^\]]+)\]/g);
+  for (const m of matches) {
+    if (!isAllowedArbitraryTracking(m[1])) return true;
+  }
+  return false;
+}
+
+/** True iff the arbitrary tracking payload is one of our allow-listed vars. */
+function isAllowedArbitraryTracking(payload: string): boolean {
+  const p = payload.trim();
+  if (p === `var(${THERMAL_TRACK_VAR})`) return true;
+  return TYPOGRAPHY_ORDER.some((b) => p === `var(--sys-track-${b})`);
+}
+
+/**
+ * Match an inline `letterSpacing: <literal>` in a style object. Allows
+ * `var(--…)` references through. Bare numbers, `em`/`px` literals, and
+ * CSS keywords fail the guard.
+ */
+function hasInlineLetterSpacingLiteral(src: string): boolean {
+  const matches = src.matchAll(/\bletterSpacing\s*:\s*([^,}\n]+)/g);
+  for (const m of matches) {
+    if (!isAllowedInlineValue(m[1])) return true;
+  }
+  return false;
+}
+
 // ─── Violation collector (single source of truth) ──────────────────────────
 
-type Kind = 'tw-preset' | 'tw-arbitrary' | 'inline-literal';
+type Kind =
+  | 'tw-preset'
+  | 'tw-arbitrary'
+  | 'inline-literal'
+  | 'tw-preset-track'
+  | 'tw-arbitrary-track'
+  | 'inline-track-literal';
 
 interface Violation {
   file: string;
@@ -153,9 +198,12 @@ function check(path: string, src: string): Violation[] {
   if (ALLOW.has(rel)) return [];
   if (isExempt(src)) return [];
   const out: Violation[] = [];
-  pushIf(out, hasTailwindPresetLeading(src),    rel, 'tw-preset');
-  pushIf(out, hasTailwindArbitraryLeading(src), rel, 'tw-arbitrary');
-  pushIf(out, hasInlineLineHeightLiteral(src),  rel, 'inline-literal');
+  pushIf(out, hasTailwindPresetLeading(src),      rel, 'tw-preset');
+  pushIf(out, hasTailwindArbitraryLeading(src),   rel, 'tw-arbitrary');
+  pushIf(out, hasInlineLineHeightLiteral(src),    rel, 'inline-literal');
+  pushIf(out, hasTailwindPresetTracking(src),     rel, 'tw-preset-track');
+  pushIf(out, hasTailwindArbitraryTracking(src),  rel, 'tw-arbitrary-track');
+  pushIf(out, hasInlineLetterSpacingLiteral(src), rel, 'inline-track-literal');
   return out;
 }
 
@@ -180,6 +228,21 @@ describe('typography adoption — every leading goes through the ledger', () => 
 
   it('no inline lineHeight: literals (only var(--…) references allowed)', () => {
     const hits = violations.filter((v) => v.kind === 'inline-literal');
+    expect(hits.map((v) => v.file)).toEqual([]);
+  });
+
+  it('no Tailwind preset tracking classes (tracking-tight, tracking-widest, …)', () => {
+    const hits = violations.filter((v) => v.kind === 'tw-preset-track');
+    expect(hits.map((v) => v.file)).toEqual([]);
+  });
+
+  it('no Tailwind arbitrary tracking except var(--sys-track-*) / var(--token-letter-spacing)', () => {
+    const hits = violations.filter((v) => v.kind === 'tw-arbitrary-track');
+    expect(hits.map((v) => v.file)).toEqual([]);
+  });
+
+  it('no inline letterSpacing: literals (only var(--…) references allowed)', () => {
+    const hits = violations.filter((v) => v.kind === 'inline-track-literal');
     expect(hits.map((v) => v.file)).toEqual([]);
   });
 });
@@ -216,5 +279,21 @@ describe('typography adoption — allow-list internals are correct', () => {
     expect(isAllowedArbitraryLeading('var(--something-else)')).toBe(false);
     expect(isAllowedArbitraryLeading('1.6')).toBe(false);
     expect(isAllowedArbitraryLeading('20px')).toBe(false);
+  });
+
+  it('isAllowedArbitraryTracking accepts every --sys-track-* var', () => {
+    TYPOGRAPHY_ORDER.forEach((b) => {
+      expect(isAllowedArbitraryTracking(`var(--sys-track-${b})`)).toBe(true);
+    });
+  });
+
+  it('isAllowedArbitraryTracking accepts the thermal --token-letter-spacing var', () => {
+    expect(isAllowedArbitraryTracking(`var(${THERMAL_TRACK_VAR})`)).toBe(true);
+  });
+
+  it('isAllowedArbitraryTracking rejects unrelated vars and bare em literals', () => {
+    expect(isAllowedArbitraryTracking('var(--something-else)')).toBe(false);
+    expect(isAllowedArbitraryTracking('0.05em')).toBe(false);
+    expect(isAllowedArbitraryTracking('-0.01em')).toBe(false);
   });
 });

@@ -195,7 +195,7 @@ function LetterCard({
         </Pressable>
       )}
       {/* Label */}
-      <p className="text-sys-micro uppercase tracking-widest text-accent/60 text-center">
+      <p className="text-sys-micro uppercase tracking-sys-caption text-accent/60 text-center">
         Because you came back&hellip;
       </p>
       {/* Salutation */}

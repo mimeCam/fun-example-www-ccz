@@ -1,7 +1,17 @@
 /**
  * Clipboard utilities for copy-to-clipboard functionality.
  * Cross-browser compatible with fallback support.
+ *
+ * Toast feedback: routed through `@/lib/sharing/toast-store` (the 6th
+ * primitive's pub/sub singleton). The previous implementation minted a
+ * foreign-DOM `<div>` with inline cssText — a mount outside React, which
+ * broke `var(--sys-*)` resolution and required three `:exempt` comments.
+ * Those comments are gone because the *mount* is fixed (Mike §1, Tanya §0).
  */
+
+import {
+  toastShow, type ToastIntent, type ToastHandle,
+} from '@/lib/sharing/toast-store';
 
 /**
  * Copy text to clipboard using modern Clipboard API.
@@ -72,84 +82,33 @@ export function isClipboardSupported(): boolean {
 }
 
 /**
- * Show a brief toast notification after copy.
- * Provides visual feedback that text was copied.
+ * Show a brief toast confirmation. Pure-TS callers route through the
+ * single store; the `<ToastHost>` portal mounted in `<ThermalLayout>`
+ * paints the surface with full ledger-token resolution.
  *
- * @param message - Message to display
- * @param duration - Duration in milliseconds (default 2000)
+ * @param message - Final, already-tinted phrase to show
+ * @param duration - Optional dwell override (defaults to `confirm` budget)
  */
-export function showCopyFeedback(message: string = 'Copied to clipboard!', duration = 2000): void {
-  // Remove existing toast if present
-  const existing = document.getElementById('copy-feedback-toast');
-  if (existing) {
-    existing.remove();
-  }
-
-  // Create toast element
-  const toast = document.createElement('div');
-  toast.id = 'copy-feedback-toast';
-  toast.textContent = message;
-  toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-surface text-white px-4 py-2 rounded-xl z-50 animate-fade-in';
-  // elevation-ledger:exempt — toast is a JS-injected float over body chrome,
-  // appears before React/Tailwind CSS may have processed --sys-elev-* vars
-  // for unmounted state. Inline shadow is the safe default. See
-  // ELEVATION_LEDGER_EXEMPT_TOKEN in lib/design/elevation.ts.
-  // (Elon §4.3 fix: previously a legacy `float` Tailwind alias contradicted
-  // the exempt comment; the cssText below is the single source of shadow.)
-  // spacing-ledger:exempt — same rationale for padding: the toast is minted
-  // outside React/Tailwind, so `px-4 py-2` + inline `padding: 0.5rem 1rem`
-  // are the honest literal that survives an unmounted ThermalProvider.
-  // See SPACING_LEDGER_EXEMPT_TOKEN in lib/design/spacing.ts.
-  // radius-ledger:exempt — foreign-DOM toast: `var(--sys-radius-*)` does
-  // not resolve on a DOM node appended before React/Tailwind process the
-  // custom-property cascade. The inline `border-radius: 0.5rem` literal
-  // mirrors `--sys-radius-medium` (held, the confirmation-scale rung).
-  // See RADIUS_LEDGER_EXEMPT_TOKEN in lib/design/radius.ts (Tanya §5.1).
-  toast.style.cssText = `
-    position: fixed;
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #1f2937;
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    z-index: 50;
-    animation: fadeIn 0.2s ease-out;
-  `;
-
-  document.body.appendChild(toast);
-
-  // Remove after duration
-  setTimeout(() => {
-    toast.style.transition = 'opacity 0.2s ease-out';
-    toast.style.opacity = '0';
-    setTimeout(() => toast.remove(), 200);
-  }, duration);
+export function showCopyFeedback(message = 'Copied.', duration?: number): ToastHandle {
+  return toastShow({ message, intent: 'confirm', durationMs: duration });
 }
 
 /**
- * Copy with automatic feedback toast.
- * Combines copy and user feedback in one call.
+ * Copy text and surface the result through the shared toast.
  *
- * @param text - Text to copy
- * @param successMessage - Custom success message
- * @returns Promise that resolves to true if successful
+ * Returns the boolean copy outcome so callers can chain follow-ups.
  */
 export async function copyWithFeedback(
   text: string,
-  successMessage?: string
+  successMessage: string = 'Copied.',
+  failureMessage: string = "Didn't land — try again.",
 ): Promise<boolean> {
-  const success = await copyToClipboard(text);
-
-  if (success) {
-    showCopyFeedback(successMessage || 'Copied to clipboard!');
-  } else {
-    showCopyFeedback('Failed to copy. Please try again.');
-  }
-
-  return success;
+  const ok = await copyToClipboard(text);
+  toastShow({
+    message: ok ? successMessage : failureMessage,
+    intent:  ok ? 'confirm' : 'warn',
+  });
+  return ok;
 }
 
 /**

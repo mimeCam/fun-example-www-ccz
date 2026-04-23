@@ -2,10 +2,14 @@
  * Motion Adoption Test — bare-ms / duration-* adoption guardrail.
  *
  * Every interactive surface on the site speaks one dialect of time
- * owned by `lib/design/motion.ts`. This test fails when a new bare
- * millisecond string literal (`'150ms'`), a seconds literal (`'1.5s'`),
- * or a Tailwind arbitrary duration (`duration-[200ms]`) slips into
- * `components/**` or the `lib/utils/*-phase.ts` family.
+ * owned by `lib/design/motion.ts`. This test fails when:
+ *
+ *   - a bare millisecond string literal (`'150ms'`), a seconds literal
+ *     (`'1.5s'`), or a Tailwind arbitrary duration (`duration-[200ms]`)
+ *     slips into `components/**`, `lib/hooks/**`, or `lib/utils/**`;
+ *   - a raw numeric `setTimeout(_, <ms>)` call appears in the same dirs
+ *     (Mike K. §4b — the exact shape the Golden Thread's `T_LINGER=2000`
+ *     constant drifted as, hiding from the string/TW scanners).
  *
  * This is not ESLint — it is a jest test. One file, zero config, one
  * allow-list. Mirrors the pattern of `pressable-adoption.test.ts`,
@@ -15,9 +19,11 @@
  * `components/**` outside `motion.ts` and tests → 0. Without this test,
  * we will regress within 3 sprints. With it, we will not.
  *
- * Credits: Mike K. (napkin §7 — adoption-guard spec), Paul K. (KPI),
- * Tanya D. (the "why it matters" in §7 of the UX spec), Elon M. (the
- * drift catches that prove the test has teeth).
+ * Credits: Mike K. (napkin §7 — adoption-guard spec; napkin #38 §4b —
+ * setTimeout scanner + guard-before-diff sequence), Paul K. (KPI),
+ * Tanya D. (the "why it matters" in §7 of the UX spec; UIX #69 — the
+ * flagship-as-violator framing), Elon M. (the drift catches that prove
+ * the test has teeth).
  */
 
 import { readFileSync, readdirSync, statSync } from 'node:fs';
@@ -81,9 +87,23 @@ function hasTailwindArbitraryDelay(src: string): boolean {
   return /delay-\[\d+\s*ms\]/.test(src);
 }
 
+/**
+ * Match a `setTimeout(_, N)` call where N is a numeric literal ≥ 10.
+ * Allows `0` (microtask defer) and 1-9ms (sub-frame, rarely named). Anything
+ * larger is a beat and should live in `MOTION` or `CEREMONY` (or a named
+ * constant that quotes one). `\d{2,}` requires two or more digits to hit.
+ *
+ * Shape of the catch — mirrors the Thread drift exactly:
+ *     setTimeout(() => setPhase('fading'), 2000)   ← caught
+ *     setTimeout(() => setPhase('fading'), T_LINGER) ← caught (see next scanner)
+ */
+function hasNumericSetTimeout(src: string): boolean {
+  return /setTimeout\s*\(\s*[^,]+,\s*\d{2,}\s*\)/.test(src);
+}
+
 // ─── Violation collector (single source of truth) ──────────────────────────
 
-type Kind = 'quoted-time' | 'tw-duration' | 'tw-delay';
+type Kind = 'quoted-time' | 'tw-duration' | 'tw-delay' | 'num-settimeout';
 
 interface Violation {
   file: string;
@@ -97,6 +117,7 @@ function check(path: string, src: string): Violation[] {
   if (hasQuotedTimeLiteral(src)) out.push({ file: rel, kind: 'quoted-time' });
   if (hasTailwindArbitraryDuration(src)) out.push({ file: rel, kind: 'tw-duration' });
   if (hasTailwindArbitraryDelay(src)) out.push({ file: rel, kind: 'tw-delay' });
+  if (hasNumericSetTimeout(src)) out.push({ file: rel, kind: 'num-settimeout' });
   return out;
 }
 
@@ -122,6 +143,26 @@ describe('motion adoption — every beat speaks one dialect', () => {
   it('no Tailwind arbitrary delays (e.g. delay-[400ms])', () => {
     const hits = violations.filter((v) => v.kind === 'tw-delay');
     expect(hits.map((v) => v.file)).toEqual([]);
+  });
+
+  /**
+   * The flagship-catch: `setTimeout(fn, 2000)` or any raw numeric beat.
+   * The failure message names `MOTION.*` / `CEREMONY.*` because that's
+   * where the value should live. Per Mike K. §4b + Tanya D. §3.1:
+   * the Thread's `T_LINGER` const is the poster child this scanner closes.
+   */
+  it('no numeric setTimeout literals (e.g. setTimeout(fn, 2000))', () => {
+    const hits = violations.filter((v) => v.kind === 'num-settimeout');
+    const message = hits
+      .map(
+        (v) =>
+          `  ${v.file} — raw setTimeout(_, N) literal\n` +
+          `    → use MOTION.* (150–1500) or CEREMONY.* (breath/giftDelay/glowHold)\n` +
+          `      from lib/design/motion.ts, or a named constant that quotes one.`,
+      )
+      .join('\n');
+    expect(hits.map((v) => v.file)).toEqual([]);
+    if (hits.length > 0) throw new Error('\n' + message);
   });
 });
 

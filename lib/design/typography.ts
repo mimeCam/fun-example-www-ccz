@@ -1,5 +1,5 @@
 /**
- * Typography Ledger — single source of truth for leading / wrap / kerning.
+ * Typography Ledger — single source of truth for leading / wrap / kerning / track.
  *
  * The fourth ledger, same shape as Motion, Elevation, Color Constants:
  * **CSS canonical → TS mirror → sync test → adoption guard.** Reviewer
@@ -8,12 +8,13 @@
  * kinship — change a beat in one place, change it in the other or the
  * test fails fast and names the beat.
  *
- * Six named beats, ordered tightest → loosest. Each beat owns three
+ * Six named beats, ordered tightest → loosest. Each beat owns four
  * properties; nothing else:
  *
  *   leadN: integer multiplier on `--sys-tick: 4px` (the spatial anchor)
  *   wrap:  'auto' | 'pretty' | 'balance'   (CSS text-wrap, per-beat)
  *   kern:  'auto' | 'none'                 (optical kerning, per-beat)
+ *   track: number (em)                     (letter-spacing, voice-print anchor)
  *
  * Naming is by *reading rhythm*, not use-site. A card title USES `heading`;
  * a hero USES `display`; the article column USES `body`/`passage`. Do NOT
@@ -50,8 +51,11 @@ export const SYS_TICK_PX = 4;
 
 /**
  * Per-beat shape: leadN locks the rhythm to the tick; wrap and kern are
- * the two AAA polish details Elon's teardown kept. One object, three
- * properties — atom shape, no use-site decoration.
+ * the two AAA polish details Elon's teardown kept; track is the voice-print
+ * anchor (letter-spacing in em). One object, four properties — atom shape,
+ * no use-site decoration. `track` does not warm with engagement; the
+ * reader's voice-print refuses to breathe. See AGENTS.md for the one-line
+ * per-property thermal declaration.
  */
 export interface TypographyBeat {
   /** Integer multiplier. Leading in px = `leadN * SYS_TICK_PX`. */
@@ -60,20 +64,30 @@ export interface TypographyBeat {
   readonly wrap: 'auto' | 'pretty' | 'balance';
   /** Optical kerning — `auto` triggers font-feature-settings + optimizeLegibility. */
   readonly kern: 'auto' | 'none';
+  /** Letter-spacing in em (-0.2 … +0.2). Anchor property — does not warm. */
+  readonly track: number;
 }
 
 /**
  * Six named beats, ordered tightest → loosest (caption → display).
  *
  * Naming is by *reading rhythm*, not use-site. See module header.
+ *
+ * `track` values:
+ *   caption  +0.08em  stage-whisper — uppercase labels, marginalia, kickers
+ *   body      0em     neutral — prose paragraphs
+ *   lede      0em     neutral — optical kerning carries the polish
+ *   passage   0em     neutral — long-form reading
+ *   heading  -0.01em  tighter — card titles, section heads
+ *   display  -0.02em  tightest — hero, keepsake artifact
  */
 export const TYPOGRAPHY = {
-  caption: { leadN: 5,  wrap: 'auto',    kern: 'none' },
-  body:    { leadN: 6,  wrap: 'pretty',  kern: 'none' },
-  lede:    { leadN: 7,  wrap: 'pretty',  kern: 'auto' },
-  passage: { leadN: 7,  wrap: 'pretty',  kern: 'none' },
-  heading: { leadN: 8,  wrap: 'balance', kern: 'auto' },
-  display: { leadN: 10, wrap: 'balance', kern: 'auto' },
+  caption: { leadN: 5,  wrap: 'auto',    kern: 'none', track:  0.08 },
+  body:    { leadN: 6,  wrap: 'pretty',  kern: 'none', track:  0    },
+  lede:    { leadN: 7,  wrap: 'pretty',  kern: 'auto', track:  0    },
+  passage: { leadN: 7,  wrap: 'pretty',  kern: 'none', track:  0    },
+  heading: { leadN: 8,  wrap: 'balance', kern: 'auto', track: -0.01 },
+  display: { leadN: 10, wrap: 'balance', kern: 'auto', track: -0.02 },
 } as const satisfies Record<string, TypographyBeat>;
 
 export type TypographyBeatName = keyof typeof TYPOGRAPHY;
@@ -103,6 +117,18 @@ export const classesOf = (b: TypographyBeatName): string => `typo-${b}`;
 export const leadingClassOf = (b: TypographyBeatName): string =>
   `leading-sys-${b}`;
 
+/** Track (letter-spacing, em) for a named beat. Pure. */
+export const trackOf = (b: TypographyBeatName): number =>
+  TYPOGRAPHY[b].track;
+
+/** CSS custom-property reference for a beat's track. Pure. */
+export const cssTrackVarOf = (b: TypographyBeatName): string =>
+  `var(--sys-track-${b})`;
+
+/** Tailwind tracking utility for a named beat (alternative to `typo-*`). */
+export const trackingClassOf = (b: TypographyBeatName): string =>
+  `tracking-sys-${b}`;
+
 /** True iff the beat opts in to optical kerning (font-feature-settings). */
 export const isKerned = (b: TypographyBeatName): boolean =>
   TYPOGRAPHY[b].kern === 'auto';
@@ -124,11 +150,13 @@ export function typographyInvariantHolds(): boolean {
   return everyBeatIsLegal() && orderIsNonDecreasing();
 }
 
-/** Every beat has a positive integer leadN and is reachable from the order. */
+/** Every beat has positive integer leadN, finite bounded track — reachable from order. */
 function everyBeatIsLegal(): boolean {
   return TYPOGRAPHY_ORDER.every((b) => {
     const beat = TYPOGRAPHY[b];
-    return Number.isInteger(beat.leadN) && beat.leadN > 0;
+    const legalLead = Number.isInteger(beat.leadN) && beat.leadN > 0;
+    const legalTrack = Number.isFinite(beat.track) && Math.abs(beat.track) <= 0.2;
+    return legalLead && legalTrack;
   });
 }
 
@@ -173,3 +201,22 @@ export const TYPOGRAPHY_LEDGER_EXEMPT_TOKEN = 'typography-ledger:exempt';
 export const THERMAL_LEADING_VAR = '--token-line-height';
 export const thermalLeadingClass = (): string =>
   `leading-[var(${THERMAL_LEADING_VAR})]`;
+
+// ─── Thermal carve-out — `--token-letter-spacing` is the BODY prose scalar ──
+
+/**
+ * The thermal engine's `--token-letter-spacing` warms body prose only
+ * (-0.01em → +0.02em with engagement). It is **not** a beat. `track` is
+ * the anchor register; `--token-letter-spacing` is the thermal carve-out
+ * on body text (analogous to `--token-line-height`). The adoption guard
+ * allow-lists the exact arbitrary class `tracking-[var(--token-letter-spacing)]`
+ * alongside `tracking-[var(--sys-track-*)]`. Everything else — `tracking-tight`,
+ * `tracking-widest`, `tracking-[0.05em]`, etc. — fails the guard.
+ *
+ * Declaration per property (AGENTS.md): `track` does not warm; body-prose
+ * `--token-letter-spacing` is the single thermal carve-out, same shape
+ * as `--token-line-height` vs. `leadN`.
+ */
+export const THERMAL_TRACK_VAR = '--token-letter-spacing';
+export const thermalTrackClass = (): string =>
+  `tracking-[var(${THERMAL_TRACK_VAR})]`;
