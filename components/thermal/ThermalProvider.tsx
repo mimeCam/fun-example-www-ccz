@@ -17,6 +17,9 @@ import { type ThermalTokens } from '@/lib/thermal/thermal-tokens';
 import { type AnimationTokens } from '@/lib/thermal/thermal-animation';
 import { computeFull, applyToDOM, type AppliedThermal } from '@/lib/thermal/apply-tokens';
 import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
+import {
+  MIRROR_STORAGE_KEY, readStoredArchetype,
+} from '@/lib/mirror/archetype-store';
 import type { ArchetypeKey } from '@/types/content';
 
 interface ThermalContextValue {
@@ -33,20 +36,6 @@ interface ThermalContextValue {
    */
   archetype: ArchetypeKey | null;
   refresh: (plan?: TransitionPlan) => void;
-}
-
-/** localStorage key the Mirror writes archetype results to. */
-const MIRROR_STORAGE_KEY = 'quick-mirror-result';
-
-/** Pure read of the stored archetype, SSR-safe. */
-function readStoredArchetype(): ArchetypeKey | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = window.localStorage.getItem(MIRROR_STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as { archetype?: ArchetypeKey };
-    return parsed?.archetype ?? null;
-  } catch { return null; }
 }
 
 const FALLBACK_ANIMATION: AnimationTokens = {

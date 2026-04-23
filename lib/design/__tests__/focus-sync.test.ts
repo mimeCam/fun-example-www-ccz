@@ -34,11 +34,15 @@ import { resolve } from 'path';
 import {
   FOCUS,
   FOCUS_CSS_PREFIX,
+  FOCUS_INK,
+  FOCUS_INK_CSS,
   READER_INVARIANT,
   widthPx,
   offsetPx,
   alphaPct,
   alphaPctString,
+  focusInkCss,
+  focusInkVar,
   focusInvariantHolds,
 } from '../focus';
 
@@ -53,29 +57,68 @@ function readFocusVisibleBlock(): string | undefined {
   return match ? match[1] : undefined;
 }
 
-/** Pull the `outline:` declaration out of the `:focus-visible` block. */
-function readOutlineDecl(): string | undefined {
+/** Pull the `box-shadow:` declaration out of the `:focus-visible` block.
+ *  The shadow spans multiple lines by design (two-stop composition) — the
+ *  regex stops at the terminating `;` which the CSS always emits. */
+function readBoxShadowDecl(): string | undefined {
   const block = readFocusVisibleBlock();
   if (!block) return undefined;
-  const rx = /outline:\s*([^;]+);/;
+  const rx = /box-shadow:\s*([^;]+);/;
   const match = block.match(rx);
-  return match ? match[1].trim() : undefined;
+  return match ? normaliseWhitespace(match[1].trim()) : undefined;
 }
 
-/** Pull the `outline-offset:` declaration out of the block. */
-function readOutlineOffsetDecl(): string | undefined {
+/** Detect any `border-radius:` declaration inside the `:focus-visible` block.
+ *  This is the inverted physics gate — if ANY commit re-introduces a
+ *  radius into the ring rule body, the ring starts rewriting pill hosts
+ *  into 8px squares again and this predicate flips to `true`. */
+function focusVisibleDeclaresBorderRadius(): boolean {
   const block = readFocusVisibleBlock();
-  if (!block) return undefined;
-  const rx = /outline-offset:\s*([^;]+);/;
-  const match = block.match(rx);
-  return match ? match[1].trim() : undefined;
+  if (!block) return false;
+  return /(^|\s|;|\{)\s*border-radius\s*:/.test(block);
 }
 
-/** Parse the first integer-px literal out of a CSS value (`"2px solid …"`). */
+/** Collapse runs of whitespace/newlines to single spaces. Pure. */
+function normaliseWhitespace(value: string): string {
+  return value.replace(/\s+/g, ' ').trim();
+}
+
+/** Split a multi-stop box-shadow declaration into its comma-separated stops.
+ *  Honours parenthesis nesting — `color-mix(in srgb, …, transparent)` has
+ *  internal commas that MUST NOT split the stop. Pure scanner. */
+function splitShadowStops(decl: string | undefined): string[] {
+  if (!decl) return [];
+  const stops: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < decl.length; i++) {
+    const c = decl[i];
+    if (c === '(') depth++;
+    else if (c === ')') depth--;
+    else if (c === ',' && depth === 0) {
+      stops.push(decl.slice(start, i).trim());
+      start = i + 1;
+    }
+  }
+  const tail = decl.slice(start).trim();
+  if (tail) stops.push(tail);
+  return stops;
+}
+
+/** Parse the first integer-px literal out of a CSS value. */
 function parseFirstPx(value: string | undefined): number {
   if (!value) return NaN;
   const match = value.match(/(\d+(?:\.\d+)?)px/);
   return match ? parseFloat(match[1]) : NaN;
+}
+
+/** Parse the Nth integer-px literal out of a CSS value (zero-indexed). */
+function parseNthPx(value: string | undefined, n: number): number {
+  if (!value) return NaN;
+  const matches = value.match(/(\d+(?:\.\d+)?)px/g);
+  if (!matches || matches.length <= n) return NaN;
+  const raw = matches[n].match(/(\d+(?:\.\d+)?)/);
+  return raw ? parseFloat(raw[1]) : NaN;
 }
 
 /** Parse the first `N%` literal out of a CSS value. */
@@ -85,30 +128,150 @@ function parseFirstPct(value: string | undefined): number {
   return match ? parseFloat(match[1]) : NaN;
 }
 
+/** Extract the full body of the `:root { … }` rule (the first one).
+ *  Uses balanced-brace scanning because the block's comments contain `{…}`
+ *  glyphs (e.g. "sys-{6,9,11,12}") that defeat a lazy regex. */
+function readRootBlock(): string | undefined {
+  const start = CSS.indexOf(':root');
+  if (start < 0) return undefined;
+  const open = CSS.indexOf('{', start);
+  if (open < 0) return undefined;
+  let depth = 1;
+  for (let i = open + 1; i < CSS.length; i++) {
+    if (CSS[i] === '{') depth++;
+    else if (CSS[i] === '}' && --depth === 0) return CSS.slice(open + 1, i);
+  }
+  return undefined;
+}
+
+/** Pull the `--sys-focus-ink:` declaration value out of `:root`. */
+function readFocusInkDecl(): string | undefined {
+  const block = readRootBlock();
+  if (!block) return undefined;
+  const rx = /--sys-focus-ink:\s*([^;]+);/;
+  const match = block.match(rx);
+  return match ? match[1].trim() : undefined;
+}
+
+/** Parse a `#rrggbb` or `#rgb` literal into its lowercase 7-char form.
+ *  The 6-char alternative is ordered first — regex alternation is greedy
+ *  left-to-right, and `#7b2cbf` must not collapse into the 3-char branch. */
+function parseHexLiteral(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  const match = value.match(/#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b/);
+  if (!match) return undefined;
+  const raw = match[1].toLowerCase();
+  if (raw.length === 3) return `#${raw[0]}${raw[0]}${raw[1]}${raw[1]}${raw[2]}${raw[2]}`;
+  return `#${raw}`;
+}
+
 // ─── Tests — CSS ↔ TS sync ─────────────────────────────────────────────────
 
-describe('FOCUS ↔ globals.css :focus-visible sync', () => {
+describe('FOCUS ↔ globals.css :focus-visible sync (two-stop box-shadow)', () => {
   it('the :focus-visible block exists in globals.css', () => {
     expect(readFocusVisibleBlock()).toBeDefined();
   });
 
-  it('FOCUS.width matches the outline width in CSS', () => {
-    expect(parseFirstPx(readOutlineDecl())).toBe(FOCUS.width);
+  it('CSS declares NO `outline:` inside `:focus-visible` (shadow composition)', () => {
+    const block = readFocusVisibleBlock();
+    expect(block).toBeDefined();
+    // Allow `box-shadow`, reject `outline:` (the old mechanism).
+    expect(/(^|\s|;)\s*outline\s*:/.test(block!)).toBe(false);
   });
 
-  it('FOCUS.alpha matches the color-mix percentage in CSS', () => {
-    const pct = parseFirstPct(readOutlineDecl());
-    expect(pct).toBe(alphaPct());
+  it('CSS declares a `box-shadow:` inside `:focus-visible`', () => {
+    expect(readBoxShadowDecl()).toBeDefined();
   });
 
-  it('FOCUS.offset matches the outline-offset in CSS', () => {
-    expect(parseFirstPx(readOutlineOffsetDecl())).toBe(FOCUS.offset);
+  it('the shadow is a two-stop composition — spacer then ring', () => {
+    expect(splitShadowStops(readBoxShadowDecl()).length).toBe(2);
   });
 
-  it('CSS uses color-mix() with --token-accent as the lerp source', () => {
-    const outline = readOutlineDecl();
-    expect(outline).toBeDefined();
-    expect(/color-mix\([^)]*--token-accent[^)]*\)/.test(outline!)).toBe(true);
+  it('stop #1 is the transparent spacer at FOCUS.offset width', () => {
+    const [spacer] = splitShadowStops(readBoxShadowDecl());
+    expect(parseFirstPx(spacer)).toBe(FOCUS.offset);
+    expect(spacer.includes('transparent')).toBe(true);
+  });
+
+  it('stop #2 is the ring ink at offset+width with color-mix on --sys-focus-ink', () => {
+    const [, ring] = splitShadowStops(readBoxShadowDecl());
+    expect(parseFirstPx(ring)).toBe(FOCUS.offset + FOCUS.width);
+    expect(/color-mix\([^)]*--sys-focus-ink[^)]*\)/.test(ring)).toBe(true);
+  });
+
+  it('FOCUS.alpha matches the color-mix percentage in the ring stop', () => {
+    const [, ring] = splitShadowStops(readBoxShadowDecl());
+    expect(parseFirstPct(ring)).toBe(alphaPct());
+  });
+
+  it('CSS shadow does NOT reference --token-accent (reader-invariant)', () => {
+    const decl = readBoxShadowDecl();
+    expect(decl).toBeDefined();
+    expect(decl!.includes('--token-accent')).toBe(false);
+  });
+
+  it('the two shadow stops are in the order (spacer, ring) — byte-identity', () => {
+    const [spacer, ring] = splitShadowStops(readBoxShadowDecl());
+    // Spacer has ONLY transparent; ring has color-mix. Order matters.
+    expect(spacer.includes('transparent')).toBe(true);
+    expect(spacer.includes('color-mix')).toBe(false);
+    expect(ring.includes('color-mix')).toBe(true);
+  });
+});
+
+// ─── Tests — --sys-focus-ink mirror (Mike #62) ────────────────────────────
+
+describe('FOCUS_INK ↔ globals.css --sys-focus-ink sync', () => {
+  it(':root declares the --sys-focus-ink custom property', () => {
+    expect(readFocusInkDecl()).toBeDefined();
+  });
+
+  it('parsed :root hex literal equals FOCUS_INK (byte-identical)', () => {
+    expect(parseHexLiteral(readFocusInkDecl())).toBe(FOCUS_INK);
+  });
+
+  it('FOCUS_INK_CSS is the stable custom-property name', () => {
+    expect(FOCUS_INK_CSS).toBe('--sys-focus-ink');
+  });
+
+  it('focusInkCss() round-trips the hex literal', () => {
+    expect(focusInkCss()).toBe(FOCUS_INK);
+  });
+
+  it('focusInkVar() returns the var() reference the ring composes with', () => {
+    expect(focusInkVar()).toBe(`var(${FOCUS_INK_CSS})`);
+  });
+
+  it('FOCUS_INK is a 7-char lowercase hex literal', () => {
+    expect(/^#[0-9a-f]{6}$/.test(FOCUS_INK)).toBe(true);
+  });
+});
+
+// ─── Tests — corner posture belongs to the host (Mike napkin / Tanya #93) ─
+//
+// The ring no longer carries a `border-radius`. Shape is inherited from
+// whatever the host element already declares (pill hosts paint pill rings,
+// cards paint 8px rings, text links paint 6px rings). This block is the
+// inverted physics gate — it fails if any future commit re-introduces a
+// `border-radius` into the `:focus-visible` rule.
+
+describe('corner posture belongs to the host (no radius on :focus-visible)', () => {
+  it('the :focus-visible block declares NO border-radius (subtractive fix)', () => {
+    expect(focusVisibleDeclaresBorderRadius()).toBe(false);
+  });
+
+  it('the block still declares box-shadow (the ring mechanism survives)', () => {
+    expect(readBoxShadowDecl()).toBeDefined();
+  });
+
+  it('FOCUS_RADIUS_* exports are gone (no sibling to mirror an absent rule)', () => {
+    // The imports at the top of this file already enforce this at TS
+    // compile-time; an assertion here documents the absence for readers.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const mod = require('../focus') as Record<string, unknown>;
+    expect(mod.FOCUS_RADIUS_CSS).toBeUndefined();
+    expect(mod.FOCUS_RADIUS_RUNG).toBeUndefined();
+    expect(mod.focusRadiusVar).toBeUndefined();
   });
 });
 

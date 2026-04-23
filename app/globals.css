@@ -282,6 +282,17 @@
   --sys-thread-offset: 3px;
   --sys-thread-width: 2px;
 
+  /* ─── Focus Ink — the reader-invariant accent ──────────────
+     // reader-invariant — never warms, never personalizes, never archetype-forks.
+     The `:focus-visible` ring reads from THIS token, not from `--token-accent`
+     (which the thermal engine interpolates violet → gold). Equal to the
+     dormant-accent literal today by design review, NOT by reference — keeping
+     them forked lets a future palette lift move the ring's ink independently
+     of the thermal anchor. TS mirror: `lib/design/focus.ts#FOCUS_INK`.
+     Sync guard: `lib/design/__tests__/focus-sync.test.ts`.
+     Physics gate: `lib/design/__tests__/focus-ink-byte-identity.test.ts`. */
+  --sys-focus-ink: #7b2cbf;
+
   /* Legacy aliases (kept for backward compat during migration) */
   --background: var(--token-bg);
   --foreground: var(--token-foreground);
@@ -294,18 +305,44 @@
    Adoption guard: lib/design/__tests__/ambient-surfaces-adoption.test.ts. */
 
 /* Focus-visible ring — author-triggered (keyboard nav), not gesture-surface.
-   Stays here by design — Tanya §7 / Mike P9. Thermal accent, not system blue.
+   Stays here by design — Tanya §7 / Mike P9. Reader-invariant: the ring paints
+   the SAME colour at thermal score 0 and thermal score 100. Corner posture is
+   NOT declared here; the ring inherits whatever `border-radius` the host
+   already carries (cards/inputs → 8px, pill hosts → pill, text links → 6px).
+   // reader-invariant — sources `--sys-focus-ink`, NEVER `--token-accent`.
    80% (was 70%): Tanya §4 prescribed mitigation — midpoints were dipping
    under WCAG 1.4.11 non-text (3:1). See lib/utils/__tests__/contrast.test.ts.
-   TS mirror: lib/design/focus.ts (reader-invariant — does not warm, does not
-   personalize, does not archetype-fork). Sync guard: focus-sync.test.ts. */
+
+   Posture: two-stop `box-shadow` (NOT `outline`). The first stop is the
+   transparent spacer (= old `outline-offset`); the second stop is the ring
+   itself (spacer + width). Order matters — do NOT collapse them; the sync
+   test pins the exact string. Corner honours the host by construction:
+   `box-shadow` follows the element's own `border-radius` without any focus-
+   side declaration. No `border-radius:` inside this rule — that was the
+   phantom that rewrote every pill host into an 8px square for one frame
+   (Mike K. napkin / Tanya D. UX #93 / Elon M. first-principles).
+
+   Clip note: `box-shadow` participates in paint order and can be clipped
+   by ancestor `overflow: hidden`. Audit 2026-04-23: the three suspects
+   (Threshold chamber, MirrorRevealCard, ThreadKeepsake preview) all have
+   ≥ 20px interior padding on focusable descendants — the 4px ring has
+   room to breathe. `z-index: 1` beats sibling dots by one stacking step
+   without a new z-ledger rung (Tanya #78 §2.3).
+
+   // reader-invariant — the ring below is byte-identical at every thermal
+   // stop and passively honours each host's declared corner.
+   TS mirror: lib/design/focus.ts. Sync guard: focus-sync.test.ts.
+   Physics gate: focus-ink-byte-identity.test.ts. */
 :focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--token-accent) 80%, transparent);
-  outline-offset: 2px;
-  border-radius: var(--sys-radius-soft);
+  box-shadow:
+    0 0 0 2px transparent,
+    0 0 0 4px color-mix(in srgb, var(--sys-focus-ink) 80%, transparent);
+  position: relative;
+  z-index: 1;
 }
 :focus:not(:focus-visible) {
   outline: none;
+  box-shadow: none;
 }
 
 /* Smooth scroll — the room turns, it doesn't jump. The scrollbar's paint
@@ -629,6 +666,12 @@ body {
 .sys-skeleton {
   animation: sysSkeletonBreath var(--sys-skeleton-beat, 1000ms)
              var(--sys-ease-sustain) infinite;
+  /* Exit polish (Elon's 3-line salvage, sealed in SKELETON.handoff):
+     when React unmounts a mid-peak skeleton, the keyframe holds its last
+     computed opacity instead of snapping back to the 0% frame. The eye
+     reads the unmount as a soft fade into the arriving subtree, not a
+     scene cut. No JS phase read; compositor-owned. */
+  animation-fill-mode: forwards;
   will-change: opacity;
 }
 
@@ -640,6 +683,31 @@ body {
 @keyframes sysSkeletonBreath {
   0%, 100% { opacity: var(--sys-alpha-hairline); }
   50%      { opacity: var(--sys-alpha-muted); }
+}
+
+/* ─── Content-Enter Crossfade ────────────────────────────
+   The arrival slot of <SuspenseFade> (components/shared/SuspenseFade.tsx)
+   carries `data-sys-enter="fade"`. When React mounts it (the moment the
+   fallback skeleton is replaced by streamed content), the keyframe runs
+   `MOTION.crossfade × ALPHA.muted → 1` over the sealed 120ms window.
+   No global clock, no phase-lock, no JS — pure CSS composition of two
+   ledgers (Motion + Alpha) under one Skeleton handoff entry.
+
+   `animation-fill-mode: both` keeps the arrival at its final opacity
+   even if React hydrates mid-animation. The reduced-motion block above
+   (`* { animation-duration: 0.01ms !important }`) collapses the beat
+   below SKELETON.handoff.reducedFloor (10ms) — the reveal still lands;
+   the ornament does not perform. */
+[data-sys-enter="fade"] {
+  animation: sysEnterFade var(--sys-time-crossfade)
+             var(--sys-ease-sustain);
+  animation-fill-mode: both;
+  will-change: opacity;
+}
+
+@keyframes sysEnterFade {
+  from { opacity: var(--sys-alpha-muted); }
+  to   { opacity: 1; }
 }
 
 /* Respect reduced motion — hard kill on all animations + transitions */

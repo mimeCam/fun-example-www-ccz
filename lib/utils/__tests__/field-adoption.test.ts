@@ -75,16 +75,27 @@ function hasContentEditable(src: string): boolean {
 }
 
 /**
- * Static no-focus-glow rule (§4.1): the Field module must not introduce
- * `box-shadow: 0 0` ring-style patterns — the one focus ring is global.
+ * Static no-focus-ring rule (§4.1 — widened in Mike #8 / Tanya #78):
+ * the global `:focus-visible` in `app/globals.css` is the ONE ring. Any
+ * per-component focus decoration (Tailwind `focus:ring-*`, `focus:shadow-*`,
+ * `focus-visible:*`, or a stray `:focus-visible`, `outline:`, `box-shadow`
+ * inside a `focus:` / `focus-visible:` prefix) is drift — the ring no
+ * longer hugs a consistent corner posture, byte-identity erodes silently.
+ *
+ * The scanner accepts TSX source; it is intentionally permissive at the
+ * character level (a `focus:` prefix anywhere, not just in className=)
+ * because component libraries compose class strings in many shapes.
  */
-function hasFocusGlow(src: string): boolean {
-  return /focus:(?:ring-|shadow-\[0_0)/.test(src);
+function hasFocusRing(src: string): boolean {
+  if (/focus:(?:ring-|shadow-\[0_0|outline-)/.test(src)) return true;
+  if (/focus-visible:(?:ring-|shadow-|outline-)/.test(src)) return true;
+  if (/:focus-visible\s*\{/.test(src)) return true; // raw CSS in a TSX string
+  return false;
 }
 
 // ─── Violation collector (single source of truth) ──────────────────────────
 
-type Kind = 'raw-textarea' | 'text-input' | 'contenteditable' | 'focus-glow';
+type Kind = 'raw-textarea' | 'text-input' | 'contenteditable' | 'focus-ring';
 
 interface Violation { file: string; kind: Kind }
 
@@ -98,7 +109,7 @@ function check(path: string, src: string): Violation[] {
     ...checkOne(rel, src, 'raw-textarea', hasRawTextarea(src), FIELD_ALLOW),
     ...checkOne(rel, src, 'text-input', hasTextInput(src), FIELD_ALLOW),
     ...checkOne(rel, src, 'contenteditable', hasContentEditable(src), FIELD_ALLOW),
-    ...checkOne(rel, src, 'focus-glow', hasFocusGlow(src), RECIPE_ALLOW),
+    ...checkOne(rel, src, 'focus-ring', hasFocusRing(src), RECIPE_ALLOW),
   ];
 }
 
@@ -127,7 +138,7 @@ describe('field adoption — every input speaks one dialect', () => {
   });
 
   it('no per-component focus rings (the global :focus-visible is the one ring)', () => {
-    const glows = violations.filter((v) => v.kind === 'focus-glow');
-    expect(glows.map((v) => v.file)).toEqual([]);
+    const rings = violations.filter((v) => v.kind === 'focus-ring');
+    expect(rings.map((v) => v.file)).toEqual([]);
   });
 });

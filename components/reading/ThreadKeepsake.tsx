@@ -15,7 +15,7 @@
  */
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   buildThreadSVG,
   KEEPSAKE_DIMENSIONS,
@@ -26,6 +26,7 @@ import { copyWithFeedback, showCopyFeedback } from '@/lib/sharing/clipboard-util
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
+import { CHECKPOINTS, emitCheckpoint } from '@/lib/hooks/useLoopFunnel';
 
 interface ThreadKeepsakeProps {
   isOpen: boolean;
@@ -59,6 +60,12 @@ function useKeepsakeDerivations(snapshot: ThreadSnapshot | null) {
 
 export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProps) {
   const { svg, deepLink, unfurlUrl } = useKeepsakeDerivations(snapshot);
+  // Reader-loop checkpoint #3: keepsake rendered. Fires once per session
+  // when the modal first opens with a real snapshot. (Mike §5 row 3.)
+  useEffect(() => {
+    if (!isOpen || !snapshot) return;
+    emitCheckpoint(CHECKPOINTS.KEEPSAKED);
+  }, [isOpen, snapshot]);
   if (!snapshot) return null;
   return (
     <Threshold

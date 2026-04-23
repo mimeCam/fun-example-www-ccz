@@ -11,9 +11,15 @@
  * Toast feedback: routed through `@/lib/sharing/toast-store` (the 6th
  * primitive's pub/sub singleton). Three `:exempt` comments removed —
  * the surface paints inside React's tree now (Mike §1, Tanya §0).
+ *
+ * Voice parity: phrases flow through `replyPhrase(kind)` — the pure-TS
+ * tone resolver. Reflective readers saving a card see "Saved."; kinetic
+ * readers see "Downloaded." The under-tinting discipline (Tanya §7.2)
+ * lives in the lexicon, not here.
  */
 
 import { toastShow } from '@/lib/sharing/toast-store';
+import { replyPhrase } from '@/lib/sharing/reply-resolve';
 
 export interface ExportOptions {
   filename?: string;
@@ -101,15 +107,16 @@ export function generateFilename(
 
 /**
  * Surface a success confirmation through the shared toast primitive.
- * The phrase is curated for the surface; tone defaults to neutral
- * (kinetic). React-side callers may override via `useToast().confirm(kind)`.
+ * Phrase is resolved via the lexicon using the reader's stored archetype
+ * (null → `DEFAULT_TONE`). Reflective readers get "Saved." / "Card copied.";
+ * kinetic & analytical readers get the neutral defaults.
  */
 export function showExportFeedback(
   method: 'download' | 'clipboard',
   onSuccess?: () => void
 ): void {
   toastShow({
-    message: method === 'download' ? 'Downloaded.' : 'Card copied.',
+    message: replyPhrase(method === 'download' ? 'download' : 'copy-image'),
     intent: 'confirm',
   });
   if (onSuccess) onSuccess();
@@ -117,10 +124,12 @@ export function showExportFeedback(
 
 /**
  * Surface a failure through the shared toast (warn intent, same surface).
+ * Phrase is resolved via the lexicon — the reflective "Didn't land — try
+ * again." only reaches reflective readers; others see the neutral failure.
  */
 export function showExportError(method: 'download' | 'clipboard'): void {
   toastShow({
-    message: method === 'download' ? 'Download failed.' : 'Copy failed.',
+    message: replyPhrase(method === 'download' ? 'download-failed' : 'copy-failed'),
     intent: 'warn',
   });
 }

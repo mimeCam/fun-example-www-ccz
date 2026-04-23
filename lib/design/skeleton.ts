@@ -29,7 +29,7 @@
  */
 
 import { ALPHA, type AlphaRung } from './alpha';
-import { MOTION, type MotionBeat } from './motion';
+import { MOTION, MOTION_REDUCED_MS, type MotionBeat } from './motion';
 
 // ─── Breath atoms — composed from sealed ledgers ─────────────────────────
 
@@ -37,11 +37,23 @@ import { MOTION, type MotionBeat } from './motion';
  * SKELETON is a *composition* of two sealed ledgers, not a new ledger.
  * `beat` reads from MOTION, `low`/`high` read from ALPHA. Changing any
  * value here means changing it in the source ledger — which is the point.
+ *
+ * `handoff` names the *content-enter crossfade* used by `<SuspenseFade>`
+ * the moment the fallback skeleton is replaced by the arriving subtree.
+ * It is a composition (`MOTION.crossfade × ALPHA.muted → 1`) — no new
+ * beat, no new alpha rung, no new ledger. The reduced-motion floor reads
+ * from the same Motion ledger every other primitive consults.
  */
 export const SKELETON = {
   beat: MOTION.linger,     // 1000ms — passage breathing
   low:  ALPHA.hairline,     // 0.10 — valley of the breath
   high: ALPHA.muted,        // 0.30 — peak of the breath
+  handoff: {
+    beat: MOTION.crossfade,  // 120ms — the content-enter crossfade window
+    from: ALPHA.muted,       // 0.30 — arrival opens at the breath's ceiling
+    to:   1,                 // 1.00 — owned by Motion (fade endpoint)
+    reducedFloor: MOTION_REDUCED_MS, // 10ms — instant reveal, ledger-bound
+  },
 } as const;
 
 /** Named rung the floor reads from. Pinned for the sync test. */
@@ -52,6 +64,22 @@ export const SKELETON_HIGH_RUNG: AlphaRung = 'muted';
 
 /** Named beat the cadence reads from. Pinned for the sync test. */
 export const SKELETON_BEAT: MotionBeat = 'linger';
+
+/** Named beat the handoff window reads from. Pinned for the sync test. */
+export const SKELETON_HANDOFF_BEAT: MotionBeat = 'crossfade';
+
+/** Named rung the handoff floor reads from. Pinned for the sync test. */
+export const SKELETON_HANDOFF_FROM_RUNG: AlphaRung = 'muted';
+
+/**
+ * The single CSS hook the arrival slot carries. One attribute, one value;
+ * future enter compositions become a *new* value (e.g. `reveal`), never a
+ * new prop on the wrapper. Per Mike §4 #4.
+ */
+export const SKELETON_ENTER_ATTR = {
+  name:  'data-sys-enter',
+  value: 'fade',
+} as const;
 
 // ─── Variant vocabulary — three shapes, sealed ───────────────────────────
 
@@ -123,4 +151,19 @@ export function skeletonShapesInvariantHolds(): boolean {
   if (keys.length !== 3) return false;
   if (SKELETON_ORDER.length !== 3) return false;
   return SKELETON_ORDER.every((v, i) => keys[i] === v);
+}
+
+/**
+ * Must hold: handoff beat reads MOTION.crossfade, floor reads ALPHA.muted,
+ * ceiling is 1 (Motion's fade endpoint), reducedFloor reads MOTION_REDUCED_MS,
+ * and `from < to` so the eye climbs into presence rather than out of it.
+ * Pure.
+ */
+export function skeletonHandoffInvariantHolds(): boolean {
+  const h = SKELETON.handoff;
+  if (h.beat !== MOTION[SKELETON_HANDOFF_BEAT]) return false;
+  if (h.from !== ALPHA[SKELETON_HANDOFF_FROM_RUNG]) return false;
+  if (h.to !== 1) return false;
+  if (h.reducedFloor !== MOTION_REDUCED_MS) return false;
+  return h.from < h.to;
 }

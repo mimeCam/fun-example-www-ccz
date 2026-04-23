@@ -29,7 +29,11 @@ export default function ExploreArticleCard({
   const isCurated = variant === 'curated';
 
   return (
-    <Link href={`/article/${article.id}`} className="block group">
+    <Link href={`/article/${article.id}`} className="block group thermal-radius">
+      {/* `thermal-radius` on the anchor itself — so the global :focus-visible
+          ring inherits the same curve the inner article surface declares.
+          Without it, keyboard-focus would paint a 0-radius box around a
+          rounded card. (Honoring-ring audit — Tanya #93 §4, Mike napkin §4.3.) */}
       {/* Tanya §2.4: cards are surfaces, not buttons. Rest → sys-rest
           (grid visibly quieter); hover lift is owned by .card-alive in
           globals.css, so no hover shadow class is needed here. */}

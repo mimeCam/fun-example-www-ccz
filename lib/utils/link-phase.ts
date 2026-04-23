@@ -205,9 +205,15 @@ export function resolveLinkStyle(
 
 // ─── Class composer — the small Tailwind slot ─────────────────────────────
 
-/** The shared skeleton: inline flow, touch-safe, focus-ring inherits global. */
+/**
+ * The shared skeleton: inline flow, touch-safe, focus-ring inherits global.
+ * The `rounded-sys-soft` declaration is the single design-system fix that
+ * lets the global `:focus-visible` ring honour text links with a 6px curve
+ * instead of the browser-default 0 (Tanya UX #93 §4). Intimate ring on a
+ * text-baseline link; 8px would over-frame the word.
+ */
 export const LINK_BASE =
-  'inline cursor-pointer select-none ' +
+  'inline cursor-pointer select-none rounded-sys-soft ' +
   'focus:outline-none ' +
   'active:[text-decoration-thickness:2px]';
 

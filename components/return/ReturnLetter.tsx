@@ -20,6 +20,7 @@ import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
+import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 
 // ─── Timing — sourced from motion tokens ───────────────────
 
@@ -144,6 +145,22 @@ function persistDismiss(): void {
   try { localStorage.setItem('letter-dismissed-at', String(Date.now())); } catch { /* noop */ }
 }
 
+/**
+ * Envelope metadata for the returning-reader letter. SSR-safe: without
+ * `window` the origin is omitted and the envelope degrades to a cited
+ * blockquote with no back-link. The prose still lands as a blockquote.
+ */
+function buildLetterEnvelope(): {
+  cite?: string; title: string; lang: string;
+} {
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  return {
+    ...(origin ? { cite: `${origin}/` } : {}),
+    title: 'A letter from the blog',
+    lang: 'en',
+  };
+}
+
 // ─── Letter Card ─────────────────────────────────────────
 
 function LetterCard({
@@ -158,10 +175,13 @@ function LetterCard({
 
   const handleCopy = useCallback(() => {
     const text = [letter.salutation, '', letter.opening, ...letter.body, '', letter.closing, '', letter.signOff].join('\n');
-    navigator.clipboard.writeText(text).then(() => {
+    // Envelope: the letter travels with its source on rich-paste targets.
+    // Plain targets see byte-identical prose (Mike §1, Tanya §6).
+    copyToClipboard(text, buildLetterEnvelope()).then((ok) => {
+      if (!ok) return;
       setCopied(true);
       setTimeout(() => setCopied(false), COPY_TOAST_MS);
-    }).catch(() => { /* noop */ });
+    });
   }, [letter]);
 
   const handleImage = useCallback(() => {

@@ -25,6 +25,9 @@ import {
   SKELETON_LOW_RUNG,
   SKELETON_HIGH_RUNG,
   SKELETON_BEAT,
+  SKELETON_HANDOFF_BEAT,
+  SKELETON_HANDOFF_FROM_RUNG,
+  SKELETON_ENTER_ATTR,
   SKELETON_SHAPES,
   SKELETON_ORDER,
   SKELETON_CSS_CLASS,
@@ -33,9 +36,10 @@ import {
   cssBeatVar,
   skeletonInvariantHolds,
   skeletonShapesInvariantHolds,
+  skeletonHandoffInvariantHolds,
 } from '../skeleton';
 import { ALPHA } from '../alpha';
-import { MOTION } from '../motion';
+import { MOTION, MOTION_REDUCED_MS } from '../motion';
 
 const CSS = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf-8');
 
@@ -56,6 +60,18 @@ function readBreathKeyframes(): string | undefined {
 /** Return the body of the `.sys-skeleton { … }` rule (top-level only). */
 function readSkeletonRule(): string | undefined {
   const m = CSS.match(/\n\.sys-skeleton\s*\{([\s\S]*?)\n\}/);
+  return m ? m[1] : undefined;
+}
+
+/** Return the body of the `[data-sys-enter="fade"] { … }` arrival rule. */
+function readEnterFadeRule(): string | undefined {
+  const m = CSS.match(/\[data-sys-enter="fade"\]\s*\{([\s\S]*?)\n\}/);
+  return m ? m[1] : undefined;
+}
+
+/** Return the body of the `@keyframes sysEnterFade { … }` rule. */
+function readEnterFadeKeyframes(): string | undefined {
+  const m = CSS.match(/@keyframes\s+sysEnterFade\s*\{([\s\S]*?)\n\}/);
   return m ? m[1] : undefined;
 }
 
@@ -164,5 +180,60 @@ describe('CSS carrier + reduced-motion floor', () => {
     expect(CSS).toMatch(
       /\.sys-skeleton\s+\.sys-skeleton\s*\{[\s\S]*?animation:\s*none/,
     );
+  });
+});
+
+// ─── Tests — content-enter handoff (SuspenseFade composition) ────────────
+
+describe('SKELETON.handoff ↔ globals.css sync (content-enter crossfade)', () => {
+  it('handoff invariant holds — beat × from × to all read from sealed ledgers', () => {
+    expect(skeletonHandoffInvariantHolds()).toBe(true);
+  });
+
+  it('TS handoff.beat mirrors MOTION.crossfade (120ms — the named beat)', () => {
+    expect(SKELETON.handoff.beat).toBe(MOTION[SKELETON_HANDOFF_BEAT]);
+    expect(SKELETON_HANDOFF_BEAT).toBe('crossfade');
+    expect(SKELETON.handoff.beat).toBe(120);
+  });
+
+  it('TS handoff.from mirrors ALPHA.muted (0.30 — the breath ceiling)', () => {
+    expect(SKELETON.handoff.from).toBe(ALPHA[SKELETON_HANDOFF_FROM_RUNG]);
+    expect(SKELETON_HANDOFF_FROM_RUNG).toBe('muted');
+  });
+
+  it('TS handoff.to is 1 — the Motion-owned fade endpoint, not a new rung', () => {
+    expect(SKELETON.handoff.to).toBe(1);
+  });
+
+  it('TS handoff.reducedFloor mirrors MOTION_REDUCED_MS (10ms ledger floor)', () => {
+    expect(SKELETON.handoff.reducedFloor).toBe(MOTION_REDUCED_MS);
+  });
+
+  it('CSS [data-sys-enter="fade"] rule references --sys-time-crossfade + ease', () => {
+    const rule = readEnterFadeRule();
+    expect(rule).toBeDefined();
+    expect(rule!).toContain('var(--sys-time-crossfade');
+    expect(rule!).toContain('var(--sys-ease-sustain');
+    expect(rule!).toMatch(/animation-fill-mode:\s*both/);
+  });
+
+  it('CSS @keyframes sysEnterFade goes from --sys-alpha-muted → 1', () => {
+    const body = readEnterFadeKeyframes();
+    expect(body).toBeDefined();
+    expect(body!).toMatch(/from\s*\{[^}]*opacity:\s*var\(--sys-alpha-muted\)/);
+    expect(body!).toMatch(/to\s*\{[^}]*opacity:\s*1\b/);
+  });
+
+  it('CSS .sys-skeleton carries `animation-fill-mode: forwards` (Elon polish)', () => {
+    const rule = readSkeletonRule();
+    expect(rule).toBeDefined();
+    expect(rule!).toMatch(/animation-fill-mode:\s*forwards/);
+  });
+
+  it('SKELETON_ENTER_ATTR is the single CSS hook (one attr, one value)', () => {
+    expect(SKELETON_ENTER_ATTR).toEqual({
+      name:  'data-sys-enter',
+      value: 'fade',
+    });
   });
 });

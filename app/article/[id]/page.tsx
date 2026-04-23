@@ -27,6 +27,7 @@ import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvide
 import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useGenuineCompletion } from '@/lib/hooks/useGenuineCompletion';
+import { useLoopFunnel } from '@/lib/hooks/useLoopFunnel';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -69,6 +70,12 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
   const { refresh: refreshThermal } = useThermal();
   const completion = useGenuineCompletion(readTime);
+
+  // Reader Loop Funnel — registers article id + archetype so any
+  // emitter (mirror, thread depth, keepsake, clipboard) can fire a
+  // session checkpoint without threading params down. Invisible to
+  // the reader; one row per session in `loop_funnel`. (Mike §6.)
+  useLoopFunnel(params.id, archetype);
 
   const { maxDepth } = useScrollDepth();
   const startTime = useRef(Date.now());

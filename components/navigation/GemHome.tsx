@@ -48,7 +48,10 @@ export function GemHome({ quiet = false }: GemHomeProps) {
   return (
     <Link
       href="/"
-      className={`fixed top-sys-4 left-sys-6 z-sys-gem hover:text-gold
+      // `rounded-sys-full` pairs the global :focus-visible ring with the gem's
+      // round silhouette — a pill ring around the gem instead of a 0-radius
+      // box (honoring-ring, Tanya #93 §4 / Mike napkin §4.3).
+      className={`rounded-sys-full fixed top-sys-4 left-sys-6 z-sys-gem hover:text-gold
         transition-colors duration-linger ease-out
         ${gemColor(state, quiet)} ${gemShadow(state, quiet)}`}
       aria-label="Home"

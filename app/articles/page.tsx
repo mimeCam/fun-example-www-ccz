@@ -5,12 +5,12 @@
  * Curated row for returning readers with detected archetype.
  */
 
-import { Suspense } from 'react';
 import { Metadata } from 'next';
 import { getAllArticles } from '@/lib/content/articleData';
 import { GemHome } from '@/components/navigation/GemHome';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import ArticlesPageClient from '@/components/articles/ArticlesPageClient';
+import { SuspenseFade } from '@/components/shared/SuspenseFade';
 
 export const metadata: Metadata = {
   title: 'Articles',
@@ -23,9 +23,15 @@ export default function ArticlesPage() {
   return (
     <main className="min-h-screen bg-background">
       <GemHome />
-      <Suspense>
+      {/* In-page boundary: route-level loading.tsx already covers the cold
+          fallback (its Skeleton wears the same breath cadence). The fade
+          is for the moment ArticlesPageClient hydrates over that surface
+          — soft handoff, no scene cut. fallback={null} because the route
+          fallback is already painting; double-painting a skeleton here
+          would polyrhythm the breath. */}
+      <SuspenseFade fallback={null}>
         <ArticlesPageClient articles={articles} />
-      </Suspense>
+      </SuspenseFade>
       <WhisperFooter />
     </main>
   );

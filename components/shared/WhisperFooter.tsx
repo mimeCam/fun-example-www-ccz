@@ -1,13 +1,21 @@
 /**
  * WhisperFooter — consistent site-wide footer.
  *
- * Two links, every page, no exceptions:
- * Mirror · Articles
+ * Three links, every page, no exceptions:
+ * Mirror · Articles · Trust
  * Plus the tagline "No algorithms. No feeds."
  *
  * Links speak through `<TextLink variant="quiet">` — the attribution
  * register. The middle-dot separator floors at mist/35 so the comma
  * stays legible even when the room is warm (Tanya §6.3).
+ *
+ * The third link (`Trust` → `/trust`) is the ONLY sitewide entry to the
+ * reader-invariant `/trust` room. No homepage banner, no modal, no tooltip,
+ * no "new" badge. Readers who ask the question find the answer in under
+ * three seconds (footer scroll → click). Readers who don't ask, don't find
+ * — intentional (Tanya #76 §3). Still a single centered line at mobile
+ * width (`text-sys-micro`, 11px); the dot floors at mist/35 — balanced for
+ * three labels by construction (Tanya #76 §8.1).
  */
 
 import { TextLink } from '@/components/shared/TextLink';
@@ -15,6 +23,7 @@ import { TextLink } from '@/components/shared/TextLink';
 const FOOTER_LINKS = [
   { href: '/mirror', label: 'Mirror' },
   { href: '/articles', label: 'Articles' },
+  { href: '/trust', label: 'Trust' },
 ] as const;
 
 export default function WhisperFooter() {

@@ -7,32 +7,72 @@
  * foreign-DOM `<div>` with inline cssText — a mount outside React, which
  * broke `var(--sys-*)` resolution and required three `:exempt` comments.
  * Those comments are gone because the *mount* is fixed (Mike §1, Tanya §0).
+ *
+ * Voice parity: default phrases now flow through `replyPhrase(kind)` —
+ * the pure-TS tone resolver reading the Mirror archetype off `localStorage`.
+ * Explicit `successMessage` / `failureMessage` overrides still win (callers
+ * like `ThreadKeepsake` pass poetic one-offs). Only the *default* path
+ * consults the lexicon.
  */
 
 import {
   toastShow, type ToastIntent, type ToastHandle,
 } from '@/lib/sharing/toast-store';
+import { replyPhrase } from '@/lib/sharing/reply-resolve';
+import {
+  buildClipboardPayload, isMultiMimeSupported,
+  type EnvelopeInput,
+} from '@/lib/sharing/clipboard-envelope';
+import { CHECKPOINTS, emitCheckpoint } from '@/lib/hooks/useLoopFunnel';
 
 /**
- * Copy text to clipboard using modern Clipboard API.
+ * Try the multi-MIME (`ClipboardItem`) path. Returns `true` on success,
+ * `false` when the env lacks the constructor or `write()` rejects.
+ * Plain-text MIME is byte-identical to `writeText(text)`.
+ */
+async function writeMultiMime(text: string, env: EnvelopeInput): Promise<boolean> {
+  if (!isMultiMimeSupported()) return false;
+  try {
+    const { plain, html } = buildClipboardPayload(text, env);
+    const Item = (globalThis as { ClipboardItem: typeof ClipboardItem }).ClipboardItem;
+    await navigator.clipboard.write([new Item({
+      'text/plain': new Blob([plain], { type: 'text/plain' }),
+      'text/html':  new Blob([html],  { type: 'text/html'  }),
+    })]);
+    return true;
+  } catch { return false; }
+}
+
+/** Plain `writeText` path — the pre-envelope behaviour. */
+async function writePlain(text: string): Promise<boolean> {
+  if (!navigator.clipboard?.writeText) return fallbackCopy(text);
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (error) {
+    console.warn('Clipboard API failed, falling back to legacy method:', error);
+    return fallbackCopy(text);
+  }
+}
+
+/**
+ * Copy text to clipboard. When `envelope` is supplied AND the runtime
+ * supports `ClipboardItem`, we ship both `text/plain` (byte-identical) and
+ * `text/html` (a semantic `<blockquote cite>`). Otherwise we fall through
+ * to the existing `writeText` path — no regression, no new failure toast.
  *
  * @param text - Text to copy
- * @returns Promise that resolves if successful
+ * @param envelope - Optional citation metadata — see `clipboard-envelope.ts`
+ * @returns Promise that resolves with success
  */
-export async function copyToClipboard(text: string): Promise<boolean> {
-  // Try modern Clipboard API first
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    try {
-      await navigator.clipboard.writeText(text);
-      return true;
-    } catch (error) {
-      console.warn('Clipboard API failed, falling back to legacy method:', error);
-      return fallbackCopy(text);
-    }
-  }
-
-  // Fallback for older browsers
-  return fallbackCopy(text);
+export async function copyToClipboard(
+  text: string,
+  envelope?: EnvelopeInput,
+): Promise<boolean> {
+  const ok = (envelope && (await writeMultiMime(text, envelope)))
+    || (await writePlain(text));
+  // Reader-loop checkpoint #4: shared (clipboard write succeeded). No-op
+  // off-article surfaces — `useLoopFunnel(articleId)` gates the emit.
+  if (ok) emitCheckpoint(CHECKPOINTS.SHARED);
+  return ok;
 }
 
 /**
@@ -86,26 +126,36 @@ export function isClipboardSupported(): boolean {
  * single store; the `<ToastHost>` portal mounted in `<ThermalLayout>`
  * paints the surface with full ledger-token resolution.
  *
- * @param message - Final, already-tinted phrase to show
+ * @param message - Final, already-tinted phrase to show; defaults to the
+ *                  reader-tinted `'copy-text'` phrase via `replyPhrase`.
  * @param duration - Optional dwell override (defaults to `confirm` budget)
  */
-export function showCopyFeedback(message = 'Copied.', duration?: number): ToastHandle {
-  return toastShow({ message, intent: 'confirm', durationMs: duration });
+export function showCopyFeedback(message?: string, duration?: number): ToastHandle {
+  return toastShow({
+    message: message ?? replyPhrase('copy-text'),
+    intent: 'confirm',
+    durationMs: duration,
+  });
 }
 
 /**
- * Copy text and surface the result through the shared toast.
+ * Copy text and surface the result through the shared toast. Defaults
+ * flow through the lexicon (reader's tone tints the phrase); callers may
+ * pass explicit `successMessage` / `failureMessage` to override.
  *
  * Returns the boolean copy outcome so callers can chain follow-ups.
  */
 export async function copyWithFeedback(
   text: string,
-  successMessage: string = 'Copied.',
-  failureMessage: string = "Didn't land — try again.",
+  successMessage?: string,
+  failureMessage?: string,
+  envelope?: EnvelopeInput,
 ): Promise<boolean> {
-  const ok = await copyToClipboard(text);
+  const ok = await copyToClipboard(text, envelope);
   toastShow({
-    message: ok ? successMessage : failureMessage,
+    message: ok
+      ? (successMessage ?? replyPhrase('copy-link'))
+      : (failureMessage ?? replyPhrase('copy-failed')),
     intent:  ok ? 'confirm' : 'warn',
   });
   return ok;

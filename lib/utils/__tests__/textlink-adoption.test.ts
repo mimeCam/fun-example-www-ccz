@@ -40,13 +40,15 @@ const ANCHOR_ALLOW = new Set<string>([
  */
 const NEXTLINK_ALLOW = new Set<string>([
   'components/shared/TextLink.tsx',
+  // EmptySurface — the 7th shared primitive. Wraps `<Pressable asChild>`
+  // around `<Link>` for its link-shaped primary action, the same
+  // consent-surface pattern the three app/** empty-state files used before
+  // they refactored to compose this primitive. One authored home now.
+  'components/shared/EmptySurface.tsx',
   'components/navigation/AmbientNav.tsx',
   'components/navigation/GemHome.tsx',
   'components/home/ReadingInvitation.tsx',
   'components/explore/ExploreArticleCard.tsx',
-  'app/not-found.tsx',
-  'app/mirror/page.tsx',
-  'app/resonances/ResonancesClient.tsx',
 ]);
 
 /** Modules allowed to import link-phase recipe helpers. */

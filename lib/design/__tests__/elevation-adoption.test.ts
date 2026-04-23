@@ -51,6 +51,10 @@ const ALLOW = new Set<string>([
 const TINTED_ALLOW: Record<string, readonly string[]> = {
   'components/content/StratifiedRenderer.tsx': ['rose-glow', 'cyan-whisper'],
   'app/resonances/ResonanceEntry.tsx':         ['rose-glow'],
+  // EmptySurface — 7th shared primitive. Per-surface halo tint is the
+  // authored warmth of the four threshold rooms (Tanya §2.5). Rose = the
+  // resonances room (remembered); cyan = the 404 room (discovery).
+  'components/shared/EmptySurface.tsx':        ['rose-glow', 'cyan-whisper'],
 };
 
 /** Directories to scan (adds `app/` so resonances files are covered). */
@@ -230,7 +234,7 @@ describe('elevation adoption — every shadow goes through the ledger', () => {
 
 // ─── Positive tinted-allow-list tests — keep the exit doors documented ─────
 
-describe('tinted accents — the two allow-listed homes are present', () => {
+describe('tinted accents — the allow-listed homes are present', () => {
   it('StratifiedRenderer.tsx uses both rose-glow and cyan-whisper', () => {
     const src = readFileSync(
       join(ROOT, 'components/content/StratifiedRenderer.tsx'),
@@ -246,6 +250,15 @@ describe('tinted accents — the two allow-listed homes are present', () => {
       'utf8',
     );
     expect(src).toMatch(/\bshadow-rose-glow\b/);
+  });
+
+  it('EmptySurface.tsx uses both rose-glow and cyan-whisper', () => {
+    const src = readFileSync(
+      join(ROOT, 'components/shared/EmptySurface.tsx'),
+      'utf8',
+    );
+    expect(src).toMatch(/\bshadow-rose-glow\b/);
+    expect(src).toMatch(/\bshadow-cyan-whisper\b/);
   });
 });
 

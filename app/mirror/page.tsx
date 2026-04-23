@@ -9,13 +9,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { GemHome } from '@/components/navigation/GemHome';
-import { GemIcon } from '@/components/shared/GemIcon';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
 import WhisperFooter from '@/components/shared/WhisperFooter';
-import { Pressable } from '@/components/shared/Pressable';
+import { EmptySurface } from '@/components/shared/EmptySurface';
+import { emptyPhrase } from '@/lib/sharing/empty-phrase';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import type { ReaderMirror } from '@/types/mirror';
 
@@ -85,22 +84,21 @@ export default function MirrorPage() {
     </div>
   );
 
+  return <EmptyMirror />;
+}
+
+/** Empty branch — no archetype yet. Delegates frame + voice to EmptySurface. */
+function EmptyMirror() {
+  const { headline, whisper } = emptyPhrase('empty-mirror');
   return (
-    <div className="min-h-screen p-sys-8">
-      <GemHome />
-      <div className="max-w-card mx-auto pt-sys-10 text-center">
-        <GemIcon size="lg" className="mx-auto text-mist/30 mb-sys-8" />
-        <h1 className="text-sys-h3 font-display font-sys-display text-foreground mb-sys-4">
-          Your reflection hasn&apos;t formed yet.
-        </h1>
-        <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto typo-caption">
-          Read an article to the end and the Mirror will find you.
-        </p>
-        <Pressable asChild variant="ghost" size="md">
-          <Link href="/articles">Browse Articles →</Link>
-        </Pressable>
-      </div>
-    </div>
+    <EmptySurface
+      kind="empty-mirror"
+      headline={headline}
+      whisper={whisper}
+      primary={{ kind: 'link', href: '/articles', label: 'Browse Articles →' }}
+      secondary={{ href: '/', label: 'Take the Quick Mirror' }}
+      tint="gold"
+    />
   );
 }
 

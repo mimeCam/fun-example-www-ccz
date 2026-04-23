@@ -9,9 +9,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import Link from 'next/link';
 import { GemHome } from '@/components/navigation/GemHome';
-import { GemIcon } from '@/components/shared/GemIcon';
+import { EmptySurface } from '@/components/shared/EmptySurface';
+import { emptyPhrase } from '@/lib/sharing/empty-phrase';
 import {
   getResonancesWithArticleAction,
   getDepthMetricsAction,
@@ -28,7 +28,6 @@ import { detectChapterBreak } from '@/lib/mirror/book-whisper-engine';
 import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import ResonanceExport from './ResonanceExport';
-import { Pressable } from '@/components/shared/Pressable';
 import { TextLink } from '@/components/shared/TextLink';
 import { Skeleton } from '@/components/shared/Skeleton';
 import WhisperFooter from '@/components/shared/WhisperFooter';
@@ -168,22 +167,8 @@ export default function ResonancesClient() {
   const archetype = readArchetype();
   const contexts = buildNarrationContexts(carrying, archetype);
 
-  // Empty state — no resonances captured yet
-  if (isEmpty) return (
-    <div className="max-w-md mx-auto pt-sys-11 text-center">
-      <GemHome />
-      <GemIcon size="lg" className="mx-auto text-mist/30 mb-sys-8" />
-      <h1 className="text-sys-h2 font-display font-sys-display text-foreground mb-sys-4">
-        Your chapter hasn&apos;t been written yet.
-      </h1>
-      <p className="text-mist text-sys-caption mb-sys-8 max-w-sm mx-auto typo-caption">
-        Read something that stops you. Capture it. Tell it why it matters.
-      </p>
-      <Pressable asChild variant="ghost" size="md">
-        <Link href="/">Browse Articles →</Link>
-      </Pressable>
-    </div>
-  );
+  // Empty state — no resonances captured yet. Frame + voice via EmptySurface.
+  if (isEmpty) return <EmptyResonances />;
 
   // Active state — render the Book of You
   return (
@@ -285,5 +270,20 @@ export default function ResonancesClient() {
       {/* Footer */}
       <WhisperFooter />
     </div>
+  );
+}
+
+/** Empty branch — no resonances yet. Delegates frame + voice to EmptySurface. */
+function EmptyResonances() {
+  const { headline, whisper } = emptyPhrase('empty-resonances');
+  return (
+    <EmptySurface
+      kind="empty-resonances"
+      headline={headline}
+      whisper={whisper}
+      primary={{ kind: 'link', href: '/articles', label: 'Browse Articles →' }}
+      secondary={{ href: '/mirror', label: 'Read the Mirror' }}
+      tint="rose"
+    />
   );
 }

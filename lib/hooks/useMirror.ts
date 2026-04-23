@@ -12,6 +12,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import type { ReaderMirror } from '@/types/mirror';
+import { CHECKPOINTS, emitCheckpoint } from '@/lib/hooks/useLoopFunnel';
 
 interface UseMirrorReturn {
   mirror: ReaderMirror | null;
@@ -62,6 +63,13 @@ export function useMirror(): UseMirrorReturn {
   }, []);
 
   useEffect(() => { load(); }, [load]);
+
+  // Reader-loop checkpoint #1: archetype resolved. Emitter is a no-op
+  // unless `useLoopFunnel(articleId)` is mounted (article surfaces).
+  useEffect(() => {
+    if (!mirror?.archetype) return;
+    emitCheckpoint(CHECKPOINTS.RESOLVED, { archetype: mirror.archetype });
+  }, [mirror?.archetype]);
 
   return { mirror, loading, error, refresh: load };
 }

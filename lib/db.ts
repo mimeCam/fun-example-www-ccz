@@ -355,4 +355,32 @@ function initializeSchema(database: Database.Database): void {
     ON mirror_snapshots(emailFingerprint, createdAt DESC)
   `);
 
+  // Reader Loop Funnel — 4 booleans per session, monotonic flags.
+  // FK to engagement_sessions is advisory (not enforced) so a reader's
+  // funnel row may exist before/without an engagement_sessions row.
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS loop_funnel (
+      sessionId  TEXT PRIMARY KEY,
+      articleId  TEXT NOT NULL,
+      archetype  TEXT,
+      landed     INTEGER NOT NULL DEFAULT 1,
+      resolved   INTEGER NOT NULL DEFAULT 0,
+      warmed     INTEGER NOT NULL DEFAULT 0,
+      keepsaked  INTEGER NOT NULL DEFAULT 0,
+      shared     INTEGER NOT NULL DEFAULT 0,
+      firstAt    INTEGER NOT NULL,
+      lastAt     INTEGER NOT NULL
+    )
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_loop_funnel_article
+    ON loop_funnel(articleId, lastAt DESC)
+  `);
+
+  database.exec(`
+    CREATE INDEX IF NOT EXISTS idx_loop_funnel_week
+    ON loop_funnel(firstAt)
+  `);
+
 }

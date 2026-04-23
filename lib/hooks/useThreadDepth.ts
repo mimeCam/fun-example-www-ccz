@@ -22,16 +22,29 @@
 
 import { useEffect } from 'react';
 import { subscribe, type ThreadState } from '@/lib/thread/thread-driver';
+import { CHECKPOINTS, emitCheckpoint } from '@/lib/hooks/useLoopFunnel';
 
 /** CSS variable the driver writes on every tick. Consumers read via var(). */
 export const THREAD_DEPTH_CSS_VAR = '--thread-depth';
 
 /**
+ * Reader-loop "warmed" boundary — the depth at which a session counts
+ * as having entered the warmth phase. Aligned with the `stirring` thermal
+ * state's lower bound (0.25). Idempotent — `emitCheckpoint` dedupes.
+ */
+const WARMED_DEPTH_BOUNDARY = 0.25;
+
+/**
  * Build the subscriber that writes --thread-depth to a root element.
  * Pure factory — the element is captured, nothing is read per tick.
+ * Side-effect: fires the reader-loop "warmed" checkpoint on first
+ * crossing of the boundary (no-op when no article surface is mounted).
  */
 function writerFor(root: HTMLElement): (s: ThreadState) => void {
-  return (s) => { root.style.setProperty(THREAD_DEPTH_CSS_VAR, String(s.depth)); };
+  return (s) => {
+    root.style.setProperty(THREAD_DEPTH_CSS_VAR, String(s.depth));
+    if (s.depth >= WARMED_DEPTH_BOUNDARY) emitCheckpoint(CHECKPOINTS.WARMED);
+  };
 }
 
 /**

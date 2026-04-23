@@ -19,6 +19,7 @@ import {
   downloadDataURL,
 } from '@/lib/sharing/share-card';
 import { encodeDeepLink } from '@/lib/sharing/deep-link';
+import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION } from '@/lib/design/motion';
 
@@ -169,7 +170,8 @@ function useCopyText(
 ) {
   return useCallback(async () => {
     const text = generateShareText(archetype, articleId);
-    await navigator.clipboard.writeText(text);
+    const ok = await copyToClipboard(text);
+    if (!ok) return;
     setCopied(true);
     setTimeout(() => setCopied(false), COPY_TOAST_MS);
   }, [archetype, articleId, setCopied]);

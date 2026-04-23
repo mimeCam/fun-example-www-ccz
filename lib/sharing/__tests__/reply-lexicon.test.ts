@@ -16,9 +16,10 @@
  */
 
 import {
-  archetypeToTone, phraseFor, confirmVerbInvariantHolds,
+  archetypeToTone, phraseFor, whisperFor, confirmVerbInvariantHolds,
   REPLY_KINDS, TONE_BUCKETS, ARCHETYPE_KEYS,
   CONFIRM_KINDS, CONFIRM_VERBS, DEFAULT_TONE,
+  EMPTY_SURFACE_KINDS,
 } from '@/lib/sharing/reply-lexicon';
 
 describe('reply-lexicon — total coverage', () => {
@@ -73,6 +74,34 @@ describe('reply-lexicon — archetype fold + defaults', () => {
 
   it('resonator is the analytical archetype', () => {
     expect(archetypeToTone('resonator')).toBe('analytical');
+  });
+});
+
+describe('reply-lexicon — empty-surface rectangle (Mike §3 item #1)', () => {
+  it('enumerates the four empty / threshold rooms', () => {
+    expect(new Set(EMPTY_SURFACE_KINDS)).toEqual(new Set([
+      'empty-mirror', 'empty-resonances', 'threshold-404', 'threshold-error',
+    ]));
+  });
+
+  it('every EmptySurfaceKind × ToneBucket cell has a non-empty whisper', () => {
+    for (const k of EMPTY_SURFACE_KINDS) {
+      for (const t of TONE_BUCKETS) {
+        const whisper = whisperFor(k, t);
+        expect(typeof whisper).toBe('string');
+        expect(whisper.length).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('empty-surface kinds are invitational — no confirm-verb requirement', () => {
+    for (const k of EMPTY_SURFACE_KINDS) {
+      expect(CONFIRM_KINDS).not.toContain(k);
+    }
+  });
+
+  it('empty-surface kinds are part of the headline rectangle (REPLY_KINDS)', () => {
+    for (const k of EMPTY_SURFACE_KINDS) expect(REPLY_KINDS).toContain(k);
   });
 });
 
