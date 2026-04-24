@@ -78,3 +78,22 @@ export function ceremonyPlan(): TransitionPlan {
     easing: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
   };
 }
+
+/**
+ * Crossing plan — lightweight transition applied at each state threshold.
+ * 600ms burst: color snaps, spacing rests, no long settle tail.
+ * Used by future callers that want a TransitionPlan on crossing events.
+ */
+export function crossingPlan(): TransitionPlan {
+  return {
+    colorDuration: 600,
+    colorDelay: 0,
+    spaceDuration: 300,
+    spaceDelay: 0,
+    typoDuration: 600,
+    typoDelay: 0,
+    shadowDuration: 600,
+    shadowDelay: 0,
+    easing: 'cubic-bezier(0.0, 0.0, 0.2, 1)',
+  };
+}

@@ -148,6 +148,17 @@
   --sys-alpha-recede:   0.5;
   --sys-alpha-quiet:    0.7;
 
+  /* ─── Crossing Bloom Intensity ───────────────────────────────
+     Peak opacity per intensity tier for the per-threshold crossing flash.
+     state-crossing.ts CROSSING_PEAK_OPACITY mirrors these values.
+     The sync test in lib/thermal/__tests__/state-crossing.test.ts catches drift.
+       subtle  — dormant→stirring: quiet notice, 40% peak
+       present — stirring→warm:   definite shift, 60% peak
+       radiant — warm→luminous:   full arrival, 80% peak */
+  --crossing-peak-opacity-subtle:  0.4;
+  --crossing-peak-opacity-present: 0.6;
+  --crossing-peak-opacity-radiant: 0.8;
+
   /* ─── Skeleton Breath ────────────────────────────────────
      The 5th shared primitive's cadence. `--sys-skeleton-beat` mirrors
      MOTION.linger (1000ms) — passage-breathing, the site-wide beat for
@@ -816,6 +827,20 @@ body {
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;
   }
+  /* Crossing bloom is invisible under reduced-motion — the flash fires at opacity 0.
+     Color still lands via the GoldenThread pulse (thread glow also hard-killed,
+     but the thermal token shift reaches color via --token-accent). */
+  .crossing-flash {
+    opacity: 0 !important;
+    animation-duration: 0.01ms !important;
+  }
+  .golden-thread-crossing,
+  .golden-thread-crossing--subtle,
+  .golden-thread-crossing--present,
+  .golden-thread-crossing--radiant {
+    box-shadow: none !important;
+    transition: none !important;
+  }
   /* Skeleton rests at α muted — the "ambient chrome" presence the ledger
      sealed. Not hairline (would disappear) and not invisible (skeleton is
      the signal that content is arriving). */
@@ -897,6 +922,61 @@ body {
     0 0 10px var(--token-accent),
     0 0 28px color-mix(in srgb, var(--gold) 45%, transparent) !important;
   transition: box-shadow var(--sys-time-reveal) var(--sys-ease-out) !important;
+}
+
+/* ─── State Crossing Bloom ───────────────────────── */
+
+/* Left-edge wipe expanding right — same axis as GoldenThread.
+   Visual family coherence: the flash and the thread share the left-edge origin.
+   Fires once per forward state crossing (dormant→stirring, stirring→warm, warm→luminous).
+   pointer-events: none — never occludes reading content. */
+.crossing-flash {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 100vw;
+  pointer-events: none;
+  z-index: 1;
+  transform-origin: left center;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--token-accent) 80%, transparent) 0%,
+    transparent 70%
+  );
+  animation: crossing-bloom 600ms var(--sys-ease-out) forwards;
+}
+
+/* Intensity tiers — peak opacity set via CSS custom property. */
+.crossing-flash--subtle  { --crossing-peak-opacity: var(--crossing-peak-opacity-subtle); }
+.crossing-flash--present { --crossing-peak-opacity: var(--crossing-peak-opacity-present); }
+.crossing-flash--radiant { --crossing-peak-opacity: var(--crossing-peak-opacity-radiant); }
+
+/* Left-edge wipe: origin left, expands right, fades out.
+   30% = the felt moment (opacity peak), then scaleX sweep completes. */
+@keyframes crossing-bloom {
+  0%   { opacity: 0; transform: scaleX(0); }
+  30%  { opacity: var(--crossing-peak-opacity, 0.4); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+/* GoldenThread crossing pulse — brief glow amplification on the thread fill.
+   Additive to the base glow; clears after CEREMONY.crossing (600ms). */
+.golden-thread-crossing {
+  transition: box-shadow var(--sys-time-enter) var(--sys-ease-out) !important;
+}
+.golden-thread-crossing--subtle {
+  box-shadow:
+    0 0 8px var(--token-accent),
+    0 0 18px color-mix(in srgb, var(--gold) 25%, transparent) !important;
+}
+.golden-thread-crossing--present {
+  box-shadow:
+    0 0 12px var(--token-accent),
+    0 0 28px color-mix(in srgb, var(--gold) 35%, transparent) !important;
+}
+.golden-thread-crossing--radiant {
+  box-shadow:
+    0 0 16px var(--token-accent),
+    0 0 40px color-mix(in srgb, var(--gold) 50%, transparent) !important;
 }
 
 /* ─── Completion Shimmer ───────────────────────────── */

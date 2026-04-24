@@ -80,6 +80,7 @@ export const MOTION_REDUCED_MS = 10;
  */
 export const CEREMONY = {
   breath:     300, // T_BREATH      — inter-phase rest, the "room inhales"
+  crossing:   600, // T_CROSSING    — per-threshold state crossing micro-ceremony
   giftDelay:  700, // T_GIFT_DELAY  — pause before NextRead reveal
   glowHold:  2000, // T_GLOW_HOLD   — keepsake halo dwell
   tSuccess:   400, // success message appears after shimmer start

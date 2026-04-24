@@ -1,33 +1,40 @@
 /**
- * CeremonySequencer — choreographs the 5-step completion ceremony.
+ * CeremonySequencer — choreographs the 4-phase completion ceremony.
  *
- * State machine: idle → breathing → shimmering → glowing → warming → gifting → settled
+ * State machine: idle → breathing → warming → gifting → settled
  *
- * The ceremony is the product's thesis made tangible:
- * "reading is rewarded, skimming is not."
+ * Streamlined from 7 phases to 4 active phases per Elon's critique and
+ * Tanya's §4 spec. Removed: shimmering (redundant — CompletionShimmer
+ * activates on 'warming' directly), glowing (redundant — GoldenThread
+ * crossing burst covers mid-reading state arrivals).
  *
- * Each phase emits a signal that subscribers react to.
- * The 300ms breath pause creates the feeling that the room
- * *responded*, not *reacted*.
+ * Total ceremony: ~2000ms (was ~3700ms).
+ * "The ceremony doesn't make the site feel like it's congratulating itself." — Elon M.
+ *
+ * Credits: Mike K. (streamline architecture, 7→4 phases), Tanya D. (§4
+ * three-act spec: Recognition → Presence → Invitation), Elon M. (critique
+ * of shimmer/glow redundancy).
  */
 
 'use client';
 
-import { useState, useEffect, useRef, useCallback, createContext, useContext, type ReactNode } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, type ReactNode } from 'react';
 import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
 import { CEREMONY, MOTION } from '@/lib/design/motion';
 
-/** Ceremony phases — each maps to a specific visual response. */
+/** Ceremony phases — four active states after idle. */
 export type CeremonyPhase =
-  | 'idle'        // nothing yet
-  | 'breathing'   // 300ms pause — the room takes a breath
-  | 'shimmering'  // gold sweep fires (duration varies by confidence)
-  | 'glowing'     // GoldenThread pulses gold
-  | 'warming'     // thermal refresh — room visibly warms
-  | 'gifting'     // NextRead fades in
-  | 'settled';    // ceremony complete
+  | 'idle'       // nothing yet
+  | 'breathing'  // 300ms inhale — the room takes a breath
+  | 'warming'    // shimmer fires + thermal refresh
+  | 'gifting'    // NextRead invitation appears
+  | 'settled';   // ceremony complete
 
-/** Intensity tier derived from completion confidence score. */
+/**
+ * Intensity tier derived from completion confidence.
+ * Re-exported here for consumers; canonical definition lives in
+ * lib/thermal/state-crossing.ts as CrossingIntensity (same shape).
+ */
 export type CeremonyIntensity = 'subtle' | 'present' | 'radiant';
 
 /** Context value for ceremony subscribers. */
@@ -65,75 +72,44 @@ interface SequencerProps {
 }
 
 /**
- * Timing constants — the choreography. Sourced from `lib/design/motion.ts`
- * CEREMONY namespace so narrative pacing reads from one ledger. Shimmer
- * uses the `reveal` / `fade` beats scaled by intensity (see shimmerDuration).
- * Names kept for call-site clarity.
+ * Timing constants — sourced from MOTION/CEREMONY so the ledger stays
+ * the single source of truth. No bare numeric literals.
  */
-const T_BREATH     = CEREMONY.breath;     // anticipation pause before shimmer
-const T_GLOW_HOLD  = CEREMONY.glowHold;   // GoldenThread gold burst hold
-const T_GIFT_DELAY = CEREMONY.giftDelay;  // after shimmer, NextRead appears
+const T_BREATH     = CEREMONY.breath;    // 300ms — room inhales
+const T_GIFT_DELAY = CEREMONY.giftDelay; // 700ms — NextRead invitation delay
 
 export function CeremonySequencer({ triggered, confidence, onRefresh, children }: SequencerProps) {
   const [phase, setPhase] = useState<CeremonyPhase>('idle');
-  const fired = useRef(false);
+  const fired        = useRef(false);
   const onRefreshRef = useRef(onRefresh);
   onRefreshRef.current = onRefresh;
 
   const intensity = intensityFromConfidence(confidence);
 
-  /**
-   * Shimmer duration scales with intensity. `present` is the canonical
-   * `reveal` beat; `subtle` backs off to `fade`; `radiant` extends the
-   * reveal by one breath so the moment sits fuller. All sourced from
-   * MOTION / CEREMONY — no bare literals.
-   */
-  const shimmerDuration =
-    intensity === 'radiant' ? MOTION.reveal + MOTION.hover   // 900 — revealed + one depth breath
-    : intensity === 'present' ? MOTION.reveal                // 700 — canonical reveal
-    : MOTION.fade;                                           // 500 — backed off to fade
-
-  /** Advance to next phase with a timeout. */
-  const advanceAfter = useCallback((next: CeremonyPhase, ms: number) => {
-    const id = setTimeout(() => setPhase(next), ms);
-    return () => clearTimeout(id);
-  }, []);
-
   useEffect(() => {
     if (!triggered || fired.current) return;
     fired.current = true;
 
-    // Phase 1: the room takes a breath
+    // Act 1 — Recognition: breathing pause, then shimmer fires.
     setPhase('breathing');
 
-    // Phase 2: shimmer fires after breath pause
-    const t1 = setTimeout(() => setPhase('shimmering'), T_BREATH);
-
-    // Phase 3: golden thread glows (overlaps with shimmer end)
-    const t2 = setTimeout(() => setPhase('glowing'), T_BREATH);
-
-    // Phase 4: thermal refresh — room warms with ceremony choreography.
-    // The ceremony plan adds staggered delays (200ms, 300ms, 500ms)
-    // creating the "room settling in stages" effect.
-    const t3 = setTimeout(() => {
+    // Act 2 — Presence: warming triggers CompletionShimmer + thermal refresh.
+    const t1 = setTimeout(() => {
       setPhase('warming');
       onRefreshRef.current(ceremonyPlan());
-    }, T_BREATH + shimmerDuration);
+    }, T_BREATH);
 
-    // Phase 5: NextRead gift appears
-    const t4 = setTimeout(
-      () => setPhase('gifting'),
-      T_BREATH + shimmerDuration + T_GIFT_DELAY
-    );
+    // Act 3 — Invitation: NextRead fades in.
+    const t2 = setTimeout(() => setPhase('gifting'), T_BREATH + T_GIFT_DELAY);
 
-    // Settled — ceremony complete
-    const t5 = setTimeout(
+    // Settled — ceremony resolved, keepsake stays accessible.
+    const t3 = setTimeout(
       () => setPhase('settled'),
-      T_BREATH + shimmerDuration + T_GIFT_DELAY + T_GLOW_HOLD
+      T_BREATH + T_GIFT_DELAY + MOTION.linger,
     );
 
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); clearTimeout(t5); };
-  }, [triggered, shimmerDuration]);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, [triggered]);
 
   const state: CeremonyState = { phase, intensity, confidence };
 

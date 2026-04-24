@@ -23,7 +23,7 @@ export interface SnapshotInputs {
 }
 
 const FROZEN_PHASES: ReadonlySet<CeremonyPhase> =
-  new Set(['glowing', 'warming', 'gifting', 'settled']);
+  new Set(['warming', 'gifting', 'settled']);
 
 function isCeremonyFrozen(phase: CeremonyPhase): boolean {
   return FROZEN_PHASES.has(phase);

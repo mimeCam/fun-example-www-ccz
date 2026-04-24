@@ -38,7 +38,7 @@ Server page that refuses to warm: no thermal tokens on foreground, no archetype 
 4 booleans (`resolved · warmed · keepsaked · shared`) + implicit `landed`. One row/session in `loop_funnel`, monotonic flags, zero PII. Client: `useLoopFunnel(articleId, archetype)` — SSR-safe, idempotent, `sendBeacon` first. Server: `POST /api/loop/checkpoint` (zod, 204), `GET /api/loop/funnel` (token-gated). Invisible to reader.
 
 ## WIP
-- _(none — all 8 ledgers sealed; 8 primitives shipped; voice parity wired; SuspenseFade live on 4 surfaces; loop funnel live; focus-ring corner-parity shipped; `/trust` live)_
+- _(none — all 8 ledgers sealed; 8 primitives shipped; voice parity wired; SuspenseFade live on 4 surfaces; loop funnel live; focus-ring corner-parity shipped; `/trust` live; per-threshold crossing micro-ceremonies shipped)_
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -3,6 +3,7 @@
 import { useMemo, useEffect, useRef } from 'react';
 import { notFound } from 'next/navigation';
 import { GoldenThread } from '@/components/reading/GoldenThread';
+import { StateCrossingFlash } from '@/components/reading/StateCrossingFlash';
 import { GemHome } from '@/components/navigation/GemHome';
 import { ResonanceButton } from '@/components/resonances/ResonanceButton';
 import { SelectionPopover } from '@/components/resonances/SelectionPopover';
@@ -28,6 +29,7 @@ import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/therm
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useGenuineCompletion } from '@/lib/hooks/useGenuineCompletion';
 import { useLoopFunnel } from '@/lib/hooks/useLoopFunnel';
+import { useStateCrossing } from '@/lib/hooks/useStateCrossing';
 
 export default function ArticlePage({ params }: { params: { id: string } }) {
   return (
@@ -68,7 +70,11 @@ function ArticleContent({ params }: { params: { id: string } }) {
   const recognition = useReturnRecognition();
   const entrance = useEntranceChoreography();
 
-  const { refresh: refreshThermal } = useThermal();
+  const { refresh: refreshThermal, state: thermalState } = useThermal();
+
+  // Emit crossing events when thermal state advances mid-reading.
+  // Skips the first delta (page-load restore guard — see useStateCrossing).
+  useStateCrossing(thermalState);
   const completion = useGenuineCompletion(readTime);
 
   // Reader Loop Funnel — registers article id + archetype so any
@@ -102,6 +108,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
       onRefresh={refreshThermal}
     >
       <GoldenThread />
+      <StateCrossingFlash />
       <GemHome quiet />
       {/* Selection popover — gem blooms above highlighted text (pointer devices only) */}
       <SelectionPopover articleId={params.id} articleTitle={article.title} />
