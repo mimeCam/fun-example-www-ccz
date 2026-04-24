@@ -62,12 +62,18 @@ interface ToastProps {
  * Z-stacking honors the existing `z-sys-toast` rung (60). The host carries
  * `aria-live="polite"`; this surface is silent at the ARIA layer.
  */
+// // reader-invariant:forced-colors — `bg-foreground` / `text-background` /
+// `shadow-sys-float` / `border-fog/15` all strip by spec. Replace with a
+// `1px solid CanvasText` edge on `Canvas` so the pill still reads as a
+// surface, not a floating string (Tanya UX #53 §3.6).
 const SURFACE_BASE =
   'rounded-sys-medium shadow-sys-float px-sys-4 py-sys-3 ' +
   'text-sys-caption font-sys-accent ' +
   'bg-foreground text-background select-none ' +
   'max-w-[18rem] w-max ' +
-  'border border-fog/15';
+  'border border-fog/15 ' +
+  'forced-colors:border-[CanvasText] forced-colors:bg-[Canvas] ' +
+  'forced-colors:text-[CanvasText] forced-colors:shadow-none';
 
 /**
  * Anchor + flip rules (Tanya §3.1 fallback path):

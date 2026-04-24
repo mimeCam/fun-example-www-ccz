@@ -9,8 +9,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store, reply-lexicon, reply-resolve
 - `lib/mirror/` — archetype scoring + archetype-store (pure-TS snapshot reader)
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
-- `lib/utils/` — focus-utils, scroll-lock, reduced-motion, phase resolvers
-- `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, useThreadDepth, useLoopFunnel)
+- `lib/utils/` — focus-utils, scroll-lock, reduced-motion, prefers-contrast, phase resolvers
+- `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, useThreadDepth, useLoopFunnel, useScrollRise)
 - `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, EmptySurface, SuspenseFade
 - `components/reading/` — Golden Thread, ceremony, keepsake
 - `lib/engagement/` — loop funnel instrumentation (checkpoint + funnel API routes)
@@ -25,7 +25,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Toast**: single acknowledgment voice; `toast-adoption` guard ensures every `toastShow` routes through the lexicon or reviewed `poetic-overrides`.
 - **EmptySurface**: single frame for the four quietest rooms (empty-mirror, empty-resonances, 404, error); `empty-adoption` guard protects raw-tag + tone perimeter.
 - **SuspenseFade**: wraps in-page `<Suspense>` with sealed `SKELETON.handoff` crossfade; `data-sys-enter="fade"`.
-- **Focus ring**: reader-invariant (`// reader-invariant`), painted from `--sys-focus-ink` (NOT `--token-accent`), two-stop `box-shadow`, inherits host `border-radius` — no radius of its own. Byte-identity gate in `focus-ink-byte-identity.test.ts`.
+- **Focus ring**: reader-invariant (`// reader-invariant`), painted from `--sys-focus-ink` (NOT `--token-accent`), two-stop `box-shadow`, inherits host `border-radius` — no radius of its own. Byte-identity gate in `focus-ink-byte-identity.test.ts`. Accessibility media queries (`prefers-reduced-motion`, `prefers-contrast: more`, future `forced-colors`) flow through `// reader-invariant` surfaces — they clarify, they do not warm.
 
 ## `/trust` Room
 Server page that refuses to warm: no thermal tokens on foreground, no archetype fork, no Golden Thread. Copy in `lib/sharing/trust-copy.ts` (3 sentences, 5 invariants — list does not grow). Entry via WhisperFooter only. Enforced by `app/trust/__tests__/trust-page.test.ts`.

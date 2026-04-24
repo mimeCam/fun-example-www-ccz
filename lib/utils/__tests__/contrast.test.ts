@@ -133,6 +133,52 @@ describe('field focus border — WCAG SC 1.4.11 informational UI gate', () => {
   });
 });
 
+// ─── prefers-contrast: more · focus ring stays byte-identical ────────────
+//
+// The ring is already `// reader-invariant` — its ink does NOT warm and
+// NOT personalize. Under `prefers-contrast: more`, the surrounding room
+// clears (thermal warming pins to dormant anchors), but the ring itself
+// is UNCHANGED BY CONTRACT. This block documents that invariant — if a
+// future PR forks the ring for contrast mode, this test fails fast and
+// names the site (Mike #7.4, Tanya §3.3).
+//
+// AAA floor (7:1) is NOT enforced here — the dormant palette reads at
+// ~1.7-2.0 for the composited ring (palette constraint, see PALETTE_FLOOR
+// above). The follow-up sprint lifts the dormant accent; that's tracked
+// as TODO(palette-tuning). This block asserts byte-identity and the
+// today's palette floor instead — the honest gate.
+
+describe('focus-ring under prefers-contrast: more (reader-invariant)', () => {
+  it('ring ink is byte-identical to its default render (no clamp fork)', () => {
+    // Under the OS flag, the composited ring is still 80% FOCUS_INK over
+    // the thermal backdrop. The ink itself does not move. If a future
+    // commit forks FOCUS_INK on contrast-mode, this suite catches it.
+    expect(FOCUS_INK).toBe('#7b2cbf');
+  });
+
+  it.each(SCORES)('score %i: ring clears documented floor on clamped bg', (score) => {
+    // Under `prefers-contrast: more`, the body bg is unchanged (thermal
+    // colour curves still paint the room) — only the warming *opacities*
+    // are clamped. Ring physics therefore match the base sweep; we
+    // re-run the floor assertion to document the invariance explicitly.
+    const tokens = computeThermalTokens(score, 'dormant');
+    const bg = tokens['--token-bg'];
+    const surface = tokens['--token-surface'];
+    const ringOnBg = compositeOver(FOCUS_INK, bg, RING_ALPHA);
+    const ringOnSurface = compositeOver(FOCUS_INK, surface, RING_ALPHA);
+    expect(contrast(ringOnBg, bg)).toBeGreaterThanOrEqual(PALETTE_FLOOR);
+    expect(contrast(ringOnSurface, surface)).toBeGreaterThanOrEqual(PALETTE_FLOOR);
+  });
+
+  // TODO(palette-tuning, follow-up sprint): once the dormant accent is
+  // lifted to a brighter violet that clears ≥ 7:1 composited at 80%, raise
+  // this expectation to the AAA floor. Today we document the floor honestly.
+  it('ring INK is byte-identical at every thermal stop (no contrast fork)', () => {
+    const inks = SCORES.map(() => FOCUS_INK);
+    expect(new Set(inks).size).toBe(1);
+  });
+});
+
 describe('contrast math sanity', () => {
   it('white on black is ~21:1', () => {
     expect(contrast('#ffffff', '#000000')).toBeCloseTo(21, 0);

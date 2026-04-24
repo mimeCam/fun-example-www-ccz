@@ -13,7 +13,7 @@
  *                  existing "no per-component focus rings" scan is the
  *                  adoption guard for this surface. Do NOT fork it.
  *
- * The four non-negotiables of a reader-invariant surface (the contract
+ * The five non-negotiables of a reader-invariant surface (the contract
  * this module names for the whole site):
  *
  *   1. Does NOT warm with engagement.     — step-function presence, not tween.
@@ -22,6 +22,11 @@
  *   4. CLEARS WCAG SC 1.4.11 floor.       — α=0.8 × accent over surface ≥ 3:1
  *                                           at every thermal stop (enforced by
  *                                           `lib/utils/__tests__/contrast.test.ts`).
+ *   5. PAINTS under forced-colors: active — via system color keywords only
+ *                                           (Canvas, CanvasText, LinkText,
+ *                                           Highlight, HighlightText, ButtonText).
+ *                                           Enforced by
+ *                                           `lib/design/__tests__/forced-colors-sync.test.ts`.
  *
  * The `// reader-invariant` tag is the **symmetric counterpart** to
  * `// <ledger-name>:exempt`. A ledger exemption declares "this value is

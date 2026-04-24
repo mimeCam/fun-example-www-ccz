@@ -47,13 +47,19 @@ export interface ThresholdProps extends ThresholdOptions {
 // ─── Design-system constants (locked — do not parameterise) ────────────────
 
 // alpha-ledger:exempt — motion fade endpoint (reduced-motion baseline at full presence)
+// // reader-invariant:forced-colors — backdrop flattens to Canvas by UA; no override.
 const BACKDROP_BASE =
   'fixed inset-0 z-sys-backdrop bg-void/65 backdrop-blur-sm ' +
   'motion-reduce:opacity-100';
 
+// // reader-invariant:forced-colors — thermal-shadow dissolves; the chamber gains
+// a `1px solid CanvasText` edge + `2px` outer outline (the "door frame" —
+// Tanya UX #53 §3.3) so it reads as a separate plane from the flat backdrop.
 const CHAMBER_BASE =
   'relative pointer-events-auto bg-surface/95 backdrop-blur-sm ' +
-  'thermal-shadow thermal-radius overflow-hidden';
+  'thermal-shadow thermal-radius overflow-hidden ' +
+  'forced-colors:outline forced-colors:outline-2 ' +
+  'forced-colors:outline-offset-0 forced-colors:outline-[CanvasText]';
 
 const CENTER_LAYOUT =
   'fixed inset-0 z-sys-drawer flex items-center justify-center ' +
@@ -62,8 +68,17 @@ const CENTER_LAYOUT =
 const DRAWER_LAYOUT =
   'fixed top-0 right-0 bottom-0 z-sys-drawer flex pointer-events-none';
 
-const CENTER_SHAPE = 'w-full max-w-2xl border border-fog/30';
-const DRAWER_SHAPE = 'h-full w-full max-w-sm border-l-2 flex flex-col overflow-y-auto';
+// // reader-invariant:forced-colors — border-fog/30 evaporates; replace with
+// a `CanvasText` edge so the modal keeps a visible rectangle.
+const CENTER_SHAPE =
+  'w-full max-w-2xl border border-fog/30 ' +
+  'forced-colors:border-[CanvasText]';
+
+// // reader-invariant:forced-colors — drawer's left-accent re-expresses as
+// `Highlight` (the OS focus ink, "this is where focus lives" — Tanya §3.3).
+const DRAWER_SHAPE =
+  'h-full w-full max-w-sm border-l-2 flex flex-col overflow-y-auto ' +
+  'forced-colors:border-l-[Highlight]';
 
 // ─── Portal host — avoids SSR window reference ─────────────────────────────
 

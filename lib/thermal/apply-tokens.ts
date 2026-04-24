@@ -9,10 +9,11 @@
  */
 
 import { computeThermalScore, type ThermalResult, type ThermalState } from './thermal-score';
-import { computeThermalTokens, type ThermalTokens } from './thermal-tokens';
+import { computeThermalTokens, type ThermalTokens, GESTURE_MIX, ACCENT_OPACITY } from './thermal-tokens';
 import { computeAnimationTokens, type AnimationTokens } from './thermal-animation';
 import { loadHistory, toThermalInput } from './thermal-history';
 import { defaultPlan, returningPlan, type TransitionPlan } from './transition-choreography';
+import { readPrefersContrast } from '@/lib/utils/prefers-contrast';
 
 export interface AppliedThermal {
   result: ThermalResult;
@@ -42,6 +43,15 @@ export function applyToDOM(applied: AppliedThermal, plan?: TransitionPlan): void
     el.style.setProperty(k, v);
   }
 
+  // `// reader-invariant` — clamp warming deltas back to dormant anchors
+  // when the OS reports `prefers-contrast: more`. Mirrors (authority-side)
+  // the `@media (prefers-contrast: more)` block in
+  // `lib/design/ambient-surfaces.css`. See Mike #7.1 — the CSS is the
+  // authority, this clamp exists only because `computeThermalTokens`
+  // runs after hydration and would otherwise overwrite the CSS values.
+  // Drift guarded by `lib/design/__tests__/prefers-contrast-sync.test.ts`.
+  if (readPrefersContrast()) clampToInvariantPosture(el);
+
   el.setAttribute('data-thermal', applied.result.state);
 
   const history = loadHistory();
@@ -52,6 +62,14 @@ export function applyToDOM(applied: AppliedThermal, plan?: TransitionPlan): void
   // Allows CSS to use dynamic transition durations/delays per context.
   const resolved = plan ?? (isReturning ? returningPlan() : defaultPlan());
   applyChoreographyPlan(el, resolved);
+}
+
+/** Pin the four warming deltas to their dormant anchors. Pure DOM write. */
+function clampToInvariantPosture(el: HTMLElement): void {
+  el.style.setProperty('--token-gesture-mix', GESTURE_MIX.dormant.toFixed(3));
+  el.style.setProperty('--token-accent-opacity', ACCENT_OPACITY.dormant.toFixed(2));
+  el.style.setProperty('--token-glow', 'none');
+  el.style.setProperty('--token-text-glow', 'none');
 }
 
 /** Read the state already set by the inline blocking script. */

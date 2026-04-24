@@ -19,7 +19,11 @@
  */
 
 import { contrast, compositeOver, luminance } from '@/lib/design/contrast';
-import { computeThermalTokens, GESTURE_MIX } from '@/lib/thermal/thermal-tokens';
+import {
+  computeThermalTokens,
+  GESTURE_MIX,
+  ACCENT_OPACITY,
+} from '@/lib/thermal/thermal-tokens';
 import { ARCHETYPE } from '@/lib/design/color-constants';
 
 // ─── Matrix axes ──────────────────────────────────────────────────────────
@@ -182,6 +186,100 @@ describe('ambient-surfaces · thermal step · selection flares with room', () =>
     );
     for (let i = 1; i < mixes.length; i++) {
       expect(mixes[i]).toBeGreaterThanOrEqual(mixes[i - 1]);
+    }
+  });
+});
+
+// ─── HI-CONTRAST axis: prefers-contrast: more clears the glass ────────────
+//
+// Under the OS flag, ambient surfaces pin their warming tokens to the
+// dormant anchors (see `lib/design/ambient-surfaces.css` @media block).
+// This axis emulates that clamp on top of `computeThermalTokens` output
+// and asserts the composited selection wash holds a stricter floor on
+// every archetype × every thermal stop. The dormant palette doesn't yet
+// clear full WCAG AAA (7:1) — that's `TODO(palette-tuning)` in
+// `contrast.test.ts`. Today's honest floor = SELECTION_DORMANT_FLOOR on
+// every stop (the clamp collapses the curve).
+//
+// Rationale: Tanya §4.1 — the *opacities* collapse; the palette stays.
+// Mike §5 / §7.5 — the clamp is an invariant of the reader-invariant
+// posture, not a new ledger rung. Krystle / Paul — WCAG AAA is the
+// extended matrix; it is enforced with a documented palette-tuning TODO.
+
+/** Emulate the CSS `@media (prefers-contrast: more)` clamp on a token set. */
+function clampToInvariantPosture(tokens: Record<string, string>): Record<string, string> {
+  return {
+    ...tokens,
+    '--token-gesture-mix': GESTURE_MIX.dormant.toFixed(3),
+    '--token-accent-opacity': ACCENT_OPACITY.dormant.toFixed(2),
+    '--token-glow': 'none',
+    '--token-text-glow': 'none',
+  };
+}
+
+// TODO(palette-tuning): raise this to 7.0 once the dormant accent is lifted.
+// Documented pre-existing palette constraint — see contrast.test.ts.
+const AAA_DOCUMENTED_FLOOR = SELECTION_DORMANT_FLOOR;
+
+describe('ambient-surfaces · prefers-contrast: more · selection floor', () => {
+  for (const stop of THERMAL_STOPS) {
+    it(`${stop.name}: clamped wash holds the documented palette floor`, () => {
+      const tokens = clampToInvariantPosture(
+        computeThermalTokens(stop.score, 'dormant'),
+      );
+      const mix = parseFloat(tokens['--token-gesture-mix']);
+      const wash = washOnto(tokens['--token-accent'], tokens['--token-bg'], mix);
+      expect(contrast(tokens['--token-foreground'], wash))
+        .toBeGreaterThanOrEqual(AAA_DOCUMENTED_FLOOR);
+    });
+  }
+});
+
+describe('ambient-surfaces · prefers-contrast: more · archetype × stop', () => {
+  for (const stop of THERMAL_STOPS) {
+    for (const [arch, hex] of ARCHETYPES) {
+      it(`${arch} × ${stop.name}: clamped wash reads above floor`, () => {
+        const tokens = clampToInvariantPosture(
+          computeThermalTokens(stop.score, 'dormant'),
+        );
+        const mix = parseFloat(tokens['--token-gesture-mix']);
+        const bg = compositeOver(hex, tokens['--token-bg'], 0.06);
+        const wash = washOnto(tokens['--token-accent'], bg, mix);
+        expect(contrast(tokens['--token-foreground'], wash))
+          .toBeGreaterThanOrEqual(AAA_DOCUMENTED_FLOOR);
+      });
+    }
+  }
+});
+
+describe('ambient-surfaces · prefers-contrast: more · structural invariants', () => {
+  it('the clamp collapses gesture-mix to the dormant anchor at every stop', () => {
+    for (const stop of THERMAL_STOPS) {
+      const clamped = clampToInvariantPosture(
+        computeThermalTokens(stop.score, 'dormant'),
+      );
+      expect(parseFloat(clamped['--token-gesture-mix']))
+        .toBeCloseTo(GESTURE_MIX.dormant, 3);
+    }
+  });
+
+  it('the clamp collapses accent-opacity to the dormant anchor', () => {
+    for (const stop of THERMAL_STOPS) {
+      const clamped = clampToInvariantPosture(
+        computeThermalTokens(stop.score, 'dormant'),
+      );
+      expect(parseFloat(clamped['--token-accent-opacity']))
+        .toBeCloseTo(ACCENT_OPACITY.dormant, 3);
+    }
+  });
+
+  it('gold halos flatten to `none` under the clamp', () => {
+    for (const stop of THERMAL_STOPS) {
+      const clamped = clampToInvariantPosture(
+        computeThermalTokens(stop.score, 'dormant'),
+      );
+      expect(clamped['--token-glow']).toBe('none');
+      expect(clamped['--token-text-glow']).toBe('none');
     }
   });
 });

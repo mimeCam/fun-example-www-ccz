@@ -345,6 +345,62 @@
   box-shadow: none;
 }
 
+/* ─── Forced-colors (Windows High Contrast) — reader-invariant witness ─────
+   // reader-invariant — under `@media (forced-colors: active)` every surface
+   tagged as reader-invariant paints via system color keywords only (Canvas,
+   CanvasText, LinkText, Highlight, HighlightText, ButtonText). The UA strips
+   `--token-*` and `--sys-*` colours by spec; the blocks below hand the paint
+   back to the OS so the room's shape survives the strip-down.
+   TS mirror:   `lib/design/focus.ts` (5th bullet of the contract header).
+   Sync guard:  `lib/design/__tests__/forced-colors-sync.test.ts`.
+   Reference:   `lib/design/ambient-surfaces.css` — the `::selection` block
+                below is the canonical pattern this block replicates.
+   Credits: Mike K. (napkin §2 — the 5th non-negotiable, the perimeter),
+   Tanya D. (UX #53 — per-surface posture, the door-frame for Threshold),
+   Elon M. (strip the doctrine vocabulary, ship the operational one-liner),
+   Paul K. (the six-surface scope-lock), Krystle C. (surface enumeration). */
+@media (forced-colors: active) {
+  /* Focus ring — swap two-stop box-shadow for a single Highlight outline.
+     `forced-color-adjust: none` tells the UA to honour our override. The
+     host's border-radius still carries corner posture (outline respects it). */
+  :focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+    box-shadow: none;
+    forced-color-adjust: none;
+  }
+
+  /* Golden Thread — drop the glow, the width-step, the settled burst.
+     Track reads GrayText (dormant-anchor equivalent); fill reads CanvasText.
+     Both keep `rounded-sys-full` — border-radius is not stripped by spec. */
+  .golden-thread-track {
+    background-color: GrayText !important;
+    box-shadow: none !important;
+  }
+  .golden-thread-glow,
+  .golden-thread-fill,
+  .golden-thread-settled {
+    background-color: CanvasText !important;
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* Thermal candle — halo dissolves; motion stops. Shape remains. */
+  .thermal-candle {
+    box-shadow: none !important;
+    animation: none !important;
+  }
+
+  /* All animations collapse to the reduced-motion beat under forced-colors.
+     High-contrast users disproportionately also prefer reduced motion; the
+     rules agree instead of fighting (Tanya UX #53 §1). */
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Smooth scroll — the room turns, it doesn't jump. The scrollbar's paint
    (width, thumb colour, track) lives in ambient-surfaces.css. */
 html {
@@ -708,6 +764,45 @@ body {
 @keyframes sysEnterFade {
   from { opacity: var(--sys-alpha-muted); }
   to   { opacity: 1; }
+}
+
+/* ─── Scroll-Rise Card Entrance ──────────────────────────────────────────────
+   Fired by useScrollRise hook (lib/hooks/useScrollRise.ts) when the
+   IntersectionObserver reports the card crossing threshold: 0.15 visibility.
+   Pre-enter: card rests 12px below + invisible. Enter: translateY(0) +
+   opacity:1. Stagger delay is carried via `--rise-delay` inline CSS var,
+   set per-card by the hook. The existing reduced-motion block below collapses
+   duration to 0.01ms — the card still arrives; the ornament does not perform.
+
+   Three-layer motion vocabulary (non-conflicting):
+     fade   (data-sys-enter="fade")  — DOM mount crossfade, 120ms, no movement
+     rise   (data-sys-enter="rise")  — viewport intersection, 300ms, 12px lift
+     hover  (.card-alive:hover)      — cursor contact, 200ms, 4px lift + scale
+
+   Credits: Tanya D. (UX spec #100 — data-sys-enter pattern, 12px rationale,
+   0.15 threshold, mount guard), Mike K. (napkin #7 — singleton observer,
+   stagger formula, one-shot semantics), Elon M. (fill-mode: both guard). */
+
+[data-sys-rise="pre"] {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+[data-sys-enter="rise"] {
+  animation: sysEnterRise var(--sys-time-enter) var(--sys-ease-out)
+             var(--rise-delay, 0ms) both;
+  will-change: opacity, transform;
+}
+
+@keyframes sysEnterRise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Respect reduced motion — hard kill on all animations + transitions */

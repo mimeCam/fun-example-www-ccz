@@ -3,6 +3,11 @@
  *
  * Worldview filter chips removed: 6 articles don't need filtering.
  * Tags serve the same purpose. The curated row is the filter that matters.
+ *
+ * Scroll-rise: each ExploreArticleCard receives its section index so the
+ * useScrollRise hook can stagger the card entrance wave correctly.
+ * Curated and main-grid cards use independent stagger clocks (index resets
+ * to 0 at the start of each section).
  */
 
 'use client';
@@ -58,16 +63,23 @@ export default function ArticlesPageClient({ articles }: Props) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-sys-7">
-        {articles.map(article => (
+        {articles.map((article, i) => (
           <ExploreArticleCard
             key={article.id}
             article={article}
+            index={i}
           />
         ))}
       </div>
     </div>
   );
 }
+
+// ─── CuratedRow ────────────────────────────────────────────
+// Tanya UX-100 §2: removed per-card `reason` text and the section-level
+// "Matches your reading pattern" caption — both duplicated the archetype
+// label which already answers "why is this section here?". Gold border
+// carries the visual identity signal; the archetype label carries the copy.
 
 function CuratedRow({
   curated,
@@ -84,14 +96,13 @@ function CuratedRow({
         </h2>
         <div className="flex-1 h-px bg-gold/20" />
       </div>
-      <p className="text-mist/60 text-sys-micro mb-sys-5">Matches your reading pattern</p>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-sys-5">
-        {curated.map(article => (
+        {curated.map((article, i) => (
           <ExploreArticleCard
             key={article.id}
             article={article}
             variant="curated"
-            reason="Matches your reading pattern"
+            index={i}
           />
         ))}
       </div>

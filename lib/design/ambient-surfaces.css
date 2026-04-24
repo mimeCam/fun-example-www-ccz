@@ -49,7 +49,11 @@
   color: var(--token-foreground);
 }
 
-/* Forced-colors (high-contrast) — hand back to the OS. Non-negotiable. */
+/* Forced-colors (high-contrast) — hand back to the OS. Non-negotiable.
+ * Canonical pattern for every reader-invariant surface; mirrored in
+ * `app/globals.css` for focus ring / golden-thread / entrance animations,
+ * and in the Tailwind `forced-colors:` variant classes on Threshold, Toast,
+ * EmptySurface. Sync guard: `forced-colors-sync.test.ts`. */
 @media (forced-colors: active) {
   ::selection {
     background-color: Highlight;
@@ -58,6 +62,27 @@
   ::-moz-selection {
     background-color: Highlight;
     color: HighlightText;
+  }
+
+  /* Chorus surfaces — strip the accent tint the same way `prefers-contrast:
+   * more` does. The room stops performing; the reader's pen stays crisp.
+   * Scrollbar: hand both thumb colours to the UA via `auto`. Placeholder
+   * and marker read `CanvasText`; caret reads `CanvasText` too. */
+  :root {
+    caret-color: CanvasText;
+  }
+  html {
+    scrollbar-color: auto;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: CanvasText;
+  }
+  ::placeholder {
+    color: CanvasText;
+    opacity: 1;
+  }
+  ::marker {
+    color: CanvasText;
   }
 }
 
@@ -121,5 +146,44 @@ html {
   ::placeholder,
   ::marker {
     transition: none !important;
+  }
+}
+
+/* ─── Reader-invariant guard: prefers-contrast: more ────────
+ * // reader-invariant — when the OS asks for clarity, ambient surfaces
+ * clear back to their dormant anchors. The room stops performing: gesture
+ * tokens pin to `GESTURE_MIX.dormant` / `ACCENT_OPACITY.dormant`, gold
+ * halos collapse, placeholders and markers lose the accent tint.
+ *
+ * Authority: this CSS block is the authoring layer — the browser reads it.
+ * The TS mirror in `lib/thermal/apply-tokens.ts` clamps the same four
+ * warming deltas after hydration so `computeThermalTokens` cannot overwrite
+ * these values. Sync guard lives at
+ * `lib/design/__tests__/prefers-contrast-sync.test.ts` (drift-fail).
+ *
+ * Composes with `prefers-reduced-motion` by subtraction — both blocks can
+ * match simultaneously; no combined rule needed (Tanya §6).
+ *
+ * Credits: Krystle C. (surgical PR scope), Tanya D. (sensory spec §4.1),
+ * Mike K. (napkin §5 — CSS as authority, TS as mirror), Elon M. (one noun),
+ * Paul K. (scope-lock list). */
+@media (prefers-contrast: more) {
+  :root {
+    /* Pin thermal warming deltas to dormant anchors (mirrors of
+     * GESTURE_MIX.dormant / ACCENT_OPACITY.dormant in thermal-tokens.ts). */
+    --token-gesture-mix: 0.28;
+    --token-accent-opacity: 0.5;
+    /* Gold halos — dissolve edges, the opposite of what contrast-mode
+     * asks for. Drop both (Tanya §4.2). */
+    --token-glow: none;
+    --token-text-glow: none;
+  }
+  /* Placeholder — drop the accent tint, leave a clean mist (Tanya §4.1). */
+  ::placeholder {
+    color: var(--mist);
+  }
+  /* Marker — structure, not style; paint with foreground (Tanya §4.1). */
+  ::marker {
+    color: var(--token-foreground);
   }
 }

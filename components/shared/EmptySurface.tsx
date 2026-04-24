@@ -116,8 +116,11 @@ function Column({ children }: { children: ReactNode }) {
 
 function Headline({ children }: { children: ReactNode }) {
   return (
+    // reader-invariant:forced-colors — `text-foreground` strips; `CanvasText`
+    // carries the heading under the OS palette.
     <h1 className="mt-sys-7 font-display text-sys-h2 font-sys-display
-                   tracking-sys-display text-foreground animate-archetype-reveal">
+                   tracking-sys-display text-foreground animate-archetype-reveal
+                   forced-colors:text-[CanvasText]">
       {children}
     </h1>
   );
@@ -125,7 +128,10 @@ function Headline({ children }: { children: ReactNode }) {
 
 function Whisper({ children }: { children: ReactNode }) {
   return (
-    <p className="mt-sys-3 text-sys-body typo-body text-mist/50">
+    // reader-invariant:forced-colors — `text-mist/50` collapses to full-presence
+    // CanvasText; α-fade is a warm-mode calibration (Tanya UX #53 §3.4).
+    <p className="mt-sys-3 text-sys-body typo-body text-mist/50
+                  forced-colors:text-[CanvasText]">
       {children}
     </p>
   );
@@ -172,10 +178,15 @@ function SecondaryLink({ href, label }: { href: string; label: string }) {
  * perceptible breath (Paul §stakes — loudest where quietest, without cost).
  */
 function Halo({ tint }: { tint: EmptySurfaceTint }) {
+  // reader-invariant:forced-colors — three tint halos (gold/rose/cyan) all
+  // dissolve to none. The gem glyph survives and repaints with CanvasText;
+  // the four rooms still rhyme by shape alone (Tanya UX #53 §3.4).
   return (
     <div className={`${haloClass(tint)} rounded-sys-full p-sys-4
-                     animate-gem-appear animate-thermal-breath`}>
-      <GemIcon size="lg" className={gemColorClass(tint)} />
+                     animate-gem-appear animate-thermal-breath
+                     forced-colors:drop-shadow-none forced-colors:shadow-none`}>
+      <GemIcon size="lg"
+        className={`${gemColorClass(tint)} forced-colors:text-[CanvasText]`} />
     </div>
   );
 }
