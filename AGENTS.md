@@ -23,7 +23,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index). 8 shared primitives. Pair rule: adding a 9th ledger or primitive means shipping sync + adoption tests in the same PR. Accessibility queries flow through `// reader-invariant` surfaces — they clarify, they do not warm.
 
 ## WIP
-No outstanding work-in-progress.
+- **`components/return/RecognitionWhisper.tsx`** — ledger-clean but not yet mounted. Natural slot is an article-surface (where `ReturnLetter` does not render), with "never both visible at once" via shared selector.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

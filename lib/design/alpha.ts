@@ -53,6 +53,21 @@ export const ALPHA = {
 
 export type AlphaRung = keyof typeof ALPHA;
 
+/**
+ * Felt-sentence calibration (Tanya UX §2 vocabulary). When a reviewer asks
+ * "is `text-mist/60` recede or quiet?" they need a sentence, not a number.
+ * Use these one-liners during snap-to-rung review:
+ *
+ *   hairline (0.10) → "It's geometry. The eye registers it as space, not surface."
+ *   muted    (0.30) → "It exists, the eye skims past. Receipts. Background metadata."
+ *   recede   (0.50) → "The frame around the subject. Bylines, captions, attribution."
+ *   quiet    (0.70) → "Content, but not THE content. Subheads, annotations, the closing of a letter."
+ *   default  (1.00) → "Meet head-on. Headings, body prose, the archetype keyword."
+ *
+ * Vocabulary calibration only — no code change, no test change. One scroll
+ * up; one less argument per PR. (Vision: "polish what we have — AAA.")
+ */
+
 /** Ordered lightest → heaviest presence. Used by the invariant + guard msg. */
 export const ALPHA_ORDER: readonly AlphaRung[] =
   ['hairline', 'muted', 'recede', 'quiet'] as const;
@@ -184,8 +199,12 @@ export const ALPHA_COLOR_SHORTHAND_LEGAL_PCTS = new Set<number>([
  *   (b) route the call through `alphaClassOf(color, rung, kind)`.
  */
 export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
-  'app/error.tsx',
-  'app/not-found.tsx',
+  // Ghost Sweep (Mike #41 + Elon empirical verification): `app/error.tsx`
+  // and `app/not-found.tsx` retired with zero hits — both compose
+  // `<EmptySurface />` and never carried color-alpha drift in the first
+  // place. Removed in this PR.
+  // Live drifter retired (Tanya UX §4.1): `RecognitionWhisper.tsx` snapped
+  // text-gold/60 → text-gold/50 (recede; the room remembers, gently).
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
@@ -201,7 +220,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/reading/ThreadKeepsake.tsx',
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
-  'components/return/RecognitionWhisper.tsx',
   'components/return/ReturnLetter.tsx',
   'components/shared/Threshold.tsx',
   'components/shared/Toast.tsx',

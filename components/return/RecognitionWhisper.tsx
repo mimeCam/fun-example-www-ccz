@@ -45,7 +45,7 @@ export function RecognitionWhisper({ recognition }: Props) {
           ${settled ? 'opacity-muted' : 'opacity-quiet'}`}
         style={{ color: 'var(--mist)' }}
       >
-        <span className="text-gold/60">{archetypeLabel}</span>
+        <span className="text-gold/50">{archetypeLabel}</span>
         {' · '}
         {recognition.lastWhisper}
       </p>
