@@ -26,5 +26,11 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## WIP
 - *(none)*
 
+## Follow-ons (deferred)
+- Promote `primary` + `cyan` into `ALPHA_COLOR_FAMILIES` + worldview taxonomy decision
+  (technical/philosophical share the `primary` family); lift `WORLDVIEW_COLORS`
+  into shared `lib/design/worldview.ts` so `ResonanceEntry`/`EvolutionThread`
+  compose the same map.
+
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -8,6 +8,7 @@ import { excerpt } from '@/lib/content/excerpt';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
+import { alphaClassOf } from '@/lib/design/alpha';
 
 interface ExploreArticleCardProps {
   article: Article;
@@ -19,12 +20,53 @@ interface ExploreArticleCardProps {
   showWorldview?: boolean;
 }
 
+/* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
+   Mike napkin #50 §4 + Tanya UX #58 §4 — the pair-invariant rule pins
+   CURATED_HOVER and ORGANIC_HOVER to the SAME rung token (`recede`); only
+   the family differs. Hover communicates *interactivity*; the family
+   carries *category*. Two channels, two jobs, no overload.
+
+   Calibration (alpha.ts felt-sentence block):
+     CURATED_REST  — `muted`    → "ambient warmth; the eye registers it."
+     CURATED_HOVER — `recede`   → "frame around the subject; lean in."
+     ORGANIC_REST  — `hairline` → "it's geometry; space, not surface."
+     ORGANIC_HOVER — `recede`   → SAME rung as CURATED_HOVER (pair invariant).
+     WORLDVIEW_BG  — `muted`    → "the tag is ambient chrome; the worldview
+                                    is the voice." All four worldviews share
+                                    this rung — one register, four voices.
+   Pinned in `__tests__/ExploreArticleCard.alpha.test.ts`. */
+const CURATED_REST    = alphaClassOf('gold', 'muted',    'border'); // border-gold/30
+const CURATED_HOVER   = alphaClassOf('gold', 'recede',   'border'); // border-gold/50
+const ORGANIC_REST    = alphaClassOf('fog',  'hairline', 'border'); // border-fog/10
+const ORGANIC_HOVER   = alphaClassOf('fog',  'recede',   'border'); // border-fog/50
+const WORLDVIEW_FALLBACK_BG = alphaClassOf('fog', 'muted', 'bg');   // bg-fog/30
+
+/* Worldview chip background+text — one register, all four at the `muted`
+   (0.30) rung. The /30 percent here resolves through alphaClassOf for `fog`
+   and `rose` (which are in ALPHA_COLOR_FAMILIES); `primary` and `cyan` are
+   not yet promoted (Mike napkin #50 §5 — taxonomy decision deferred), so
+   their /30 literals appear as raw class strings. The grep-fence accepts
+   any color at a legal rung — `primary` / `cyan` family promotion is a
+   follow-up sprint (see _my/report.md). */
 const WORLDVIEW_COLORS: Record<string, string> = {
-  technical:     'bg-primary/20 text-accent',
-  philosophical: 'bg-primary/20 text-primary',
-  practical:     'bg-cyan/20 text-cyan',
-  contrarian:    'bg-rose/20 text-rose',
+  technical:     'bg-primary/30 text-accent',
+  philosophical: 'bg-primary/30 text-primary',
+  practical:     'bg-cyan/30 text-cyan',
+  contrarian:    `${alphaClassOf('rose', 'muted', 'bg')} text-rose`, // bg-rose/30
 };
+
+/**
+ * Card edge class — one decision, two voices. Hover variants are written
+ * as literals (Tailwind JIT cannot see `hover:${X}` interpolation; the full
+ * token must appear verbatim in source). Gold/fog hue is the suprathreshold
+ * signal carrying the curated/organic split; the rung pair is the lock that
+ * keeps it from drifting back into noise. Pure, ≤ 10 LOC.
+ */
+function edgeClass(isCurated: boolean): string {
+  return isCurated
+    ? 'border border-gold/30 hover:border-gold/50 card-alive-curated'
+    : 'border border-fog/10 hover:border-fog/50';
+}
 
 export default function ExploreArticleCard({
   article,
@@ -55,11 +97,7 @@ export default function ExploreArticleCard({
           (card animates in with stagger). One observer for the whole list. */}
       <article
         className={`bg-surface thermal-radius shadow-sys-rest p-sys-6 h-full flex flex-col
-          card-alive ${
-          isCurated
-            ? 'border border-gold/20 hover:border-gold/50 card-alive-curated'
-            : 'border border-fog/15 hover:border-fog/40'
-        }`}
+          card-alive ${edgeClass(isCurated)}`}
       >
         {/* Tanya §2.4: cards are surfaces, not buttons. Rest → sys-rest
             (grid visibly quieter); hover lift is owned by .card-alive in
@@ -98,7 +136,7 @@ export default function ExploreArticleCard({
           {showWorldview && article.worldview && (
             <>
               <span className="text-mist/30">·</span>
-              <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent ${WORLDVIEW_COLORS[article.worldview] ?? 'bg-fog/20 text-mist'}`}>
+              <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent ${WORLDVIEW_COLORS[article.worldview] ?? `${WORLDVIEW_FALLBACK_BG} text-mist`}`}>
                 {article.worldview}
               </span>
             </>
@@ -114,3 +152,19 @@ export default function ExploreArticleCard({
     </Link>
   );
 }
+
+/**
+ * Test seam — pure helpers + alpha-ledger handles, exposed so the per-file
+ * adoption test can pin the card's edge classes deterministically without
+ * spinning up the full SSR render. Mirrors the `QuickMirrorCard.__testing__`
+ * idiom (Mike napkin #19 §5; #50 §4).
+ */
+export const __testing__ = {
+  edgeClass,
+  WORLDVIEW_COLORS,
+  CURATED_REST,
+  CURATED_HOVER,
+  ORGANIC_REST,
+  ORGANIC_HOVER,
+  WORLDVIEW_FALLBACK_BG,
+} as const;

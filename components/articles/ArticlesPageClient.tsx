@@ -90,11 +90,16 @@ function CuratedRow({
 }) {
   return (
     <section className="mb-sys-10">
+      {/* Tanya UX #58 §7: the curated row's heading rule and the curated
+          card border share a rung — both `muted` (0.30). Same warmth
+          speaking the same line. The grandfather entry stays for now
+          (other drift in this file may surface in a future audit; this
+          file remains scoped out per Mike napkin #50 §9). */}
       <div className="flex items-center gap-sys-4 mb-sys-7">
         <h2 className="font-display text-gold text-sys-xl font-sys-heading">
           {getExtensionLabel(archetype)}
         </h2>
-        <div className="flex-1 h-px bg-gold/20" />
+        <div className="flex-1 h-px bg-gold/30" />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-sys-5">
         {curated.map((article, i) => (

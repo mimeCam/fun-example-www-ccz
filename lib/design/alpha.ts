@@ -221,12 +221,23 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   hairline so the choreography reads as progressive presence
   //   (emergence whispers itself in → shimmer/reveal/rest earn the muted
   //   border). Pinned in `components/mirror/__tests__/QuickMirrorCard.alpha.test.ts`.
+  // Live drifter retired (Mike napkin #50, Tanya UX #58):
+  //   `ExploreArticleCard.tsx` — nine drift sites snapped to the ledger
+  //   (curated rest /20 → muted; organic rest /15 → hairline; organic
+  //   hover /40 → recede; four worldview-chip backgrounds /20 → muted;
+  //   worldview fallback /20 → muted). The pair-invariant edge — curated
+  //   hover ≡ organic hover at the `recede` rung — is now structural
+  //   (different family, same alpha): hue carries category, the rung
+  //   carries interactivity. `primary` and `cyan` stay as raw-family
+  //   literals at /30 (legal rung); their promotion to ALPHA_COLOR_FAMILIES
+  //   is a follow-on sprint paired with the four-vs-three-voices taxonomy
+  //   decision (Mike #50 §5, Tanya #58 §6). Pinned in
+  //   `components/explore/__tests__/ExploreArticleCard.alpha.test.ts`.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
-  'components/explore/ExploreArticleCard.tsx',
   'components/home/ViaWhisper.tsx',
   'components/navigation/AmbientNav.tsx',
   'components/navigation/GemHome.tsx',
