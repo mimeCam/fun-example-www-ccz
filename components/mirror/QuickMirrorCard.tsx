@@ -16,6 +16,24 @@ import { useMirrorPhases, QUICK_TIMINGS, type Phase } from '@/lib/hooks/useMirro
 import ShareOverlay from './ShareOverlay';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION } from '@/lib/design/motion';
+import { alphaClassOf } from '@/lib/design/alpha';
+
+/* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
+   Module-scope bindings so the JSX + `phaseClass` map below stay plain
+   className compositions and Tailwind's JIT sees every literal in source.
+   Mirrors the `MirrorRevealCard` convention (Mike napkin #19 §4.2 — pair
+   rule: shimmer/reveal/rest share ONE rung family on the gold border).
+
+   Calibration (Tanya UX §3, alpha.ts felt-sentence block):
+     • DIVIDER_HAIRLINE — "it's geometry; the eye registers it as space."
+     • WHISPER_TEXT     — "content, but not THE content" (the closing of the card).
+     • BORDER_HAIRLINE  — same: a border IS a line. Emergence whispers itself in.
+     • BORDER_MUTED     — "ambient chrome; skip past it." Earned-attention rung.
+   Pinned in `__tests__/QuickMirrorCard.alpha.test.ts`. */
+const DIVIDER_HAIRLINE = alphaClassOf('gold',       'hairline', 'bg');     // bg-gold/10
+const WHISPER_TEXT     = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
+const BORDER_HAIRLINE  = alphaClassOf('gold',       'hairline', 'border'); // border-gold/10
+const BORDER_MUTED     = alphaClassOf('gold',       'muted',    'border'); // border-gold/30
 
 interface Props {
   result: QuickMirrorResult;
@@ -28,7 +46,7 @@ export default function QuickMirrorCard({ result, articleId }: Props) {
   const colors = ARCHETYPE_COLORS[(result.archetype as ArchetypeKey) ?? 'collector'];
 
   if (dismissed) return (
-    <div className="my-sys-8 mx-auto max-w-divider h-px bg-gold/20 rounded-sys-full" />
+    <div className={`my-sys-8 mx-auto max-w-divider h-px ${DIVIDER_HAIRLINE} rounded-sys-full`} />
   );
 
   return (
@@ -83,8 +101,11 @@ function ArchetypeName({ label, visible, color }: {
 }
 
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
+  // Alpha ledger: `quiet` (0.70) — "content, but not THE content."
+  // The whisper is the closing of the card; the archetype name above is THE
+  // content. /80 was drift; same rung as MirrorRevealCard's whisper-quote.
   return (
-    <p className={`mt-sys-3 text-sys-caption text-foreground/80 italic max-w-card-body
+    <p className={`mt-sys-3 text-sys-caption ${WHISPER_TEXT} italic max-w-card-body
       mx-auto typo-caption ${fadeClass(visible)}`}
       style={fadeStyle(visible, MOTION.enter)}>
       &ldquo;{text}&rdquo;
@@ -119,12 +140,19 @@ function phaseClass(p: Phase): string {
   // ride Motion's opacity axis). `emergence` uses `opacity-quiet` (0.70) —
   // the "content-but-not-the-content" rung — because the card is legible
   // at that tier before the shimmer brings it to full presence.
+  // Borders: hairline (0.10) on emergence, muted (0.30) on shimmer/reveal/rest.
+  // Pair-rule (Mike napkin #19 §4.2): every "earned-attention" phase shares
+  // ONE rung — splitting rungs across shimmer/reveal/rest would read as the
+  // card flickering between definitions. Drift `/20` was equidistant from
+  // /10 and /30; it ties down by `snapToRung` but the *intent* is progressive
+  // presence — emergence (hairline) → shimmer/reveal/rest (muted), the card
+  // gaining definition exactly once (Mike napkin #47 §3 footnote ²).
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
-    emergence: 'opacity-quiet translate-y-0 border-gold/10',
-    shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
-    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
-    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
+    emergence: `opacity-quiet translate-y-0 ${BORDER_HAIRLINE}`,
+    shimmer:   `opacity-100 translate-y-0 ${BORDER_MUTED} mirror-card-shimmer`,
+    reveal:    `opacity-100 translate-y-0 ${BORDER_MUTED} shadow-sys-bloom`,
+    rest:      `opacity-100 translate-y-0 ${BORDER_MUTED} shadow-sys-bloom`,
   };
   return map[p];
 }
@@ -148,3 +176,17 @@ function fadeClass(visible: boolean): string {
 function fadeStyle(visible: boolean, delayMs: number): React.CSSProperties {
   return visible ? { transitionDelay: `${delayMs}ms` } : {};
 }
+
+/**
+ * Test seam — pure helpers + alpha-ledger handles, exposed so the per-file
+ * adoption test can pin the phase→className map deterministically without
+ * spinning up a phase machine. Mirrors the `MirrorRevealCard.__testing__`
+ * idiom (Mike napkin #19 §5; #47 §6 — failure-message-is-the-doc).
+ */
+export const __testing__ = {
+  phaseClass,
+  DIVIDER_HAIRLINE,
+  WHISPER_TEXT,
+  BORDER_HAIRLINE,
+  BORDER_MUTED,
+} as const;

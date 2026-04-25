@@ -213,6 +213,14 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   at the surfaces where they speak the same line; the closing of the
   //   letter and the whisper-quote register both resolve to `quiet`. Pinned
   //   in `components/return/__tests__/ReturnLetter.alpha.test.ts`.
+  // Live drifter retired (Mike napkin #47 §3, mirroring napkin #19 §4.2):
+  //   `QuickMirrorCard.tsx` — five drift sites snapped to the ledger
+  //   (dismissed-divider /20 → hairline; whisper-quote /80 → quiet;
+  //   shimmer + reveal + rest border /20 → muted, the pair-rule rung the
+  //   sibling MirrorRevealCard already paints with). Emergence stays at
+  //   hairline so the choreography reads as progressive presence
+  //   (emergence whispers itself in → shimmer/reveal/rest earn the muted
+  //   border). Pinned in `components/mirror/__tests__/QuickMirrorCard.alpha.test.ts`.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
@@ -220,7 +228,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/content/StratifiedRenderer.tsx',
   'components/explore/ExploreArticleCard.tsx',
   'components/home/ViaWhisper.tsx',
-  'components/mirror/QuickMirrorCard.tsx',
   'components/navigation/AmbientNav.tsx',
   'components/navigation/GemHome.tsx',
   'components/reading/NextRead.tsx',
