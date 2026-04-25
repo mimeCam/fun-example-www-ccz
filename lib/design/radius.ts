@@ -258,16 +258,16 @@ export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
  * entry is failing the literacy contract — the fence exists to fail
  * loudly the moment a new corner becomes unspoken.
  *
- * Pre-Threshold migration this list carried 8 entries; the chamber's
- * graduation drops it to 7. Counter (occurrences across `.ts/.tsx/.css`
- * source — Mike napkin §4): 14 → 13 with this PR. (Mike #35 §8/§5,
- * Tanya UX §6 — the chamber is ceremony, the corner stays held.)
+ * Pre-MirrorReveal migration this list carried 7 entries; the killer-
+ * feature surface's graduation drops it to 6. Counter (occurrences across
+ * `.ts/.tsx/.css` source — Mike napkin §4): 13 → 12 with this PR.
+ * (Mike #63 §1, Tanya UX #53 §3 — the corner is the carrier; the
+ * killer feature speaks one posture word, in one voice.)
  */
 export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [
   'app/mirror/page.tsx',
   'components/explore/ExploreArticleCard.tsx',
   'components/mirror/MirrorLoadingSurface.tsx',
-  'components/mirror/MirrorRevealCard.tsx',
   'components/mirror/QuickMirrorCard.tsx',
   'components/return/ReturnLetter.tsx',
   'lib/utils/press-phase.ts',

@@ -16,6 +16,7 @@ import { useMirrorPhases, MIRROR_PAGE_TIMINGS, type Phase } from '@/lib/hooks/us
 import ShareOverlay from './ShareOverlay';
 import { MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 
 /* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
    Pinned at module scope so the `phaseClass` map below stays a plain
@@ -24,6 +25,15 @@ import { alphaClassOf } from '@/lib/design/alpha';
 const BORDER_HAIRLINE = alphaClassOf('gold', 'hairline', 'border'); // border-gold/10
 const BORDER_MUTED    = alphaClassOf('gold', 'muted',    'border'); // border-gold/30
 const WHISPER_TEXT    = alphaClassOf('foreground', 'quiet', 'text'); // text-foreground/70
+
+/* ─── Radius-ledger handle — typed posture, JIT-safe ────────────────────
+   Mike napkin #63 §5.1: hoist the resolved class string to module scope
+   with UPPER_SNAKE provenance. Posture vocabulary (`ceremony`) is the
+   reviewer-facing word; the helper resolves to the thermal-lifted wide
+   rung at runtime. The class literal lives once in `lib/design/radius.ts`
+   (line 144) so Tailwind JIT scans it there. Output bytes: identical.
+   (Tanya UX #53 §3 — pixel / breath / shadow parity is the contract.) */
+const THERM_CEREMONY = thermalRadiusClassByPosture('ceremony');
 
 interface Props {
   mirror: ReaderMirror;
@@ -38,7 +48,7 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   return (
     <div className="flex justify-center">
       <div className={`
-        relative max-w-md w-full thermal-radius-wide p-sys-8 text-center
+        relative max-w-md w-full ${THERM_CEREMONY} p-sys-8 text-center
         bg-gradient-to-b from-surface to-background overflow-hidden
         transition-all duration-reveal ease-out
         ${phaseClass(phase)}
