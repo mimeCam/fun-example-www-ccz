@@ -34,6 +34,25 @@ import {
   composeFieldClass, resolveFieldStyle,
 } from '@/lib/utils/field-phase';
 import { useFieldPhase } from '@/lib/hooks/useFieldPhase';
+import { alphaClassOf } from '@/lib/design/alpha';
+
+// ─── Module-scope class strings — JIT-visible literals ────────────────────
+
+/**
+ * Label rung — `quiet` (0.70). Routed through `alphaClassOf` (not a literal)
+ * so the rung is grep-honest and a future ledger move stays mechanical.
+ *
+ * Why `quiet` and not `recede`: the label is "content, but not THE content"
+ * — content the reader skims to confirm, not reads to understand. The reader
+ * value (α=1.0) is the loudest thing on the surface; the label sits one rung
+ * down so the input box itself becomes the brightest non-value surface in
+ * the field group (Tanya UX #76 §1, §3.1). Color-family stays `foreground`
+ * (not `mist`) so the label tracks page foreground under thermal warming —
+ * sibling whisper surfaces (WhisperFooter, CaptionMetric) deliberately use
+ * `mist` to dissolve into the page; a label needs to remain locatable
+ * (Tanya §5).
+ */
+const LABEL_TEXT_CLASS = alphaClassOf('foreground', 'quiet', 'text');
 
 // ─── Public API ────────────────────────────────────────────────────────────
 
@@ -183,7 +202,7 @@ function Label({ htmlFor, text }: { htmlFor: string; text: string }): JSX.Elemen
   return (
     <label
       htmlFor={htmlFor}
-      className="block text-sys-caption font-sys-accent text-foreground/80 mb-sys-3"
+      className={`block text-sys-caption font-sys-accent ${LABEL_TEXT_CLASS} mb-sys-3`}
     >
       {text}
     </label>

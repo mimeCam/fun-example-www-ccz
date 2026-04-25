@@ -203,7 +203,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/return/RecognitionWhisper.tsx',
   'components/return/ReturnLetter.tsx',
-  'components/shared/Field.tsx',
   'components/shared/Threshold.tsx',
   'components/shared/Toast.tsx',
 ] as const;
