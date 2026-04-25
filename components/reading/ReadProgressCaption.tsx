@@ -69,6 +69,7 @@ import { formatReadingTime } from '@/lib/utils/reading-time';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useGenuineCompletion } from '@/lib/hooks/useGenuineCompletion';
 import { SKELETON_ENTER_ATTR } from '@/lib/design/skeleton';
+import { CaptionMetric } from '@/components/shared/CaptionMetric';
 
 // ─── Public API — one prop, sealed ───────────────────────────────────────
 
@@ -142,14 +143,16 @@ function ScreenCaption({
  * paper has no scroll position; states 1 and 2 would be incoherent. The
  * string flows from the substrate `formatReadingTime` so paper and
  * screen wear the same edge cases (Mike #35 §5 #5 — print parity is a
- * deliverable). `tabular-nums` + `tracking-sys-caption` keep the digit
- * metric and caption-voice identical to the hero & card (Tanya §4c).
+ * deliverable). Snaps to the standard caption-metric face via
+ * `<CaptionMetric as="span">` (Mike #38) so the digit metric, caption-
+ * voice and `quiet` rung match the hero, mirror MetaLine and explore
+ * card — one face for every metric surface (Tanya §4c).
  */
 function PrintCaption({ readTime }: { readTime: number }): JSX.Element {
   return (
-    <span className="print-only tracking-sys-caption tabular-nums">
+    <CaptionMetric as="span" className="print-only">
       {formatReadingTime(readTime)}
-    </span>
+    </CaptionMetric>
   );
 }
 

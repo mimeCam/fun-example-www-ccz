@@ -7,6 +7,7 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import { excerpt } from '@/lib/content/excerpt';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { formatReadingTime } from '@/lib/utils/reading-time';
+import { CaptionMetric } from '@/components/shared/CaptionMetric';
 
 interface ExploreArticleCardProps {
   article: Article;
@@ -84,13 +85,16 @@ export default function ExploreArticleCard({
         {/* Card metadata row — the duration recedes one alpha-ledger rung
             below the hero (`quiet` = 70%) so it reads as "content, but
             not THE content" (Tanya §3, alpha ledger §quiet). The
-            duration span carries `tracking-sys-caption tabular-nums` so
-            the caption-voice and digit-column match the hero & article
-            caption. */}
+            duration span uses `<CaptionMetric>` (Mike #38) so the
+            caption-voice, digit-column, and `quiet` rung match the
+            hero, mirror MetaLine and article caption — one face. The
+            parent retains `text-sys-micro text-mist/70` for the sibling
+            separator + tag span to inherit; CaptionMetric's literals
+            override on its own element. */}
         <div className="flex items-center gap-sys-3 text-sys-micro text-mist/70">
-          <span className="tracking-sys-caption tabular-nums">
+          <CaptionMetric as="span">
             {formatReadingTime(minutes)}
-          </span>
+          </CaptionMetric>
           {showWorldview && article.worldview && (
             <>
               <span className="text-mist/30">·</span>

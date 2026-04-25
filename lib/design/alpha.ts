@@ -185,7 +185,6 @@ export const ALPHA_COLOR_SHORTHAND_LEGAL_PCTS = new Set<number>([
  */
 export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'app/error.tsx',
-  'app/mirror/page.tsx',
   'app/not-found.tsx',
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',

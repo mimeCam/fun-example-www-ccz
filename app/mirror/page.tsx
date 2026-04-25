@@ -14,6 +14,7 @@ import { GemHome } from '@/components/navigation/GemHome';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { EmptySurface } from '@/components/shared/EmptySurface';
+import { CaptionMetric } from '@/components/shared/CaptionMetric';
 import { emptyPhrase } from '@/lib/sharing/empty-phrase';
 import { formatReaderShortDate } from '@/lib/utils/reader-locale';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
@@ -81,7 +82,15 @@ export default function MirrorPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
       <GemHome />
-      <div className="animate-mirror-pulse w-80 h-96 thermal-radius bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/20" />
+      {/* Loading skeleton — alpha-ledger snap: `border-primary/30` is the
+          `muted` rung (0.30), the documented home for "ambient chrome,
+          skip past it" — matches what a loading surface IS. The gradient
+          stops `from-primary/20 to-secondary/10` are not reachable by
+          the alpha-adoption regex (which carves out gradient-stop
+          dialects to Color, not Alpha). // TODO: route this loading
+          surface through the shared <Skeleton> primitive in a follow-up
+          (would also retire the bespoke animate-mirror-pulse keyframe). */}
+      <div className="animate-mirror-pulse w-80 h-96 thermal-radius bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/30" />
     </div>
   );
 
@@ -128,6 +137,11 @@ function QuickMirrorAsReveal({ result }: { result: QuickMirrorResult }) {
  * bureaucratic — and would lengthen the line past the card's
  * centerline, breaking the visual rhyme of card + caption. One
  * metric, one date, one whisper line.
+ *
+ * Wears the standard caption-metric face via `<CaptionMetric>` — the
+ * `quiet` rung, `tracking-sys-caption`, `tabular-nums` (digits do not
+ * waltz when the count rolls 9 → 10). Tanya UX §3.1 — *stillness is
+ * the feature*.
  */
 function MetaLine({ articlesRead, firstDetected }: {
   articlesRead: number; firstDetected: string | null;
@@ -137,8 +151,8 @@ function MetaLine({ articlesRead, firstDetected }: {
   const since = firstDetected ? formatReaderShortDate(firstDetected) : '';
   if (since) parts.push(`since ${since}`);
   return (
-    <p className="text-sys-micro text-mist/60 text-center mt-sys-8">
+    <CaptionMetric className="text-center mt-sys-8">
       {parts.join(' · ')}
-    </p>
+    </CaptionMetric>
   );
 }
