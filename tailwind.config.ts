@@ -169,13 +169,18 @@ const config: Config = {
         'sys-toast':    'var(--sys-z-toast)',
       },
       transitionDuration: {
-        'hover': '200ms',
-        'enter': '300ms',
-        'reveal': '700ms',
-        'linger': '1000ms',
-        'fade': '500ms',
-        'instant': '150ms',
-        'settle': '1500ms',
+        /* Motion Ledger — 8 beats, mirror of --sys-time-* in globals.css.
+           Source of truth: lib/design/motion.ts. Sync test guards drift.
+           Beat-pairing contract: see AGENTS.md §Motion Beat Pairing Contract.
+           crossfade ≠ hover ≠ settle — semantic roles, not interchangeable. */
+        'crossfade': '120ms', /* inline color/border dissolve — "this changed" */
+        'instant':   '150ms', /* press receipt — "I heard you" */
+        'hover':     '200ms', /* depth/scale gesture — card lift */
+        'enter':     '300ms', /* surface arriving — "welcome" */
+        'fade':      '500ms', /* neutral content swap */
+        'reveal':    '700ms', /* deliberate discovery */
+        'linger':   '1000ms', /* ambient pulse / passage breathing */
+        'settle':   '1500ms', /* room arriving at rest — NOT for interactive hover */
       },
       transitionTimingFunction: {
         'out': 'cubic-bezier(0.0, 0.0, 0.2, 1)',

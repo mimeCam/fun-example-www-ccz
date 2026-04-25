@@ -109,6 +109,37 @@
   --sys-time-linger: 1000ms;   /* passage breathing — density & spacing shifts */
   --sys-time-settle: 1500ms;   /* signature patience — the room arriving at rest */
 
+  /* ─── Animation Timing — ceremony beats wired to MOTION ─────────────────
+     These feed keyframe animation-duration properties that cannot use Tailwind
+     utility classes (they live in CSS @keyframes / class declarations).
+     Source of truth: lib/design/motion.ts (MOTION + CEREMONY objects).
+     Named beats: --sys-anim-* alias the corresponding --sys-time-* beat.
+     --sys-anim-thermal is a documented exception: atmospheric ambient shift
+     deliberately slower than `settle` (not a reaction, not a gesture).
+     Sync: motion-sync.test.ts covers --sys-time-*; motion-adoption.test.ts
+     globals.css scanner covers this block.
+     Allow-list exceptions: --sys-anim-thermal (atmospheric, not reactive). */
+  --sys-anim-hover:            var(--sys-time-hover);    /* 200ms — card bg tint on hover */
+  --sys-anim-enter:            var(--sys-time-enter);    /* 300ms — share flash, slot pulse */
+  --sys-anim-reveal:           var(--sys-time-reveal);   /* 700ms — mirror radius breathe, ceremony tier */
+  --sys-anim-linger:           var(--sys-time-linger);   /* 1000ms — candle pulse cycle arm */
+  --sys-anim-settle:           var(--sys-time-settle);   /* 1500ms — box-shadow glow settle */
+  --sys-anim-crossing:         600ms;  /* CEREMONY.crossing — state crossing flash,
+                                          resonance success, archetype reveal.
+                                          Exception: ceremony narrative beat, not interaction. */
+  --sys-anim-resonance:        800ms;  /* resonance shimmer — deliberate between-beat pace.
+                                          Exception: sits between reveal (700) and linger (1000)
+                                          by design — the shimmer lingers just past discovery. */
+  --sys-anim-ceremony-radiant: 900ms;  /* ceremony radiant tier — slow-burn "look at this."
+                                          Exception: sits between reveal/linger — radiant earns
+                                          more time than subtle/present. */
+  --sys-anim-glow-onset:       2000ms; /* thermal glow pulse onset delay (not duration) —
+                                          post-settle warmup so base transition smooths first.
+                                          Exception: ambient atmospheric, not a gesture beat. */
+  --sys-anim-thermal:          3000ms; /* thermal bg/candle shift — atmospheric,
+                                          deliberately slower than settle.
+                                          Exception: room temperature, not gesture. */
+
   --sys-ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
   --sys-ease-sustain: cubic-bezier(0.4, 0.0, 0.2, 1);
   --sys-ease-settle: cubic-bezier(0.0, 0.0, 0.2, 0.5);
@@ -436,7 +467,7 @@
    (width, thumb colour, track) lives in ambient-surfaces.css. */
 html {
   scroll-behavior: smooth;
-  transition: background-color 3s ease-out;
+  transition: background-color var(--sys-anim-thermal) ease-out; /* thermal bg — atmospheric, not reactive */
 }
 
 /* ─── Thermal Transitions ─────────────────────────────────── */
@@ -563,7 +594,7 @@ body {
    See `--sys-elev-whisper` for the static low-alpha gold halo. */
 .thermal-candle {
   box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 12%, transparent);
-  animation: candlePulse 3s ease-in-out infinite;
+  animation: candlePulse var(--sys-anim-thermal) ease-in-out infinite; /* thermal exception — atmospheric candle pacing */
 }
 
 @keyframes candlePulse {
@@ -595,13 +626,13 @@ body {
 
 /* Margin note highlights */
 .mark {
-  transition: background-color 0.2s ease;
+  transition: background-color var(--sys-anim-hover) ease; /* card bg tint = hover beat */
 }
 
 /* Mirror gold glow — warm pulse during shimmer phase */
 .mirror-chromatic h2 {
   text-shadow: 0 0 20px color-mix(in srgb, var(--gold) 30%, transparent);
-  transition: text-shadow 400ms ease-out;
+  transition: text-shadow var(--sys-anim-enter) ease-out; /* text shadow lands on enter beat */
 }
 
 /* ─── Mirror Reveal — Archetype-specific animations ────── */
@@ -639,14 +670,14 @@ body {
 
 /* Archetype label — blur-to-sharp reveal */
 .mirror-archetype-label {
-  animation: archetypeReveal 600ms var(--sys-ease-out) both;
+  animation: archetypeReveal var(--sys-anim-crossing) var(--sys-ease-out) both;
 }
 
 /* Card shimmer — archetype-colored glow + radius breathe */
 .mirror-card-shimmer {
   animation:
-    mirrorRadiusBreathe 0.8s ease-in-out,
-    mirrorGlow 0.8s ease-in-out infinite;
+    mirrorRadiusBreathe var(--sys-anim-reveal) ease-in-out,        /* reveal = deliberate discovery */
+    mirrorGlow var(--sys-anim-reveal) ease-in-out infinite;
 }
 
 /* Share action confirmation — brief gold flash */
@@ -656,7 +687,7 @@ body {
 }
 
 .mirror-share-confirm {
-  animation: shareConfirmFlash 300ms ease-out;
+  animation: shareConfirmFlash var(--sys-anim-enter) ease-out;
 }
 
 /* slideUp, gemAppear, whisperShadow, thermalBreath/Glow/Drift —
@@ -705,7 +736,7 @@ body {
 }
 .card-alive:not(:hover) {
   transition-timing-function: var(--sys-ease-settle);
-  transition-duration: 300ms; /* leave: gentle settle-down */
+  transition-duration: var(--sys-time-enter); /* 300ms leave: gentle settle-down = enter beat */
 }
 
 /* ─── Resonance Alive Card Glow ──────────────────────────────────────────
@@ -748,7 +779,7 @@ body {
 }
 .cta-physical:not(:hover) {
   transition-timing-function: var(--sys-ease-settle);
-  transition-duration: 250ms; /* leave: gentle release */
+  transition-duration: var(--sys-time-enter); /* ~300ms leave: gentle release ≈ enter beat */
 }
 
 /* ─── Skeleton Breath ────────────────────────────────────
@@ -855,6 +886,14 @@ body {
     transition-duration: 0.01ms !important;
   }
   html { scroll-behavior: auto; }
+  /* Scroll-rise stagger delay — zero the per-card delay so cards appear
+     immediately rather than waiting 300ms+ before a 0.01ms animation.
+     The element still arrives (presence preserved); the stagger journey drops.
+     Paul K. gap: animation-duration collapses but delay was not explicitly zeroed.
+     0ms: not 0.01ms — delay ≠ duration; no transitionend to catch here. */
+  [data-sys-enter="rise"] {
+    --rise-delay: 0ms !important;
+  }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;
   }
@@ -918,7 +957,7 @@ body {
    Transition smooths onset when thermal state changes to stirring+. */
 .golden-thread-glow {
   box-shadow: 0 0 4px var(--token-accent);
-  transition: box-shadow 2s ease-out;
+  transition: box-shadow var(--sys-anim-settle) ease-out; /* glow settle — signature patience */
 }
 
 @keyframes goldenThreadGlow {
@@ -940,7 +979,7 @@ body {
 [data-thermal="luminous"] .golden-thread-glow {
   box-shadow: 0 0 6px var(--token-accent),
               0 0 14px color-mix(in srgb, var(--gold) 15%, transparent);
-  animation: goldenThreadGlow var(--token-glow-speed) ease-in-out 2s infinite;
+  animation: goldenThreadGlow var(--token-glow-speed) ease-in-out var(--sys-anim-glow-onset) infinite;
   will-change: box-shadow;
 }
 
@@ -982,7 +1021,7 @@ body {
     color-mix(in srgb, var(--token-accent) 80%, transparent) 0%,
     transparent 70%
   );
-  animation: crossing-bloom 600ms var(--sys-ease-out) forwards;
+  animation: crossing-bloom var(--sys-anim-crossing) var(--sys-ease-out) forwards;
 }
 
 /* Intensity tiers — peak opacity set via CSS custom property. */
@@ -1115,7 +1154,7 @@ body {
    Net deletion: 6 rules → 3, plus the per-thermal overrides drop entirely. */
 .ceremony-subtle .completion-shimmer-track::after {
   opacity: 0.6;
-  animation-duration: 700ms;
+  animation-duration: var(--sys-anim-reveal); /* reveal beat — earned moment */
 }
 .ceremony-subtle {
   box-shadow: var(--sys-elev-whisper);
@@ -1123,7 +1162,7 @@ body {
 
 .ceremony-present .completion-shimmer-track::after {
   opacity: 0.75;
-  animation-duration: 700ms;
+  animation-duration: var(--sys-anim-reveal); /* reveal beat — present = earned visibility */
 }
 .ceremony-present {
   box-shadow: var(--sys-elev-bloom);
@@ -1131,7 +1170,7 @@ body {
 
 .ceremony-radiant .completion-shimmer-track::after {
   opacity: 0.9;
-  animation-duration: 900ms;
+  animation-duration: var(--sys-anim-ceremony-radiant); /* slow burn — earns extra time vs reveal */
 }
 .ceremony-radiant {
   box-shadow: var(--sys-elev-radiance);
@@ -1169,9 +1208,9 @@ body {
   border-color: color-mix(in srgb, var(--gold) 60%, transparent) !important;
   border-radius: var(--sys-radius-wide);
   box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 15%, transparent);
-  transition: border-color 800ms var(--sys-ease-out),
-              border-radius 400ms var(--sys-ease-out),
-              box-shadow 800ms var(--sys-ease-out);
+  transition: border-color var(--sys-anim-reveal) var(--sys-ease-out),  /* reveal = gold border sweeps in */
+              border-radius var(--sys-anim-enter) var(--sys-ease-out),  /* enter = radius closes on entry */
+              box-shadow var(--sys-anim-reveal) var(--sys-ease-out);
 }
 
 /* Gold sweep pseudo-element — one-shot left-to-right. */
@@ -1187,7 +1226,7 @@ body {
     color-mix(in srgb, var(--gold) 40%, transparent) 60%,
     transparent 100%
   );
-  animation: resonanceBorderSweep 800ms var(--sys-ease-out) forwards;
+  animation: resonanceBorderSweep var(--sys-anim-resonance) var(--sys-ease-out) forwards;
 }
 
 @keyframes resonanceBorderSweep {
@@ -1199,7 +1238,7 @@ body {
 /* Quote text glow during shimmer — warm gold text-shadow. */
 .resonance-shimmer > :first-child p {
   text-shadow: 0 0 12px color-mix(in srgb, var(--gold) 20%, transparent);
-  animation: resonanceTextGlow 800ms var(--sys-ease-out) forwards;
+  animation: resonanceTextGlow var(--sys-anim-resonance) var(--sys-ease-out) forwards;
 }
 
 @keyframes resonanceTextGlow {
@@ -1212,7 +1251,7 @@ body {
 
 .resonance-shimmer--subtle .resonance-shimmer-sweep {
   opacity: 0.35;
-  animation-duration: 600ms;
+  animation-duration: var(--sys-anim-crossing); /* crossing beat — subtle acknowledgment */
 }
 .resonance-shimmer--subtle > :first-child {
   box-shadow: 0 0 10px color-mix(in srgb, var(--gold) 8%, transparent);
@@ -1220,7 +1259,7 @@ body {
 
 .resonance-shimmer--warm .resonance-shimmer-sweep {
   opacity: 0.6;
-  animation-duration: 800ms;
+  animation-duration: var(--sys-anim-resonance); /* resonance beat — warm between-beat pace */
 }
 .resonance-shimmer--warm > :first-child {
   box-shadow: 0 0 16px color-mix(in srgb, var(--gold) 15%, transparent);
@@ -1228,7 +1267,7 @@ body {
 
 .resonance-shimmer--rich .resonance-shimmer-sweep {
   opacity: 0.85;
-  animation-duration: 1000ms;
+  animation-duration: var(--sys-anim-linger); /* linger beat — rich = passage-breathing presence */
 }
 .resonance-shimmer--rich > :first-child {
   box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 25%, transparent);
@@ -1268,7 +1307,7 @@ body {
 
 /* Success message — warm gold fade-in replaces bounce. */
 .resonance-success-enter {
-  animation: resonanceSuccessFade 600ms var(--sys-ease-out) both;
+  animation: resonanceSuccessFade var(--sys-anim-crossing) var(--sys-ease-out) both;
 }
 
 @keyframes resonanceSuccessFade {
@@ -1306,7 +1345,7 @@ body {
     0 0 6px var(--gold),
     -2px 0 8px color-mix(in srgb, var(--gold) 40%, transparent),
     -5px 0 12px color-mix(in srgb, var(--gold) 15%, transparent);
-  animation: slotDotPulse 400ms var(--sys-ease-out);
+  animation: slotDotPulse var(--sys-anim-enter) var(--sys-ease-out); /* enter = slot confirms save moment */
 }
 
 @keyframes slotDotPulse {
@@ -1345,7 +1384,8 @@ body {
 .nav-active-link {
   color: var(--mist);
   opacity: 0.8;
-  transition: color 1.5s ease-out, opacity 1.5s ease-out;
+  transition: color var(--sys-anim-settle) ease-out,   /* settle = room arriving at rest */
+              opacity var(--sys-anim-settle) ease-out;
   display: inline-flex;
   align-items: center;
 }
@@ -1379,7 +1419,8 @@ body {
   opacity: 0.5;
   position: relative;
   z-index: 1;
-  transition: background-color 1.5s ease-out, opacity 1.5s ease-out;
+  transition: background-color var(--sys-anim-settle) ease-out,
+              opacity var(--sys-anim-settle) ease-out;
 }
 
 [data-thermal="stirring"] .nav-pulse-core,
@@ -1396,7 +1437,8 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 8px 0 var(--token-accent);
   opacity: 0.4;
-  transition: box-shadow 1.5s ease-out, opacity 1.5s ease-out;
+  transition: box-shadow var(--sys-anim-settle) ease-out,
+              opacity var(--sys-anim-settle) ease-out;
 }
 
 /* Outer aura — 16px wider glow at warm+ */
@@ -1406,7 +1448,8 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 24px 0 var(--token-accent);
   opacity: 0.2;
-  transition: box-shadow 1.5s ease-out, opacity 1.5s ease-out;
+  transition: box-shadow var(--sys-anim-settle) ease-out,
+              opacity var(--sys-anim-settle) ease-out;
 }
 
 /* Pulse animation — synchronized with thermal glow tokens */

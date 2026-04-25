@@ -176,3 +176,103 @@ describe('motion adoption — motion.ts is the one legitimate home', () => {
     expect(src).toMatch(/settle:\s*1500/);
   });
 });
+
+// ─── globals.css orphaned duration guard ──────────────────────────────────
+//
+// The TS/TSX scanners above guard components/ and lib/ against raw time
+// literals. But CSS keyframes and `animation:`/`transition:` declarations
+// in app/globals.css are opaque to those scanners — any hardcoded `Xms` or
+// `X.Xs` in a CSS animation property is a future drift vector that the
+// MOTION vocabulary can never enforce. This scanner closes that gap.
+//
+// Allow-listed exceptions (documented, intentional):
+//   --thread-breathe-duration   — ThreadPulse RAF physics constant (2800ms tide cadence)
+//   --sys-anim-thermal          — atmospheric ambient shift, slower than settle by design
+//   --sys-skeleton-beat         — Skeleton pulse (1000ms = MOTION.linger, CSS-only alias)
+//   --ch-color-dur / --ch-*     — choreography plan vars set by ThermalProvider at runtime
+//
+// Pattern: bare numeric milliseconds in CSS animation/transition VALUE positions
+// (after the property name), outside --sys-* / --ch-* / --token-* / var() refs.
+//
+// Credits: Mike K. (napkin §5 — gap identification, scanner spec),
+//          Paul K. (BA report — "orphaned literals are time bombs"),
+//          Tanya D. (UIX §6 — all durations must map to named custom properties).
+
+describe('motion adoption — globals.css orphaned duration guard', () => {
+  function loadGlobalsCss(): string {
+    return readFileSync(join(ROOT, 'app/globals.css'), 'utf8');
+  }
+
+  function stripComments(src: string): string {
+    return src.replace(/\/\*[\s\S]*?\*\//g, '');
+  }
+
+  /** Strip var(prop, fallback) references — fallback values are CSS safety nets,
+   *  not anonymous magic literals. We do not want to flag them as orphans.
+   *  Example: `var(--rise-delay, 0ms)` → `var(STRIPPED)` */
+  function stripVarFallbacks(line: string): string {
+    return line.replace(/var\([^)]+\)/g, 'var(STRIPPED)');
+  }
+
+  function isAllowListedLine(line: string): boolean {
+    // Exception: --thread-breathe-duration (RAF physics constant, documented)
+    if (/--thread-breathe-duration/.test(line)) return true;
+    // Exception: --sys-anim-* declarations (define named tokens — allow-list the block)
+    if (/--sys-anim-/.test(line)) return true;
+    // Exception: --sys-skeleton-beat (CSS-only alias for MOTION.linger, locked by sync test)
+    if (/--sys-skeleton-beat/.test(line)) return true;
+    // Exception: choreography plan vars (ThermalProvider-controlled, not design beats)
+    if (/--ch-/.test(line)) return true;
+    // Exception: pure CSS custom property declarations (left-hand side)
+    // These define named tokens — their values are the system source, not orphans.
+    if (/^\s*--[\w-]+:/.test(line)) return true;
+    return false;
+  }
+
+  /** 0.01ms is the universal reduced-motion floor constant (MOTION_REDUCED_MS = 10).
+   *  It appears in prefers-reduced-motion blocks and forced-colors blocks.
+   *  It is not a design beat — it is the floor below which animations are imperceptible.
+   *  Allow-list it explicitly so the scanner does not flag accessibility overrides. */
+  function isReducedMotionFloor(line: string): boolean {
+    return /\b0\.01ms\b/.test(line);
+  }
+
+  /** 0ms (zero delay/duration) is trivially zero — not a named beat. Allow-list. */
+  function isTrivialZero(line: string): boolean {
+    return /\b0ms\b/.test(line) && !/\d+0ms\b/.test(line);
+  }
+
+  function findOrphanedDurations(css: string): string[] {
+    const stripped = stripComments(css);
+    const violations: string[] = [];
+    stripped.split('\n').forEach((line, idx) => {
+      if (isAllowListedLine(line)) return;
+      if (isReducedMotionFloor(line)) return;
+      const lineWithoutVars = stripVarFallbacks(line);
+      if (isTrivialZero(lineWithoutVars)) return;
+      // Match bare numeric ms/s values in animation/transition value positions.
+      // Catches: `animation: foo 400ms ...`, `transition: color 0.8s ...`
+      // Does NOT catch: `--sys-*: 120ms` (allow-listed above) or var() refs (stripped).
+      const hasMs = /(?<![a-zA-Z-])\d+ms\b/.test(lineWithoutVars);
+      const hasS  = /(?<![a-zA-Z-])\d+(?:\.\d+)?s\b/.test(lineWithoutVars);
+      if (hasMs || hasS) {
+        violations.push(`  line ${idx + 1}: ${line.trim()}`);
+      }
+    });
+    return violations;
+  }
+
+  it('no orphaned raw ms/s duration literals in animation or transition declarations', () => {
+    const css = loadGlobalsCss();
+    const violations = findOrphanedDurations(css);
+    const message =
+      violations.length > 0
+        ? `\nOrphaned time literals found in app/globals.css:\n` +
+          violations.join('\n') +
+          `\n\nFix: wire to --sys-anim-* (aliasing --sys-time-*) or document the exception.\n` +
+          `See AGENTS.md §Motion Beat Pairing Contract.`
+        : '';
+    expect(violations).toEqual([]);
+    if (violations.length > 0) throw new Error(message);
+  });
+});

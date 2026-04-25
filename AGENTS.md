@@ -37,8 +37,11 @@ Server page that refuses to warm: no thermal tokens on foreground, no archetype 
 ## Reader Loop Funnel
 4 booleans (`resolved · warmed · keepsaked · shared`) + implicit `landed`. One row/session in `loop_funnel`, monotonic flags, zero PII. Client: `useLoopFunnel(articleId, archetype)` — SSR-safe, idempotent, `sendBeacon` first. Server: `POST /api/loop/checkpoint` (zod, 204), `GET /api/loop/funnel` (token-gated). Invisible to reader.
 
+## Motion Beat Pairing
+8 beats (`crossfade`→`settle`, 120ms→1500ms) — each has one semantic role. `crossfade` ≠ `hover` (color vs depth/scale). `settle` = room at rest, never interactive hover. CSS `@keyframes` use `--sys-anim-*` vars (aliasing `--sys-time-*`). Ceremony exceptions: `--sys-anim-crossing`, `--sys-anim-resonance`, `--sys-anim-ceremony-radiant`, `--sys-anim-glow-onset`, `--sys-anim-thermal`. Enforced by `motion-adoption.test.ts` (TS/TSX + CSS scanner).
+
 ## WIP
-- _(none — all 8 ledgers sealed; 8 primitives shipped; voice parity wired; SuspenseFade live on 4 surfaces; loop funnel live; focus-ring corner-parity shipped; `/trust` live; per-threshold crossing micro-ceremonies shipped; Golden Thread tide mark semantics shipped — never retreats, breathes when settled, persists across sessions)_
+- _(none — all 8 ledgers sealed; 8 primitives shipped; voice parity wired; SuspenseFade live on 4 surfaces; loop funnel live; focus-ring corner-parity shipped; `/trust` live; per-threshold crossing micro-ceremonies shipped; Golden Thread tide mark semantics shipped — never retreats, breathes when settled, persists across sessions; motion beat integrity sprint shipped — `duration-crossfade` wired, drift sites fixed, globals.css orphaned durations eliminated, adoption guard extended to CSS)_
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -61,7 +61,11 @@ export default function ExploreArticleCard({
         {/* Tanya §2.4: cards are surfaces, not buttons. Rest → sys-rest
             (grid visibly quieter); hover lift is owned by .card-alive in
             globals.css, so no hover shadow class is needed here. */}
-        <h3 className="font-display text-foreground font-sys-display text-sys-lg mb-sys-3 group-hover:text-gold transition-colors">
+        {/* duration-crossfade (120ms): title color warms before card lifts (200ms).
+            Hierarchy: color signal first → surface responds. Tanya §1.2.
+            text-thermal-accent = var(--token-accent) = violet dormant → gold luminous.
+            Cards warm with the reader — gold is earned, not preset. Tanya §3.1. */}
+        <h3 className="font-display text-foreground font-sys-display text-sys-lg mb-sys-3 group-hover:text-thermal-accent transition-colors duration-crossfade">
           {article.title}
         </h3>
 

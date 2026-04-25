@@ -57,7 +57,7 @@ export function AmbientNav() {
               aria-current={active ? 'page' : undefined}
               // `rounded-sys-soft` pairs with the global :focus-visible ring —
               // the ring inherits the 6px curve (honoring-ring, Tanya #93 §4).
-              className={`rounded-sys-soft px-sys-1 py-sys-1 text-sys-caption tracking-sys-caption transition-colors duration-settle ease-out ${
+              className={`rounded-sys-soft px-sys-1 py-sys-1 text-sys-caption tracking-sys-caption transition-colors duration-crossfade ease-out ${
                 active
                   ? 'nav-active-link'
                   : `text-mist/50 ${accent}`
