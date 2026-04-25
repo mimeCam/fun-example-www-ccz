@@ -40,7 +40,7 @@ export interface UseScrollRiseOptions {
 }
 
 export interface UseScrollRiseReturn {
-  ref: RefObject<HTMLAnchorElement>;
+  ref: RefObject<HTMLElement>;
 }
 
 // ─── Stagger formula ──────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@ export function useScrollRise({
   index,
   disabled = false,
 }: UseScrollRiseOptions): UseScrollRiseReturn {
-  const ref = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<HTMLElement>(null);
   const delay = riseDelay(index);
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export function useScrollRise({
 
 // ─── Internals ────────────────────────────────────────────────────────────────
 
-function scheduleObservation(el: HTMLAnchorElement, delay: number): void {
+function scheduleObservation(el: HTMLElement, delay: number): void {
   const obs = getObserver();
   if (!obs) return;
 
@@ -117,13 +117,13 @@ function scheduleObservation(el: HTMLAnchorElement, delay: number): void {
   obs.observe(el);
 }
 
-function applyRise(el: HTMLAnchorElement, delay: number): void {
+function applyRise(el: HTMLElement, delay: number): void {
   el.removeAttribute('data-sys-rise');
   el.style.setProperty('--rise-delay', `${delay}ms`);
   el.setAttribute('data-sys-enter', 'rise');
 }
 
-function teardown(mountTimer: ReturnType<typeof setTimeout>, el: HTMLAnchorElement): void {
+function teardown(mountTimer: ReturnType<typeof setTimeout>, el: HTMLElement): void {
   clearTimeout(mountTimer);
   entryCallbacks.delete(el);
   sharedObserver?.unobserve(el);

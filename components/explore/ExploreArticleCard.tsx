@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import Link from 'next/link';
 import { Article } from '@/lib/content/ContentTagger';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
@@ -37,7 +38,7 @@ export default function ExploreArticleCard({
 
   return (
     <Link
-      ref={ref}
+      ref={ref as React.RefObject<HTMLAnchorElement>}
       href={`/article/${article.id}`}
       className="block group thermal-radius"
     >

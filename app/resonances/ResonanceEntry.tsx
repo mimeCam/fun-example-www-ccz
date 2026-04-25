@@ -1,12 +1,23 @@
 /**
  * ResonanceEntry — a single resonance card in the Book of You.
  * Two visual states: alive (carrying) with rose glow, or faded (shaped) with dimmed mist.
+ *
+ * Scroll-rise: each card lifts into view via `useScrollRise` when it crosses
+ * 15% visibility. Section-local `index` drives the stagger wave (50ms × i, cap 300ms).
+ * When `index` is undefined, the hook is disabled — no observer, no ref, no timers.
+ *
+ * Opacity fix: the shaped card drops `opacity-recede` (Tanya UIX #64 §3). Its faded
+ * identity is carried by four internal color tokens (bg-surface/30, border-rose/30,
+ * mist/30 gem, no shadow). The wrapper blanket opacity conflicted with scroll-rise's
+ * `animation-fill-mode: both` which ends at opacity:1.
  */
 'use client';
 
+import type React from 'react';
 import { TextLink } from '@/components/shared/TextLink';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 
 interface Props {
@@ -14,6 +25,8 @@ interface Props {
   timeAgo: string;
   faded?: boolean;
   closingLine?: string;
+  /** Section-local position (0-based). Drives stagger delay. Omit to disable animation. */
+  index?: number;
 }
 
 /** Small gem icon for the card label. */
@@ -38,20 +51,23 @@ function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean })
   );
 }
 
-export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine }: Props) {
-  // `shadow-rose-glow` is a tinted accent outside the six-beat ledger
-  // (TINTED_ACCENTS in lib/design/elevation.ts); this file is one of two
-  // allow-listed homes for it — the reader's own voice carrying warmth.
-  // Tanya §4.2: faded row collapses the duet — surface/30 is already stepped
-  // back; the prior bare 0.60 alpha snaps DOWN to `opacity-recede` (0.50) so
-  // the whole row speaks at one "context around the subject" tier.
+export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine, index }: Props) {
+  // Scroll-rise: disabled when index is undefined (backward-compat with call-sites
+  // that don't pass an index). When enabled, hides the card on mount and reveals
+  // it with a 12px lift + opacity fade once 15% of the card enters the viewport.
+  const { ref } = useScrollRise({ index: index ?? 0, disabled: index === undefined });
+
+  // `resonance-card-alive` replaces `shadow-rose-glow`: two-layer box-shadow
+  // (outer belt + inner thermal pulse via `--token-resonance-glow-alive`).
+  // `opacity-recede` removed from `dimmed` — the faded state is carried by
+  // four internal color tokens (Tanya UIX #64 §3). Animation compatibility fix.
   const base = 'rounded-sys-medium p-sys-7 my-sys-8 transition-all duration-enter';
-  const alive = 'bg-surface/60 border-l-4 border-rose shadow-rose-glow';
-  const dimmed = 'bg-surface/30 border-l-4 border-rose/30 opacity-recede';
+  const alive = 'bg-surface/60 border-l-4 border-rose resonance-card-alive';
+  const dimmed = 'bg-surface/30 border-l-4 border-rose/30';
   const cls = `${base} ${faded ? dimmed : alive}`;
 
   return (
-    <div className={cls}>
+    <div ref={ref as React.RefObject<HTMLDivElement>} className={cls}>
       {/* Label */}
       <div className="flex items-center gap-sys-3 mb-sys-4">
         <CardGem faded={faded} />

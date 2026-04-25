@@ -304,6 +304,17 @@
      Physics gate: `lib/design/__tests__/focus-ink-byte-identity.test.ts`. */
   --sys-focus-ink: #7b2cbf;
 
+  /* ─── Resonance Glow — thermal carve-out for alive cards ───────────────
+     Two-layer box-shadow on carrying (alive) resonance cards:
+       outer belt:  0 6px 32px rose/20  (static, always present on alive)
+       inner pulse: var(--token-resonance-glow-alive) (thermal, rises with warmth)
+     `--thermal-rose-glow` is the override slot — ThermalProvider can set it
+     at runtime to intensify the inner pulse as warmth accumulates.
+     Used ONLY via `.resonance-card-alive` class — do not apply elsewhere.
+     Credits: Mike K. (napkin #29 — carve-out pattern),
+              Tanya D. (UIX #64 — rose family, inner-pulse spec). */
+  --token-resonance-glow-alive: var(--thermal-rose-glow, 0 0 12px rgba(251, 113, 133, 0.25));
+
   /* Legacy aliases (kept for backward compat during migration) */
   --background: var(--token-bg);
   --foreground: var(--token-foreground);
@@ -686,6 +697,17 @@ body {
 .card-alive:not(:hover) {
   transition-timing-function: var(--sys-ease-settle);
   transition-duration: 300ms; /* leave: gentle settle-down */
+}
+
+/* ─── Resonance Alive Card Glow ──────────────────────────────────────────
+   Two-layer shadow: outer rose belt (static ambient warmth) +
+   inner thermal pulse from `--token-resonance-glow-alive`.
+   The inner pulse intensifies as `--thermal-rose-glow` rises with warmth.
+   Only carrying (alive) ResonanceEntry cards use this class. */
+.resonance-card-alive {
+  box-shadow:
+    0 6px 32px color-mix(in srgb, var(--rose) 20%, transparent),
+    var(--token-resonance-glow-alive);
 }
 
 /* Curated card alive-state — gold-tinted shadow on hover */

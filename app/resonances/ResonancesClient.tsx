@@ -27,6 +27,7 @@ import { synthesizeClosingLine } from '@/lib/mirror/closing-line-engine';
 import { detectChapterBreak } from '@/lib/mirror/book-whisper-engine';
 import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
+import { ResonanceSectionHeader } from '@/components/resonances/ResonanceSectionHeader';
 import ResonanceExport from './ResonanceExport';
 import { TextLink } from '@/components/shared/TextLink';
 import { Skeleton } from '@/components/shared/Skeleton';
@@ -215,7 +216,7 @@ export default function ResonancesClient() {
                     </p>
                   </div>
                 )}
-                <ResonanceEntry resonance={r} timeAgo={formatTimeAgo(r.createdAt)} />
+                <ResonanceEntry resonance={r} timeAgo={formatTimeAgo(r.createdAt)} index={i} />
                 {/* Data-driven whisper between entries */}
                 {i < carrying.length - 1 && (
                   <EvolutionThread context={contexts[i]} />
@@ -231,13 +232,12 @@ export default function ResonancesClient() {
         <div className="my-sys-11" />
       )}
 
-      {/* Shaped section — faded resonances with closing lines */}
+      {/* Shaped section — faded resonances with closing lines.
+          Section-local index resets to 0 (independent stagger wave). */}
       {shaped.length > 0 && (
         <section className="mb-sys-9">
-          <p className="text-sys-micro uppercase tracking-sys-caption text-gold/40 mb-sys-7">
-            what shaped you
-          </p>
-          {shaped.map((r) => {
+          <ResonanceSectionHeader label="what shaped you" tone="gold" />
+          {shaped.map((r, i) => {
             const closingCtx = buildClosingCtx(r);
             const closing = synthesizeClosingLine(closingCtx);
             return (
@@ -247,6 +247,7 @@ export default function ResonancesClient() {
                 timeAgo={formatTimeAgo(r.createdAt)}
                 faded
                 closingLine={closing}
+                index={i}
               />
             );
           })}
