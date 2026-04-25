@@ -35,6 +35,7 @@ import { join, relative, sep } from 'node:path';
 import {
   RADIUS_LEDGER_EXEMPT_TOKEN,
   RADIUS_ORDER,
+  THERMAL_RADIUS_GRANDFATHERED_PATHS,
 } from '../radius';
 
 const ROOT = join(__dirname, '..', '..', '..');
@@ -144,9 +145,30 @@ function hasInlineRadiusLiteral(src: string): boolean {
   return /style=\{\{[^}]*?\bborderRadius\s*:\s*['"`][\d.]+\s*(px|rem)/.test(src);
 }
 
+/**
+ * Match a raw `.thermal-radius` / `.thermal-radius-wide` class literal —
+ * the rung-level thermal carve-out that is supposed to flow through
+ * `thermalRadiusClassByPosture(posture)` (Mike #35 §4 / Tanya UX #92 §2.1).
+ *
+ * The helper itself returns the literal at runtime, so a file that uses
+ * the helper does NOT carry the raw token in source. The defensive guard
+ * `!src.includes('thermalRadiusClassByPosture')` lets the helper file +
+ * any consumer that imports it pass the fence.
+ */
+const THERMAL_RADIUS_RX = /\bthermal-radius(?:-wide)?\b/;
+
+function hasThermalRadiusRaw(src: string): boolean {
+  return THERMAL_RADIUS_RX.test(src) && !src.includes('thermalRadiusClassByPosture');
+}
+
 // ─── Violation collector (single source of truth) ──────────────────────────
 
-type Kind = 'tw-preset' | 'tw-bare' | 'tw-arbitrary' | 'inline-literal';
+type Kind =
+  | 'tw-preset'
+  | 'tw-bare'
+  | 'tw-arbitrary'
+  | 'inline-literal'
+  | 'tw-thermal-radius';
 
 interface Violation {
   file: string;
@@ -166,7 +188,21 @@ function check(path: string, src: string): Violation[] {
   pushIf(out, hasBareRounded(src),        rel, 'tw-bare');
   pushIf(out, hasArbitraryRounded(src),   rel, 'tw-arbitrary');
   pushIf(out, hasInlineRadiusLiteral(src),rel, 'inline-literal');
+  if (!isThermalRadiusGrandfathered(rel)) {
+    pushIf(out, hasThermalRadiusRaw(src), rel, 'tw-thermal-radius');
+  }
   return out;
+}
+
+/**
+ * Drift receipts that pre-date the helper migration are grandfathered —
+ * one entry shrinks per PR (Mike #35 §4: 14→13 with the Threshold
+ * graduation). Only files NOT on this list are fenced for raw
+ * `thermal-radius`; new drift fails the build on first run with a
+ * posture-vocabulary message (Tanya UX §4.1).
+ */
+function isThermalRadiusGrandfathered(rel: string): boolean {
+  return (THERMAL_RADIUS_GRANDFATHERED_PATHS as readonly string[]).includes(rel);
 }
 
 function findAllViolations(): Violation[] {
@@ -195,6 +231,11 @@ describe('radius adoption — every corner goes through the ledger', () => {
 
   it('no inline style={{ borderRadius: "<n>px" }} literals', () => {
     const hits = violations.filter((v) => v.kind === 'inline-literal');
+    expect(hits.map((v) => v.file)).toEqual([]);
+  });
+
+  it('no unspoken `thermal-radius` literals outside the grandfather list', () => {
+    const hits = violations.filter((v) => v.kind === 'tw-thermal-radius');
     expect(hits.map((v) => v.file)).toEqual([]);
   });
 });
@@ -273,5 +314,55 @@ describe('radius adoption — scanner internals are correct', () => {
   it('hasInlineRadiusLiteral does NOT flag var(--…) references', () => {
     const src = '<div style={{ borderRadius: "var(--sys-radius-wide)" }} />';
     expect(hasInlineRadiusLiteral(src)).toBe(false);
+  });
+
+  it('hasThermalRadiusRaw flags raw `.thermal-radius` and `.thermal-radius-wide`', () => {
+    expect(hasThermalRadiusRaw('className="thermal-radius"')).toBe(true);
+    expect(hasThermalRadiusRaw('className="thermal-radius-wide"')).toBe(true);
+    expect(hasThermalRadiusRaw('thermal-shadow thermal-radius overflow-hidden')).toBe(true);
+  });
+
+  it('hasThermalRadiusRaw passes when the file imports / uses the helper', () => {
+    const src =
+      'import { thermalRadiusClassByPosture } from "@/lib/design/radius";\n' +
+      "const x = thermalRadiusClassByPosture('held');";
+    expect(hasThermalRadiusRaw(src)).toBe(false);
+  });
+
+  it('hasThermalRadiusRaw does NOT flag unrelated thermal-* tokens', () => {
+    expect(hasThermalRadiusRaw('className="thermal-shadow"')).toBe(false);
+    expect(hasThermalRadiusRaw('className="thermal-accent"')).toBe(false);
+  });
+});
+
+// ─── Grandfather list — drift receipts, decrementing per migration ────────
+
+describe('thermal-radius grandfather list — auditable drift, shrinking', () => {
+  it('every entry is a real, readable source path (no dead receipts)', () => {
+    THERMAL_RADIUS_GRANDFATHERED_PATHS.forEach((p) => {
+      expect(() => readFileSync(join(ROOT, p), 'utf8')).not.toThrow();
+    });
+  });
+
+  it('no grandfather entry duplicates an ALLOW-list path (no double-coverage)', () => {
+    THERMAL_RADIUS_GRANDFATHERED_PATHS.forEach((p) => {
+      expect(ALLOW.has(p)).toBe(false);
+    });
+  });
+
+  it('every grandfather entry actually carries a raw thermal-radius token', () => {
+    THERMAL_RADIUS_GRANDFATHERED_PATHS.forEach((p) => {
+      const src = readFileSync(join(ROOT, p), 'utf8');
+      expect(THERMAL_RADIUS_RX.test(src)).toBe(true);
+    });
+  });
+
+  it('the migrated chamber (Threshold.tsx) is OFF the grandfather list', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
+      .not.toContain('components/shared/Threshold.tsx');
+  });
+
+  it('counter shrinks one per PR — current size is 7 (was 8 pre-Threshold)', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(7);
   });
 });

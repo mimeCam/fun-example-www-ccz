@@ -26,6 +26,7 @@ import {
   resolveChamberAnimationClass, resolveBackdropAnimationClass,
   resolveBackdropStyle, resolveChamberExitStyle,
 } from '@/lib/utils/animation-phase';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -55,9 +56,11 @@ const BACKDROP_BASE =
 // // reader-invariant:forced-colors — thermal-shadow dissolves; the chamber gains
 // a `1px solid CanvasText` edge + `2px` outer outline (the "door frame" —
 // Tanya UX #53 §3.3) so it reads as a separate plane from the flat backdrop.
+// `held` posture — the chamber is a contained thing the reader acts on
+// (Tanya UX #92 §2.1 — radius does not warm with score; pixel parity ✓).
 const CHAMBER_BASE =
   'relative pointer-events-auto bg-surface/95 backdrop-blur-sm ' +
-  'thermal-shadow thermal-radius overflow-hidden ' +
+  'thermal-shadow ' + thermalRadiusClassByPosture('held') + ' overflow-hidden ' +
   'forced-colors:outline forced-colors:outline-2 ' +
   'forced-colors:outline-offset-0 forced-colors:outline-[CanvasText]';
 

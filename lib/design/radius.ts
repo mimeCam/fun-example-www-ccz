@@ -124,6 +124,26 @@ export const radiusClassOf = (r: RadiusRungName): string =>
   `rounded-sys-${r}`;
 
 /**
+ * Posture-first alias of `radiusClassOf` — the reviewer answers
+ * *"what is this corner saying?"* in posture vocabulary, this helper
+ * resolves to the rung's `rounded-sys-*` class. Pure. Total over the
+ * four-element posture domain (sync test guards the bijection).
+ */
+export const radiusClassByPosture = (p: RadiusPosture): string =>
+  radiusClassOf(rungByPosture(p));
+
+/**
+ * Thermal-lifted variant — only `held` and `ceremony` carry a thermal
+ * carve-out class today (`.thermal-radius`, `.thermal-radius-wide` in
+ * `app/globals.css`). `label` and `closure` have no thermal corner by
+ * design (Tanya §4 — radius is the slowest ledger). Pure, total over
+ * its declared two-element domain.
+ */
+export const thermalRadiusClassByPosture = (
+  p: Extract<RadiusPosture, 'held' | 'ceremony'>,
+): string => (p === 'held' ? 'thermal-radius' : 'thermal-radius-wide');
+
+/**
  * Thermal-lift CSS var reference — exposes `--token-radius-soft` to TS
  * callers who compose it (e.g. the mirrorRadiusBreathe keyframe).
  * `0rem` fallback matches the dormant anchor, making the carve-out
@@ -224,3 +244,31 @@ export const THERMAL_RADIUS_VAR = '--token-radius-soft';
  * token is drift.
  */
 export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
+
+// ─── Thermal-radius drift grandfather — shrinks one entry per PR ───────────
+
+/**
+ * Files that still ship a raw `.thermal-radius` / `.thermal-radius-wide`
+ * class literal while the helper migration walks file-by-file. The
+ * adoption guard fences NEW drift hard; this list grandfathers the
+ * pre-migration callsites so the test stays green between graduations.
+ *
+ * Reviewer mantra: **decrement, do not add.** An entry leaves when the
+ * file flips to `thermalRadiusClassByPosture(...)`. A PR that adds an
+ * entry is failing the literacy contract — the fence exists to fail
+ * loudly the moment a new corner becomes unspoken.
+ *
+ * Pre-Threshold migration this list carried 8 entries; the chamber's
+ * graduation drops it to 7. Counter (occurrences across `.ts/.tsx/.css`
+ * source — Mike napkin §4): 14 → 13 with this PR. (Mike #35 §8/§5,
+ * Tanya UX §6 — the chamber is ceremony, the corner stays held.)
+ */
+export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [
+  'app/mirror/page.tsx',
+  'components/explore/ExploreArticleCard.tsx',
+  'components/mirror/MirrorLoadingSurface.tsx',
+  'components/mirror/MirrorRevealCard.tsx',
+  'components/mirror/QuickMirrorCard.tsx',
+  'components/return/ReturnLetter.tsx',
+  'lib/utils/press-phase.ts',
+] as const;
