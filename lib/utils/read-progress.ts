@@ -34,6 +34,16 @@
  * must never move unless the reader moves" as the structural rule).
  */
 
+// ─── Substrate import — single source of `{N} min read` ─────────────────
+//
+// `formatReadingTime` (lib/utils/reading-time.ts) is the canonical place
+// the literal `min read` is stamped — the static substrate, with edge
+// cases (`0 → "No content"`, `1 → "1 min read"`, otherwise `${N} min
+// read`) and a discoverable name. The dynamic resolver below composes on
+// top of it; the dependency arrow points down, never up. (Mike #35 §0,
+// Elon "static is substrate; dynamic composes".)
+import { formatReadingTime } from './reading-time';
+
 // ─── Constants — pinned, documented, grep-stable ────────────────────────
 
 /**
@@ -62,9 +72,15 @@ export const TESTIMONY = 'read';
 
 // ─── Tiny pure formatters — each ≤ 10 LOC ───────────────────────────────
 
-/** State 0 · `{readTime} min read` — byte-identical to today's literal. */
+/**
+ * State 0 · byte-identical to `formatReadingTime(readTime)`, which it
+ * delegates to. The static substrate owns the literal `min read`; this
+ * resolver composes on top, so a future tweak (e.g. `0 → "No content"`,
+ * `1 → "1 min read"`) reaches the caption automatically. (Mike #35 §5
+ * "Points of interest" #1 + #6.)
+ */
 export function formatPromise(readTime: number): string {
-  return `${readTime} min read`;
+  return formatReadingTime(readTime);
 }
 
 /**

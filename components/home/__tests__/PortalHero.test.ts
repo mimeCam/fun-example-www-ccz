@@ -24,6 +24,8 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 
+import { formatReadingTime } from '@/lib/utils/reading-time';
+
 // Imported via require() to keep the test layer parallel to ReadersMark.test.ts.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const PortalHero = require('../PortalHero').default;
@@ -200,5 +202,30 @@ describe('PortalHero · SSR render shape — Trust at the Threshold', () => {
     const paragraphs = html.match(/typo-passage/g) ?? [];
     expect(paragraphs.length).toBeGreaterThanOrEqual(1);
     expect(paragraphs.length).toBeLessThanOrEqual(2);
+  });
+});
+
+// ─── 3 · publisher's promise · substrate + token contract ────
+
+describe('PortalHero · duration label · substrate & tokens (Tanya §3, Mike §35)', () => {
+  it('renders a duration string the substrate would produce', () => {
+    const html = renderToStaticMarkup(createElement(PortalHero, { article: PLAIN }));
+    // PLAIN's word-count is small — substrate floors at 1 min for any
+    // non-empty content, so the rendered string must equal `formatReadingTime(N)`.
+    // We assert the *shape* (`/^\d+ min read$|^1 min read$/`) flows through
+    // the substrate by sampling its output for the same input range.
+    const candidates = [1, 2, 3, 4, 5].map(formatReadingTime);
+    const found = candidates.some((s) => html.includes(s));
+    expect(found).toBe(true);
+  });
+
+  it('duration line carries `tabular-nums` (digits never wobble)', () => {
+    const html = renderToStaticMarkup(createElement(PortalHero, { article: PLAIN }));
+    expect(html).toMatch(/tabular-nums/);
+  });
+
+  it('duration line carries `tracking-sys-caption` (caption attitude)', () => {
+    const html = renderToStaticMarkup(createElement(PortalHero, { article: PLAIN }));
+    expect(html).toMatch(/tracking-sys-caption/);
   });
 });

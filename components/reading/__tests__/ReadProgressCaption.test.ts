@@ -30,6 +30,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { ReadProgressCaption } from '../ReadProgressCaption';
+import { formatReadingTime } from '@/lib/utils/reading-time';
 
 // ─── 1 · SSR render shape · byte-identical to today’s literal ────────────
 
@@ -109,6 +110,40 @@ describe('ReadProgressCaption · print/screen split', () => {
       createElement(ReadProgressCaption, { readTime: 7 }),
     );
     expect(html).toMatch(/font-variant-numeric:\s*tabular-nums/);
+  });
+
+  it('print fallback carries `tabular-nums` class (paper digit metric)', () => {
+    const html = renderToString(
+      createElement(ReadProgressCaption, { readTime: 7 }),
+    );
+    // Ensure the print-only span specifically carries tabular-nums as a
+    // class — Tanya §4c paper/screen digit-metric parity.
+    expect(html).toMatch(
+      /class="[^"]*print-only[^"]*tabular-nums[^"]*"|class="[^"]*tabular-nums[^"]*print-only[^"]*"/,
+    );
+  });
+
+  it('print fallback carries `tracking-sys-caption` class (caption attitude)', () => {
+    const html = renderToString(
+      createElement(ReadProgressCaption, { readTime: 7 }),
+    );
+    expect(html).toMatch(
+      /class="[^"]*print-only[^"]*tracking-sys-caption[^"]*"|class="[^"]*tracking-sys-caption[^"]*print-only[^"]*"/,
+    );
+  });
+
+  it('print fallback string matches `formatReadingTime` byte-for-byte', () => {
+    // Print parity is a deliverable (Mike §35 §5 #5 — paper is a surface).
+    // The substrate handles the `1 → "1 min read"` edge case; the print
+    // fallback now flows through it.
+    const oneHtml = renderToString(
+      createElement(ReadProgressCaption, { readTime: 1 }),
+    );
+    expect(oneHtml).toContain(formatReadingTime(1));
+    const tenHtml = renderToString(
+      createElement(ReadProgressCaption, { readTime: 10 }),
+    );
+    expect(tenHtml).toContain(formatReadingTime(10));
   });
 });
 

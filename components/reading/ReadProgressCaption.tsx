@@ -65,6 +65,7 @@ import {
   readProgressKey,
   type ReadProgressKey,
 } from '@/lib/utils/read-progress';
+import { formatReadingTime } from '@/lib/utils/reading-time';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useGenuineCompletion } from '@/lib/hooks/useGenuineCompletion';
 import { SKELETON_ENTER_ATTR } from '@/lib/design/skeleton';
@@ -138,10 +139,18 @@ function ScreenCaption({
 
 /**
  * Print-side caption. Always state 0. Reader-invariant on paper because
- * paper has no scroll position; states 1 and 2 would be incoherent.
+ * paper has no scroll position; states 1 and 2 would be incoherent. The
+ * string flows from the substrate `formatReadingTime` so paper and
+ * screen wear the same edge cases (Mike #35 §5 #5 — print parity is a
+ * deliverable). `tabular-nums` + `tracking-sys-caption` keep the digit
+ * metric and caption-voice identical to the hero & card (Tanya §4c).
  */
 function PrintCaption({ readTime }: { readTime: number }): JSX.Element {
-  return <span className="print-only">{readTime} min read</span>;
+  return (
+    <span className="print-only tracking-sys-caption tabular-nums">
+      {formatReadingTime(readTime)}
+    </span>
+  );
 }
 
 // ─── Style atoms — pinned, hoisted, no per-render allocation ─────────────

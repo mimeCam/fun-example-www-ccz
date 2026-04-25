@@ -41,6 +41,7 @@ import {
   TESTIMONY,
   type ReadProgressInput,
 } from '../read-progress';
+import { formatReadingTime } from '../reading-time';
 
 // ─── 1 · SSR parity at maxDepth=0, isComplete=false ──────────────────────
 
@@ -58,6 +59,36 @@ describe('formatReadProgress · state 0 (publisher promise) · SSR parity', () =
 
   it('uses `formatPromise` directly when state 0 fires (single source)', () => {
     expect(formatReadProgress(7, 0, false)).toBe(formatPromise(7));
+  });
+});
+
+// ─── 1b · `formatPromise` is byte-equal to the substrate · single source ─
+
+/**
+ * The dynamic resolver does not duplicate the literal `min read`; it
+ * delegates to the static substrate (`formatReadingTime`). This test pins
+ * the delegation byte-for-byte across the inputs the substrate handles
+ * specially — `0 → "No content"`, `1 → "1 min read"`, otherwise
+ * `${N} min read`. If a future PR re-introduces a literal here, this
+ * test plus the promise-centrality guard catch it from two sides.
+ *
+ * Mike #35 §6 acceptance #2: the byte-parity test reinforces the SSR
+ * parity contract pinned in the state-0 block above.
+ */
+describe('formatPromise · delegates to formatReadingTime · byte-parity', () => {
+  it.each([0, 1, 5, 15, 60])(
+    'formatPromise(%i) === formatReadingTime(%i)',
+    (n) => {
+      expect(formatPromise(n)).toBe(formatReadingTime(n));
+    },
+  );
+
+  it('inherits substrate edge case · 0 → "No content"', () => {
+    expect(formatPromise(0)).toBe('No content');
+  });
+
+  it('inherits substrate edge case · 1 → "1 min read"', () => {
+    expect(formatPromise(1)).toBe('1 min read');
   });
 });
 

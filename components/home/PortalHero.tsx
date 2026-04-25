@@ -23,6 +23,7 @@
 import type { Article } from '@/lib/content/ContentTagger';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import { stripMarkdownTokens, collapseWhitespace } from '@/lib/content/excerpt';
+import { formatReadingTime } from '@/lib/utils/reading-time';
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -70,8 +71,13 @@ export default function PortalHero({ article }: { article: Article }) {
         {article.title}
       </h1>
 
-      <p className="text-mist text-sys-caption mt-sys-4 tracking-sys-caption">
-        {readTime} min read
+      {/* Duration label — the publisher's promise. Tokens align with
+          Tanya §3: `tracking-sys-caption` (caption attitude),
+          `tabular-nums` (digits never wobble). The string itself flows
+          from the substrate `formatReadingTime` so paper, hero, card,
+          and caption all wear one voice. */}
+      <p className="text-mist text-sys-caption mt-sys-4 tracking-sys-caption tabular-nums">
+        {formatReadingTime(readTime)}
       </p>
 
       <div className="border-t border-fog mt-sys-8 mb-sys-8 mx-auto max-w-xs" />

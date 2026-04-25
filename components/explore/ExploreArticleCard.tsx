@@ -6,6 +6,7 @@ import { Article } from '@/lib/content/ContentTagger';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import { excerpt } from '@/lib/content/excerpt';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
+import { formatReadingTime } from '@/lib/utils/reading-time';
 
 interface ExploreArticleCardProps {
   article: Article;
@@ -80,8 +81,16 @@ export default function ExploreArticleCard({
           </p>
         )}
 
-        <div className="flex items-center gap-sys-3 text-sys-micro text-mist/60">
-          <span>{minutes} min read</span>
+        {/* Card metadata row — the duration recedes one alpha-ledger rung
+            below the hero (`quiet` = 70%) so it reads as "content, but
+            not THE content" (Tanya §3, alpha ledger §quiet). The
+            duration span carries `tracking-sys-caption tabular-nums` so
+            the caption-voice and digit-column match the hero & article
+            caption. */}
+        <div className="flex items-center gap-sys-3 text-sys-micro text-mist/70">
+          <span className="tracking-sys-caption tabular-nums">
+            {formatReadingTime(minutes)}
+          </span>
           {showWorldview && article.worldview && (
             <>
               <span className="text-mist/30">·</span>
