@@ -12,6 +12,7 @@ import { NextRead } from '@/components/reading/NextRead';
 import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
 import { ReadersMark } from '@/components/reading/ReadersMark';
 import { ArticleProvenance } from '@/components/reading/ArticleProvenance';
+import { ReadProgressCaption } from '@/components/reading/ReadProgressCaption';
 import { CeremonySequencer } from '@/components/reading/CeremonySequencer';
 import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
@@ -183,7 +184,9 @@ function ArticleHeader({ title, readTime }: { title: string; readTime: number })
       <h1 className="font-display text-sys-h2 font-sys-display text-foreground typo-display">
         {title}
       </h1>
-      <p className="text-mist text-sys-caption mt-sys-3">{readTime} min read</p>
+      <p className="text-mist text-sys-caption mt-sys-3">
+        <ReadProgressCaption readTime={readTime} />
+      </p>
     </header>
   );
 }
