@@ -18,6 +18,9 @@
  * Elon M. (semantic floor as a number, not prose), Mike K. (napkin §1).
  */
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
 import { contrast, compositeOver, luminance } from '@/lib/design/contrast';
 import {
   computeThermalTokens,
@@ -25,6 +28,9 @@ import {
   ACCENT_OPACITY,
 } from '@/lib/thermal/thermal-tokens';
 import { ARCHETYPE } from '@/lib/design/color-constants';
+
+const AMBIENT_CSS_PATH = join(__dirname, '..', 'ambient-surfaces.css');
+const AMBIENT_CSS = readFileSync(AMBIENT_CSS_PATH, 'utf8');
 
 // ─── Matrix axes ──────────────────────────────────────────────────────────
 
@@ -281,5 +287,60 @@ describe('ambient-surfaces · prefers-contrast: more · structural invariants', 
       expect(clamped['--token-glow']).toBe('none');
       expect(clamped['--token-text-glow']).toBe('none');
     }
+  });
+});
+
+// ─── Right-edge stillness · scrollbar-gutter: stable ─────────────────────
+//
+// Four sealed assertions on the source CSS (Mike §1, Tanya §10):
+//   1. The declaration `scrollbar-gutter: stable` exists in the file.
+//   2. It is `stable` only — never `stable both-edges` (would shift the
+//      LTR-content edge and break the Golden Thread's left invariant).
+//   3. It is declared inside the top-level `html { … }` chorus block —
+//      the same root anchor that owns `scrollbar-width` and
+//      `scrollbar-color`.
+//   4. It is declared exactly once in the source (no drift).
+//
+// Greppable test name (Elon §2.3) — at 2 AM an engineer searches for
+// "scrollbar-gutter" and finds this block.
+
+/** Strip CSS block comments — keep declarations honest, comments inert. */
+function stripCssComments(css: string): string {
+  return css.replace(/\/\*[\s\S]*?\*\//g, '');
+}
+
+/**
+ * The chorus `html { … }` block — uniquely identified by `scrollbar-width`.
+ * Skips the `@media (forced-colors: active)` html block (which only carries
+ * `scrollbar-color: auto`). Returns the body or null when not found.
+ */
+function findChorusHtmlBlock(css: string): string | null {
+  const stripped = stripCssComments(css);
+  const re = /html\s*\{([^}]*scrollbar-width[^}]*)\}/m;
+  const match = re.exec(stripped);
+  return match ? match[1] : null;
+}
+
+describe('ambient-surfaces · scrollbar-gutter-stable · right-edge stillness', () => {
+  const STRIPPED = stripCssComments(AMBIENT_CSS);
+
+  it('declares `scrollbar-gutter: stable` somewhere in the file', () => {
+    expect(STRIPPED).toMatch(/scrollbar-gutter\s*:\s*stable\b/);
+  });
+
+  it('uses single-edge `stable`, never `stable both-edges`', () => {
+    expect(STRIPPED).not.toMatch(/scrollbar-gutter\s*:[^;]*both-edges/);
+  });
+
+  it('lives inside the chorus `html { … }` block, beside scrollbar-width', () => {
+    const htmlBlock = findChorusHtmlBlock(AMBIENT_CSS);
+    expect(htmlBlock).not.toBeNull();
+    expect(htmlBlock as string).toMatch(/scrollbar-gutter\s*:\s*stable\b/);
+    expect(htmlBlock as string).toMatch(/scrollbar-width\s*:\s*thin\b/);
+  });
+
+  it('declares scrollbar-gutter exactly once in the file', () => {
+    const matches = STRIPPED.match(/scrollbar-gutter\s*:/g) ?? [];
+    expect(matches).toHaveLength(1);
   });
 });

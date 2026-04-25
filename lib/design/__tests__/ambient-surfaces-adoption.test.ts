@@ -94,6 +94,10 @@ function hasScrollbarColor(src: string): boolean {
   return /\bscrollbar-color\s*:/.test(src);
 }
 
+function hasScrollbarGutter(src: string): boolean {
+  return /\bscrollbar-gutter\s*:/.test(src);
+}
+
 function hasCaretColor(src: string): boolean {
   // Matches bare `caret-color:` declarations, including Tailwind-bracket
   // utilities like `[caret-color:var(--token-accent)]`.
@@ -111,7 +115,7 @@ function hasMarkerPseudo(src: string): boolean {
 // ─── Violation collector (single source of truth) ──────────────────────────
 
 type Kind =
-  | 'selection' | 'scrollbar-pseudo' | 'scrollbar-color'
+  | 'selection' | 'scrollbar-pseudo' | 'scrollbar-color' | 'scrollbar-gutter'
   | 'caret-color' | 'placeholder' | 'marker';
 
 interface Violation { file: string; kind: Kind }
@@ -127,6 +131,7 @@ function check(path: string, raw: string): Violation[] {
     ...checkOne(rel, hasSelectionPseudo(src), 'selection'),
     ...checkOne(rel, hasScrollbarPseudo(src), 'scrollbar-pseudo'),
     ...checkOne(rel, hasScrollbarColor(src), 'scrollbar-color'),
+    ...checkOne(rel, hasScrollbarGutter(src), 'scrollbar-gutter'),
     ...checkOne(rel, hasCaretColor(src), 'caret-color'),
     ...checkOne(rel, hasPlaceholderPseudo(src), 'placeholder'),
     ...checkOne(rel, hasMarkerPseudo(src), 'marker'),
@@ -154,6 +159,11 @@ describe('ambient-surfaces adoption — one file owns gesture-chrome', () => {
 
   it('no `scrollbar-color:` outside ambient-surfaces.css', () => {
     expect(violations.filter((v) => v.kind === 'scrollbar-color').map((v) => v.file))
+      .toEqual([]);
+  });
+
+  it('no `scrollbar-gutter:` outside ambient-surfaces.css', () => {
+    expect(violations.filter((v) => v.kind === 'scrollbar-gutter').map((v) => v.file))
       .toEqual([]);
   });
 

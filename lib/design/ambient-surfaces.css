@@ -97,9 +97,19 @@
 /* ─── Chorus: scrollbar ─────────────────────────────────────
  * Linear (not boosted) 16% → 28% alpha — ambient, not semantic.
  * Radius stays at --sys-radius-full at every thermal stop: the room
- * warms, the pebble does not grow (Tanya §7). */
+ * warms, the pebble does not grow (Tanya §7).
+ *
+ * `scrollbar-gutter: stable` // reader-invariant
+ * Reserves the scrollbar gutter unconditionally so viewport width does not
+ * jump between routes; protects fixed right-edge primitives (AmbientNav,
+ * Threshold, toast portal) from a 15px reflow on tall↔short navigation.
+ * Single edge — `stable both-edges` would create an asymmetric canvas in
+ * an LTR layout (Tanya §6, Elon/Jason agreement). The `lib/utils/scroll-
+ * lock.ts` compensation pad degrades to ~0 once the gutter is reserved;
+ * helper stays as the safety net for legacy Safari ≤15. */
 html {
   scrollbar-width: thin;
+  scrollbar-gutter: stable;
   scrollbar-color:
     color-mix(
       in srgb,
