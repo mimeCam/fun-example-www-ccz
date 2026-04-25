@@ -21,7 +21,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — Thread Keepsake lets readers share a unique artifact of *their* read.
 
 ## Design System
-8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index). 8 shared primitives. Pair rule: adding a 9th ledger or primitive means shipping sync + adoption tests in the same PR. Accessibility queries flow through `// reader-invariant` surfaces — they clarify, they do not warm.
+8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index). 8 shared primitives. Pair rule: adding a 9th ledger or primitive means shipping sync + adoption tests in the same PR. Radius rungs carry a typed `posture` field (`label · held · ceremony · closure`) — reviewer asks "what is this corner saying?" before reaching for a pixel. Accessibility queries flow through `// reader-invariant` surfaces — they clarify, they do not warm.
 
 ## WIP
 - *(none)*
@@ -32,9 +32,6 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
   `types/filter.ts` + `lib/design/worldview.ts` together. Per Tanya UX #58 §4,
   chip stays the only surface that paints worldview hue — no smear into
   `ResonanceEntry` / `EvolutionThread` / Mirror.
-- Audit small-radius pill shapes (chips, badges, tags, toast pills) for
-  consistent `rounded-sys-soft` resolution (Tanya UX #58 §5 — flagged for a
-  future polish pass, not this sprint).
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

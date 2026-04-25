@@ -13,6 +13,10 @@
  *   - `--sys-radius-*` declarations do NOT reference `--sys-tick`, `rem`-
  *     typography beats, or any other ledger's unit space (Tanya's "radius
  *     is the slowest-moving ledger" rule expressed as a non-link)
+ *   - posture grammar (Mike napkin §6 / Tanya §4.1): exactly four postures
+ *     exist, the vocabulary is `{ label, held, ceremony, closure }`, every
+ *     rung carries one posture, and `postureOf`/`rungByPosture` are
+ *     round-trip inverses over the four-element domain.
  *
  * Mirrors the strategy of `spacing-sync.test.ts` and `elevation-sync.test.ts`.
  * No build step, no codegen — a plain regex read from disk at test time.
@@ -30,12 +34,16 @@ import { resolve } from 'path';
 import {
   RADIUS,
   RADIUS_ORDER,
+  RADIUS_POSTURE_ORDER,
   RadiusRungName,
+  RadiusPosture,
   REM_TO_PX,
   rungOf,
   cssVarOf,
   radiusClassOf,
   liftVar,
+  postureOf,
+  rungByPosture,
   radiusInvariantHolds,
   RADIUS_LEDGER_EXEMPT_TOKEN,
   THERMAL_RADIUS_VAR,
@@ -123,6 +131,37 @@ describe('RADIUS structural invariants', () => {
   });
 });
 
+describe('RADIUS posture grammar — typed field, not folklore', () => {
+  it('exactly four postures exist (cardinality lock)', () => {
+    expect(RADIUS_POSTURE_ORDER.length).toBe(4);
+    expect(new Set(RADIUS_POSTURE_ORDER).size).toBe(4);
+  });
+
+  it('the posture vocabulary is { label, held, ceremony, closure }', () => {
+    expect(RADIUS_POSTURE_ORDER).toEqual(
+      ['label', 'held', 'ceremony', 'closure'],
+    );
+  });
+
+  it('every rung carries a posture from the locked vocabulary', () => {
+    RADIUS_ORDER.forEach((r) => {
+      expect(RADIUS_POSTURE_ORDER).toContain(RADIUS[r].posture);
+    });
+  });
+
+  it('posture is a bijection — each appears on exactly one rung', () => {
+    const seen = RADIUS_ORDER.map((r) => RADIUS[r].posture);
+    expect(new Set(seen).size).toBe(RADIUS_ORDER.length);
+  });
+
+  it('soft → medium → wide → full maps 1:1 to label → held → ceremony → closure', () => {
+    expect(RADIUS.soft.posture).toBe('label');
+    expect(RADIUS.medium.posture).toBe('held');
+    expect(RADIUS.wide.posture).toBe('ceremony');
+    expect(RADIUS.full.posture).toBe('closure');
+  });
+});
+
 describe('radius helpers', () => {
   it('rungOf returns the rung record for each name', () => {
     RADIUS_ORDER.forEach((r) => expect(rungOf(r)).toBe(RADIUS[r]));
@@ -146,6 +185,34 @@ describe('radius helpers', () => {
 
   it('THERMAL_RADIUS_VAR lines up with liftVar() output', () => {
     expect(liftVar()).toContain(THERMAL_RADIUS_VAR);
+  });
+
+  it('postureOf returns the typed posture for each rung', () => {
+    expect(postureOf('soft')).toBe('label');
+    expect(postureOf('medium')).toBe('held');
+    expect(postureOf('wide')).toBe('ceremony');
+    expect(postureOf('full')).toBe('closure');
+  });
+
+  it('rungByPosture is the inverse of postureOf (round-trip)', () => {
+    RADIUS_ORDER.forEach((r) => {
+      expect(rungByPosture(postureOf(r))).toBe(r);
+    });
+    RADIUS_POSTURE_ORDER.forEach((p) => {
+      expect(postureOf(rungByPosture(p))).toBe(p);
+    });
+  });
+
+  it('rungByPosture maps each locked posture word to its rung', () => {
+    const expected: Record<RadiusPosture, RadiusRungName> = {
+      label: 'soft',
+      held: 'medium',
+      ceremony: 'wide',
+      closure: 'full',
+    };
+    RADIUS_POSTURE_ORDER.forEach((p) => {
+      expect(rungByPosture(p)).toBe(expected[p]);
+    });
   });
 
   it('the exempt token is the string the scanner looks for', () => {
