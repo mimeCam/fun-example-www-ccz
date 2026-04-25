@@ -23,10 +23,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index). 8 shared primitives. Pair rule: adding a 9th ledger or primitive means shipping sync + adoption tests in the same PR. Accessibility queries flow through `// reader-invariant` surfaces — they clarify, they do not warm.
 
 ## WIP
-No outstanding work-in-progress. Follow-ups (each its own PR — pair rule):
-WhisperFooter `text-mist/60` snap to `quiet`, MirrorRevealCard inline
-`opacity` → `opacity-quiet` class, Mirror loading skeleton routed through
-shared Skeleton primitive (TODO in `app/mirror/page.tsx`).
+No outstanding work-in-progress.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

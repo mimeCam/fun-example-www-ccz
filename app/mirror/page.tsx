@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useMirror } from '@/lib/hooks/useMirror';
 import { GemHome } from '@/components/navigation/GemHome';
 import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
+import MirrorLoadingSurface from '@/components/mirror/MirrorLoadingSurface';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { EmptySurface } from '@/components/shared/EmptySurface';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
@@ -80,17 +81,17 @@ export default function MirrorPage() {
   );
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center">
+    <div className="min-h-screen p-sys-8">
       <GemHome />
-      {/* Loading skeleton — alpha-ledger snap: `border-primary/30` is the
-          `muted` rung (0.30), the documented home for "ambient chrome,
-          skip past it" — matches what a loading surface IS. The gradient
-          stops `from-primary/20 to-secondary/10` are not reachable by
-          the alpha-adoption regex (which carves out gradient-stop
-          dialects to Color, not Alpha). // TODO: route this loading
-          surface through the shared <Skeleton> primitive in a follow-up
-          (would also retire the bespoke animate-mirror-pulse keyframe). */}
-      <div className="animate-mirror-pulse w-80 h-96 thermal-radius bg-gradient-to-b from-primary/20 to-secondary/10 border border-primary/30" />
+      {/* Loading surface — routed through <Skeleton variant="card"> with
+          geometry pinned to MirrorRevealCard (max-w-md, thermal-radius-wide,
+          p-sys-8). Cadence flows through `.sys-skeleton` (MOTION.linger);
+          reduced-motion floor lands at ALPHA.muted (Tanya UX #47 §3.1). No
+          archetype pre-promise: surface is `bg-surface`, no border, no
+          shadow, no gradient — the reveal earns those when it arrives. */}
+      <div className="flex flex-col items-center justify-center min-h-[85vh]">
+        <MirrorLoadingSurface />
+      </div>
     </div>
   );
 

@@ -198,9 +198,12 @@ const config: Config = {
         'content-lock-breath': 'contentLockBreath 3s ease-in-out infinite',
         'resonance-remembered': 'resonanceRemembered 1s ease-out',
         'portal-glow': 'portalGlow 3s ease-in-out infinite',
-        // Mirror reveal — gold glow pulse (2 cycles during shimmer phase)
+        // Mirror reveal — gold glow pulse (2 cycles during shimmer phase).
+        // `mirror-pulse` retired with the bespoke /mirror loading surface
+        // (Mike napkin #19): the loading branch now routes through the
+        // shared <Skeleton variant="card"> primitive, so the breath cadence
+        // matches every other loading surface on the site (`MOTION.linger`).
         'mirror-shimmer': 'mirrorGlow 0.8s ease-in-out infinite',
-        'mirror-pulse': 'mirrorGlow 1.5s ease-in-out infinite',
         // QuickMirrorCard — 2-cycle gold glow during emergence
         'quick-mirror-glow': 'quickMirrorPulse 600ms ease-in-out 2',
         // Discovery — one-shot gold-to-cyan border transition

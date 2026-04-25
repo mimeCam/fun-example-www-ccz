@@ -15,6 +15,15 @@ import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import { useMirrorPhases, MIRROR_PAGE_TIMINGS, type Phase } from '@/lib/hooks/useMirrorPhases';
 import ShareOverlay from './ShareOverlay';
 import { MOTION } from '@/lib/design/motion';
+import { alphaClassOf } from '@/lib/design/alpha';
+
+/* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
+   Pinned at module scope so the `phaseClass` map below stays a plain
+   Record<Phase,string> and Tailwind's JIT sees every literal in source.
+   Mike napkin #19 §4.2 — pair-rule: all four phases share one rung family. */
+const BORDER_HAIRLINE = alphaClassOf('gold', 'hairline', 'border'); // border-gold/10
+const BORDER_MUTED    = alphaClassOf('gold', 'muted',    'border'); // border-gold/30
+const WHISPER_TEXT    = alphaClassOf('foreground', 'quiet', 'text'); // text-foreground/70
 
 interface Props {
   mirror: ReaderMirror;
@@ -70,8 +79,10 @@ function ArchetypeName({ label, visible, color }: {
 }
 
 function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
+  // Alpha ledger: `quiet` (0.70) — "content, but not THE content."
+  // The whisper is a quote; archetype name above is THE content. /80 was drift.
   return (
-    <p className={`mt-sys-3 text-sys-caption text-foreground/80 italic max-w-card-body
+    <p className={`mt-sys-3 text-sys-caption ${WHISPER_TEXT} italic max-w-card-body
       mx-auto typo-caption transition-all duration-fade ${fadeClass(visible)}`}
       style={fadeStyle(visible, MOTION.enter)}>
       &ldquo;{text}&rdquo;
@@ -97,12 +108,16 @@ function phaseClass(p: Phase): string {
   // alpha-ledger:exempt — motion fade endpoints (hidden → shimmer/reveal/rest).
   // `emergence` uses `opacity-quiet` (0.70) — the "content-but-not-the-content"
   // rung — so the card is legible at that tier before shimmer brings full presence.
+  // Borders: hairline (0.10) on emergence, muted (0.30) on shimmer/reveal/rest —
+  // pair-rule (Mike napkin #19): every "earned-attention" phase shares ONE rung.
+  // Drift /20 was a tie-break to `muted`, not `hairline`, because shimmer/reveal
+  // are attention-EARNING states, not chrome (Mike §4.2).
   const map: Record<Phase, string> = {
     hidden:    'opacity-0 translate-y-enter-md border-transparent',
-    emergence: 'opacity-quiet translate-y-0 border-gold/10',
-    shimmer:   'opacity-100 translate-y-0 border-gold/20 mirror-card-shimmer',
-    reveal:    'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
-    rest:      'opacity-100 translate-y-0 border-gold/20 shadow-sys-bloom',
+    emergence: `opacity-quiet translate-y-0 ${BORDER_HAIRLINE}`,
+    shimmer:   `opacity-100 translate-y-0 ${BORDER_MUTED} mirror-card-shimmer`,
+    reveal:    `opacity-100 translate-y-0 ${BORDER_MUTED} shadow-sys-bloom`,
+    rest:      `opacity-100 translate-y-0 ${BORDER_MUTED} shadow-sys-bloom`,
   };
   return map[p];
 }
@@ -122,6 +137,19 @@ function fadeClass(visible: boolean): string {
 function fadeStyle(visible: boolean, delayMs: number): React.CSSProperties {
   return visible ? { transitionDelay: `${delayMs}ms` } : {};
 }
+
+/**
+ * Test seam — pure helpers + alpha-ledger handles, exposed so the
+ * adoption test can pin the phase→className map deterministically
+ * without spinning up a phase machine. Mirrors the CaptionMetric
+ * `__testing__` idiom (Mike #38 §5).
+ */
+export const __testing__ = {
+  phaseClass,
+  WHISPER_TEXT,
+  BORDER_HAIRLINE,
+  BORDER_MUTED,
+} as const;
 
 function buildShareResult(mirror: ReaderMirror): QuickMirrorResult {
   return {

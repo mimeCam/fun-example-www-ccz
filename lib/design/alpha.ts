@@ -194,19 +194,18 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/explore/ExploreArticleCard.tsx',
   'components/home/PortalHero.tsx',
   'components/home/ViaWhisper.tsx',
-  'components/mirror/MirrorRevealCard.tsx',
   'components/mirror/QuickMirrorCard.tsx',
   'components/navigation/AmbientNav.tsx',
   'components/navigation/GemHome.tsx',
   'components/reading/NextRead.tsx',
   'components/reading/ThreadKeepsake.tsx',
   'components/resonances/ResonanceDrawer.tsx',
+  'components/resonances/ResonanceSectionHeader.tsx',
   'components/return/RecognitionWhisper.tsx',
   'components/return/ReturnLetter.tsx',
   'components/shared/Field.tsx',
   'components/shared/Threshold.tsx',
   'components/shared/Toast.tsx',
-  'components/shared/WhisperFooter.tsx',
 ] as const;
 
 // ─── Helpers — JIT-safe color-alpha class-string factories ────────────────

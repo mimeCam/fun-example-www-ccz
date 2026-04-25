@@ -9,7 +9,8 @@
  * Opacity fix: the shaped card drops `opacity-recede` (Tanya UIX #64 §3). Its faded
  * identity is carried by four internal color tokens (bg-surface/30, border-rose/30,
  * mist/30 gem, no shadow). The wrapper blanket opacity conflicted with scroll-rise's
- * `animation-fill-mode: both` which ends at opacity:1.
+ * `animation-fill-mode: both` which ends at full presence (opacity 1, the
+ * Motion-owned fade endpoint).
  */
 'use client';
 
