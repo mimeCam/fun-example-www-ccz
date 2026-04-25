@@ -4,6 +4,7 @@ import type React from 'react';
 import Link from 'next/link';
 import { Article } from '@/lib/content/ContentTagger';
 import { estimateReadingTime } from '@/lib/content/ContentTagger';
+import { excerpt } from '@/lib/content/excerpt';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 
 interface ExploreArticleCardProps {
@@ -30,8 +31,8 @@ export default function ExploreArticleCard({
   reason,
   showWorldview = false,
 }: ExploreArticleCardProps) {
-  const minutes  = estimateReadingTime(article.content);
-  const excerpt  = article.content.slice(0, 120).replace(/[#*_]/g, '').trim();
+  const minutes   = estimateReadingTime(article.content);
+  const summary   = excerpt(article.content, 120);
   const isCurated = variant === 'curated';
 
   const { ref } = useScrollRise({ index });
@@ -73,9 +74,11 @@ export default function ExploreArticleCard({
           <p className="text-gold/70 text-sys-micro italic mb-sys-3">{reason}</p>
         )}
 
-        <p className="text-mist text-sys-caption typo-caption mb-sys-4 flex-1 line-clamp-3">
-          {excerpt}…
-        </p>
+        {summary && (
+          <p className="text-mist text-sys-caption typo-caption mb-sys-4 flex-1 line-clamp-3">
+            {summary}
+          </p>
+        )}
 
         <div className="flex items-center gap-sys-3 text-sys-micro text-mist/60">
           <span>{minutes} min read</span>

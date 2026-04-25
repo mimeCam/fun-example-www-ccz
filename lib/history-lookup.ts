@@ -5,6 +5,7 @@
 
 import { Article } from './content/ContentTagger';
 import { getAllArticles } from './content/articleData';
+import { excerpt } from './content/excerpt';
 
 export interface HistoricalArticle {
   id: string;
@@ -43,12 +44,12 @@ export function getTodaysHistoricalArticles(): HistoricalArticle[] {
   return articles.map(article => {
     const publishedDate = new Date(article.publishedAt!);
     const yearsAgo = currentYear - publishedDate.getFullYear();
-    const excerpt = article.content.substring(0, 150) + '...';
+    const summary = excerpt(article.content, 150);
 
     return {
       id: article.id,
       title: article.title,
-      excerpt,
+      excerpt: summary,
       publishedAt: article.publishedAt!,
       yearsAgo,
       url: `/article/${article.id}`,
