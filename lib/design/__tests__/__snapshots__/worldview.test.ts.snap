@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`worldview manifest — snapshot pin (any change is a deliberate review) WORLDVIEW_CHIP_LABELS shape is byte-pinned 1`] = `
+{
+  "contrarian": "Contrarian",
+  "philosophical": "Philosophical",
+  "practical": "Practical",
+  "technical": "Technical",
+}
+`;
+
+exports[`worldview manifest — snapshot pin (any change is a deliberate review) WORLDVIEW_COLORS shape is byte-pinned 1`] = `
+{
+  "contrarian": "bg-rose/30 text-rose",
+  "philosophical": "bg-primary/30 text-primary",
+  "practical": "bg-cyan/30 text-cyan",
+  "technical": "bg-primary/30 text-accent",
+}
+`;

@@ -50,6 +50,10 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { alphaClassOf } from '@/lib/design/alpha';
+import {
+  WORLDVIEW_COLORS as WV_COLORS_MODULE,
+  WORLDVIEW_FALLBACK_BG as WV_FALLBACK_MODULE,
+} from '@/lib/design/worldview';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ExploreArticleCard = require('../ExploreArticleCard').default;
@@ -104,6 +108,23 @@ function offLedgerPercents(html: string): string[] {
 }
 
 // ─── 1 · Module-level rung handles point at the right rungs ────────────────
+
+// ─── 0 · Centrality — test seam mirrors lib/design/worldview.ts ───────────
+//
+// The card's `__testing__` re-exports must be byte-identical to the
+// `lib/design/worldview` module (the new system-of-record). If a future
+// PR redefines `WORLDVIEW_COLORS` locally on the card, this assertion goes
+// red and the lift's centrality guarantee surfaces in CI.
+
+describe('ExploreArticleCard — centrality: re-exports the design-module manifest', () => {
+  it('WORLDVIEW_COLORS comes from lib/design/worldview (object identity)', () => {
+    expect(WORLDVIEW_COLORS).toBe(WV_COLORS_MODULE);
+  });
+
+  it('WORLDVIEW_FALLBACK_BG comes from lib/design/worldview (string identity)', () => {
+    expect(WORLDVIEW_FALLBACK_BG).toBe(WV_FALLBACK_MODULE);
+  });
+});
 
 describe('ExploreArticleCard — alpha-ledger handles point at the canonical rungs', () => {
   it('CURATED_REST is border-gold/30 (= `muted`, ambient warmth)', () => {
@@ -257,5 +278,39 @@ describe('Worldview chip strip — all four siblings sit at the `muted` rung', (
 
   it('snapshot pin: the full WORLDVIEW_COLORS map (any change is a deliberate review)', () => {
     expect(WORLDVIEW_COLORS).toMatchSnapshot();
+  });
+});
+
+// ─── 5 · Chip text — capitalized labels, no raw lowercase identifiers ─────
+//
+// Tanya UX #58 §3.3: the chip used to render `{article.worldview}` directly,
+// which surfaced the raw lowercase key (`technical`, `philosophical`, …) as
+// chip text — the AAA-polish defect Tanya called out. After the lift the
+// chip text routes through `worldviewChipLabel`, capitalized once, owned by
+// the design module. This is the ONE intentional pixel-mover in the lift PR.
+
+describe('Worldview chip strip — capitalized labels, no raw lowercase tag', () => {
+  const labels = [
+    ['technical',     'Technical'],
+    ['philosophical', 'Philosophical'],
+    ['practical',     'Practical'],
+    ['contrarian',    'Contrarian'],
+  ] as const;
+
+  it.each(labels)('worldview `%s` renders chip label `%s` (capitalized)', (w, label) => {
+    const html = render({
+      article: { id: 'a', title: 'T', content: 'word '.repeat(600).trim(), worldview: w },
+      showWorldview: true,
+    });
+    // The capitalized label appears in the rendered chip span.
+    expect(html).toContain(`>${label}<`);
+  });
+
+  it('rendered chip never carries the raw lowercase identifier', () => {
+    const html = renderAllWorldviews();
+    // Each raw key would only appear in the SSR if we forgot to capitalize.
+    ['>technical<', '>philosophical<', '>practical<', '>contrarian<'].forEach((s) => {
+      expect(html).not.toContain(s);
+    });
   });
 });

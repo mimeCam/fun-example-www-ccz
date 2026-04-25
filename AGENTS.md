@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers + ambient-surfaces CSS + print-surface CSS + contrast helpers
+- `lib/design/` — 8 ledgers + ambient-surfaces CSS + print-surface CSS + contrast helpers + worldview chip manifest
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/mirror/` — archetype scoring + archetype-store
 - `lib/return/` — recognition-surface selector: single arbiter for which return-recognition primitive paints (`letter` | `whisper` | `silent`); mutual-exclusion is a typed return value, not a vibe
@@ -27,10 +27,14 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - *(none)*
 
 ## Follow-ons (deferred)
-- Promote `primary` + `cyan` into `ALPHA_COLOR_FAMILIES` + worldview taxonomy decision
-  (technical/philosophical share the `primary` family); lift `WORLDVIEW_COLORS`
-  into shared `lib/design/worldview.ts` so `ResonanceEntry`/`EvolutionThread`
-  compose the same map.
+- Worldview taxonomy decision (technical+philosophical share the `primary`
+  family — four chips, three voices). Resolution would touch
+  `types/filter.ts` + `lib/design/worldview.ts` together. Per Tanya UX #58 §4,
+  chip stays the only surface that paints worldview hue — no smear into
+  `ResonanceEntry` / `EvolutionThread` / Mirror.
+- Audit small-radius pill shapes (chips, badges, tags, toast pills) for
+  consistent `rounded-sys-soft` resolution (Tanya UX #58 §5 — flagged for a
+  future polish pass, not this sprint).
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

@@ -9,6 +9,12 @@ import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
 import { alphaClassOf } from '@/lib/design/alpha';
+import {
+  WORLDVIEW_COLORS,
+  WORLDVIEW_FALLBACK_BG,
+  worldviewChipClass,
+  worldviewChipLabel,
+} from '@/lib/design/worldview';
 
 interface ExploreArticleCardProps {
   article: Article;
@@ -31,29 +37,15 @@ interface ExploreArticleCardProps {
      CURATED_HOVER — `recede`   → "frame around the subject; lean in."
      ORGANIC_REST  — `hairline` → "it's geometry; space, not surface."
      ORGANIC_HOVER — `recede`   → SAME rung as CURATED_HOVER (pair invariant).
-     WORLDVIEW_BG  — `muted`    → "the tag is ambient chrome; the worldview
-                                    is the voice." All four worldviews share
-                                    this rung — one register, four voices.
-   Pinned in `__tests__/ExploreArticleCard.alpha.test.ts`. */
+
+   Worldview chip chrome lives in `lib/design/worldview.ts` (Mike #51,
+   Tanya #58 §6) — single typed home keyed by `FilterType`. Imported
+   above; the test seam below re-exports for backward-compat with the
+   existing `__tests__/ExploreArticleCard.alpha.test.ts`. */
 const CURATED_REST    = alphaClassOf('gold', 'muted',    'border'); // border-gold/30
 const CURATED_HOVER   = alphaClassOf('gold', 'recede',   'border'); // border-gold/50
 const ORGANIC_REST    = alphaClassOf('fog',  'hairline', 'border'); // border-fog/10
 const ORGANIC_HOVER   = alphaClassOf('fog',  'recede',   'border'); // border-fog/50
-const WORLDVIEW_FALLBACK_BG = alphaClassOf('fog', 'muted', 'bg');   // bg-fog/30
-
-/* Worldview chip background+text — one register, all four at the `muted`
-   (0.30) rung. The /30 percent here resolves through alphaClassOf for `fog`
-   and `rose` (which are in ALPHA_COLOR_FAMILIES); `primary` and `cyan` are
-   not yet promoted (Mike napkin #50 §5 — taxonomy decision deferred), so
-   their /30 literals appear as raw class strings. The grep-fence accepts
-   any color at a legal rung — `primary` / `cyan` family promotion is a
-   follow-up sprint (see _my/report.md). */
-const WORLDVIEW_COLORS: Record<string, string> = {
-  technical:     'bg-primary/30 text-accent',
-  philosophical: 'bg-primary/30 text-primary',
-  practical:     'bg-cyan/30 text-cyan',
-  contrarian:    `${alphaClassOf('rose', 'muted', 'bg')} text-rose`, // bg-rose/30
-};
 
 /**
  * Card edge class — one decision, two voices. Hover variants are written
@@ -136,8 +128,13 @@ export default function ExploreArticleCard({
           {showWorldview && article.worldview && (
             <>
               <span className="text-mist/30">·</span>
-              <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent ${WORLDVIEW_COLORS[article.worldview] ?? `${WORLDVIEW_FALLBACK_BG} text-mist`}`}>
-                {article.worldview}
+              {/* Chip text routes through `worldviewChipLabel` (Tanya UX #58 §3.3)
+                  so we render `Technical` / `Philosophical` / `Practical` /
+                  `Contrarian` — the chip stops looking like a debug tag. The
+                  chip chrome routes through `worldviewChipClass` so the
+                  fallback can never be forgotten (Mike #51 §5 #4). */}
+              <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent ${worldviewChipClass(article.worldview)}`}>
+                {worldviewChipLabel(article.worldview)}
               </span>
             </>
           )}
