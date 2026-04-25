@@ -344,6 +344,36 @@
      Physics gate: `lib/design/__tests__/focus-ink-byte-identity.test.ts`. */
   --sys-focus-ink: #7b2cbf;
 
+  /* ─── Room Constitution — OS↔CSS seam, dark from byte zero ────────────
+     These three declarations paint BEFORE script runs, BEFORE thermal
+     hydrates, BEFORE the body parses. They live at the floor of the
+     layering, paired with `<meta name="color-scheme" content="dark">` in
+     `app/layout.tsx <head>` (which must appear ABOVE the inline restore
+     script — UAs parse <head> top-down for canvas-paint hints).
+
+       color-scheme:    tells the UA to dress its own chrome (scrollbar,
+                        form-widget shadows, tab seam) for a dark document.
+       accent-color:    propagates to native form chrome (<input checkbox/
+                        radio/range>, <progress>, <select> caret, fallback
+                        scrollbar thumb). Anchored to `--sys-focus-ink`
+                        (reader-invariant), NEVER `--token-accent` (thermal).
+                        Binding to the thermal token would silently warm
+                        the reader's pen with the engagement score —
+                        contradiction of the reader-invariant promise.
+       background-color: pins the canvas to the dormant thermal anchor so
+                        no white interim paints between meta-resolve and
+                        body-paint. Byte-identical to --token-bg.
+     // reader-invariant — accent-color sources `--sys-focus-ink`, NEVER
+     // `--token-accent`. Sync guard: `color-scheme-sync.test.ts`.
+     Credits: Jason F. (the accent-color → --token-accent bug catch),
+              Mike K. (napkin — the `:root` co-location call),
+              Tanya D. (UX — the byte-identical canvas pin),
+              Elon M. (the cut-list that kept this 3 lines, not a layer),
+              Paul K. (the four make-or-break invariants). */
+  color-scheme: dark;
+  accent-color: var(--sys-focus-ink);
+  background-color: var(--token-bg);
+
   /* ─── Resonance Glow — thermal carve-out for alive cards ───────────────
      Two-layer box-shadow on carrying (alive) resonance cards:
        outer belt:  0 6px 32px rose/20  (static, always present on alive)

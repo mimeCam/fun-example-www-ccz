@@ -31,6 +31,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Room Constitution — OS↔CSS seam. Must appear BEFORE the inline
+            restore script: UAs parse <head> top-down for canvas-paint
+            hints, so the meta has to land first. Pairs with the three
+            declarations on `:root` in `app/globals.css` (color-scheme,
+            accent-color, background-color). Sync guard:
+            `lib/design/__tests__/color-scheme-sync.test.ts`. */}
+        <meta name="color-scheme" content="dark" />
         <script dangerouslySetInnerHTML={{ __html: INLINE_RESTORE_SCRIPT }} />
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased bg-background`}>
