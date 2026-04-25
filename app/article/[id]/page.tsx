@@ -10,6 +10,7 @@ import { SelectionPopover } from '@/components/resonances/SelectionPopover';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
 import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
+import { ReadersMark } from '@/components/reading/ReadersMark';
 import { CeremonySequencer } from '@/components/reading/CeremonySequencer';
 import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
@@ -144,6 +145,9 @@ function ArticleContent({ params }: { params: { id: string } }) {
               archetype={archetype}
             />
           )}
+          {/* Paper-only colophon — hidden on screen, lands inline on the
+              printed page when the reader's maxDepth ≥ 10%. Tanya UX #13 §5. */}
+          <ReadersMark />
         </div>
         <WhisperFooter />
       </article>

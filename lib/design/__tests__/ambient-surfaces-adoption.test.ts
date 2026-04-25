@@ -22,9 +22,21 @@ import { join, relative, sep } from 'node:path';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
-/** The one module that legitimately owns gesture-chrome rules. */
+/** Modules that legitimately own gesture-chrome rules.
+ *
+ *  - `ambient-surfaces.css` — owns SCREEN-medium gesture chrome
+ *    (::selection, scrollbar-*, caret-color, ::placeholder, ::marker).
+ *    Reciprocal Chrome doctrine, Krystle/Tanya/Mike sprint.
+ *  - `print-surface.css` — owns PAPER-medium overrides for the same
+ *    surfaces. Different medium, different rules: ink-only, no accent
+ *    tint, no scrollbar-thumb gradient (paper has no scrollbar). The
+ *    rules live inside the file's single `@media print` block; the
+ *    adoption guard treats the file as a legitimate second owner so
+ *    the cross-medium contract is explicit, not silent (Mike #24 §A).
+ */
 const MODULE_ALLOW = new Set<string>([
   'lib/design/ambient-surfaces.css',
+  'lib/design/print-surface.css',
 ]);
 
 /** Directories to scan. Mirrors Mike §5 P4 — full surface coverage. */

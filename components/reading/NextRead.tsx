@@ -55,7 +55,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
   const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
 
   return (
-    <div className="py-sys-7 animate-fade-in">
+    <div data-next-read className="py-sys-7 animate-fade-in">
       {/* "UP NEXT" label + archetype badge */}
       <div className="mb-sys-4 flex items-center gap-sys-4">
         <span className="text-sys-micro tracking-sys-caption uppercase text-mist/50 font-sys-accent">

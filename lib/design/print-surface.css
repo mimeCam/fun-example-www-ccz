@@ -1,0 +1,318 @@
+/* print-surface.css — The room's quiet bow on paper.
+ *
+ * Three philosophies, three sections (Tanya §3 — subtraction, ink, hush):
+ *
+ *   A. Subtraction.   The room steps all the way back. Every reactive
+ *                     chrome dissolves. The reader is alone with the words.
+ *   B. Paper hygiene. @page margins, prose typography, widows/orphans,
+ *                     break discipline, link footnotes. Invisible on
+ *                     screen; the entire experience on paper.
+ *   C. Opt-out hooks. `.print-only` / `.screen-only` escape valves for
+ *                     surfaces that need to flip per medium without
+ *                     scattering Tailwind `print:` variants across JSX.
+ *
+ * Out of scope (deliberately, see Mike #24 §6 + Tanya §10):
+ *   - NO `print-color-adjust: exact`. The reader's printer is the
+ *     reader's printer. The room does not paint ink the reader did not
+ *     request.
+ *   - NO reference to thermal tokens (`--token-*`) or thread state
+ *     (`--thread-*`). Paper is a static portrait of the article, not a
+ *     freeze-frame of the reader's last warm second.
+ *   - NO `prefers-*` / `forced-colors` / `:root` declarations.
+ *     Print is `@media print` — a media TYPE, not a user preference.
+ *     This file lives outside the OS-Honor Register's bijection by
+ *     design (parser filters for `prefers-*` / `forced-colors` only;
+ *     cardinality stays at 6). os-honor-register.test.ts asserts.
+ *   - NO new tokens, no new ledger rungs, no 9th register. The 8/8
+ *     design system is sealed. We do not break the seal for paper.
+ *
+ * `!important` discipline (Mike #24 §7.3): only inside @media print.
+ * Print subtraction is a final cascade override; we use `!important` to
+ * defeat inline styles, Tailwind utilities, and thermal token writes.
+ * Outside print, never.
+ *
+ * Credits: Mike K. (#24 — napkin shape, kill-list, paper hygiene LOC
+ * budget, the OS-Honor Register carve-out), Tanya D. (UX #13 §3 — the
+ * three-noun philosophy, §4 layout spec, §5 ReadersMark colophon),
+ * Elon M. (six-mode failure analysis of the autograph proposal — the
+ * shape this file dodges), Paul K. (named the gap: print is the last
+ * medium where the room goes mute), Krystle C. (the foundation PR
+ * doctrine this file ships), Jason F. (paper-deserves-care intuition
+ * which becomes Section B).
+ */
+
+@media print {
+  /* ─── SECTION A — Subtraction ───────────────────────────────────────
+   * Every reactive surface dissolves. Targets the eight z-rung classes
+   * Tailwind generates from the z-index ledger (lib/design/z-index.ts);
+   * each is the canonical hook for one fixed-plane primitive.
+   * Layer-stack risk Tanya §2 flags: paper has only one z-plane, so we
+   * hide every fixed layer explicitly — never rely on edge separation.
+   */
+
+  /* Golden Thread spine (left edge, fixed). */
+  .z-sys-thread { display: none !important; }
+
+  /* AmbientNav (bottom bar, fixed) — site navigation chrome. */
+  .z-sys-nav { display: none !important; }
+
+  /* GemHome (top-left, fixed) — quiet home gem. */
+  .z-sys-gem { display: none !important; }
+
+  /* SelectionPopover (portal, fixed) — pointer-only resonance gem. */
+  .z-sys-popover { display: none !important; }
+
+  /* Threshold backdrop / Drawer (modal layers). */
+  .z-sys-backdrop,
+  .z-sys-drawer { display: none !important; }
+
+  /* Toast pill + its host portal (live region + portal root). */
+  .z-sys-toast,
+  [data-testid="toast-host"] { display: none !important; }
+
+  /* StateCrossingFlash — fixed thermal-threshold bloom. */
+  .crossing-flash { display: none !important; }
+
+  /* CompletionShimmer — inline post-prose ceremony beat. Demote (Tanya §4.4). */
+  .completion-shimmer,
+  .completion-shimmer-track { display: none !important; }
+
+  /* NextRead recommendation card — dynamic, not content (Tanya §6.1). */
+  [data-next-read] { display: none !important; }
+
+  /* Focus rings — irrelevant on paper. The 4px halo is screen affordance. */
+  :focus,
+  :focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  /* Entrance choreography — the page is already arrived. Freeze, do not
+   * play (Tanya §4 — entrance choreography disabled). */
+  .entrance-fade-up,
+  .entrance-divider-draw,
+  [class*="ceremony-"] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* ─── SECTION B — Paper hygiene ─────────────────────────────────────
+   * @page geometry, body posture, prose typography, link footnotes.
+   * "The typesetting is the room's voice on paper" (Tanya §4.3).
+   */
+
+  /* Page geometry — let the user's printer pick the size. Mirror margins
+   * via @page :left / :right so a duplex print honors the gutter
+   * convention (Tanya §4.1: 0.85in outer / 0.6in inner). */
+  @page {
+    margin: 0.75in 0.85in;
+  }
+  @page :left {
+    margin-left: 0.6in;
+    margin-right: 0.85in;
+  }
+  @page :right {
+    margin-left: 0.85in;
+    margin-right: 0.6in;
+  }
+
+  /* Body posture — the dark theme inverts to ink-on-paper. Background
+   * unset so the printer chooses the paper colour (most readers print
+   * white; some print onto cream — we honor either). The reader's ink
+   * mode is the reader's ink mode (Tanya §3.2 — Ink is the only medium). */
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    /* `economy` is the explicit honoring-mode value: do NOT force
+     * background colours; the user's printer setting wins. The opposite
+     * of the rejected `print-color-adjust: exact`. */
+    -webkit-print-color-adjust: economy;
+    print-color-adjust: economy;
+  }
+
+  /* Single-column prose — let the column breathe to the page margin
+   * (Tanya §4.1). Drop the 38rem clamp; the printer's natural measure
+   * is the right measure on paper. */
+  .max-w-prose,
+  [class*="max-w-prose"] {
+    max-width: none !important;
+  }
+
+  /* Body type — 11pt, generous line-height, hyphenation enabled.
+   * Widows/orphans clamped so a stray line never strands at a page
+   * boundary (Tanya §4.3). */
+  body,
+  p,
+  li {
+    font-size: 11pt;
+    line-height: 1.55;
+    color: #000 !important;
+    text-shadow: none !important;
+    orphans: 3;
+    widows: 3;
+    hyphens: auto;
+  }
+
+  /* Display / heading hierarchy — sentence-case, weight discipline.
+   * `break-after: avoid` keeps a heading from stranding at the bottom
+   * of a page; `break-inside: avoid` keeps a heading on one line. */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+    text-shadow: none !important;
+    page-break-after: avoid;
+    break-after: avoid;
+    break-inside: avoid;
+  }
+  h1 {
+    font-size: 24pt;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    text-align: center;
+  }
+  h2 { font-size: 16pt; font-weight: 700; }
+  h3 { font-size: 14pt; font-weight: 700; }
+  h4, h5, h6 { font-size: 12pt; font-weight: 700; }
+
+  /* Thermal typography — freeze the variable-font axis at regular.
+   * Paper does not warm. Pin para-rhythm to 0; print spacing is the
+   * static `--sys-space-*` scale only (Tanya §4.3 — para-rhythm pinned). */
+  .thermal-typography,
+  .thermal-typography p {
+    font-weight: 400 !important;
+    letter-spacing: -0.01em !important;
+    margin-block-end: 0.6em !important;
+  }
+
+  /* Block-level care — images, code, blockquotes, figures must not
+   * split across a page break (Tanya §4.3 risk table). */
+  img, svg, pre, blockquote, figure, table {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    filter: none !important;
+  }
+
+  /* Rounded corners on paper read as fuzzy noise at low DPI — drop them
+   * across the prose (Tanya §4.1). Screen affordance only. */
+  pre, blockquote, figure, table, hr {
+    border-radius: 0 !important;
+  }
+
+  /* Links — underlined in ink, never relying on colour (Tanya §4.3 —
+   * principle #7). Reveal href for absolute URLs only; relative and
+   * mailto links are noise on paper. The `:where()` wrapper keeps
+   * specificity at 0 so author overrides on a specific link still win. */
+  :where(article a[href]) {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+  :where(article a[href^="http://"]):after,
+  :where(article a[href^="https://"]):after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    font-weight: 400;
+    word-break: break-all;
+  }
+
+  /* Horizontal rules — a hairline, no glow. */
+  hr {
+    border: 0 !important;
+    border-top: 0.5pt solid #000 !important;
+    background: none !important;
+    box-shadow: none !important;
+    height: auto !important;
+    margin: 1em auto !important;
+  }
+
+  /* Reciprocal-chrome family — paper-mode neutralization.
+   *
+   * Cross-medium ownership note: gesture-chrome surfaces (::selection,
+   * ::placeholder, ::marker) are owned by `lib/design/ambient-surfaces.css`
+   * for the SCREEN medium. The paper medium has its own posture: ink-only,
+   * no accent tint, the reader's printer paints what it paints. The
+   * `ambient-surfaces-adoption.test.ts` MODULE_ALLOW set names this file
+   * as the second legitimate owner — paper and screen each get one home
+   * for their gesture-chrome rules (Tanya §3.2 — "ink is the only medium",
+   * Mike #24 §A — paper-mode authoring surface). */
+  ::selection,
+  ::-moz-selection {
+    background: transparent !important;
+    color: #000 !important;
+    text-shadow: none !important;
+  }
+  ::placeholder { color: #555 !important; }
+  ::marker { color: #000 !important; }
+
+  /* ─── ReadersMark colophon (paper-only) ─────────────────────────────
+   * Wrapper geometry + caption + glyph row + hairline rule. Class hooks
+   * are authored here so the React component (ReadersMark.tsx) carries
+   * structure only — no inline color/letter-spacing literals (color- and
+   * typography-adoption ledgers stay clean). Tanya §5.1 spec, verbatim. */
+  .readers-mark {
+    margin-top: 6mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .readers-mark-rule {
+    border: 0 !important;
+    border-top: 0.4pt solid #000 !important;
+    background: none !important;
+    margin: 0 auto !important;
+    width: 16ch;
+    height: auto !important;
+  }
+  .readers-mark-body {
+    text-align: center;
+    padding: 0.4em 0;
+  }
+  .readers-mark-caption {
+    display: block;
+    font-size: 8pt;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.08em;
+    color: #555;
+    margin-bottom: 0.3em;
+  }
+  .readers-mark-glyphs {
+    display: block;
+    font-size: 12pt;
+    letter-spacing: 0.15em;
+    color: #000;
+    font-family: Inter, system-ui, serif;
+  }
+
+  /* Small / time / caption — soft mist for secondary content (Tanya §4.2). */
+  small, time, figcaption {
+    color: #555 !important;
+  }
+
+  /* ─── SECTION C — Opt-out hooks ─────────────────────────────────────
+   * Two utility classes for surfaces that need to flip per medium
+   * without scattering Tailwind `print:` variants across JSX. Mike #24
+   * §7.5: prefer authoring-CSS hooks for cross-cutting print intent.
+   *
+   * Tailwind's own `print:hidden` / `print:block` variants remain
+   * available as escape valves — these classes are the documented
+   * convention for components like ReadersMark whose entire purpose
+   * is medium-conditional.
+   */
+
+  /* `.screen-only` — visible on screen, hidden on paper. */
+  .screen-only { display: none !important; }
+
+  /* `.print-only` (paired half) — surfaces only in print. The screen-side
+   * `display: none` is authored OUTSIDE this block (below) so the
+   * cascade pins both halves of the contract in this single file. */
+  .print-only { display: block !important; }
+}
+
+/* `.print-only` (screen-side default) — hidden on screen by default.
+ * The `@media print` half above flips it back on for paper. Authored
+ * outside the print at-rule on purpose: a default cascade rule, not a
+ * print-only rule. The OS-Honor Register parser does not see it (no
+ * `prefers-*`, no `forced-colors`, no `:root`). Ships outside the
+ * single allowed `@media print` block by intent. */
+.print-only { display: none; }
