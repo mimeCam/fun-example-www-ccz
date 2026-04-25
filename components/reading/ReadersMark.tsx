@@ -72,9 +72,11 @@ function buildMark(maxDepth: number): string {
   return FILLED.repeat(filled) + EMPTY.repeat(MARK_GLYPHS - filled);
 }
 
-/** Hairline rule — geometry pinned in `print-surface.css` (.readers-mark-rule). */
+/** Hairline rule — geometry pinned in `print-surface.css` (.print-hairline,
+ *  shared with ArticleProvenance so the printed page reads as bracketed
+ *  by one hand at top and bottom — Tanya UX #8 §3.4). */
 function HairlineRule() {
-  return <hr aria-hidden="true" className="readers-mark-rule" />;
+  return <hr aria-hidden="true" className="print-hairline" />;
 }
 
 /** The body of the colophon — caption + glyph row. Class hooks only. */

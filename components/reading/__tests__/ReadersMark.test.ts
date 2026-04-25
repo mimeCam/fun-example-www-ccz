@@ -134,6 +134,16 @@ describe('ReadersMark · SSR render shape', () => {
     expect(html).toMatch(/class="[^"]*readers-mark[^"]*"/);
   });
 
+  it('uses the shared `.print-hairline` selector (Mike #20 — bracketed-page rhyme)', () => {
+    latest.maxDepth = 0.50;
+    const html = renderToStaticMarkup(createElement(ReadersMark));
+    // Two hairlines bracket the colophon body — top + bottom.
+    const hairlines = html.match(/print-hairline/g) ?? [];
+    expect(hairlines.length).toBe(2);
+    // The legacy class is gone from the SSR output (greppable lock).
+    expect(html).not.toMatch(/readers-mark-rule/);
+  });
+
   it('aria-hidden on the colophon (decorative, not announced)', () => {
     latest.maxDepth = 0.50;
     const html = renderToStaticMarkup(createElement(ReadersMark));

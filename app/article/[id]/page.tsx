@@ -11,6 +11,7 @@ import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
 import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
 import { ReadersMark } from '@/components/reading/ReadersMark';
+import { ArticleProvenance } from '@/components/reading/ArticleProvenance';
 import { CeremonySequencer } from '@/components/reading/CeremonySequencer';
 import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
@@ -115,6 +116,10 @@ function ArticleContent({ params }: { params: { id: string } }) {
       <SelectionPopover articleId={params.id} articleTitle={article.title} />
       <article className="min-h-screen">
         <div className="max-w-prose mx-auto px-sys-7">
+          {/* Paper-only greeting bow — hidden on screen, lands inline at the
+              top of the printed page. Pairs with ReadersMark (parting bow)
+              to bracket the printed article. Tanya UX #8 §3, Mike #20 §3. */}
+          <ArticleProvenance article={article} />
           <div className={entrance.disabled ? '' : 'entrance-fade-up'} style={entranceStyle(entrance.topbar)}>
             <TopBar articleId={params.id} title={article.title} />
           </div>

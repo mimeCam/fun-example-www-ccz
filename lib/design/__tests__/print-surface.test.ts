@@ -180,6 +180,56 @@ describe('print-surface · reader-invariant lock (no thermal, no thread)', () =>
   });
 });
 
+// ─── 4b · shared `.print-hairline` rule has BOTH paper consumers ─────────
+//
+// The printed page is bracketed by two paper-only components (Tanya UX #8
+// §3 — bracketed-page rhyme). They share one geometry rule: `.print-hairline`,
+// 16ch / 0.4pt #000. This block is the drift-lock — if either consumer
+// renames its hairline class in isolation, the rhyme dies and this test
+// fails. Mike #20 §6.10 — "naming review is the polish at this level."
+//
+// Two regressions this guards:
+//   1. The CSS rule itself disappears or loses its 16ch/0.4pt geometry.
+//   2. Either consumer (ReadersMark / ArticleProvenance) renames its
+//      hairline class away from `.print-hairline`.
+// All three sources (CSS + 2 TSX) are read fresh; this is a fast file
+// read, not a build-graph traversal.
+
+describe('print-surface · shared hairline (.print-hairline) is the bracketed-page rhyme', () => {
+  const READERS_MARK = readFileSync(
+    join(__dirname, '..', '..', '..', 'components/reading/ReadersMark.tsx'),
+    'utf8',
+  );
+  const ARTICLE_PROVENANCE = readFileSync(
+    join(__dirname, '..', '..', '..', 'components/reading/ArticleProvenance.tsx'),
+    'utf8',
+  );
+
+  it('the rule `.print-hairline` is authored in print-surface.css', () => {
+    const block = extractPrintBlock();
+    expect(block).toMatch(/\.print-hairline\s*\{[^}]*border-top:\s*0\.4pt\s+solid\s+#000[^}]*\}/);
+  });
+
+  it('the rule fixes the width at 16ch (the bracket measure)', () => {
+    const block = extractPrintBlock();
+    expect(block).toMatch(/\.print-hairline\s*\{[^}]*width:\s*16ch[^}]*\}/);
+  });
+
+  it('ReadersMark consumes `.print-hairline` (parting bow)', () => {
+    expect(READERS_MARK).toMatch(/className=["']print-hairline["']/);
+  });
+
+  it('ArticleProvenance consumes `.print-hairline` (greeting bow)', () => {
+    expect(ARTICLE_PROVENANCE).toMatch(/className=["']print-hairline["']/);
+  });
+
+  it('the legacy `.readers-mark-rule` selector is fully gone from CSS + components', () => {
+    expect(rules()).not.toMatch(/\.readers-mark-rule/);
+    expect(READERS_MARK).not.toMatch(/readers-mark-rule/);
+    expect(ARTICLE_PROVENANCE).not.toMatch(/readers-mark-rule/);
+  });
+});
+
 // ─── 5 · OS-Honor Register parser MUST NOT see this file ─────────────────
 
 describe('print-surface · stays outside the OS-Honor Register bijection', () => {

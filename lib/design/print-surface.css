@@ -1,44 +1,22 @@
 /* print-surface.css — The room's quiet bow on paper.
  *
- * Three philosophies, three sections (Tanya §3 — subtraction, ink, hush):
+ * Three sections (Tanya §3 — subtraction, ink, hush):
+ *   A. Subtraction.   Every reactive chrome dissolves on paper.
+ *   B. Paper hygiene. @page geometry + prose typography + break discipline.
+ *   C. Opt-out hooks. `.print-only` / `.screen-only` flip-per-medium hooks.
  *
- *   A. Subtraction.   The room steps all the way back. Every reactive
- *                     chrome dissolves. The reader is alone with the words.
- *   B. Paper hygiene. @page margins, prose typography, widows/orphans,
- *                     break discipline, link footnotes. Invisible on
- *                     screen; the entire experience on paper.
- *   C. Opt-out hooks. `.print-only` / `.screen-only` escape valves for
- *                     surfaces that need to flip per medium without
- *                     scattering Tailwind `print:` variants across JSX.
+ * Hard rails (Mike #24 §6, Tanya §10):
+ *   - NO `print-color-adjust: exact` — reader's printer wins.
+ *   - NO `--token-*` / `--thread-*` references — paper is static.
+ *   - NO `prefers-*` / `forced-colors` / `:root` — print is media TYPE,
+ *     not a user preference. Lives outside the OS-Honor Register.
+ *   - `!important` lives ONLY inside @media print (cascade override).
  *
- * Out of scope (deliberately, see Mike #24 §6 + Tanya §10):
- *   - NO `print-color-adjust: exact`. The reader's printer is the
- *     reader's printer. The room does not paint ink the reader did not
- *     request.
- *   - NO reference to thermal tokens (`--token-*`) or thread state
- *     (`--thread-*`). Paper is a static portrait of the article, not a
- *     freeze-frame of the reader's last warm second.
- *   - NO `prefers-*` / `forced-colors` / `:root` declarations.
- *     Print is `@media print` — a media TYPE, not a user preference.
- *     This file lives outside the OS-Honor Register's bijection by
- *     design (parser filters for `prefers-*` / `forced-colors` only;
- *     cardinality stays at 6). os-honor-register.test.ts asserts.
- *   - NO new tokens, no new ledger rungs, no 9th register. The 8/8
- *     design system is sealed. We do not break the seal for paper.
- *
- * `!important` discipline (Mike #24 §7.3): only inside @media print.
- * Print subtraction is a final cascade override; we use `!important` to
- * defeat inline styles, Tailwind utilities, and thermal token writes.
- * Outside print, never.
- *
- * Credits: Mike K. (#24 — napkin shape, kill-list, paper hygiene LOC
- * budget, the OS-Honor Register carve-out), Tanya D. (UX #13 §3 — the
- * three-noun philosophy, §4 layout spec, §5 ReadersMark colophon),
- * Elon M. (six-mode failure analysis of the autograph proposal — the
- * shape this file dodges), Paul K. (named the gap: print is the last
- * medium where the room goes mute), Krystle C. (the foundation PR
- * doctrine this file ships), Jason F. (paper-deserves-care intuition
- * which becomes Section B).
+ * Credits: Mike K. (#24/#20 — kill-list, OS-Honor carve-out, the
+ * `.print-hairline` rename), Tanya D. (UX #13/#8 — three-noun
+ * philosophy, ReadersMark + ArticleProvenance bracketed-page spec),
+ * Elon M. (boring-name discipline), Paul K. (bracketed-page outcome),
+ * Krystle C. (foundation-PR doctrine), Jason F. (paired-bows shape).
  */
 
 @media print {
@@ -246,23 +224,61 @@
   ::placeholder { color: #555 !important; }
   ::marker { color: #000 !important; }
 
-  /* ─── ReadersMark colophon (paper-only) ─────────────────────────────
-   * Wrapper geometry + caption + glyph row + hairline rule. Class hooks
-   * are authored here so the React component (ReadersMark.tsx) carries
-   * structure only — no inline color/letter-spacing literals (color- and
-   * typography-adoption ledgers stay clean). Tanya §5.1 spec, verbatim. */
-  .readers-mark {
-    margin-top: 6mm;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-  .readers-mark-rule {
+  /* ─── Shared paper hairline (the bracketed-page rhyme) ──────────────
+   * One geometry, two consumers: the greeting bow (.article-provenance,
+   * top of article) and the parting bow (.readers-mark, bottom). Both
+   * paper-only, both 16ch / 0.4pt #000, both `aria-hidden`. Keep this
+   * rule generic — DO NOT inline a third consumer's metaphor; if a
+   * future paper component needs a different weight/width, author its
+   * own class instead of forking this one. Tanya UX #8 §3.4. */
+  .print-hairline {
     border: 0 !important;
     border-top: 0.4pt solid #000 !important;
     background: none !important;
     margin: 0 auto !important;
     width: 16ch;
     height: auto !important;
+  }
+
+  /* ─── ArticleProvenance — greeting bow at top of article (paper-only)
+   * Mirrors the ReadersMark hairline geometry; meta line is 9pt #000,
+   * URL line is 8pt #555 with `word-break: break-all` so a long URL
+   * never clips the column. `break-after: avoid` keeps the bow welded
+   * to the <h1> that follows it (Tanya UX #8 §5.e — title-page-1 seal). */
+  .article-provenance {
+    margin-bottom: 6mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  .article-provenance-body {
+    text-align: center;
+    padding: 0.4em 0;
+  }
+  .article-provenance-meta {
+    display: block;
+    font-size: 9pt;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: #000;
+    margin-bottom: 0.2em;
+  }
+  .article-provenance-href {
+    display: block;
+    font-size: 8pt;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: #555;
+    word-break: break-all;
+  }
+
+  /* ─── ReadersMark colophon — parting bow at bottom (paper-only)
+   * Glyph row + caption ride above/below the shared hairline. Tanya §5.1. */
+  .readers-mark {
+    margin-top: 6mm;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
   .readers-mark-body {
     text-align: center;
