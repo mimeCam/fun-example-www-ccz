@@ -15,6 +15,7 @@ import MirrorRevealCard from '@/components/mirror/MirrorRevealCard';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { EmptySurface } from '@/components/shared/EmptySurface';
 import { emptyPhrase } from '@/lib/sharing/empty-phrase';
+import { formatReaderShortDate } from '@/lib/utils/reader-locale';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import type { ReaderMirror } from '@/types/mirror';
 
@@ -117,22 +118,27 @@ function QuickMirrorAsReveal({ result }: { result: QuickMirrorResult }) {
   return <MirrorRevealCard mirror={fakeMirror} />;
 }
 
-/** Single whisper line: "5 articles · detected Apr 4" */
+/**
+ * Single whisper line: "5 articles · since Apr 4" (en-US) /
+ * "5 articles · since 4 Apr" (en-GB).
+ *
+ * The MetaLine is pinned to `formatReaderShortDate` forever (Tanya
+ * UIX #2 §3.2 Finding 1): the whisper line resists the urge to grow
+ * a year. "since 4 Apr" reads warm; "since April 4, 2026" reads
+ * bureaucratic — and would lengthen the line past the card's
+ * centerline, breaking the visual rhyme of card + caption. One
+ * metric, one date, one whisper line.
+ */
 function MetaLine({ articlesRead, firstDetected }: {
   articlesRead: number; firstDetected: string | null;
 }) {
   if (!articlesRead) return null;
   const parts = [`${articlesRead} article${articlesRead !== 1 ? 's' : ''}`];
-  if (firstDetected) parts.push(`since ${formatDate(firstDetected)}`);
+  const since = firstDetected ? formatReaderShortDate(firstDetected) : '';
+  if (since) parts.push(`since ${since}`);
   return (
     <p className="text-sys-micro text-mist/60 text-center mt-sys-8">
       {parts.join(' · ')}
     </p>
   );
-}
-
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  } catch { return iso; }
 }

@@ -92,10 +92,23 @@ function archetypeLabel(key: ArchetypeKey | null): string {
   return pretty[key];
 }
 
-/** Local YYYY-MM-DD formatter (no Intl dependency, deterministic in node). */
+/**
+ * Local YYYY-MM-DD formatter (no Intl dependency, deterministic in node).
+ *
+ * Carve-out — DO NOT route through `lib/utils/reader-locale`. The
+ * keepsake SVG is a SHARED artifact: the same bytes reach every viewer
+ * via the OG unfurl, the share modal, and the /api/og/thread route.
+ * The stamp must render byte-identically for every reader regardless
+ * of their locale — that is *reader-invariant* physics, not *reader-
+ * fidelity* physics. Different physics, different substrate.
+ *
+ * Same vocabulary family as `// reader-invariant` markers in
+ * `lib/design/` (focus / contrast / reduced-transparency). The colon-
+ * suffixed form below is the carved-out reason — locale, not motion.
+ */
 export function formatDate(unix: number): string {
   const d = new Date(unix * 1000);
-  const iso = d.toISOString();           // 2026-04-22T12:34:56.000Z
+  const iso = d.toISOString();           // reader-invariant: locale-independent
   return iso.slice(0, 10);               // 2026-04-22
 }
 

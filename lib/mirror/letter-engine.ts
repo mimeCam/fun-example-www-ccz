@@ -10,6 +10,7 @@
 import type { ArchetypeKey } from '@/types/content';
 import type { LetterContext, Letter, SeasonKey } from '@/types/book-narration';
 import { synthesizeReturnWhisper } from './return-whisper-engine';
+import { formatReaderMonthDay } from '@/lib/utils/reader-locale';
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -148,7 +149,7 @@ function pickClosing(ctx: LetterContext): string {
 // ─── Sign-off ─────────────────────────────────────────────
 
 function composeSignOff(): string {
-  return `Written for you on ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+  return `Written for you on ${formatReaderMonthDay(new Date().toISOString())}`;
 }
 
 // ─── Public API ───────────────────────────────────────────

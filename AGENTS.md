@@ -11,6 +11,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
 - `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, useThreadDepth, useLoopFunnel, useScrollRise)
 - `lib/content/` — single owner of "raw markdown → plain prose": `stripMarkdownTokens`, `collapseWhitespace`, `excerpt`. Centrality guarded — no other surface re-derives the strip pipeline.
+- `lib/utils/reader-locale.ts` — single owner of reader-facing date formatting (`formatReaderShortDate` · `formatReaderMonthDay` · `formatReaderLongDate`). Centrality guarded — literal locales (`en-US`, …) are forbidden; `// reader-invariant: locale-independent` carves out shared artifacts (e.g. keepsake SVG ISO stamp).
 - `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, EmptySurface, SuspenseFade
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, ArticleProvenance, ReadProgressCaption
 - `scripts/` — build-time codegen

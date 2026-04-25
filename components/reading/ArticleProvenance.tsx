@@ -47,6 +47,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Article } from '@/lib/content/ContentTagger';
+import { formatReaderLongDate } from '@/lib/utils/reader-locale';
 
 /** Default byline when the Article record has no `author` field. */
 const DEFAULT_AUTHOR = 'Anton';
@@ -56,15 +57,15 @@ const DEFAULT_AUTHOR = 'Anton';
 const META_SEPARATOR = ' · ';
 
 /**
- * Format an ISO date as a long-form, locale-aware string.
- * `dateStyle: 'long'` picks up the printer's locale (UK → "25 April 2026",
- * US → "April 25, 2026"). Both are correct on paper. Pure, ≤10 LOC.
+ * Format an ISO date as a long-form, locale-aware string. Delegates to
+ * the reader-locale substrate (`formatReaderLongDate`) so the printer's
+ * locale picks up the same way it does on screen — UK → "25 April 2026",
+ * US → "April 25, 2026". Both are correct on paper. The substrate is
+ * comment-blind, the centrality guard now covers the paper too. Five-
+ * character edit at the call site, zero pixel delta on paper (Tanya §5).
  */
 export function formatLongDate(iso: string | undefined): string {
-  if (!iso) return '';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '';
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'long' }).format(d);
+  return formatReaderLongDate(iso);
 }
 
 /** Compose the byline · date line. Pure, deterministic, ≤10 LOC. */
