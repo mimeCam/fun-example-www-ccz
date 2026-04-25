@@ -293,6 +293,15 @@
   --sys-thread-offset: 3px;
   --sys-thread-width: 2px;
 
+  /* ─── Thread Tide Mark ─────────────────────────────────────
+     Tokens for the never-retreating high-water mark behavior.
+     Duration: 2800ms — slow, contemplative; mirrors CEREMONY.glowHold.
+     Placed in this group so the ledger owns all thread temporal values.
+     No raw ms in component files — always reference these vars.
+     Credits: Mike K. (napkin — token names), Tanya D. (UIX spec §1). */
+  --thread-breathe-duration: 2800ms;
+  --thread-breathe-easing:   ease-in-out;
+
   /* ─── Focus Ink — the reader-invariant accent ──────────────
      // reader-invariant — never warms, never personalizes, never archetype-forks.
      The `:focus-visible` ring reads from THIS token, not from `--token-accent`
@@ -863,6 +872,15 @@ body {
     box-shadow: none !important;
     transition: none !important;
   }
+  /* Tide breathing and pulse collapse under reduced-motion.
+     The tide mark HOLDS at its height; only the ornamental animation stops. */
+  [data-thread-settled="1"] .golden-thread-glow {
+    animation: none !important;
+  }
+  .golden-thread-tide-pulse {
+    box-shadow: none !important;
+    transition: none !important;
+  }
   /* Skeleton rests at α muted — the "ambient chrome" presence the ledger
      sealed. Not hairline (would disappear) and not invisible (skeleton is
      the signal that content is arriving). */
@@ -999,6 +1017,49 @@ body {
   box-shadow:
     0 0 16px var(--token-accent),
     0 0 40px color-mix(in srgb, var(--gold) 50%, transparent) !important;
+}
+
+/* ─── Tide Mark: settled breathing ──────────────────────────────────────────
+   When the reader scrolls back below their high-water mark, the fill breathes
+   rather than retreating. This is the "dried ink" visual identity — the thread
+   rests and says "you've been here."
+   Gated by data-thread-settled="1" on <html> (written by useThreadDepth).
+   Overrides goldenThreadGlow via document order (same specificity, later wins).
+   CSS-only — compositor thread — no JS timers or RAF involvement.
+
+   Reduced-motion: see existing block below (animation collapsed to 0.01ms).
+   Forced-colors:  see existing block above (animation: none !important).
+
+   Credits: Mike K. (napkin §4 — breathing spec, CSS-only mandate),
+            Tanya D. (UIX spec §1 — 2800ms "slow, contemplative" cadence). */
+
+@keyframes tide-breathe {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 4px var(--token-accent);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: var(--sys-elev-whisper);
+  }
+}
+
+/* Settled state — replaces the thermal goldenThreadGlow animation.
+   Same specificity (one attribute selector + one class); later rule wins.
+   When reader returns below their tide mark: breathing, not chasing. */
+[data-thread-settled="1"] .golden-thread-glow {
+  animation: tide-breathe var(--thread-breathe-duration) var(--thread-breathe-easing) infinite;
+  will-change: box-shadow, opacity;
+}
+
+/* Tide mark crossing pulse — new personal maximum reached (25/50/75/100%).
+   One breath at whisper level: thread says "noted." Applied for MOTION.enter
+   (300ms) via useTidePulse() in GoldenThread.tsx, then class is removed.
+   Whisper glow: 12px gold at 12% opacity — below perceptible but present.
+   Sits above crossingClass in the paint order; no !important needed. */
+.golden-thread-tide-pulse {
+  box-shadow: var(--sys-elev-whisper) !important;
+  transition: box-shadow var(--sys-time-enter) var(--sys-ease-out) !important;
 }
 
 /* ─── Completion Shimmer ───────────────────────────── */

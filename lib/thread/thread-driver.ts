@@ -5,7 +5,7 @@
  * loop. Every consumer of continuous Thread depth (the fill, a future
  * ceremony damper, the dev overlay) plugs into the same port:
  *
- *     subscribe((state) => void)  // ThreadState = { depth, velocity, mode }
+ *     subscribe((state) => void)  // ThreadState = { depth, velocity, mode, ... }
  *
  * The driver owns the scroll listener, computes the normalized depth
  * (0..1, sub-pixel), runs the critical-damped tween, and broadcasts the
@@ -13,17 +13,30 @@
  * unsubscribes, the RAF stops, the listener is removed, and `window`
  * goes back to paying zero cost.
  *
+ * ── Tide mark semantics (new in this revision) ──────────────────────────
+ * The tween now chases `maxRawDepth` (the reader's all-time high), NOT
+ * `rawTarget` (current scroll). This means the fill height is a tide
+ * mark — it never retreats. When the reader scrolls back up, the filled
+ * column stays at its highest reached point and quietly breathes.
+ *
+ * `maxRawDepth` is:
+ *   - loaded from localStorage on first subscriber attach (one sync read)
+ *   - updated when `rawTarget > maxRawDepth`
+ *   - debounce-persisted (500ms) to localStorage on each increase
+ *   - published as `maxDepth` in every ThreadState broadcast
+ *
  * Architectural contract (Mike K. napkin §2 + §5):
  *   - NOT a React component. Plain module, client-side singleton.
  *   - NO React state on the scroll path. Subscribers write to the DOM
  *     (CSS vars, aria attributes) directly.
- *   - ONE scroll listener, `{ passive: true }`. ONE RAF. No setTimeout.
+ *   - ONE scroll listener, `{ passive: true }`. ONE RAF. No setTimeout
+ *     on the hot path (persist timer is cold path).
  *   - ONE truth source for Thread depth. `useScrollDepth` still owns
- *     the `isReading` / `isFinished` gates — we only replace the
- *     continuous scalar.
+ *     the `isReading` / `isFinished` gates — we only drive the scalar.
  *
- * Credits: Mike K. (architect napkin — the whole shape, every section),
- * Tanya D. (UIX #81 §5 — smoothness as the signature polish).
+ * Credits: Mike K. (architect napkin — whole shape, every section),
+ *          Tanya D. (UIX #81 §5 — smoothness as the signature polish;
+ *                    UIX spec §1 — tide mark semantics + "dried ink").
  */
 
 import { MOTION } from '@/lib/design/motion';
@@ -41,17 +54,33 @@ import {
   snapStep,
   type TweenState,
 } from './thread-tween';
+import {
+  calcTideDelta,
+  isTideSettled,
+  persistMaxDepth,
+  readMaxDepth,
+  shouldEmitCrossing,
+  slugFromPathname,
+  TIDE_CROSSING_EVENT,
+  type TideBand,
+} from './thread-tide';
 
 // ─── Public surface ────────────────────────────────────────────────────────
 
 /** A single tick's broadcast. One shape for every subscriber. Stable. */
 export interface ThreadState {
-  /** Normalized depth 0..1, sub-pixel precision. */
+  /** Smoothed tide mark depth 0..1 (never retreats). */
   depth: number;
-  /** d(depth)/dt, 1/s. Positive = scrolling down. */
+  /** d(depth)/dt, 1/s. Positive = advancing. */
   velocity: number;
   /** Current driver posture. Resolved from reduced-motion. */
   mode: ThreadMode;
+  /** Raw tide mark (unsmooted). Equal to or greater than rawTarget. */
+  maxDepth: number;
+  /** True iff reader has retreated > 2% below their high-water mark. */
+  isSettled: boolean;
+  /** maxDepth − rawDepth, 0..1. Zero when reader is at/above their mark. */
+  tideDelta: number;
 }
 
 /** Every subscriber is the same shape. Polymorphism = killer. */
@@ -66,13 +95,18 @@ const subs = new Set<ThreadSubscriber>();
 let mode: ThreadMode = DEFAULT_MODE;
 let tween: TweenState = restingAt(0);
 let rawTarget = 0;
+let maxRawDepth = 0;
 let lastFrameMs = 0;
 let rafId: number | null = null;
 let motionUnsub: (() => void) | null = null;
 let scrollAttached = false;
+let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
 /** Latest tick's snapshot — served to late subscribers so they don't flash 0. */
-let latest: ThreadState = { depth: 0, velocity: 0, mode };
+let latest: ThreadState = {
+  depth: 0, velocity: 0, mode,
+  maxDepth: 0, isSettled: false, tideDelta: 0,
+};
 
 // ─── Raw scroll read (pure, env-guarded) ───────────────────────────────────
 
@@ -83,6 +117,36 @@ function readRawTarget(): number {
   const scrollable = el.scrollHeight - window.innerHeight;
   if (scrollable <= 0) return 1;
   return Math.max(0, Math.min(1, window.scrollY / scrollable));
+}
+
+// ─── Tide mark helpers (each ≤ 10 LOC) ────────────────────────────────────
+
+/** Emit a tide-crossing CustomEvent when a band milestone is reached. */
+function emitTideCrossing(band: TideBand): void {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(TIDE_CROSSING_EVENT, { detail: { band } }));
+}
+
+/** Schedule a debounced persist of maxRawDepth to localStorage (500ms). */
+function schedulePersist(): void {
+  if (persistTimer !== null) return;
+  persistTimer = setTimeout(() => {
+    if (typeof window !== 'undefined') {
+      persistMaxDepth(slugFromPathname(window.location.pathname), maxRawDepth);
+    }
+    persistTimer = null;
+  }, 500);
+}
+
+/**
+ * Advance the tide mark to `next`. Emits a crossing event if a band
+ * milestone is crossed. Schedules a debounced localStorage persist.
+ */
+function updateMaxDepth(next: number): void {
+  const crossing = shouldEmitCrossing(maxRawDepth, next);
+  maxRawDepth = next;
+  schedulePersist();
+  if (crossing !== null) emitTideCrossing(crossing);
 }
 
 // ─── Listener wiring (each ≤ 10 LOC) ───────────────────────────────────────
@@ -114,9 +178,10 @@ function detachListeners(): void {
 function step(nowMs: number): void {
   const dt = lastFrameMs === 0 ? 0 : nowMs - lastFrameMs;
   lastFrameMs = nowMs;
-  tween = isSnap(mode) ? snapStep(tween, rawTarget) : smoothStep(tween, rawTarget, dt);
+  if (rawTarget > maxRawDepth) updateMaxDepth(rawTarget);
+  tween = isSnap(mode) ? snapStep(tween, maxRawDepth) : smoothStep(tween, maxRawDepth, dt);
   publish(tween.display, dt === 0 ? 0 : tween.velocity);
-  if (isSettled(tween, rawTarget) && !isSnap(mode)) { rafId = null; lastFrameMs = 0; return; }
+  if (isSettled(tween, maxRawDepth) && !isSnap(mode)) { rafId = null; lastFrameMs = 0; return; }
   rafId = requestAnimationFrame(step);
 }
 
@@ -135,7 +200,12 @@ function stopLoop(): void {
 // ─── Pub/sub (each ≤ 10 LOC) ───────────────────────────────────────────────
 
 function publish(depth: number, velocity: number): void {
-  latest = { depth, velocity, mode };
+  latest = {
+    depth, velocity, mode,
+    maxDepth: maxRawDepth,
+    isSettled: isTideSettled(rawTarget, maxRawDepth),
+    tideDelta: calcTideDelta(rawTarget, maxRawDepth),
+  };
   subs.forEach((s) => s(latest));
 }
 
@@ -146,7 +216,15 @@ function publish(depth: number, velocity: number): void {
  * synchronously so it never paints a stale 0.
  */
 export function subscribe(fn: ThreadSubscriber): Unsubscribe {
-  if (subs.size === 0) { attachListeners(); rawTarget = readRawTarget(); ensureLoop(); }
+  if (subs.size === 0) {
+    attachListeners();
+    rawTarget = readRawTarget();
+    const slug = typeof window !== 'undefined'
+      ? slugFromPathname(window.location.pathname)
+      : 'root';
+    maxRawDepth = Math.max(readMaxDepth(slug), rawTarget);
+    ensureLoop();
+  }
   subs.add(fn);
   fn(latest);
   return () => { subs.delete(fn); if (subs.size === 0) { stopLoop(); detachListeners(); } };
@@ -163,11 +241,13 @@ export function peek(): ThreadState {
 export function __resetDriverForTests(): void {
   stopLoop();
   detachListeners();
+  if (persistTimer !== null) { clearTimeout(persistTimer); persistTimer = null; }
   subs.clear();
   mode = DEFAULT_MODE;
   tween = restingAt(0);
   rawTarget = 0;
-  latest = { depth: 0, velocity: 0, mode };
+  maxRawDepth = 0;
+  latest = { depth: 0, velocity: 0, mode, maxDepth: 0, isSettled: false, tideDelta: 0 };
 }
 
 /** Read current subscriber count. For tests only. */
