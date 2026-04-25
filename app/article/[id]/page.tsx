@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useEffect, useRef } from 'react';
+import dynamic from 'next/dynamic';
 import { notFound } from 'next/navigation';
 import { GoldenThread } from '@/components/reading/GoldenThread';
 import { StateCrossingFlash } from '@/components/reading/StateCrossingFlash';
@@ -27,6 +28,14 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import WhisperFooter from '@/components/shared/WhisperFooter';
+
+// Recognition-surface portal — gated by the shared selector so the
+// Whisper and the home-rail Letter can never paint at the same time
+// (Mike §5, Tanya §2). Dynamic + ssr:false mirrors `ReturningPortal`.
+const ArticleWhisperPortal = dynamic(
+  () => import('@/components/return/ArticleWhisperPortal'),
+  { ssr: false },
+);
 import { ThermalProvider, useThermal } from '@/components/thermal/ThermalProvider';
 import { accumulateArticle, saveHistory, loadHistory } from '@/lib/thermal/thermal-history';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
@@ -154,6 +163,19 @@ function ArticleContent({ params }: { params: { id: string } }) {
           {/* Paper-only colophon — hidden on screen, lands inline on the
               printed page when the reader's maxDepth ≥ 10%. Tanya UX #13 §5. */}
           <ReadersMark />
+
+          {/* Coda — recognition Whisper for returning readers, gated by
+              the shared selector. Stranger readers get a zero-height
+              shell (no ghost margin). Tanya §2 — "the comma in the right
+              margin." Sits below NextRead, above the coda hairline. */}
+          <ArticleWhisperPortal />
+
+          {/* Coda hairline — geometric divider between the article body
+              (and its quiet Whisper) and site chrome (the WhisperFooter).
+              Reuses the header hairline token. Tanya §4 — prevents the
+              mist-on-mist mumble where the Whisper bleeds into the
+              Footer's tagline. No new tokens; same `border-gold/10`. */}
+          <hr className="mt-sys-7 max-w-divider mx-auto border-gold/10" />
         </div>
         <WhisperFooter />
       </article>
