@@ -10,6 +10,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/mirror/` — archetype scoring + archetype-store
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
 - `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, useThreadDepth, useLoopFunnel, useScrollRise)
+- `lib/content/` — single owner of "raw markdown → plain prose": `stripMarkdownTokens`, `collapseWhitespace`, `excerpt`. Centrality guarded — no other surface re-derives the strip pipeline.
 - `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, EmptySurface, SuspenseFade
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, ArticleProvenance, ReadProgressCaption
 - `scripts/` — build-time codegen

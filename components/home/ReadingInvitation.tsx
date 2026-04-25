@@ -32,8 +32,11 @@ export default function ReadingInvitation(
 ) {
   const hint = pickHint(articleId);
 
+  // mt-sys-11 (was mt-sys-10): the CTA needs one extra spacing step now
+  // that the prose is markdown-clean — the pill should breathe; the hint
+  // stays whispered. (Tanya §3.2 Finding B)
   return (
-    <div className="text-center mt-sys-10 mb-sys-11">
+    <div className="text-center mt-sys-11 mb-sys-11">
       <Pressable asChild variant="solid" size="md" className="thermal-candle">
         <Link href={`/article/${articleId}`}>
           Begin Reading &rarr;

@@ -44,9 +44,16 @@ export default function Home({
       <div className="flex-1 flex flex-col justify-center max-w-3xl
         mx-auto px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">
 
-        <SuspenseFade fallback={<Skeleton variant="block" className="h-40 max-w-3xl mb-sys-6" />}>
-          <ReturningPortal suppress={!!via} />
-        </SuspenseFade>
+        {/* Finding A (Tanya §3.2): a `?via=` reader gets the whisper
+            INSTEAD of the returning-letter — never both.  Rendering the
+            ReturningPortal SuspenseFade in the via-case would reserve
+            an h-40 vertical slot of paint-time silence even though the
+            client component will return null on hydrate.  Skip it. */}
+        {!via && (
+          <SuspenseFade fallback={<Skeleton variant="block" className="h-40 max-w-3xl mb-sys-6" />}>
+            <ReturningPortal />
+          </SuspenseFade>
+        )}
 
         {via && (
           <SuspenseFade fallback={<Skeleton variant="block" className="h-8 max-w-xl mb-sys-4" />}>

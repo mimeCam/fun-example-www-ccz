@@ -4,8 +4,11 @@
  *
  * For strangers: renders nothing (the hero and invitation show as-is).
  * For returning readers: renders ReturnLetter above the hero content.
- * When ViaWhisper is present (reader arrived via shared link),
- * suppresses the letter — the whisper IS the greeting.
+ *
+ * The `?via=` deep-link case (ViaWhisper IS the greeting) is
+ * decided one level up in `app/page.tsx` — that surface skips
+ * mounting the ReturningPortal entirely, so the via-reader never
+ * pays the h-40 paint-time silence (Tanya §3.2 Finding A).
  *
  * Client-only (reads localStorage via ReturnLetter).
  * SSR-safe — always imported via dynamic() with { ssr: false }.
@@ -20,14 +23,7 @@ const ReturnLetter = dynamic(
   { ssr: false }
 );
 
-interface Props {
-  /** Suppress the letter when ViaWhisper is showing. */
-  suppress?: boolean;
-}
-
-export default function ReturningPortal({ suppress }: Props) {
-  if (suppress) return null;
-
+export default function ReturningPortal() {
   return (
     <div className="mb-sys-8 animate-fade-in">
       <ReturnLetter />

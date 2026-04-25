@@ -21,7 +21,7 @@
  *  +   CJK without spaces hard-clips at code-point budget
  */
 
-import { excerpt } from '../excerpt';
+import { excerpt, stripMarkdownTokens, collapseWhitespace } from '../excerpt';
 
 const ELLIPSIS = '…';
 
@@ -156,5 +156,112 @@ describe('excerpt() — whitespace normalization', () => {
     const text = 'a'.repeat(50) + '\n\n\n\n\n' + 'b'.repeat(50);
     const out = excerpt(text, 200);
     expect(out).toBe('a'.repeat(50) + ' ' + 'b'.repeat(50));
+  });
+});
+
+// ─── stripMarkdownTokens — paragraph-honest sibling (Mike §"Two siblings") ──
+
+describe('stripMarkdownTokens — markdown out, paragraph rhythm in', () => {
+  test('preserves \\n\\n between paragraphs (THE reason for the split)', () => {
+    expect(stripMarkdownTokens('**a**\n\n**b**')).toBe('a\n\nb');
+  });
+
+  test('keeps three or more blank lines as a single \\n\\n+ run', () => {
+    // Caller decides whitespace policy; we just don't *destroy* breaks.
+    const out = stripMarkdownTokens('p1\n\n\n\np2');
+    expect(out).toContain('\n\n');
+    expect(out.split(/\n\n+/)).toEqual(['p1', 'p2']);
+  });
+
+  test('paired emphasis stripped, words preserved', () => {
+    expect(stripMarkdownTokens('**bold** and _italic_'))
+      .toBe('bold and italic');
+  });
+
+  test('stray asterisk in `*nix` survives (no closing pair)', () => {
+    expect(stripMarkdownTokens('*nix systems'))
+      .toBe('*nix systems');
+  });
+
+  test('link text retained; URL dropped', () => {
+    expect(stripMarkdownTokens('See [the docs](https://example.com)'))
+      .toBe('See the docs');
+  });
+
+  test('image syntax (alt text included) is removed entirely', () => {
+    expect(stripMarkdownTokens('![sunrise](sun.png) Begin.'))
+      .toBe(' Begin.');
+  });
+
+  test('heading marker dropped, heading text kept; \\n\\n preserved', () => {
+    expect(stripMarkdownTokens('# Title\n\nbody'))
+      .toBe('Title\n\nbody');
+  });
+
+  test('blockquote markers dropped per-line', () => {
+    expect(stripMarkdownTokens('> quoted\n> continues'))
+      .toBe('quoted\ncontinues');
+  });
+
+  test('list markers (-, *, +, 1.) dropped', () => {
+    expect(stripMarkdownTokens('- one\n- two\n1. three'))
+      .toBe('one\ntwo\nthree');
+  });
+
+  test('inline code stripped, content kept', () => {
+    expect(stripMarkdownTokens('use `useEffect` carefully'))
+      .toBe('use useEffect carefully');
+  });
+
+  test('empty input → empty string (no orphan glyphs)', () => {
+    expect(stripMarkdownTokens('')).toBe('');
+  });
+
+  test('idempotent: stripping twice equals stripping once', () => {
+    const text = '# H\n\n**bold** [link](u) `code`\n\n- one\n- two';
+    expect(stripMarkdownTokens(stripMarkdownTokens(text)))
+      .toBe(stripMarkdownTokens(text));
+  });
+
+  test('output never contains markdown anchor glyphs from input markup', () => {
+    const text =
+      '# Heading\n\n**bold** _em_ `code` [link](u) ![alt](i.png)\n\n> quote';
+    const out = stripMarkdownTokens(text);
+    // Glyphs that came from MARKUP are gone; raw chars in prose would survive.
+    expect(out).not.toMatch(/^#\s|^\*\s|^>\s/m);
+    expect(out).not.toMatch(/\*\*/);
+    expect(out).not.toMatch(/!\[/);
+    expect(out).not.toMatch(/\]\(/);
+  });
+});
+
+// ─── collapseWhitespace — flowing-prose sibling ─────────────────────────
+
+describe('collapseWhitespace — flowing-prose sibling', () => {
+  test('squashes runs of any whitespace to a single space', () => {
+    expect(collapseWhitespace('a\n\nb\t\tc   d')).toBe('a b c d');
+  });
+
+  test('trims leading and trailing whitespace', () => {
+    expect(collapseWhitespace('   hello   ')).toBe('hello');
+  });
+
+  test('whitespace-only input collapses to empty string', () => {
+    expect(collapseWhitespace('   \n\t  ')).toBe('');
+  });
+
+  test('idempotent: collapsing twice equals collapsing once', () => {
+    expect(collapseWhitespace(collapseWhitespace('a  b\n c')))
+      .toBe(collapseWhitespace('a  b\n c'));
+  });
+});
+
+// ─── recomposition contract — excerpt() === clip(collapse(strip())) ────
+
+describe('excerpt() — recomposition of the two siblings', () => {
+  test('matches collapseWhitespace(stripMarkdownTokens(x)) when no clip', () => {
+    const text = '# H\n\n**bold** body and [link](u) here.';
+    const composed = collapseWhitespace(stripMarkdownTokens(text));
+    expect(excerpt(text, 1000)).toBe(composed);
   });
 });

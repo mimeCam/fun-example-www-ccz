@@ -1,25 +1,34 @@
 /**
- * Canonical article excerpt — the cold open's typographic contract.
+ * Canonical article prose pipeline — single owner of the markdown→prose
+ * contract. Two public, composable siblings:
  *
- * Strips markdown, collapses whitespace, clips at the last word boundary,
- * appends a single `…` (U+2026) only when truncation actually happened.
- * Sentence-terminated clips omit the ellipsis on purpose — three periods
- * after a period is the most common typographic crime in CMS-driven blogs.
+ *   • `stripMarkdownTokens(s)` — markdown tokens only.
+ *     **Preserves `\n\n`** so callers that care about paragraph rhythm
+ *     (e.g. PortalHero, the Threshold) can split on blank lines AFTER
+ *     the strip, not before.
  *
- * Pure · synchronous · archetype-blind. The cold open precedes the Mirror
- * by design; warming the excerpt would betray that promise.
+ *   • `collapseWhitespace(s)` — squashes every whitespace run to a
+ *     single space and trims the ends. Use it AFTER the strip when a
+ *     surface needs flowing prose (cards, search snippets, RSS).
+ *
+ * `excerpt()` is a recomposition of both, plus the word-honest clip
+ * and the typographic-ellipsis policy. Pure · synchronous · archetype-blind.
+ *
+ * Centrality rule (enforced by `centrality-guard.test.ts`):
+ *   No surface re-derives the strip pipeline. Import these functions;
+ *   do not re-implement them. If a new surface needs a different shape,
+ *   compose these — do not fork.
  *
  * Code-point-correct length math (`Array.from(s).length`, never `s.length`)
- * — emoji and CJK never break a surrogate pair at the clip.
- *
- * Use this; do not re-implement. Excerpts are a single-source contract:
- * if you need a different shape, extend this function — do not fork it.
+ * lives only in `clipToBudget` — strip operates on regex, not code points.
  */
 
 const ELLIPSIS = '…';
 const DEFAULT_MAX = 160;
 const SENTENCE_END = /[.?!]$/;
 const SOFT_TAIL = /[,;:]+$/;
+
+// ─── markdown-only strips (paragraph breaks preserved) ─────────────
 
 function stripImages(s: string): string {
   return s.replace(/!\[[^\]]*\]\([^)]*\)/g, '');
@@ -46,20 +55,38 @@ function stripLineMarkers(s: string): string {
   return s.replace(/^[ \t]*(#{1,6}\s+|[-*+]\s+|\d+\.\s+|>\s*)/gm, '');
 }
 
-function collapseWhitespace(s: string): string {
+/**
+ * Strip markdown tokens; preserve paragraph breaks (`\n\n`).
+ *
+ * The whitespace policy is the caller's choice — pair with
+ * `collapseWhitespace` for flowing prose, or split on `/\n\n+/` for
+ * paragraph-honest surfaces (e.g. PortalHero).
+ *
+ * Order matters:
+ *   1. line markers first — `# ` / `> ` / `- ` must be stripped before
+ *      `*` / `_` emphasis runs to avoid `**` (paired bold) being read
+ *      as `* ` (list bullet) at line start.
+ *   2. images before links — image syntax is a superset of link syntax
+ *      (`![alt](u)` would otherwise match the link regex, leaving `!`).
+ *   3. emphasis before code — backticks inside emphasis are content,
+ *      not a code fence; stripping emphasis first keeps the inner text.
+ */
+export function stripMarkdownTokens(s: string): string {
+  if (!s) return '';
+  return stripCode(
+    stripEmphasis(stripLinks(stripImages(stripLineMarkers(s)))),
+  );
+}
+
+/** Collapse every whitespace run to a single space; trim. */
+export function collapseWhitespace(s: string): string {
   return s.replace(/\s+/g, ' ').trim();
 }
 
-function normalize(content: string): string {
-  const stripped = stripCode(
-    stripEmphasis(stripLinks(stripImages(stripLineMarkers(content)))),
-  );
-  return collapseWhitespace(stripped);
-}
+// ─── excerpt() — the flowing-prose composition ─────────────────────
 
 /** Code-point-correct clip; word-honest when whitespace exists in window. */
 function clipToBudget(s: string, max: number): string {
-  // BMP fast-path: s.length is an upper bound on code-point count.
   if (s.length <= max) return s;
   const points = Array.from(s);
   if (points.length <= max) return s;
@@ -90,7 +117,7 @@ function withTail(clipped: string, plain: string): string {
  */
 export function excerpt(content: string, max: number = DEFAULT_MAX): string {
   if (!content) return '';
-  const plain = normalize(content);
+  const plain = collapseWhitespace(stripMarkdownTokens(content));
   if (!plain) return '';
   return withTail(clipToBudget(plain, max), plain);
 }
