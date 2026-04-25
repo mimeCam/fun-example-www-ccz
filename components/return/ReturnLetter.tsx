@@ -20,7 +20,29 @@ import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
+import { alphaClassOf } from '@/lib/design/alpha';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
+
+// ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
+//
+// One module-scope binding per surface role so the JSX below stays a plain
+// className composition and Tailwind's JIT sees every literal in source. The
+// pair invariant lives here: `CLOSING_QUIET` is the same rung token as the
+// `opacity-quiet` register `RecognitionWhisper` paints in — sibling surfaces
+// in the same UX moment, by intent. Pinned in `__tests__/ReturnLetter.alpha`.
+//
+// Calibration (Tanya UX §3, alpha.ts felt-sentence block):
+//   • LABEL_RECEDE     — "the frame around the subject" (the kicker label).
+//   • CLOSING_QUIET    — "the closing of a letter" (verbatim).
+//   • COMPACT_QUIET    — "content, but not THE content" (hushed greeting).
+//   • DIVIDER_HAIRLINE — "it's geometry; the eye registers it as space."
+//   • BORDER_HAIRLINE  — same: a border IS a line. Shadow owns elevation.
+
+const LABEL_RECEDE     = alphaClassOf('accent',     'recede',   'text');   // text-accent/50
+const CLOSING_QUIET    = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
+const COMPACT_QUIET    = alphaClassOf('mist',       'quiet',    'text');   // text-mist/70
+const DIVIDER_HAIRLINE = alphaClassOf('accent',     'hairline', 'bg');     // bg-accent/10
+const BORDER_HAIRLINE  = alphaClassOf('accent',     'hairline', 'border'); // border-accent/10
 
 // ─── Timing — sourced from motion tokens ───────────────────
 
@@ -41,13 +63,17 @@ function phaseStyles(phase: Phase, settled: boolean): string {
   }
   if (phase === 'settle') {
     // Tanya §2.1: bloom halo arrives with the copy — flat warmth, not lift.
-    // alpha-ledger:exempt — motion fade endpoint (transition target at full presence)
+    // The border speaks `hairline` (it IS a line); shadow owns elevation.
+    // alpha-ledger:exempt — motion fade endpoint (opacity-100 = transition target)
     return `opacity-100 translate-y-0 transition-all duration-reveal ease-out
-            border-accent/20 shadow-sys-bloom`;
+            ${BORDER_HAIRLINE} shadow-sys-bloom`;
   }
   // At rest: settled letters keep the bloom (warmth stays); un-settled
   // drop to `sys-rest` (the letter keeps its seat; the warmth leaves).
-  return `opacity-100 translate-y-0 ${settled ? 'border-accent/20 shadow-sys-bloom' : 'border-accent/10 shadow-sys-rest'}`; // alpha-ledger:exempt — motion fade endpoint
+  // Both states share the `hairline` border rung — the depth signal lives in
+  // shadow (`shadow-sys-bloom` vs `shadow-sys-rest`), not in border alpha.
+  // alpha-ledger:exempt — motion fade endpoint (opacity-100 = transition target)
+  return `opacity-100 translate-y-0 ${BORDER_HAIRLINE} ${settled ? 'shadow-sys-bloom' : 'shadow-sys-rest'}`;
 }
 
 // ─── Compact greeting (known readers, < 3 days) ──────────
@@ -61,8 +87,10 @@ const GREETINGS: Record<ArchetypeKey, string> = {
 };
 
 function CompactGreeting({ archetype }: { archetype: ArchetypeKey }) {
+  // Alpha ledger: `quiet` (0.70) — "content, but not THE content."
+  // A hushed greeting; the page below is the destination.
   return (
-    <p className="text-mist/60 text-sys-md max-w-prose-ch mx-auto mt-sys-2 font-display italic">
+    <p className={`${COMPACT_QUIET} text-sys-md max-w-prose-ch mx-auto mt-sys-2 font-display italic`}>
       {GREETINGS[archetype] ?? GREETINGS['explorer']}
     </p>
   );
@@ -214,30 +242,32 @@ function LetterCard({
           &times;
         </Pressable>
       )}
-      {/* Label */}
-      <p className="text-sys-micro uppercase tracking-sys-caption text-accent/60 text-center">
+      {/* Label — `recede` (0.50): the frame around the subject. */}
+      <p className={`text-sys-micro uppercase tracking-sys-caption ${LABEL_RECEDE} text-center`}>
         Because you came back&hellip;
       </p>
       {/* Salutation */}
       <p className="text-accent text-sys-lg font-display font-sys-heading mt-sys-5 text-center">
         {letter.salutation}
       </p>
-      {/* Opening */}
-      <p className="text-foreground/90 text-sys-md thermal-typography mt-sys-5 text-center">
+      {/* Opening — body of the letter is THE content; meet it head-on (default 1.00). */}
+      <p className="text-foreground text-sys-md thermal-typography mt-sys-5 text-center">
         {letter.opening}
       </p>
-      {/* Body */}
+      {/* Body — same register as the opening; the reader's destination. */}
       {letter.body.map((para, i) => (
-        <p key={i} className="text-foreground/90 text-sys-md thermal-typography mt-sys-5 text-center">
+        <p key={i} className="text-foreground text-sys-md thermal-typography mt-sys-5 text-center">
           {para}
         </p>
       ))}
-      {/* Divider */}
+      {/* Divider — `hairline` (0.10): geometry, not surface. */}
       <div className="my-sys-7 flex justify-center">
-        <div className={`h-px max-w-divider bg-accent/20 transition-transform duration-fade ${dividerScale}`} />
+        <div className={`h-px max-w-divider ${DIVIDER_HAIRLINE} transition-transform duration-fade ${dividerScale}`} />
       </div>
-      {/* Closing */}
-      <p className="text-foreground/80 text-sys-md italic text-center">{letter.closing}</p>
+      {/* Closing — `quiet` (0.70): "the closing of a letter."
+          Pair invariant: same rung as the whisper-quote register in
+          RecognitionWhisper. Pinned in __tests__/ReturnLetter.alpha. */}
+      <p className={`${CLOSING_QUIET} text-sys-md italic text-center`}>{letter.closing}</p>
       {/* Sign-off */}
       <p className="text-mist text-sys-caption italic text-center mt-sys-4">{letter.signOff}</p>
       {/* Actions */}
@@ -307,3 +337,21 @@ export function ReturnLetter() {
     />
   );
 }
+
+/**
+ * Test seam — pure alpha-ledger handles + the inner `LetterCard` /
+ * `CompactGreeting` views, exposed so the per-file SSR pin can render the
+ * card with a fixed letter object (no hooks, no localStorage, no jsdom).
+ * Mirrors the `MirrorRevealCard.__testing__` and `ArticleWhisperPortalInner`
+ * idioms (Mike #38 §5; Tanya UX §4).
+ */
+export const __testing__ = {
+  LetterCard,
+  CompactGreeting,
+  phaseStyles,
+  LABEL_RECEDE,
+  CLOSING_QUIET,
+  COMPACT_QUIET,
+  DIVIDER_HAIRLINE,
+  BORDER_HAIRLINE,
+} as const;

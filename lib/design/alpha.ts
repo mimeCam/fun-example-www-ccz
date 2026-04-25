@@ -205,6 +205,14 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   // place. Removed in this PR.
   // Live drifter retired (Tanya UX §4.1): `RecognitionWhisper.tsx` snapped
   // text-gold/60 → text-gold/50 (recede; the room remembers, gently).
+  // Live drifter retired (Tanya UX #63 §3, Mike napkin #27 §4):
+  //   `ReturnLetter.tsx` — six drift sites snapped to the ledger
+  //   (label /60 → recede; opening + body /90 → default 1.00; divider /20 →
+  //   hairline; closing /80 → quiet; settled + un-settled border → hairline).
+  //   The recognition pair (Letter + Whisper) now share rung tokens by intent
+  //   at the surfaces where they speak the same line; the closing of the
+  //   letter and the whisper-quote register both resolve to `quiet`. Pinned
+  //   in `components/return/__tests__/ReturnLetter.alpha.test.ts`.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
@@ -220,7 +228,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/reading/ThreadKeepsake.tsx',
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
-  'components/return/ReturnLetter.tsx',
   'components/shared/Threshold.tsx',
   'components/shared/Toast.tsx',
 ] as const;
