@@ -14,6 +14,7 @@ import { computeAnimationTokens, type AnimationTokens } from './thermal-animatio
 import { loadHistory, toThermalInput } from './thermal-history';
 import { defaultPlan, returningPlan, type TransitionPlan } from './transition-choreography';
 import { readPrefersContrast } from '@/lib/utils/prefers-contrast';
+import { readPrefersReducedTransparency } from '@/lib/utils/prefers-reduced-transparency';
 
 export interface AppliedThermal {
   result: ThermalResult;
@@ -52,6 +53,18 @@ export function applyToDOM(applied: AppliedThermal, plan?: TransitionPlan): void
   // Drift guarded by `lib/design/__tests__/prefers-contrast-sync.test.ts`.
   if (readPrefersContrast()) clampToInvariantPosture(el);
 
+  // `// reader-invariant` — clamp warming deltas back to dormant anchors
+  // when the OS reports `prefers-reduced-transparency: reduce`. Sibling of
+  // the contrast-more clamp above (Mike napkin #71 — polymorphism is a
+  // killer; same shape, same anchors). Mirrors the
+  // `@media (prefers-reduced-transparency: reduce)` block in
+  // `lib/design/ambient-surfaces.css`. CSS is the authority; this clamp
+  // exists only to keep `computeThermalTokens` from overwriting the CSS
+  // values after hydration. Two queries converging on the same dormant
+  // posture is a feature (Tanya §6 — composes by subtraction). Drift
+  // guarded by `lib/design/__tests__/prefers-reduced-transparency-sync.test.ts`.
+  if (readPrefersReducedTransparency()) clampToOpaquePosture(el);
+
   el.setAttribute('data-thermal', applied.result.state);
 
   const history = loadHistory();
@@ -66,6 +79,19 @@ export function applyToDOM(applied: AppliedThermal, plan?: TransitionPlan): void
 
 /** Pin the four warming deltas to their dormant anchors. Pure DOM write. */
 function clampToInvariantPosture(el: HTMLElement): void {
+  el.style.setProperty('--token-gesture-mix', GESTURE_MIX.dormant.toFixed(3));
+  el.style.setProperty('--token-accent-opacity', ACCENT_OPACITY.dormant.toFixed(2));
+  el.style.setProperty('--token-glow', 'none');
+  el.style.setProperty('--token-text-glow', 'none');
+}
+
+/** Sibling of `clampToInvariantPosture` — same four warming deltas pinned
+ *  to the same dormant anchors. The two queries converge on identical TS
+ *  writes because they converge on identical CSS clamps (Tanya §6 — two
+ *  different OS prefs, one dormant posture, by design). Kept as separate
+ *  fns so the call-site reads at intent (`OpaquePosture` ≠ `InvariantPosture`)
+ *  even though the body is byte-identical. Pure DOM write. */
+function clampToOpaquePosture(el: HTMLElement): void {
   el.style.setProperty('--token-gesture-mix', GESTURE_MIX.dormant.toFixed(3));
   el.style.setProperty('--token-accent-opacity', ACCENT_OPACITY.dormant.toFixed(2));
   el.style.setProperty('--token-glow', 'none');

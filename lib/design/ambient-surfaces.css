@@ -187,3 +187,66 @@ html {
     color: var(--token-foreground);
   }
 }
+
+/* ─── Reader-invariant guard: prefers-reduced-transparency: reduce ──
+ * // reader-invariant — when the OS asks for opacity, the room stops
+ * dissolving. Tinted glass becomes painted wall: gesture tokens pin to
+ * `GESTURE_MIX.dormant` / `ACCENT_OPACITY.dormant`, gold halos collapse,
+ * placeholders and markers lose the accent tint. ::selection paints as
+ * an inverted chip (solid accent under solid bg) — the reader's mark is
+ * a chip, not a film (Tanya §3.8 — the single biggest "feel" change at
+ * the sentence level).
+ *
+ * Authority: this CSS block is the authoring layer — the browser reads it.
+ * The TS mirror in `lib/thermal/apply-tokens.ts` clamps the same four
+ * warming deltas after hydration so `computeThermalTokens` cannot overwrite
+ * these values. Sync guard lives at
+ * `lib/design/__tests__/prefers-reduced-transparency-sync.test.ts`
+ * (drift-fail).
+ *
+ * Composes with `prefers-reduced-motion` and `prefers-contrast: more` by
+ * subtraction — all three blocks can match simultaneously; no combined
+ * rule needed (Tanya §6). The dormant posture two queries converge on is
+ * a feature, not a coincidence.
+ *
+ * Subtractive discipline: NO new tokens, NO new ledger rungs (Tanya §10).
+ * Every clamp value is either an existing dormant anchor or `none`.
+ *
+ * Credits: Krystle C. (surgical PR scope), Tanya D. (sensory spec §3 —
+ * the inverted-chip selection, glass-becomes-wall framing), Mike K.
+ * (napkin #71 — CSS as authority, TS as mirror, sibling-shape probe),
+ * Elon M. (drop "Reader Vows" varnish, keep the kernel — sync-test
+ * pair-rule), Paul K. (one PR, three artifacts gate). */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    /* Pin thermal warming deltas to dormant anchors — sibling of the
+     * prefers-contrast: more block above. The room stops dissolving the
+     * same way it stops performing: at the dormant rung. */
+    --token-gesture-mix: 0.28;
+    --token-accent-opacity: 0.5;
+    /* Gold halos — pure transparency theatre. Drop both (Tanya §5.2). */
+    --token-glow: none;
+    --token-text-glow: none;
+  }
+  /* ::selection — inverted chip (Tanya §3.8). Solid accent background,
+   * solid bg foreground. The pen leaves ink, not perfume. Same pattern
+   * macOS / iOS uses when reduced-transparency is on. */
+  ::selection {
+    background-color: var(--token-accent);
+    color: var(--token-bg);
+  }
+  ::-moz-selection {
+    background-color: var(--token-accent);
+    color: var(--token-bg);
+  }
+  /* Placeholder — drop the accent tint, leave a clean mist (Tanya §3 —
+   * mirror of contrast-more). */
+  ::placeholder {
+    color: var(--mist);
+  }
+  /* Marker — structure, not style; paint with foreground (mirror of
+   * contrast-more). */
+  ::marker {
+    color: var(--token-foreground);
+  }
+}
