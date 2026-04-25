@@ -229,3 +229,13 @@ describe('PortalHero · duration label · substrate & tokens (Tanya §3, Mike §
     expect(html).toMatch(/tracking-sys-caption/);
   });
 });
+
+// ─── 4 · alpha rung — door joins the choir ───────────────────
+
+describe('PortalHero · alpha rung — door joins the choir (Tanya §3.1, Mike #47 §6)', () => {
+  it('body prose paints at the `quiet` rung (text-foreground/70), not /80 drift', () => {
+    const html = renderToStaticMarkup(createElement(PortalHero, { article: PLAIN }));
+    expect(html).toMatch(/text-foreground\/70/);
+    expect(html).not.toMatch(/text-foreground\/80/);
+  });
+});

@@ -219,7 +219,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
   'components/explore/ExploreArticleCard.tsx',
-  'components/home/PortalHero.tsx',
   'components/home/ViaWhisper.tsx',
   'components/mirror/QuickMirrorCard.tsx',
   'components/navigation/AmbientNav.tsx',

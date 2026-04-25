@@ -84,7 +84,7 @@ export default function PortalHero({ article }: { article: Article }) {
       <div className="border-t border-fog mt-sys-8 mb-sys-8 mx-auto max-w-xs" />
 
       {excerpts.map((para, i) => (
-        <p key={i} className="text-foreground/80 text-sys-lg
+        <p key={i} className="text-foreground/70 text-sys-lg
           typo-passage mb-sys-4 max-w-xl mx-auto thermal-typography">
           {para}
         </p>
