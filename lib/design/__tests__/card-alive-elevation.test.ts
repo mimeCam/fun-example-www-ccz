@@ -46,18 +46,24 @@ function readCss(): string {
   return readFileSync(CSS_PATH, 'utf8');
 }
 
+/** Escape a string for safe use inside a RegExp character class / atom. Pure. */
+function escapeRe(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
- * Extract the body of a single CSS rule by selector. Returns the text
- * between `selector {` and the next matching `}`. Naive but adequate
- * for the flat `.card-alive*` rules in globals.css. Pure.
+ * Extract the body of a CSS rule whose selector list contains `selector`.
+ * Matches both standalone (`sel {`) and co-listed (`sel,\n other {`) forms,
+ * so a `:focus-within` peer added next to `:hover` still resolves through
+ * the same query. Boundary-anchored: substring matches do not bind. Pure.
  */
 function ruleBody(css: string, selector: string): string {
-  const head = `${selector} {`;
-  const start = css.indexOf(head);
-  if (start === -1) return '';
-  const open = start + head.length;
-  const end = css.indexOf('}', open);
-  return end === -1 ? '' : css.slice(open, end);
+  const re = new RegExp(`(?:^|[\\s,}])${escapeRe(selector)}\\s*[,{]`);
+  const m = re.exec(css);
+  if (!m) return '';
+  const open = css.indexOf('{', m.index);
+  const end = open === -1 ? -1 : css.indexOf('}', open + 1);
+  return open === -1 || end === -1 ? '' : css.slice(open + 1, end);
 }
 
 /** True iff the rule body declares a `box-shadow` via the elevation ledger. */
@@ -133,13 +139,13 @@ describe('card-alive — hover sequencing offsets the surface behind the title',
     expect(body).toMatch(/transition-delay\s*:\s*var\(--card-alive-notice\)\s*;/);
   });
 
-  it('.card-alive:not(:hover) zeros the delay so settle is one breath', () => {
-    const body = ruleBody(css, '.card-alive:not(:hover)');
+  it('.card-alive:not(:hover):not(:focus-within) zeros the delay so settle is one breath', () => {
+    const body = ruleBody(css, '.card-alive:not(:hover):not(:focus-within)');
     expect(body).toMatch(/transition-delay\s*:\s*0ms\s*;/);
   });
 
-  it('.card-alive:not(:hover) keeps the settle ease (sys-ease-settle)', () => {
-    const body = ruleBody(css, '.card-alive:not(:hover)');
+  it('.card-alive:not(:hover):not(:focus-within) keeps the settle ease (sys-ease-settle)', () => {
+    const body = ruleBody(css, '.card-alive:not(:hover):not(:focus-within)');
     expect(body).toContain('var(--sys-ease-settle)');
   });
 });
@@ -192,5 +198,80 @@ describe('card-alive — depth/glow split mirrors the organic/curated identity',
   it('curated hover paints --sys-elev-whisper (glow family — gold-tinted halo)', () => {
     const body = ruleBody(css, '.card-alive-curated:hover');
     expect(body).toContain('var(--sys-elev-whisper)');
+  });
+});
+
+// ─── 5 · Channel-symmetry: :focus-within crosses every reader ──────────────
+//
+// The keyboard / screen-reader / voice reader earns the same felt
+// acknowledgement the cursor reader gets — via ONE selector chain. The
+// outer <Link> takes :focus-visible (the global ring); :focus-within
+// then fires on the inner <article>. Same body, same vocabulary, same
+// volume. (Mike #92 napkin, extending the KeepsakePlate :focus-within
+// precedent at globals.css L886.)
+//
+// These pins are the conversation surface: a future "tidy" that moves
+// `.card-alive` onto the <Link> would break the parent/child :focus-within
+// relationship — and the co-list assertions below would catch that as
+// the source-of-truth in CSS.
+
+describe('card-alive — :focus-within mirrors :hover (channel-symmetry of intent)', () => {
+  const css = readCss();
+
+  it('.card-alive:focus-within paints the same lift as :hover (translateY -4px, scale 1.015)', () => {
+    const body = ruleBody(css, '.card-alive:focus-within');
+    expect(body).toMatch(/transform\s*:\s*translateY\(-4px\)\s+scale\(1\.015\)/);
+  });
+
+  it('.card-alive:focus-within paints --sys-elev-float (same depth as :hover)', () => {
+    const body = ruleBody(css, '.card-alive:focus-within');
+    expect(body).toContain('var(--sys-elev-float)');
+  });
+
+  it('.card-alive:focus-within inherits the --card-alive-notice delay (title-warmth-leads)', () => {
+    const body = ruleBody(css, '.card-alive:focus-within');
+    expect(body).toMatch(/transition-delay\s*:\s*var\(--card-alive-notice\)\s*;/);
+  });
+
+  it('.card-alive-curated:focus-within paints --sys-elev-whisper (curated glow survives across readers)', () => {
+    const body = ruleBody(css, '.card-alive-curated:focus-within');
+    expect(body).toContain('var(--sys-elev-whisper)');
+  });
+
+  it(':hover and :focus-within share ONE rule body (single source of truth)', () => {
+    // Co-list assertion: the regex pins the comma-list shape so a future
+    // refactor that splits the rule into two duplicate bodies would catch
+    // here — the truth is one selector chain, not two.
+    expect(css).toMatch(/\.card-alive:hover\s*,\s*\n?\s*\.card-alive:focus-within\s*\{/);
+    expect(css).toMatch(/\.card-alive-curated:hover\s*,\s*\n?\s*\.card-alive-curated:focus-within\s*\{/);
+  });
+});
+
+// ─── 6 · Cascade order — :active still wins over :focus-within ─────────────
+//
+// `:focus-within` is sticky (persists across Tab stops); `:active` is
+// momentary (≤200ms tap confirmation). When a sticky-focused card is
+// then tapped, the press depth must out-paint the focus glow — same
+// rule that already protects the curated glow from being mistaken for
+// a press. Source-order is the lever; this pin is the receipt.
+// (Mike #92 napkin §2: `:hover` → `:focus-within` peers → `:active`
+// is the load-bearing top-to-bottom order.)
+
+describe('card-alive — :active is declared AFTER :focus-within (cascade order)', () => {
+  const css = readCss();
+
+  it('.card-alive:active source-order beats .card-alive:focus-within', () => {
+    const focusWithin = indexOf(css, '.card-alive:focus-within');
+    const active      = indexOf(css, '.card-alive:active');
+    expect(focusWithin).toBeGreaterThan(-1);
+    expect(active).toBeGreaterThan(-1);
+    expect(active).toBeGreaterThan(focusWithin);
+  });
+
+  it('.card-alive:active source-order beats .card-alive-curated:focus-within', () => {
+    const curatedFocus = indexOf(css, '.card-alive-curated:focus-within');
+    const active       = indexOf(css, '.card-alive:active');
+    expect(curatedFocus).toBeGreaterThan(-1);
+    expect(active).toBeGreaterThan(curatedFocus);
   });
 });

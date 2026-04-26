@@ -101,7 +101,22 @@ export default function ExploreArticleCard({
 
           `ref` feeds useScrollRise — the hook sets `data-sys-rise="pre"` on
           mount (card invisible) then `data-sys-enter="rise"` on intersection
-          (card animates in with stagger). One observer for the whole list. */}
+          (card animates in with stagger). One observer for the whole list.
+
+          ── INVARIANT — DO NOT MOVE `card-alive` ONTO THE <Link> ──────────
+          The `.card-alive` family lives on the inner <article>, on purpose.
+          The outer <Link> receives `:focus-visible` (the global ring lands
+          there); `:focus-within` then fires on the inner <article> and the
+          card lifts the same way it does on `:hover` — one selector chain
+          covers cursor / touch / keyboard / screen-reader / voice. If a
+          future refactor "tidies" the class up onto the <Link>, the
+          parent/child relationship `:focus-within` depends on collapses
+          and the keyboard reader silently loses the felt acknowledgement.
+          The pin: `lib/design/__tests__/card-alive-elevation.test.ts`
+          asserts the co-listed `:focus-within` peer in `app/globals.css`,
+          and the `THERM_HELD`-on-Link convention above keeps the focus
+          ring on the rounded corner. (Mike #92 napkin §2 / §3 risk #2;
+          precedent: `KeepsakePlate :focus-within` at globals.css L886.) */}
       <article
         className={`bg-surface ${THERM_HELD} shadow-sys-rest p-sys-6 h-full flex flex-col
           card-alive ${edgeClass(isCurated)}`}

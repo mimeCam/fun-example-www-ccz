@@ -792,15 +792,31 @@ body {
    surface follows after `--card-alive-notice` — below conscious
    perception (~100ms), above simultaneity (~30ms). The reader cannot
    count the gap; they only feel the room notice them, then lean in.
-   Title-warmth-leads, surface-follows. */
-.card-alive:hover {
+   Title-warmth-leads, surface-follows.
+
+   `:focus-within` peer (Mike #92 napkin — channel-symmetry of intent):
+   the inner <article> carries `.card-alive`; the outer <Link> carries
+   the focus ring. When the link gets `:focus-visible`, `:focus-within`
+   fires on the article automatically — one selector chain crosses every
+   reader (cursor / touch / keyboard / screen-reader / voice). Same
+   vocabulary as hover; the room notices the keyboard reader the same
+   way it notices the cursor. Precedent: `.plate-destination:focus-within`
+   at L886 (Mike #43 — KeepsakePlate). */
+.card-alive:hover,
+.card-alive:focus-within {
   transform: translateY(-4px) scale(1.015);
   box-shadow: var(--sys-elev-float);
   transition-timing-function: var(--sys-ease-out);
   transition-duration: var(--sys-time-hover);
   transition-delay: var(--card-alive-notice);
 }
-.card-alive:not(:hover) {
+/* Leave-settle path: must zero on BOTH channels otherwise blurring a
+   focused card would skip the 300ms settle ease (the gentle return).
+   `.card-alive:not(:hover):not(:focus-within)` keeps the breath out
+   one-channel-symmetric with the breath in. (Mike #92 napkin §3 risk
+   table: the test for this assertion exists so the regression cannot
+   ship invisibly.) */
+.card-alive:not(:hover):not(:focus-within) {
   transition-timing-function: var(--sys-ease-settle);
   transition-duration: var(--sys-time-enter); /* 300ms leave: gentle settle-down = enter beat */
   transition-delay: 0ms;                      /* one breath out, not two */
@@ -819,8 +835,15 @@ body {
 
 /* Curated card alive-state — glow family, not depth. The curated row's
    entire identity is *warmth*; the depth family belongs to the organic
-   grid. Two channels, two jobs, no overload. (Tanya UX #100 §5.) */
-.card-alive-curated:hover {
+   grid. Two channels, two jobs, no overload. (Tanya UX #100 §5.)
+
+   `:focus-within` peer carries the same gold-tinted halo: the curated
+   identity (whisper-glow, not lift-depth) survives across every reader
+   class. Glow stays at-rung, not attenuated — attenuating a quiet glow
+   extinguishes it. The depth-family attenuation logic (Tanya UX #100 §4)
+   belongs to organic, not curated. (Mike #92 napkin.) */
+.card-alive-curated:hover,
+.card-alive-curated:focus-within {
   box-shadow: var(--sys-elev-whisper);
 }
 
@@ -831,9 +854,12 @@ body {
    being pressed, not a URL being requested. Mobile parity for the
    desktop hover polish.
 
-   Source-order matters: this rule must follow `.card-alive:hover` and
-   `.card-alive-curated:hover` so the press depth wins over the curated
-   glow during a press. Same specificity, later cascade. */
+   Source-order matters: this rule must follow `.card-alive:hover`,
+   `.card-alive:focus-within`, AND `.card-alive-curated:hover` /
+   `:focus-within` so the press depth wins over the curated glow AND
+   over a sticky-focus glow during a tap. Same specificity, later
+   cascade. (Mike #92 napkin §2: `:hover` → `:focus-within` peers →
+   `:active` is the load-bearing top-to-bottom order.) */
 .card-alive:active {
   transform: translateY(-2px) scale(1.005);
   box-shadow: var(--sys-elev-rise);
