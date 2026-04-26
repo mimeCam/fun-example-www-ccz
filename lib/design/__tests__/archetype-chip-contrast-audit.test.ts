@@ -172,40 +172,15 @@ function measuredRatio(k: ArchetypeKey, anchor: SurfaceAnchor): number {
 // ─── Structured failure message (Elon's kernel — number first, key second) ─
 
 /**
- * Today's calibrated floor. The architectural target (Tanya UX #22 §7,
- * Mike napkin #97 §"Acceptance criteria") is **WCAG 4.5:1 (1.4.3 AA,
- * normal text)** — that is the destination this audit lifts toward.
- *
- * Calibration receipt (2026-04-26). Brand-vs-surface measurement caught
- * the `Faithful Reader (secondary)` voice slipping below 4.5:1 against
- * BOTH thermal anchors today: `3.46:1 @ dormant`, `3.14:1 @ warm`. Every
- * other archetype clears 4.5:1 with headroom (worst non-secondary cell:
- * `Explorer (accent) @ warm = 5.53:1`). The atomic-fail-path doctrine
- * (Tanya §3.3) calls for stepping the family rung as one register when
- * the audit catches a fail — but the failing axis here is the BRAND HEX
- * itself, not the alpha rung; stepping the border alpha cannot lift
- * text-on-surface contrast. The honest move is a **calibrated floor +
- * lift TODO**, mirroring the established palette-tuning pattern in
- * `ambient-surfaces.test.ts:226` ("raise this to 7.0 once the dormant
- * accent is lifted") rather than papering over a real defect to make
- * the test green. Floor today is `3.0:1` (WCAG 1.4.11 non-text floor —
- * the most conservative reading of the chip-as-badge geometry); lift
- * target is `4.5:1` once `BRAND.secondary` is reviewed.
- *
- * TODO(palette-tuning): lift FLOOR to 4.5 once `BRAND.secondary`
- * (`#9d4edd`) is reviewed against the warm thermal anchor — the
- * Faithful Reader voice currently sits at 3.14:1 over `THERMAL_WARM
- * .surface`. Resolution paths for the team to choose:
- *   (a) Lift `BRAND.secondary` toward a brighter violet (e.g., closer to
- *       the brand `accent` violet `#c77dff`, which clears 5.53:1 @ warm).
- *   (b) Switch the `faithful` archetype's family from `secondary` to a
- *       brighter family (e.g., a calibrated paler-rose, or `accent` —
- *       though that creates a perceptual collision with `explorer`).
- *   (c) Promote the audit to a per-archetype floor table (rule of three;
- *       worldview already has per-pair floors via `CONTRAST_PAIRS`).
- * The choice is design's, not engineering's. Track in AGENTS.md.
+ * WCAG 1.4.3 AA floor for normal text. Receipt (2026-04-26): after
+ * lifting `BRAND.secondary` `#9d4edd → #bc8cf0` (napkin #98), `faithful`
+ * @ warm now reads 5.60:1 — no longer the worst cell. The new worst-case
+ * is `Explorer (accent) @ warm = 5.36:1` (0.86 of headroom over the
+ * floor); every cell clears with margin and the atomic-fail-path lever
+ * (one rung-step in `archetype-accents.ts`) remains unspent for the next
+ * regression.
  */
-const FLOOR = 3.0;
+const FLOOR = 4.5;
 
 /**
  * Asserts the cell clears the floor with a structured failure message.

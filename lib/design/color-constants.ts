@@ -44,7 +44,10 @@ export const BRAND = {
   fog:     '#222244',
   void:    '#0d0d1a',
   primary: '#7b2cbf',
-  secondary: '#9d4edd',
+  secondary: '#bc8cf0',
+  // Calibrated for `archetype-chip-contrast-audit` (≥ 4.5:1 vs THERMAL_WARM.surface,
+  // the painted hex over the warm anchor — Faithful Reader voice).
+  // Before nudging for taste, read that test file's calibration block.
   // The static brand violet Tailwind paints under `text-accent` /
   // `border-accent` (see `tailwind.config.ts` → `accent: var(--accent-
   // violet)`). NOT thermal — `--token-accent` lerps violet→gold; this

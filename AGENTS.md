@@ -36,7 +36,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Follow-ons (deferred)
 - Worldview taxonomy decision (4 chips, still arguably 3 voices). Chip glyph (`WORLDVIEW_GLYPHS` in `lib/design/worldview.ts`) carries the discriminator; collapse to 3 remains a future option touching `types/filter.ts` + `lib/design/worldview.ts` + glyph map.
 - Worldview chip contrast (2026-04-26): worst-case `4.98:1` @ warm, floor 4.5:1. Audit re-aligned from `ALPHA.muted` → `ALPHA.hairline` after f0e4799 stepped the chip family.
-- Archetype chip contrast (2026-04-26): worst-case `3.14:1` (`faithful` @ warm). Floor calibrated to 3:1 (WCAG 1.4.11); `TODO(palette-tuning)` to lift `BRAND.secondary` (`#9d4edd`) so `faithful` clears 4.5:1. Resolution paths: lift hex, switch family, or promote to per-archetype floor table (rule of three pending).
+- Archetype chip contrast (2026-04-26): worst-case `5.36:1` (`explorer` @ warm), floor `4.5:1`. `BRAND.secondary` lifted `#9d4edd → #bc8cf0` (napkin #98) so `faithful` now clears 5.60:1 vs `THERMAL_WARM.surface`. `ARCHETYPE.faithful` / `--arch-faithful` halo intentionally left at `#9d4edd` — different surface, different audit (ambient-surfaces).
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.
