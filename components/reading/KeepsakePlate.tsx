@@ -136,11 +136,22 @@ function PlateSurface(p: PlateSurfaceProps) {
  * primitive's `inline-flex justify-center` so children stack vertically;
  * `text-left` overrides centered text inside the Pressable. The corner
  * resolves to `thermal-radius-wide` via the helper — posture: ceremony.
+ *
+ * `plate-destination` is the at-rest acknowledgement rule (one CSS class
+ * in `app/globals.css`, sibling to the `.card-alive` family): a single
+ * gold halo dwell after the entrance settles + a 2px arrow nudge on
+ * `:focus-within`. Zero new tokens; pure ledger reuse. (Mike #43 napkin,
+ * Tanya UX #100, plate-destination.test.ts is the adoption guard.)
+ *
+ * NOTE for future cosmetic tweaks: this composer is the canonical
+ * composition site for the Plate's surface classes — add new cosmetic
+ * classes here, not on the JSX. (Mike #43 §8.)
  */
 function plateClass(): string {
   return [
     'block w-full max-w-md text-left',
     thermalRadiusClassByPosture('ceremony'),
+    'plate-destination',
   ].join(' ');
 }
 
@@ -162,11 +173,19 @@ function PlateThumbnail({ snapshot }: { snapshot: ThreadSnapshot }) {
   );
 }
 
-/** The "Keep this thread →" eyebrow caption. One verb, one direction. */
+/**
+ * The "Keep this thread →" eyebrow caption. One verb, one direction.
+ *
+ * The `→` glyph lives inside a `.plate-caption-arrow` span (decorative,
+ * `aria-hidden`) so the destination CSS rule can nudge a single character
+ * 2px right on `:focus-within` without animating the whole `<p>`. Screen
+ * readers continue to announce "Keep this thread" cleanly; the arrow is
+ * the universal handshake. (Mike #43 §5.5, Tanya UX #100 §2.5.)
+ */
 function PlateCaption() {
   return (
     <p className="mt-sys-3 mb-sys-1 text-center text-gold text-sys-caption font-sys-accent">
-      Keep this thread →
+      Keep this thread <span aria-hidden="true" className="plate-caption-arrow">→</span>
     </p>
   );
 }

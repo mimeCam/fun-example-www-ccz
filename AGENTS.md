@@ -29,8 +29,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - *(none)*
 
 ## Follow-ons (deferred)
-- Worldview taxonomy decision (4 chips, still arguably 3 voices). The chip glyph (`WORLDVIEW_GLYPHS` in `lib/design/worldview.ts`) carries the discriminator at chip size; collapse to 3 worldviews remains a future option that would touch `types/filter.ts` + `lib/design/worldview.ts` + the glyph map together.
-- ~~Worldview chip contrast measurement~~ — completed 2026-04-26: audit built (`chip-contrast-audit.test.ts`), chip background alpha stepped `muted` (0.30) → `hairline` (0.10) atomically, all pairs clear WCAG 4.5:1 at both thermal anchors.
+- Worldview taxonomy decision (4 chips, still arguably 3 voices). Chip glyph (`WORLDVIEW_GLYPHS` in `lib/design/worldview.ts`) carries the discriminator; collapse to 3 remains a future option touching `types/filter.ts` + `lib/design/worldview.ts` + glyph map.
+- Coda hairline spacing under stranger reads — `ArticleWhisperPortal` renders zero-height for strangers, the closing `<hr className="mt-sys-7 ...">` lands too close to `WhisperFooter`. Step to `mt-sys-8` (one rung, no new token).
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

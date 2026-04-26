@@ -136,6 +136,12 @@
   --sys-anim-glow-onset:       2000ms; /* thermal glow pulse onset delay (not duration) —
                                           post-settle warmup so base transition smooths first.
                                           Exception: ambient atmospheric, not a gesture beat. */
+  --sys-anim-glow-hold:        2000ms; /* CEREMONY.glowHold — keepsake halo dwell.
+                                          The Coda Plate's "given, not offered" breath:
+                                          one whisper-on / whisper-off cycle the room
+                                          performs once after the entrance settles.
+                                          Mirror: lib/design/motion.ts CEREMONY.glowHold.
+                                          Pinned by plate-destination.test.ts. */
   --sys-anim-thermal:          3000ms; /* thermal bg/candle shift — atmospheric,
                                           deliberately slower than settle.
                                           Exception: room temperature, not gesture. */
@@ -836,6 +842,75 @@ body {
   transition-delay: 0ms;                        /* press confirmation must be immediate */
 }
 
+/* ─── Plate Destination ────────────────────────────────────────────────────
+   The article Coda's KeepsakePlate is a *destination*, not a corridor tile.
+   The grid lifts to greet the cursor; the Coda holds its artifact still
+   and lets the room glow around it. Two channels, one promise:
+
+     1. After the entrance resolves, the surface breathes one quiet gold
+        halo (rest → whisper → rest). The dwell uses CEREMONY.glowHold
+        (2000ms) and starts at var(--entrance-duration) so a single
+        source of truth pins "when the entrance ends." Desktop-only via
+        `@media (hover: hover)` — touch / keyboard get the focus path.
+
+     2. On `:focus-within`, the caption's eyebrow arrow nudges 2px right
+        with --sys-time-crossfade (120ms). Focus-within is universal
+        across pointer / touch / keyboard / screen-reader, so this is
+        the one channel that crosses every reader.
+
+   Zero new tokens: halo color/weight = elevation ledger (--sys-elev-whisper /
+   --sys-elev-rest); halo dwell = CEREMONY.glowHold (motion.ts:86); arrow
+   timing = --sys-time-crossfade (motion ledger). AGENTS.md L26 holds:
+   posture suggests, posture does not dictate — no new --sys-ease-* curve,
+   no posture-encoded token name. Reduced motion silences both gestures;
+   the focus ring still lands. The ::after halo is a stacking-isolated
+   overlay so the Pressable's existing hover/active box-shadow transitions
+   stay independent (the artifact never moves toward the reader).
+
+   Source order matters: this rule sits AFTER the .card-alive family so
+   the destination's quiet glow wins over any accidental peer-tile
+   inheritance — defensive, not load-bearing.
+
+   Credits: Mike K. (#43 napkin — class name, ledger reuse, focus-within
+   universality, source-order discipline), Tanya D. (UX #100 §2/§5 —
+   glow-not-depth family lock, single-mover-arrow rationale), Elon M.
+   (§5 destinations do not rhyme with corridors — the architectural spine),
+   Paul K. (KPI: "the keepsake's reveal must feel given, not offered"). */
+.plate-destination {
+  position: relative;
+}
+.plate-destination .plate-caption-arrow {
+  display: inline-block;
+  transition: transform var(--sys-time-crossfade) var(--sys-ease-out);
+}
+.plate-destination:focus-within .plate-caption-arrow {
+  transform: translateX(2px);
+}
+@media (hover: hover) {
+  .plate-destination::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    box-shadow: var(--sys-elev-rest);
+    animation: plateDestinationDwell var(--sys-anim-glow-hold) var(--sys-ease-settle)
+               var(--entrance-duration, 700ms) 1 both;
+  }
+}
+@keyframes plateDestinationDwell {
+  0%   { box-shadow: var(--sys-elev-rest); }
+  35%  { box-shadow: var(--sys-elev-whisper); }
+  65%  { box-shadow: var(--sys-elev-whisper); }
+  100% { box-shadow: var(--sys-elev-rest); }
+}
+/* The arrow-nudge reduced-motion override is appended at the foot of the
+   universal `@media (prefers-reduced-motion: reduce)` block (the universal
+   `*` rule already silences the halo dwell via animation-duration: 0.01ms).
+   Kept co-located with the other reduced-motion overrides so the skeleton-
+   sync ordering invariant (first reduced-motion block carries the skeleton
+   pin) is not disturbed. (Mike #43 §5.3.) */
+
 /* ─── CTA Physical Press ────────────────────────────── */
 /* Hover: button lifts off surface (3px + scale).
    Active: button depresses INTO surface (1px down + shrink).
@@ -1007,6 +1082,19 @@ body {
   .sys-skeleton {
     animation: none !important;
     opacity: var(--sys-alpha-muted) !important;
+  }
+  /* Plate destination — neither the halo dwell nor the focus arrow
+     nudge fire under reduced motion. The universal `*` rule above
+     already collapses animation-duration to the floor; this hard-kills
+     the halo regardless of fill-mode and zeros the arrow's transform
+     so no end-state translation lands on focus. The focus ring (driven
+     by --token-accent on :focus-visible) still lands — accessibility
+     never fails silently. (Mike #43 §5.3, Tanya UX #100 §2.4 table.) */
+  .plate-destination::after {
+    animation: none !important;
+  }
+  .plate-destination:focus-within .plate-caption-arrow {
+    transform: none !important;
   }
   .thermal-typography {
     text-shadow: none !important;
