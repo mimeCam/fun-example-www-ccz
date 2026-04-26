@@ -9,19 +9,28 @@
  * paints when the selector says `whisper`.
  *
  * Layout (Tanya §2): the Whisper sits in the *coda margin*, below
- * NextRead and above WhisperFooter, inside the same `max-w-prose`
+ * NextRead and above the coda hairline, inside the same `max-w-prose`
  * column as the article body. No card, no shadow, no radius — a single
- * italic line. The portal's wrapper exists only to:
- *   – hold the `mt-sys-10` / `mb-sys-8` breathing room (Tanya §2.2),
- *   – center the line in the prose column,
- *   – collapse to zero height for non-returning readers (no ghost margin).
+ * italic line.
+ *
+ * Envelope ownership (Mike #2 §5, Sid #5):
+ *   The portal does NOT own its own breathing room. The call site
+ *   (`app/article/[id]/page.tsx`) wraps it in `<CollapsibleSlot>` so the
+ *   envelope SSRs even though this component is dynamic-loaded with
+ *   `{ ssr: false }`. The envelope carries `mt-sys-10` / `mb-sys-8`;
+ *   this component carries only the italic-line styling. Strangers and
+ *   returners produce the same DOM rhythm at the page level; only the
+ *   italic line paints differently. Margin contract lives at the seam
+ *   that survives the dynamic gate.
  *
  * Client-only (the hook reads localStorage). Always imported from
  * `app/article/[id]/page.tsx` via `next/dynamic` with `{ ssr: false }`,
  * mirroring the `ReturningPortal` pattern.
  *
- * Credits: Mike Koch (architect §4 — portal shape, selector adoption),
- * Tanya Donska (UIX §2 — coda slot, "the line is the feature").
+ * Credits: Mike Koch (architect §4 — portal shape, selector adoption;
+ * #2 — envelope-at-the-call-site contract, SSR pin), Tanya Donska
+ * (UIX §2 — coda slot, "the line is the feature"; #3 — lens naming the
+ * "spacing math may not silently assume the recognition-positive case").
  */
 
 'use client';
@@ -39,7 +48,8 @@ import {
  * below short-circuits to `null` server-side, which would silence the
  * test). The hook returns its INITIAL state in SSR, so the rendered
  * verdict is `silent` for any unauthenticated/unhydrated reader. That
- * is the desired contract.
+ * is the desired contract — the call site's `<CollapsibleSlot>` mounts
+ * the envelope; this component returns `null` for strangers.
  */
 export function ArticleWhisperPortalInner() {
   const recognition = useReturnRecognition();
@@ -56,10 +66,11 @@ export function ArticleWhisperPortalInner() {
 
   if (surface !== 'whisper') return null;
 
-  // Tanya §2.2 — direct child of the article column. The wrapper carries
-  // ONLY breathing room; no container, no border, no shadow.
+  // Tanya §2.2 — direct child of the envelope. This wrapper carries
+  // ONLY centering; no margin (the envelope owns the gap), no border,
+  // no shadow.
   return (
-    <div className="mt-sys-10 mb-sys-8 text-center">
+    <div className="text-center">
       <RecognitionWhisper recognition={recognition} />
     </div>
   );

@@ -29,6 +29,7 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import WhisperFooter from '@/components/shared/WhisperFooter';
+import { CollapsibleSlot } from '@/components/shared/CollapsibleSlot';
 
 // Recognition-surface portal — gated by the shared selector so the
 // Whisper and the home-rail Letter can never paint at the same time
@@ -171,16 +172,30 @@ function ArticleContent({ params }: { params: { id: string } }) {
           <ReadersMark />
 
           {/* Coda — recognition Whisper for returning readers, gated by
-              the shared selector. Stranger readers get a zero-height
-              shell (no ghost margin). Tanya §2 — "the comma in the right
-              margin." Sits below NextRead, above the coda hairline. */}
-          <ArticleWhisperPortal />
+              the shared selector. Tanya §2 — "the comma in the right
+              margin." Sits below NextRead, above the coda hairline.
+              ──
+              `CollapsibleSlot` owns the breathing room (mt-sys-10 /
+              mb-sys-8) so the gap survives the stranger branch where
+              the inner returns `null`. The envelope SSRs even though
+              the portal itself is `dynamic({ ssr: false })` — that is
+              the SSR pin (Krystle, Tanya #3 §4). Strangers and
+              returners produce identical surrounding-DOM rhythm; only
+              the italic line paints differently. Mike #2 §5 — margins
+              for a collapsible portal live on the portal's envelope,
+              not on its siblings. */}
+          <CollapsibleSlot top={10} bottom={8}>
+            <ArticleWhisperPortal />
+          </CollapsibleSlot>
 
           {/* Coda hairline — geometric divider between the article body
               (and its quiet Whisper) and site chrome (the WhisperFooter).
               Reuses the header hairline token. Tanya §4 — prevents the
               mist-on-mist mumble where the Whisper bleeds into the
-              Footer's tagline. No new tokens; same `border-gold/10`. */}
+              Footer's tagline. No new tokens; same `border-gold/10`.
+              The top margin is the hairline's own rung — the envelope
+              above provides the asymmetric breath; this sibling does
+              not compensate for the portal's render verdict. */}
           <hr className="mt-sys-7 max-w-divider mx-auto border-gold/10" />
         </div>
         <WhisperFooter />

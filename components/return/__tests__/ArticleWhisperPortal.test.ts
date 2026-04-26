@@ -24,18 +24,27 @@ import { RecognitionWhisper } from '@/components/return/RecognitionWhisper';
 import { ArticleWhisperPortalInner } from '@/components/return/ArticleWhisperPortal';
 
 // ─── 1 · stranger SSR baseline ─────────────────────────────────
+//
+// Sid #5 — envelope ownership moved to the call site (`<CollapsibleSlot>`
+// at `app/article/[id]/page.tsx`). The inner no longer carries the
+// `mt-sys-10` / `mb-sys-8` breathing room — that lives on the envelope
+// so it survives the dynamic `{ ssr: false }` gate and the `null` branch.
+// These assertions become a *negative* check on the inner: it must paint
+// nothing for strangers AND must not re-introduce the margins it gave up.
 
 describe('ArticleWhisperPortal · SSR baseline (stranger reader)', () => {
-  it('paints nothing on first render — no ghost margin', () => {
+  it('paints nothing on first render — the envelope owns the gap, not the inner', () => {
     const html = renderToStaticMarkup(createElement(ArticleWhisperPortalInner));
     // The hook returns INITIAL { isReturning: false, lastWhisper: null }
-    // server-side. Selector → silent → component returns null.
+    // server-side. Selector → silent → inner returns null. The
+    // CollapsibleSlot envelope at the call site supplies the breath.
     expect(html).toBe('');
   });
 
   it('does not leak any whisper-shell class on stranger SSR', () => {
     const html = renderToStaticMarkup(createElement(ArticleWhisperPortalInner));
     expect(html).not.toMatch(/mt-sys-10/);
+    expect(html).not.toMatch(/mb-sys-8/);
     expect(html).not.toMatch(/text-sys-caption/);
     expect(html).not.toMatch(/font-display/);
   });
