@@ -45,7 +45,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 > ring carries (Mike #103 §7 risk note; rule of three).
 
 ### Reader Anchor (invariant chrome) (1)
-- Focus ring: worst-case `3.94:1` at both anchors, floor 3.0:1 (WCAG 1.4.11 non-text; reader-invariant chrome — type forbids divergence)
+- Focus ring: worst-case `3.94:1` at both anchors, floor 3.0:1 (WCAG 1.4.11 non-text; reader-invariant chrome — type forbids divergence) · hue-Δ `1.91°` vs THERMAL.accent (floor ≤ `10°`; same violet family)
 
 ### Thermal Voices (7)
 - Worldview chip: worst-case `4.98:1` @ warm, floor 4.5:1

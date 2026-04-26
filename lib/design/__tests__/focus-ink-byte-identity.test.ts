@@ -88,6 +88,36 @@ function matchesOf(block: string, prefix: string): string[] {
   return block.match(rx) ?? [];
 }
 
+// ─── Helpers — kinship gate (HSL math), ≤10 LOC each ────────────────────
+// Private to this file. Promote to `lib/design/contrast.ts` on the SECOND
+// caller, never the first (Mike rule of three #78 §6 #1; Elon §3).
+
+/** `#rrggbb` → [r,g,b] each in [0,1]. Pure. */
+function hexToRgb(hex: string): [number, number, number] {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
+  if (!m) throw new Error(`hexToRgb: bad hex: ${hex}`);
+  return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
+}
+
+/** `#rrggbb` → { h:[0,360), s:[0,100], l:[0,100] }. Pure. */
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+  const [r, g, b] = hexToRgb(hex);
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  const l = (mx + mn) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d !== 0 && mx === r) h = ((g - b) / d + 6) % 6;
+  else if (d !== 0 && mx === g) h = (b - r) / d + 2;
+  else if (d !== 0) h = (r - g) / d + 4;
+  return { h: ((h * 60) + 360) % 360, s: s * 100, l: l * 100 };
+}
+
+/** Circular hue distance — survives the 0°/360° wrap. Pure. */
+function circularHueDelta(a: number, b: number): number {
+  const raw = Math.abs(a - b) % 360;
+  return Math.min(raw, 360 - raw);
+}
+
 // ─── Tests — the three physics assertions ─────────────────────────────────
 
 describe('focus-ink byte-identity — the physics gate', () => {
@@ -162,5 +192,29 @@ describe('reader-invariant tag — the convention is grep-visible', () => {
       src.indexOf('FOCUS_INK') + 400,
     );
     expect(focusInkBlock.includes('reader-invariant')).toBe(true);
+  });
+});
+
+// ─── Tests — kinship gate: same violet family (hue only) ────────────────
+// Sibling to the `INTENTIONALLY DIFFERENT` test above: that one pins the
+// *different* half (post-WCAG-lift fork); this one pins the *same-family*
+// half (the JSDoc claim that `#c77dff` is the brighter sibling of `#7b2cbf`
+// in the violet hue family). Hue-only — ΔS / ΔL diverge by design (Elon
+// #14; ΔL audited via `focus-ring-contrast-audit`). Floor `10°` = today's
+// Δh (~1.91°) × 5 margin, not eyeballed (Mike #78 §6 #6).
+
+describe('focus-ink kinship — same violet family (hue gate)', () => {
+  const HUE_FLOOR_DEG = 10;
+
+  it(`Δh(FOCUS_INK, THERMAL.accent) ≤ ${HUE_FLOOR_DEG}° (same violet family)`, () => {
+    const dh = circularHueDelta(
+      hexToHsl(FOCUS_INK).h,
+      hexToHsl(THERMAL.accent).h,
+    );
+    // eslint-disable-next-line no-console
+    console.log(
+      `[focus-ink-kinship] Δh ${dh.toFixed(2)}° (floor ${HUE_FLOOR_DEG}°)`,
+    );
+    expect(dh).toBeLessThanOrEqual(HUE_FLOOR_DEG);
   });
 });
