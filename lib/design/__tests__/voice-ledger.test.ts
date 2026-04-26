@@ -168,12 +168,20 @@ describe('CONTRAST_PAIRS — every (fg, bg) is in licenseFor(surface)', () => {
   // shared shape (Mike napkin #54 — "polymorphism is a killer"). Four
   // siblings sit honestly side-by-side; a fifth sibling with a fifth
   // distinct role earns the genus, not before.
-  it('four rows today: `chip` + `keepsake` + `thread` + `textLink`; genus deferred (shape ≠ role)', () => {
+  it('five rows today: four Surface + one chrome (`focusRing`); genus deferred (shape ≠ role)', () => {
+    // Mike #103 §5 file #2 / Sid 2026-04-26 — `focusRing` joins as the
+    // *first* member of the chrome group via `ReaderInvariantPair` brand.
+    // The key is NOT a `Surface` member (chrome ≠ paint-bearing journey
+    // surface); it lives under `ContrastPairsKey` (Surface | 'focusRing')
+    // with the index signature minimally widened (Mike #103 §6 #6).
     expect(Object.keys(CONTRAST_PAIRS).sort())
-      .toEqual(['chip', 'keepsake', 'textLink', 'thread'].sort());
+      .toEqual(['chip', 'focusRing', 'keepsake', 'textLink', 'thread'].sort());
   });
 
-  (Object.keys(CONTRAST_PAIRS) as Surface[]).forEach((surface) => {
+  // Surface-row license check — focusRing is not a Surface (it is chrome),
+  // so it is excluded from this iteration. Its own structural assertion
+  // lives in the next describe block (Mike #103 §5 file #6).
+  ALL_SURFACES.filter((s) => s in CONTRAST_PAIRS).forEach((surface) => {
     const licensed = new Set<Voice>(licenseFor(surface));
     contrastPairsFor(surface).forEach((pair) => {
       it(`${surface} pair (${pair.fg}, ${pair.bg}) names licensed voices`, () => {
@@ -189,6 +197,33 @@ describe('CONTRAST_PAIRS — every (fg, bg) is in licenseFor(surface)', () => {
     // remains paired-row-free until its own concrete consumer lands.
     expect(contrastPairsFor('letter')).toEqual([]);
     expect(contrastPairsFor('whisper')).toEqual([]);
+  });
+});
+
+// ─── 5b · focusRing — structural drift gate (Mike #103 §5 file #6) ────────
+// Drift test, not behavior. The brand `invariant: true` makes
+// `cold ≡ warm` a SHAPE invariant; the audit module
+// `focus-ring-contrast-audit.test.ts` measures the math behind it. This
+// block pins the structural shape so a refactor that drops the brand or
+// extends the row trips here, before the audit runs.
+
+describe('CONTRAST_PAIRS.focusRing — reader-invariant chrome (one cell, by shape)', () => {
+  it('exists with exactly one cell — cardinality-1 by intent', () => {
+    expect(CONTRAST_PAIRS.focusRing).toBeDefined();
+    expect(CONTRAST_PAIRS.focusRing!.length).toBe(1);
+  });
+
+  it('the cell carries `invariant: true` (the ReaderInvariantPair brand)', () => {
+    const cell = CONTRAST_PAIRS.focusRing![0] as { invariant?: boolean };
+    expect(cell.invariant).toBe(true);
+  });
+
+  it('is NOT iterated as a Surface (chrome ≠ journey surface)', () => {
+    // Mike #103 §6 #6 — `focusRing` is added as a `CONTRAST_PAIRS` *key*
+    // but the `Surface` union is *not* extended. This pin documents the
+    // separation: future refactors that promote chrome into Surface must
+    // delete this assertion deliberately.
+    expect(ALL_SURFACES.includes('focusRing' as Surface)).toBe(false);
   });
 });
 

@@ -286,6 +286,44 @@ export interface ContrastPair {
   readonly floor: number;
 }
 
+/**
+ * Reader-invariant audit row — one cell, by *shape*. `ring.cold ≡ ring.warm`
+ * is unrepresentable: divergence fails at compile time, before any test
+ * runs. The `invariant: true` brand is what makes the row a *named
+ * asymmetry* the reader of the file sees in 1 second — and it is what the
+ * audit module reads to decide "print one number twice."
+ *
+ * One sentence on *why this row is typed differently*: the focus ring is
+ * reader-invariant chrome (Tanya UX #60 §3 / Paul §4 — same painted
+ * bytes at every thermal anchor); the type forbids a future palette PR
+ * from typing `{ cold: 5.1, warm: 5.0 }` into the row by mistake.
+ *
+ * Used today by exactly one row: `CONTRAST_PAIRS.focusRing`. NOT a new
+ * genus — a cardinality-1 brand on the existing `ContrastPair` shape
+ * (Mike #103 §3, Elon §3 — kernel-only, 5 LOC of TS, no manifesto).
+ *
+ * Credits: Mike K. (#103 §3), Jason F. (#91 — type-pin the cold≡warm
+ * invariant; the salvaged structural insight), Elon M. (§3 — kernel-only),
+ * Tanya D. (#60 §3 — the layout reframe that named "Reader-Invariant
+ * Chrome" and motivates the brand).
+ */
+export interface ReaderInvariantPair extends ContrastPair {
+  readonly invariant: true;
+}
+
+/**
+ * Keys of `CONTRAST_PAIRS`. The base set is `Surface` — the seven paint-
+ * bearing rooms the journey ledger licenses. The widening admits *one*
+ * reader-invariant chrome key (`focusRing`) that does NOT belong on the
+ * `Surface` union by design (Mike #103 §6 #6: the focus ring is chrome,
+ * not a paint-bearing journey surface; the `Surface` union stays closed).
+ *
+ * Adding a second chrome key here without earning the rule-of-three
+ * promotes the genus (Mike napkin #54). Today: one chrome row, one
+ * Surface-row set. Tomorrow: same.
+ */
+export type ContrastPairsKey = Surface | 'focusRing';
+
 // ─── Named WCAG floors + the halo's intentional sub-WCAG ambient floor ────
 //
 // Floors are *numbers in the type system*, not prose in a docblock — so a
@@ -406,6 +444,50 @@ export const THREAD_AMBIENT_FLOOR = 1.5;
 export const TEXTLINK_PASSAGE_FLOOR = WCAG_AA_TEXT;
 
 /**
+ * Focus-ring painted contrast floor — **1.65:1, intentionally below WCAG
+ * 1.4.11** (3:1 non-text) by *current palette* (Sid 2026-04-26, mirroring
+ * the lock-LOW pattern of `THREAD_AMBIENT_FLOOR`). The painted ring is
+ * `FOCUS_INK × 80% over surface`; the dormant violet `#7b2cbf` over
+ * `THERMAL.surface = #16213e` measures `1.86:1`, and the same ink over
+ * `THERMAL_WARM.surface = #1e2a3e` measures `1.71:1`. Both clear `1.65:1`,
+ * neither clears `WCAG_NONTEXT (3.0:1)` today.
+ *
+ * **Why a documented painted floor, not the WCAG_NONTEXT contract floor.**
+ * The 3:1 contract is named in `lib/design/focus.ts` JSDoc (item #4),
+ * named in Mike #103 §6 #3, and ALREADY tracked by
+ * `lib/utils/__tests__/contrast.test.ts` (`PALETTE_FLOOR = 1.65`) with an
+ * explicit `TODO(palette-tuning, follow-up sprint)` to lift the dormant
+ * accent to a brighter violet that clears 3:1 against both anchors. This
+ * audit MIRRORS that documented floor verbatim — the same number, in the
+ * same source-of-truth file (`voice-ledger.ts`), gated by the same
+ * structural fence (the row's type and the §1 LOCK assertion).
+ *
+ * **Atomic fail-path on palette lift.** When the palette PR lands, ALL of
+ * the following move together:
+ *   • lift `BRAND.accentViolet` / dormant accent in `lib/design/color-
+ *     constants.ts` and `lib/thermal/thermal-tokens.ts`,
+ *   • raise `PALETTE_FLOOR` → `3.0` (rename `WCAG_NON_TEXT_FLOOR`) in
+ *     `lib/utils/__tests__/contrast.test.ts`,
+ *   • raise `FOCUS_RING_PAINTED_FLOOR` → `WCAG_NONTEXT` in *this* file,
+ *   • update the `focus-ring-contrast-audit` §1 LOCK assertion (one
+ *     line — the floor identity changes from this constant to
+ *     `WCAG_NONTEXT`),
+ *   • update the AGENTS.md receipt line (the `1.71:1` and `1.86:1`
+ *     numbers move).
+ * The `// reader-invariant` tag in `globals.css` is the grep anchor; the
+ * type lock here is the fence; the §1 LOCK assertion is the alarm.
+ *
+ * **The brand survives the lift.** `ReaderInvariantPair` (`invariant:
+ * true`) is independent of the floor numeric — the SHAPE invariant
+ * (one cell, not a `{cold, warm}` tuple) is what the type pins; the
+ * floor is the *target*. Lifting the palette raises the floor; it does
+ * NOT widen the row to two cells.
+ *
+ * Pure constant.
+ */
+export const FOCUS_RING_PAINTED_FLOOR = 1.65;
+
+/**
  * Audit pairs per surface. The chip row encodes the four named worldview
  * voices + the `fog`/`mist` fallback (Tanya UX #62 §4.5: "the audit table
  * should include the fallback pair, not just the four named voices, so
@@ -421,7 +503,7 @@ export const TEXTLINK_PASSAGE_FLOOR = WCAG_AA_TEXT;
  * rows so a future split (philosophical → its own family — see AGENTS.
  * md taxonomy follow-on) cannot ship without re-running the floor.
  */
-export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> = {
+export const CONTRAST_PAIRS: Partial<Record<ContrastPairsKey, readonly (ContrastPair | ReaderInvariantPair)[]>> = {
   chip: [
     { fg: 'voice.accent', bg: 'worldview.primary', floor: 4.5 }, // technical
     { fg: 'voice.accent', bg: 'worldview.primary', floor: 4.5 }, // philosophical
@@ -522,6 +604,42 @@ export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> =
     { fg: 'archetype.gold', bg: 'thermal.accent', floor: TEXTLINK_PASSAGE_FLOOR },
     { fg: 'worldview.rose', bg: 'thermal.accent', floor: TEXTLINK_PASSAGE_FLOOR },
   ],
+  // ─── focusRing — reader-invariant chrome (one cell, by shape) ────────
+  //
+  // Why this row is typed differently: the focus ring is reader-invariant
+  // chrome (Tanya UX #60 §3 / Paul §4) — same painted bytes at every
+  // thermal anchor. The `invariant: true` brand collapses the would-be
+  // `{cold, warm}` two-cell shape to ONE cell by *type*, so a future
+  // palette PR cannot type `{ cold: 5.1, warm: 5.0 }` into this row by
+  // mistake. The audit reads the brand and prints "X.XX:1 at both
+  // anchors" as one number twice — the visual repetition IS the contract
+  // (Tanya UX #60 §6; Paul §5 MUST-2). Drift is a TS error, not a test
+  // failure.
+  //
+  // The `bg` slot is *symbolic* — same convention the keepsake / thread /
+  // textLink rows use. `bg: 'thermal.accent'` stands in for "the live
+  // focus surface"; the audit resolves both canvas-safe surface anchors
+  // (`THERMAL.surface`, `THERMAL_WARM.surface`) at iteration time. Do
+  // NOT invent a `bg: 'reader.invariant'` voice (Mike #103 §6 #1 —
+  // pinned trap; the Voice union does not grow).
+  //
+  // Floor: `FOCUS_RING_PAINTED_FLOOR` (1.65, lock-LOW by current palette
+  // — see the constant's JSDoc for the gap to WCAG_NONTEXT and the
+  // palette-lift TODO). The contract target is WCAG_NONTEXT (3:1, SC
+  // 1.4.11) — the ring is a UI affordance the reader looks *at* but
+  // does not read; do NOT use WCAG_AA_TEXT (Mike #103 §6 #3). The
+  // current painted reality below 3:1 is documented in `contrast.test.
+  // ts` (PALETTE_FLOOR = 1.65) with the same lift TODO; this row
+  // mirrors that floor verbatim until the palette PR lands.
+  //
+  // Cardinality-1 row. NOT a new Surface union member — the focus ring is
+  // chrome, not a paint-bearing journey surface (Mike #103 §6 #6). The
+  // key lives under `ContrastPairsKey` (Surface | 'focusRing') with the
+  // index signature minimally widened.
+  focusRing: [
+    { fg: 'thermal.accent', bg: 'thermal.accent',
+      floor: FOCUS_RING_PAINTED_FLOOR, invariant: true },
+  ] as const satisfies readonly ReaderInvariantPair[],
 } as const;
 
 /**

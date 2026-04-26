@@ -332,17 +332,20 @@ describe('thread-contrast-audit · §2 LICENSE (the thermal voice belongs to thr
     }
   });
 
-  it('CONTRAST_PAIRS holds four rows today (chip + keepsake + thread + textLink); genus deferred', () => {
+  it('CONTRAST_PAIRS holds five keys today (four Surface + focusRing chrome); genus deferred', () => {
     // Mike napkin #101: `thread` joined the manifest as the fifth contrast-
     // audit sibling. Mike napkin #45 / Sid (2026-04-26): `textLink` joined
     // as the seventh sibling (foreshadow gesture, three voices, text floor).
-    // Four rows now, but the `ContrastFamily` genus is STILL deferred
-    // because they share *shape* (one fg over one bg at one floor) and not
-    // *role*: chip is text-legibility, keepsake is ornament + signal,
-    // thread is ambient cue, textLink is foreshadow. Polymorphism is a
-    // killer (Mike #54).
+    // Mike #103 / Sid 2026-04-26: `focusRing` joined as the eighth — but
+    // as the *first* member of the Reader Anchor (invariant chrome) group
+    // via `ReaderInvariantPair` brand. Five keys today — four Surface rows
+    // + one chrome row — but the `ContrastFamily` genus is STILL deferred
+    // because they share *shape* and not *role*: chip is text-legibility,
+    // keepsake is ornament + signal, thread is ambient cue, textLink is
+    // foreshadow, focusRing is invariant chrome. Polymorphism is a killer
+    // (Mike #54).
     expect(Object.keys(CONTRAST_PAIRS).sort())
-      .toEqual(['chip', 'keepsake', 'textLink', 'thread'].sort());
+      .toEqual(['chip', 'focusRing', 'keepsake', 'textLink', 'thread'].sort());
   });
 });
 

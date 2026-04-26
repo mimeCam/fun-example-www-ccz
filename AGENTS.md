@@ -5,8 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, seven sibling contrast audits
-  - *Numeric typography (tabular + lining figures) lives in `lib/design/typography.ts` via `numericFeatureStyle()` (SVG/canvas) and in `<CaptionMetric>` (DOM). One adoption test pins both homes.*
+- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, eight sibling contrast audits
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store
@@ -27,7 +26,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Ceremony quiet — gate at the host, not at the call site.** During `useCeremonyQuiet()` (gifting phase) output surfaces defer. Toast suppresses in `<ToastHost>`; thermal crossing pulses suppress in `onCrossing()`. Input-side surfaces (popovers opening from a new gesture) may guard per-instance. The silence is the design.
 - **Reader-invariant chrome — `id="main-content"` is the SkipLink's landmark.** Every route's top-level wrapper carries the id (`<main>`, `<article>`, or wrapper `<div>` for the mirror). The audit lives in `lib/sharing/__tests__/trust-promise-honored.test.ts`; a route shipping without the landmark fails CI. SkipLink mounts once, in `app/layout.tsx`, as the first child of `<body>`. CSS-only slide; works pre-hydration.
 - **Reader-invariant promise → audit pairings.** `TRUST_INVARIANTS` (`lib/sharing/trust-copy.ts`) ships exactly five reader-verifiable surfaces; each is anchored to a real audit module via `assertTrustAnchor(i, label)` in `lib/sharing/__tests__/_helpers.ts`. A grep for `assertTrustAnchor(` returns five hits — one per index, one per audit. (Mike #70 §A — *no ninth ledger*; the type-pinned tuple is the only registry.)
-  - `[0]` "The focus ring" → `lib/design/__tests__/focus-ink-byte-identity.test.ts`
+  - `[0]` "The focus ring" → `lib/design/__tests__/focus-ring-contrast-audit.test.ts` (the painted-receipt audit; `focus-ink-byte-identity.test.ts` remains as a sibling physics gate, no anchor)
   - `[1]` "The skip-link" → `lib/sharing/__tests__/trust-promise-honored.test.ts`
   - `[2]` "The share envelope’s left rule" → `lib/sharing/__tests__/clipboard-envelope.test.ts`
   - `[3]` "The thread keepsake’s timestamp" → `lib/sharing/__tests__/thread-render.test.ts` (locale/TZ/DST sweep, Mike #70 §B)
@@ -37,12 +36,24 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - *(none)*
 
 ## Contrast Audit Receipts
+
+> Two named groups; cardinality lives in the heading. Within each group every
+> receipt reads in the same shape — numbers, not adjectives (Tanya UX #60 §3:
+> "shape decides group; new audits land in the group whose shape they share").
+> SkipLink prints "at both anchors" but is audited as a Thermal Voice today —
+> its *audit shape* is paint-byte identity, not the type-pinned brand the focus
+> ring carries (Mike #103 §7 risk note; rule of three).
+
+### Reader Anchor (invariant chrome) (1)
+- Focus ring: `1.71:1` at both anchors, floor 1.65:1 (lock-LOW by current palette; contract target 3.0:1 WCAG 1.4.11 non-text — palette lift pending, see `FOCUS_RING_PAINTED_FLOOR` JSDoc; reader-invariant chrome — type forbids divergence)
+
+### Thermal Voices (7)
 - Worldview chip: worst-case `4.98:1` @ warm, floor 4.5:1
 - Archetype chip: worst-case `5.36:1` @ warm, floor 4.5:1
 - Halo ambient: worst-case `3.14:1` @ warm, floor 1.5:1 (intentionally sub-WCAG; ornament, not signal)
 - Keepsake gold: worst-case `8.95:1` @ warm, floor 3.0:1 (WCAG 1.4.11 non-text; signal)
 - Thread accent: cold `2.24:1` · warm `8.95:1`, floor 1.5:1 (intentionally sub-WCAG ambient cue; signal at warm — the spread is the killer feature)
-- SkipLink (static): `6.60:1` at both anchors, floor 4.5:1 (reader-invariant chrome — copy/paint identical at both thermal anchors)
+- SkipLink (static): `6.60:1` at both anchors, floor 4.5:1 (paint-byte-identical at both thermal anchors)
 - TextLink (passage): rest `5.36:1` · hover-gold `8.95:1` · hover-rose `6.13:1` (worst-case across destination accents) @ warm, floor 4.5:1 (WCAG 1.4.3 — the foreshadow gesture being honest about itself)
 
 ## Deployment

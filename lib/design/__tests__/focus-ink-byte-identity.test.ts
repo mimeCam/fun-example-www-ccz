@@ -37,12 +37,15 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { FOCUS_INK, FOCUS_INK_CSS } from '../focus';
 import { THERMAL } from '../color-constants';
-import { assertTrustAnchor } from '@/lib/sharing/__tests__/_helpers';
 
-// Mike #70 §A — the file-backed link from /trust bullet #1 to its audit.
-// `TRUST_INVARIANTS[0]` is "The focus ring"; this module audits its byte-
-// identity. A trust-copy edit that breaks the anchor fails CI before merge.
-assertTrustAnchor(0, 'The focus ring');
+// Note (Mike #103 §5 file #5 — Sid 2026-04-26): the index-0 trust-anchor
+// helper invocation USED to live here. With the focus-ring contrast audit
+// ship, the `TRUST_INVARIANTS[0]` anchor moved to `focus-ring-contrast-audit.test.ts`
+// — a *contrast* receipt of the painted ring, not a *physics* receipt of
+// the authoring CSS bytes. This module remains as a sibling guarantee
+// (the byte-identity gate the physics depends on); the anchor lives next
+// to the receipt the reader can verify with their own eyes. Grep-for-five
+// rule from AGENTS.md §"Reader-invariant promise" still holds.
 
 const CSS = readFileSync(
   resolve(__dirname, '../../../app/globals.css'),

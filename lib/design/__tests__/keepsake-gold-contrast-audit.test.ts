@@ -290,8 +290,12 @@ describe('keepsake-gold-contrast-audit · §2 LICENSE (the gold voice belongs to
     //   thread     (one thermal.accent pair)       →  ambient cue
     //   textLink   (rest + hover-gold + hover-rose)→  foreshadow gesture
     // Distinct roles, shared shape — genus deferred until shared *role*.
+    // Sid 2026-04-26 (Mike #103): `focusRing` joined as the *first*
+    // member of the Reader Anchor (invariant chrome) group via the
+    // `ReaderInvariantPair` brand. Five keys today — four Surface
+    // rows + one chrome row. Genus still deferred (rule of three).
     expect(Object.keys(CONTRAST_PAIRS).sort())
-      .toEqual(['chip', 'keepsake', 'textLink', 'thread'].sort());
+      .toEqual(['chip', 'focusRing', 'keepsake', 'textLink', 'thread'].sort());
   });
 });
 
