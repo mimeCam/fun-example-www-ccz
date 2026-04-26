@@ -21,6 +21,7 @@
  */
 import { BRAND, THERMAL, THERMAL_WARM, ARCHETYPE } from '@/lib/design/color-constants';
 import { licenseFor as voiceLicenseFor } from '@/lib/design/voice-ledger';
+import { numericFeatureStyle } from '@/lib/design/typography';
 import type { ArchetypeKey } from '@/types/content';
 
 /** Thread accent endpoints — dormant violet → warm gold. The keepsake's
@@ -204,18 +205,19 @@ function titleText(title: string): string {
  * format already promises (Tanya #77 §2.2 — `tnum` aligns advance widths,
  * `lnum` forces lining figures so 0–9 share baseline + cap-height).
  *
- * Single quotes inside the CSS value because the surrounding SVG attribute
- * uses double quotes; both forms are valid CSS but mixing them keeps the
- * builder string parseable without escapes.
+ * The literal lives ONCE on the typography ledger (`numericFeatureStyle()`
+ * from `lib/design/typography`). The DOM register is the `<CaptionMetric>`
+ * primitive; this SVG register is the only legit second home, gated by the
+ * `numeric-features-adoption.test.ts` allow-list. Mike #77 §3 — *one
+ * literal, two homes, one adoption guard*. The byte output is unchanged.
  */
-const NUMERIC_FEATURES = `font-feature-settings: 'tnum' 1, 'lnum' 1`;
 
 function attributionLine(key: ArchetypeKey | null, ts: number): string {
   const who = esc(archetypeLabel(key));
   const when = esc(formatDate(ts));
   return `<text x="200" y="260" font-family="'Inter', system-ui, sans-serif"
     font-size="24" font-weight="400" fill="${BRAND.mist}" opacity="0.85"
-    style="${NUMERIC_FEATURES}">
+    style="${numericFeatureStyle()}">
     ${who} · ${when}</text>`;
 }
 
@@ -225,7 +227,7 @@ function statsLine(snapshot: ThreadSnapshot): string {
   const w = Math.round(snapshot.thermal * 100);
   return `<text x="200" y="${OG_HEIGHT - 96}" font-family="'Inter', system-ui, sans-serif"
     font-size="18" fill="${BRAND.mist}" opacity="0.7"
-    style="${NUMERIC_FEATURES}">
+    style="${numericFeatureStyle()}">
     <tspan>depth ${d}%</tspan>
     <tspan dx="24">warmth ${w}%</tspan>
   </text>`;

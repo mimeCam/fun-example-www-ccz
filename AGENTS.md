@@ -6,6 +6,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
 - `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, five sibling contrast audits
+  - *Numeric typography (tabular + lining figures) lives in `lib/design/typography.ts` via `numericFeatureStyle()` (SVG/canvas) and in `<CaptionMetric>` (DOM). One adoption test pins both homes.*
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store

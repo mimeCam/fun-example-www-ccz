@@ -121,6 +121,16 @@ export function ReadProgressCaption({
  * Screen-side caption. Re-keyed on state to trigger the sealed
  * `[data-sys-enter="fade"]` crossfade. `aria-live="off"`; the static
  * promise is the AT announcement.
+ *
+ * Wraps the text child in `<CaptionMetric as="span" size="caption">` so
+ * the screen and print branches share the same metric primitive — one
+ * face for every metric surface (Tanya §4c, Mike #77 §3). The
+ * `tabular-nums` digit-column lock is now carried as a Tailwind class on
+ * the primitive instead of a `fontVariantNumeric` inline literal on the
+ * outer wrapper. The `min-width: 14ch` slot stabilizer stays on the
+ * outer wrapper unchanged. `ENTER_FADE_PROPS` stays on the keyed
+ * wrapper, NEVER on `<CaptionMetric>` itself — the primitive is silent
+ * by contract (CaptionMetric.tsx header: "No motion").
  */
 function ScreenCaption({
   text,
@@ -132,7 +142,7 @@ function ScreenCaption({
   return (
     <span aria-live="off" className="screen-only" style={SCREEN_WRAPPER_STYLE}>
       <span key={stateKey} {...ENTER_FADE_PROPS} style={SCREEN_INNER_STYLE}>
-        {text}
+        <CaptionMetric as="span" size="caption">{text}</CaptionMetric>
       </span>
     </span>
   );
@@ -158,11 +168,16 @@ function PrintCaption({ readTime }: { readTime: number }): JSX.Element {
 
 // ─── Style atoms — pinned, hoisted, no per-render allocation ─────────────
 
-/** Wrapper style on the screen-side span. Inline-block so min-width takes effect. */
+/**
+ * Wrapper style on the screen-side span. Inline-block so min-width takes
+ * effect. `fontVariantNumeric: 'tabular-nums'` was retired here when the
+ * text child snapped to `<CaptionMetric>`; the primitive carries the
+ * `tabular-nums` Tailwind class. Keeping the slot-stabilizer literal
+ * inline (vs. a class) so the 14ch contract reads in one place.
+ */
 const SCREEN_WRAPPER_STYLE: React.CSSProperties = {
   display: 'inline-block',
   minWidth: `${CAPTION_MIN_WIDTH_CH}ch`,
-  fontVariantNumeric: 'tabular-nums',
 };
 
 /** Inner style on the keyed span. The element the keyframe animates. */

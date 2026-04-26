@@ -239,3 +239,46 @@ export const passageThermalClass = (): string => 'typo-passage-thermal';
 export const THERMAL_TRACK_VAR = '--token-letter-spacing';
 export const thermalTrackClass = (): string =>
   `tracking-[var(${THERMAL_TRACK_VAR})]`;
+
+// ─── Numeric features — SVG/canvas register, DOM uses <CaptionMetric> ──────
+
+/**
+ * Tabular + lining figures, raw CSS string for SVG/canvas surfaces only.
+ *
+ * The DOM register lives on `<CaptionMetric>` (in `components/shared/`),
+ * which carries the `tabular-nums` Tailwind utility plus
+ * `tracking-sys-caption` plus the alpha-ledger `quiet` rung. **Reach for
+ * `<CaptionMetric>` from any `.tsx` render tree.** This export exists for
+ * the one register where Tailwind classes do not apply — server-built
+ * SVG strings (and, in principle, `<canvas>` text) where the keepsake's
+ * date and stats lines must align byte-stably across readers.
+ *
+ * Why a literal const, not a template string: reviewer muscle memory from
+ * `CaptionMetric.tsx` — JIT/byte-identity-stable consumers must see a
+ * STATIC string at parse time. `'tnum' 1` aligns advance widths so digits
+ * share a column; `'lnum' 1` forces lining figures so 0–9 share baseline
+ * and cap-height (load-bearing on the keepsake's display-size attribution
+ * — do not drop). Single-quoted feature tags so consumers can embed this
+ * inside double-quoted SVG attributes without escaping (Tanya #90 §3.7).
+ *
+ * Adoption guard: `lib/design/__tests__/numeric-features-adoption.test.ts`
+ * fails CI if any module other than this ledger or `<CaptionMetric>`
+ * spells the `font-feature-settings.*tnum|lnum` literal or the
+ * `fontVariantNumeric` React style key. The two homes are the registry.
+ *
+ * Mike #77 §5.1: *Name the CSS, not the cosmology.* No "Cross-Reader
+ * Stasis" rename — the mechanism is `tnum`/`lnum` typography.
+ */
+export const NUMERIC_FEATURE_SETTINGS =
+  "font-feature-settings: 'tnum' 1, 'lnum' 1";
+
+/**
+ * Returns the same literal as a leading semicolon-free fragment suitable
+ * for direct interpolation inside an SVG `style="…"` attribute. Pure,
+ * ≤ 10 LOC, no allocation per call. The two SVG sites in the keepsake
+ * builder use this; nothing else should.
+ *
+ * Example (SVG, server build):
+ *   `<text style="${numericFeatureStyle()}">…</text>`
+ */
+export const numericFeatureStyle = (): string => NUMERIC_FEATURE_SETTINGS;

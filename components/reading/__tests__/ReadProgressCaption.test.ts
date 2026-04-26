@@ -106,10 +106,16 @@ describe('ReadProgressCaption · print/screen split', () => {
   });
 
   it('applies tabular-nums so digits do not jitter under the dissolve', () => {
+    // The digit-column lock now flows through the <CaptionMetric>
+    // primitive (Tailwind class), not an inline `fontVariantNumeric`
+    // literal on the outer wrapper. Both branches (screen + print)
+    // emit the class — assert at least two `tabular-nums` class hits
+    // appear in the rendered HTML so the screen branch is covered.
     const html = renderToString(
       createElement(ReadProgressCaption, { readTime: 7 }),
     );
-    expect(html).toMatch(/font-variant-numeric:\s*tabular-nums/);
+    const matches = html.match(/(?<![\w-])tabular-nums(?![\w-])/g) ?? [];
+    expect(matches.length).toBeGreaterThanOrEqual(2);
   });
 
   it('print fallback carries `tabular-nums` class (paper digit metric)', () => {
