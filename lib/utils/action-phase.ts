@@ -97,3 +97,19 @@ export function resolvePhaseLabel(
 export function showsCheck(phase: ActionPhase): boolean {
   return phase === 'settled';
 }
+
+// ─── Announcement contract — fingertip-local SR receipt (Mike #71 §4.1) ────
+
+/**
+ * Whether the SR-only `aria-live` span should hold a string this render.
+ * Mount-on-`settled` / unmount-on-`idle|busy` is what guarantees the
+ * once-per-settle firing edge — the live region appears with the witness
+ * and is gone before another press can land. Pure, no React, no DOM.
+ *
+ * Same module that owns phase semantics owns this predicate so the JSX
+ * stays presentational (Mike §4.1: keep the mount decision off the JSX
+ * and inside the helper that already names the phases).
+ */
+export function announceOnSettle(phase: ActionPhase): boolean {
+  return phase === 'settled';
+}

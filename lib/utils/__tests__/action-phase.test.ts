@@ -14,6 +14,7 @@ import {
   ACTION_HOLD_MS,
   ACTION_HOLD_BUDGET_MS,
   actionInvariantHolds,
+  announceOnSettle,
   resolveFadeMs,
   resolvePhaseLabel,
   resolveSwapStyle,
@@ -114,5 +115,25 @@ describe('showsCheck — glyph swap predicate', () => {
     expect(showsCheck('idle')).toBe(false);
     expect(showsCheck('busy')).toBe(false);
     expect(showsCheck('settled')).toBe(true);
+  });
+});
+
+// ─── announceOnSettle — fingertip-local SR receipt (Mike #71 §4.1) ─────────
+
+describe('announceOnSettle — live-region mount predicate', () => {
+  it('only `settled` holds a string; idle/busy keep the live node unmounted', () => {
+    expect(announceOnSettle('idle')).toBe(false);
+    expect(announceOnSettle('busy')).toBe(false);
+    expect(announceOnSettle('settled')).toBe(true);
+  });
+
+  it('matches showsCheck in shape (paint and voice cross the same edge)', () => {
+    // The witness lands on settled in *both* organs. If a future change
+    // ever splits these two predicates, this assertion fails first.
+    const phases: ReadonlyArray<'idle' | 'busy' | 'settled'> =
+      ['idle', 'busy', 'settled'];
+    for (const phase of phases) {
+      expect(announceOnSettle(phase)).toBe(showsCheck(phase));
+    }
   });
 });

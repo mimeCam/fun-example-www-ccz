@@ -24,11 +24,20 @@
  * (ReadersMark, subscribe buttons, etc.) adopt by swapping in this
  * component plus its hook — no per-call-site choreography.
  *
+ * Stereo at the fingertip (Mike #71 / Tanya #89): a third inner peer
+ * `<PhaseAnnouncement>` mounts an `sr-only aria-live="polite"` span on
+ * the `idle → settled` edge so a screen-reader receives the same word
+ * the eye sees, sourced from the same `resolvePhaseLabel`. Zero pixels,
+ * zero new layers — the receipt lands in two organs from one source.
+ *
  * Credits: Mike K. (napkin §4 — compose-only primitive, two-layer split,
- * `phase` prop), Tanya D. (UX §5 — icon swap, verb tense, color =
- * text-foreground only, no shadow/scale/chromatic aberration), Krystle C.
- * (original spec — primary excluded, fail-quiet covenant), Elon M.
- * (mechanical-vs-semantic split), Sid (this lift — single home).
+ * `phase` prop; #71 — `PhaseAnnouncement` peer, same-source rule),
+ * Tanya D. (UX §5 — icon swap, verb tense, color = text-foreground only,
+ * no shadow/scale/chromatic aberration; #89 — fingertip receipt covenant
+ * with no new visible stage), Krystle C. (original spec — primary
+ * excluded, fail-quiet covenant, byte-identity wiring), Elon M.
+ * (mechanical-vs-semantic split, what-we-actually-own physics), Sid
+ * (this lift — single home; this round — settled-state receipt).
  */
 
 'use client';
@@ -37,6 +46,7 @@ import { Pressable } from '@/components/shared/Pressable';
 import { CheckIcon } from '@/components/shared/Icons';
 import {
   type ActionPhase,
+  announceOnSettle,
   resolvePhaseLabel, resolveSwapStyle, showsCheck,
 } from '@/lib/utils/action-phase';
 
@@ -77,6 +87,10 @@ export function ActionPressable(props: ActionPressableProps): JSX.Element {
       <PhaseGlyph phase={phase} reduced={reduced} idle={props.icon} />
       <PhaseLabel
         phase={phase} reduced={reduced}
+        idle={props.idleLabel} settled={props.settledLabel}
+      />
+      <PhaseAnnouncement
+        phase={phase}
         idle={props.idleLabel} settled={props.settledLabel}
       />
     </Pressable>
@@ -121,6 +135,41 @@ function PhaseLabel({ phase, reduced, idle, settled }: PhaseLabelProps): JSX.Ele
       className="motion-safe:animate-fade-in"
       style={resolveSwapStyle(phase, reduced)}
     >
+      {text}
+    </span>
+  );
+}
+
+// ─── Inner — SR-only fingertip receipt (Tanya #89 §5 / Mike #71 §4.2) ──────
+
+interface PhaseAnnouncementProps {
+  phase: ActionPhase;
+  idle: string;
+  settled: string;
+}
+
+/**
+ * Stereo without a new stage: a polite live region that mounts only on
+ * `settled` and sources its text from the same `resolvePhaseLabel` the
+ * visible label uses. Byte-identical paint and voice by construction —
+ * drift is impossible unless a future contributor adds a deliberate
+ * second call site (Mike §6.1: same-source rule is load-bearing).
+ *
+ * Mount-on-settled / unmount-on-idle is the firing edge — the live node
+ * appears with the witness and is removed before another press can land,
+ * which is what gives us the once-per-settle covenant Tanya §5.1 names.
+ *
+ * Reduced-motion-immune: this paints zero pixels, so there is no fade
+ * to collapse — the witness lands intact (Tanya §6.2). Quiet-zone-immune
+ * by mount location: page-scope `ToastHost` is muffled during the
+ * keepsake reveal; the fingertip receipt is local, so it still fires —
+ * the press *just* happened, this is its receipt (Tanya §4.3).
+ */
+function PhaseAnnouncement(p: PhaseAnnouncementProps): JSX.Element | null {
+  if (!announceOnSettle(p.phase)) return null;
+  const text = resolvePhaseLabel(p.phase, p.idle, p.settled);
+  return (
+    <span className="sr-only" aria-live="polite" aria-atomic="true">
       {text}
     </span>
   );
