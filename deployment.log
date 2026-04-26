@@ -1,4 +1,4 @@
-Deployment started at: Sun Apr 26 05:33:54 AM UTC 2026
+Deployment started at: Sun Apr 26 06:02:33 AM UTC 2026
 Stopping existing container (if running)...
   Removing container: persona-blog-z
 Removing old image...
@@ -11,7 +11,7 @@ Building Docker image...
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/library/node:20-alpine
-#2 DONE 0.1s
+#2 DONE 0.2s
 
 #3 [builder  1/11] FROM docker.io/library/node:20-alpine@sha256:fb4cd12c85ee03686f6af5362a0b0d56d50c58a04632e6c0fb8363f609372293
 #3 DONE 0.0s
@@ -27,37 +27,37 @@ Building Docker image...
 #6 DONE 0.0s
 
 #7 [internal] load build context
-#7 transferring context: 123.64kB 0.0s done
-#7 DONE 0.1s
+#7 transferring context: 120.81kB 0.0s done
+#7 DONE 0.0s
 
-#8 [ 7/19] COPY next.config.js ./
+#8 [11/19] COPY next-env.d.ts ./
 #8 CACHED
 
-#9 [10/19] COPY postcss.config.js ./
+#9 [ 8/19] COPY tsconfig.json ./
 #9 CACHED
 
-#10 [ 6/19] RUN npm ci && npm cache clean --force
+#10 [ 7/19] COPY next.config.js ./
 #10 CACHED
 
 #11 [ 3/19] RUN mkdir -p /app/data /app/logs
 #11 CACHED
 
-#12 [11/19] COPY next-env.d.ts ./
+#12 [ 5/19] COPY package*.json ./
 #12 CACHED
 
-#13 [ 8/19] COPY tsconfig.json ./
+#13 [10/19] COPY postcss.config.js ./
 #13 CACHED
 
-#14 [ 9/19] COPY tailwind.config.ts ./
+#14 [ 4/19] RUN apk add --no-cache python3 make g++
 #14 CACHED
 
-#15 [ 2/19] WORKDIR /app
+#15 [ 6/19] RUN npm ci && npm cache clean --force
 #15 CACHED
 
-#16 [ 4/19] RUN apk add --no-cache python3 make g++
+#16 [ 2/19] WORKDIR /app
 #16 CACHED
 
-#17 [ 5/19] COPY package*.json ./
+#17 [ 9/19] COPY tailwind.config.ts ./
 #17 CACHED
 
 #18 [12/19] COPY middleware.ts ./
@@ -82,80 +82,80 @@ Building Docker image...
 #24 DONE 0.0s
 
 #25 [19/19] RUN npm run build
-#25 0.344 
-#25 0.344 > persona-blog@0.1.0 prebuild
-#25 0.344 > tsx scripts/generate-inline-restore.ts
-#25 0.344 
-#25 0.893 Generated: /app/lib/thermal/inline-restore.ts (3786 bytes)
-#25 0.913 
-#25 0.913 > persona-blog@0.1.0 build
-#25 0.913 > next build
-#25 0.913 
-#25 1.671 Attention: Next.js now collects completely anonymous telemetry regarding usage.
-#25 1.673 This information is used to shape Next.js' roadmap and prioritize features.
-#25 1.673 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
-#25 1.673 https://nextjs.org/telemetry
-#25 1.673 
-#25 1.760   ▲ Next.js 14.2.3
-#25 1.763 
-#25 1.891    Creating an optimized production build ...
-#25 23.47  ✓ Compiled successfully
-#25 23.47    Linting and checking validity of types ...
-#25 33.33    Collecting page data ...
-#25 35.20    Generating static pages (0/13) ...
-#25 35.70    Generating static pages (3/13) 
-#25 35.72    Generating static pages (6/13) 
-#25 35.83    Generating static pages (9/13) 
-#25 35.99  ✓ Generating static pages (13/13)
-#25 36.26    Finalizing page optimization ...
-#25 36.26    Collecting build traces ...
-#25 42.12 
-#25 42.14 Route (app)                              Size     First Load JS
-#25 42.14 ┌ ƒ /                                    3.16 kB         129 kB
-#25 42.14 ├ ○ /_not-found                          145 B          87.2 kB
-#25 42.14 ├ ƒ /api/articles                        0 B                0 B
-#25 42.14 ├ ƒ /api/articles/[id]/categories        0 B                0 B
-#25 42.14 ├ ƒ /api/categories                      0 B                0 B
-#25 42.14 ├ ƒ /api/categories/[slug]               0 B                0 B
-#25 42.14 ├ ƒ /api/highlights                      0 B                0 B
-#25 42.14 ├ ○ /api/history/today                   0 B                0 B
-#25 42.14 ├ ƒ /api/loop/checkpoint                 0 B                0 B
-#25 42.14 ├ ƒ /api/loop/funnel                     0 B                0 B
-#25 42.14 ├ ƒ /api/mirror                          0 B                0 B
-#25 42.14 ├ ƒ /api/og/thread/[slug]                0 B                0 B
-#25 42.14 ├ ƒ /api/reading/memory                  0 B                0 B
-#25 42.14 ├ ƒ /api/reading/streak                  0 B                0 B
-#25 42.14 ├ ƒ /api/reading/topics                  0 B                0 B
-#25 42.14 ├ ƒ /api/related-posts                   0 B                0 B
-#25 42.14 ├ ƒ /api/resonances                      0 B                0 B
-#25 42.14 ├ ƒ /api/resonances/[id]                 0 B                0 B
-#25 42.14 ├ ƒ /api/trails                          0 B                0 B
-#25 42.14 ├ ƒ /article/[id]                        29.1 kB         158 kB
-#25 42.14 ├ ○ /articles                            3.57 kB         106 kB
-#25 42.14 ├ ○ /mirror                              5.89 kB         114 kB
-#25 42.14 ├ ○ /resonances                          6.9 kB          111 kB
-#25 42.14 └ ○ /trust                               539 B           101 kB
-#25 42.14 + First Load JS shared by all            87.1 kB
-#25 42.14   ├ chunks/23-6f0fa3acf1332449.js        31.5 kB
-#25 42.14   ├ chunks/fd9d1056-43aee59a29b2429f.js  53.6 kB
-#25 42.14   └ other shared chunks (total)          2.01 kB
-#25 42.14 
-#25 42.14 
-#25 42.14 ƒ Middleware                             27.1 kB
-#25 42.14 
-#25 42.14 ○  (Static)   prerendered as static content
-#25 42.14 ƒ  (Dynamic)  server-rendered on demand
-#25 42.14 
-#25 DONE 42.2s
+#25 0.331 
+#25 0.331 > persona-blog@0.1.0 prebuild
+#25 0.331 > tsx scripts/generate-inline-restore.ts
+#25 0.331 
+#25 0.852 Generated: /app/lib/thermal/inline-restore.ts (3786 bytes)
+#25 0.876 
+#25 0.876 > persona-blog@0.1.0 build
+#25 0.876 > next build
+#25 0.876 
+#25 1.644 Attention: Next.js now collects completely anonymous telemetry regarding usage.
+#25 1.644 This information is used to shape Next.js' roadmap and prioritize features.
+#25 1.646 You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+#25 1.646 https://nextjs.org/telemetry
+#25 1.646 
+#25 1.735   ▲ Next.js 14.2.3
+#25 1.736 
+#25 1.840    Creating an optimized production build ...
+#25 23.06  ✓ Compiled successfully
+#25 23.06    Linting and checking validity of types ...
+#25 32.88    Collecting page data ...
+#25 34.75    Generating static pages (0/13) ...
+#25 34.97    Generating static pages (3/13) 
+#25 35.26    Generating static pages (6/13) 
+#25 35.34    Generating static pages (9/13) 
+#25 35.46  ✓ Generating static pages (13/13)
+#25 35.73    Finalizing page optimization ...
+#25 35.73    Collecting build traces ...
+#25 41.58 
+#25 41.60 Route (app)                              Size     First Load JS
+#25 41.60 ┌ ƒ /                                    3.16 kB         129 kB
+#25 41.60 ├ ○ /_not-found                          145 B          87.2 kB
+#25 41.60 ├ ƒ /api/articles                        0 B                0 B
+#25 41.60 ├ ƒ /api/articles/[id]/categories        0 B                0 B
+#25 41.60 ├ ƒ /api/categories                      0 B                0 B
+#25 41.60 ├ ƒ /api/categories/[slug]               0 B                0 B
+#25 41.60 ├ ƒ /api/highlights                      0 B                0 B
+#25 41.60 ├ ○ /api/history/today                   0 B                0 B
+#25 41.60 ├ ƒ /api/loop/checkpoint                 0 B                0 B
+#25 41.60 ├ ƒ /api/loop/funnel                     0 B                0 B
+#25 41.60 ├ ƒ /api/mirror                          0 B                0 B
+#25 41.60 ├ ƒ /api/og/thread/[slug]                0 B                0 B
+#25 41.60 ├ ƒ /api/reading/memory                  0 B                0 B
+#25 41.60 ├ ƒ /api/reading/streak                  0 B                0 B
+#25 41.60 ├ ƒ /api/reading/topics                  0 B                0 B
+#25 41.60 ├ ƒ /api/related-posts                   0 B                0 B
+#25 41.60 ├ ƒ /api/resonances                      0 B                0 B
+#25 41.60 ├ ƒ /api/resonances/[id]                 0 B                0 B
+#25 41.60 ├ ƒ /api/trails                          0 B                0 B
+#25 41.60 ├ ƒ /article/[id]                        29.1 kB         158 kB
+#25 41.60 ├ ○ /articles                            3.57 kB         106 kB
+#25 41.60 ├ ○ /mirror                              5.89 kB         114 kB
+#25 41.60 ├ ○ /resonances                          6.91 kB         111 kB
+#25 41.60 └ ○ /trust                               539 B           101 kB
+#25 41.60 + First Load JS shared by all            87.1 kB
+#25 41.60   ├ chunks/23-6f0fa3acf1332449.js        31.5 kB
+#25 41.60   ├ chunks/fd9d1056-43aee59a29b2429f.js  53.6 kB
+#25 41.60   └ other shared chunks (total)          2.01 kB
+#25 41.60 
+#25 41.60 
+#25 41.60 ƒ Middleware                             27.1 kB
+#25 41.60 
+#25 41.60 ○  (Static)   prerendered as static content
+#25 41.60 ƒ  (Dynamic)  server-rendered on demand
+#25 41.60 
+#25 DONE 41.7s
 
 #26 exporting to image
 #26 exporting layers
 #26 exporting layers 0.2s done
-#26 writing image sha256:5e600469a03efad09174fb5c1f508f19f10b67a17f71c1eb88de2d52f34e773f done
+#26 writing image sha256:1464a50ae23e4d51cd197399160f3311512e3a04ad3264d543f3c1c0029dd51f done
 #26 naming to docker.io/library/persona-blog-image:latest done
 #26 DONE 0.2s
 Starting container on port 7200 (log level: info)...
-c9a1ed9577b96b19096efe82d246de2df67b112a3e4e179242c5f704186d772d
+233cf142ac4b16446533dec7d1e52159593b6cf9f0bcdb3e41dbddc82394f535
 Container is running
   Checking container health...
   Container is healthy and responding
@@ -175,6 +175,6 @@ Management:
   docker stop persona-blog-z
   docker restart persona-blog-z
 
-Deployment completed at: Sun Apr 26 05:34:43 AM UTC 2026
+Deployment completed at: Sun Apr 26 06:03:21 AM UTC 2026
 Removed dangling images
 Done.

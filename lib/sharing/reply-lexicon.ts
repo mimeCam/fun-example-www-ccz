@@ -114,12 +114,16 @@ const PHRASES: Readonly<Record<ReplyKind, Readonly<Record<ToneBucket, string>>>>
   },
 
   // ─── Empty-surface cells (invitational — no confirm verb required) ──────
-  // Under-tinting holds: reflective is the only column that shifts; kinetic
-  // and analytical converge on the curious neutral (Tanya §7.2). Kinetic
-  // IS the first-visit voice (null archetype → DEFAULT_TONE = 'kinetic').
+  // Under-tinting holds (Tanya §7.2): reflective+kinetic converge by design.
+  // Kinetic IS the first-visit voice (null archetype → DEFAULT_TONE).
+  // Single sanctioned divergence: empty-mirror's kinetic cell — that is the
+  // surface a stranger lands on, and the headline carries a real product job
+  // (Tanya §5 — "the closest thing the site has to an above-the-fold value
+  // proposition for a stranger"). The kinetic line names the Mirror, reads
+  // as invitation; the reflective column keeps the original interior tone.
   'empty-mirror': {
     reflective: "Your reflection hasn't formed yet.",
-    kinetic:    "Your reflection hasn't formed yet.",
+    kinetic:    "The Mirror hasn't met you yet.",
     analytical: 'No Mirror yet — read an article and one forms.',
   },
   'empty-resonances': {

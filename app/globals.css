@@ -1060,6 +1060,21 @@ body {
   }
 }
 
+/* ─── Empty-Surface Entrance Choreography ──────────────────────────────────
+   The four quietest rooms (empty-mirror, empty-resonances, 404, error) read
+   top-down: gem → headline → whisper. Without a stagger, the halo's
+   `gem-appear` and the headline's `archetype-reveal` fire at frame 0 and the
+   gem loses focal authority (Tanya UX §6 — "the eye reads top-down: gem
+   first, then word. If they fire simultaneously, the halo loses focal
+   authority"). One small `animation-delay` — wired to the named `crossfade`
+   beat (120ms — the inline-dissolve atom on the motion ledger) — gives the
+   halo the first beat alone, then the headline reveals into stillness.
+   Composition only: no new keyframes, no new tokens, no new animation
+   (Tanya UX §6 #What-we-do-NOT-add). The reduced-motion block below zeros
+   the delay so the room still arrives instantly; the choreography simply
+   does not perform. */
+.empty-stagger-headline { animation-delay: var(--sys-time-crossfade); }
+
 /* Respect reduced motion — hard kill on all animations + transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1075,6 +1090,11 @@ body {
      0ms: not 0.01ms — delay ≠ duration; no transitionend to catch here. */
   [data-sys-enter="rise"] {
     --rise-delay: 0ms !important;
+  }
+  /* Empty-surface choreography — zero the stagger so the room arrives instantly
+     (presence preserved; the breath sequence does not perform). Tanya UX §6. */
+  .empty-stagger-headline {
+    animation-delay: 0ms !important;
   }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;

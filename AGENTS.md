@@ -28,6 +28,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 **Margins for a collapsible portal live on the portal's envelope, not on its siblings.** If a child may render `null` for one reader class, wrap it in `<CollapsibleSlot top? bottom?>` — the envelope SSRs whether the inner paints or not. Spacing math may not silently assume the recognition-positive case (Tanya #3 §5, Mike #2 §5). `scripts/audit-spacing-collapse.ts` is the local guardrail; run it before sending a portal-shape PR.
 
+**Empty rooms speak in registers, not variants.** The four `EmptySurfaceKind` surfaces (`empty-mirror`, `empty-resonances`, `threshold-404`, `threshold-error`) all route through `<EmptySurface />` with copy resolved by `emptyPhrase(kind)`. Reflective and kinetic tones converge in most cells *by design* (Tanya §7.2 under-tinting — 5 archetypes fold to 3 buckets, kinetic IS the first-visit voice). The single sanctioned divergence is `empty-mirror`'s kinetic cell, because that surface carries a real product job for strangers (Tanya §5). Halo tint is **per-room, not per-archetype** — the room is a property of the place, not the visitor. Personalization lives in copy; ornament lives in surface. Do not promote `tint` to a reader-derived resolver, do not add `'empty'` to `voice-ledger.ts#Surface`, and do not split the under-tinting fold across the other three rooms.
+
 ## WIP
 - *(none)*
 

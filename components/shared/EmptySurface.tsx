@@ -118,9 +118,13 @@ function Headline({ children }: { children: ReactNode }) {
   return (
     // reader-invariant:forced-colors — `text-foreground` strips; `CanvasText`
     // carries the heading under the OS palette.
+    // `empty-stagger-headline` adds animation-delay: var(--sys-time-crossfade)
+    // — 120ms, the named "inline dissolve" beat — zeroed under reduced-motion
+    // so the halo's gem-appear holds focal authority for the first beat.
+    // Tanya UX §6 — the eye reads top-down, gem first then word.
     <h1 className="mt-sys-7 font-display text-sys-h2 font-sys-display
                    tracking-sys-display text-foreground animate-archetype-reveal
-                   forced-colors:text-[CanvasText]">
+                   empty-stagger-headline forced-colors:text-[CanvasText]">
       {children}
     </h1>
   );
