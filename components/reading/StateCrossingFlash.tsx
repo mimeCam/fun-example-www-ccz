@@ -22,6 +22,7 @@
 import { useEffect, useState } from 'react';
 import { onCrossing, type ThermalStateCrossing } from '@/lib/thermal/state-crossing';
 import { CEREMONY } from '@/lib/design/motion';
+import { useCeremony } from '@/components/reading/CeremonySequencer';
 
 type FlashState = (ThermalStateCrossing & { key: number }) | null;
 
@@ -41,8 +42,18 @@ function useCrossingFlash(): FlashState {
   return flash;
 }
 
+/**
+ * Coda-overlay guard (Tanya UX #62 §8 #1): suppress the flash during the
+ * `gifting` phase so a thermal state crossing cannot paint over the
+ * Plate's `MOTION.reveal` entrance. The `CeremonySequencer` already
+ * manages phase ordering — this is a one-line gate, not a redesign.
+ * Outside the article-page sequencer the hook returns `phase: 'idle'`
+ * (default context value), so the guard is a no-op everywhere else.
+ */
 export function StateCrossingFlash() {
   const flash = useCrossingFlash();
+  const { phase } = useCeremony();
+  if (phase === 'gifting') return null;
   if (!flash) return null;
   return <CrossingBloom key={flash.key} intensity={flash.intensity} />;
 }

@@ -9,6 +9,7 @@ import type { PopoverPosition } from '@/lib/hooks/usePopoverPosition';
 import { SelectionPopoverTrigger } from './SelectionPopoverTrigger';
 import { ResonanceDrawer } from './ResonanceDrawer';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
+import { useCeremony } from '@/components/reading/CeremonySequencer';
 
 /** Enter / exit dwells for the popover. `hover` matches depth gestures
  *  across the site; exit runs on `crossfade` plus one reduced-motion
@@ -127,12 +128,19 @@ export function SelectionPopover({ articleId, articleTitle }: Props) {
   const { selection } = useTextSelection({ enabled: isPointer });
   const { isFull, refresh } = useSlotStatus();
   const { isOpen, open, close } = useDrawerState();
+  // Coda-overlay guard (Tanya UX #62 §8 #2): the popover dismisses during
+  // the `gifting` phase so a closing-paragraph highlight cannot land the
+  // gem-pill on top of the Plate's reveal. Outside the article-page
+  // sequencer the hook returns `phase: 'idle'`, so the guard is a no-op.
+  const { phase: ceremonyPhase } = useCeremony();
+  const isGifting = ceremonyPhase === 'gifting';
 
   const capturedQuoteRef = useRef('');
   const lastPositionRef  = useRef<PopoverPosition | null>(null);
 
   // Show popover only when text is selected AND drawer isn't already open
-  const showPopover = !!selection && !isOpen;
+  // AND the ceremony is not actively presenting the keepsake.
+  const showPopover = !!selection && !isOpen && !isGifting;
   const phase = usePopoverPhase(showPopover);
 
   // Cache the last known position so exit animation can play after selection clears

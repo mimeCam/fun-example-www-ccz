@@ -254,11 +254,15 @@ describe('halo-contrast-audit · §2 LICENSE (the halo voice belongs to keepsake
   });
 
   it('CONTRAST_PAIRS.keepsake declares the (halo, surface, halo-floor) contract', () => {
-    const pairs = contrastPairsFor('keepsake');
-    expect(pairs).toHaveLength(1);
-    const [pair] = pairs;
-    expect(pair.fg).toBe('archetype.halo');
-    expect(pair.floor).toBe(HALO_AMBIENT_FLOOR);
+    // The keepsake row may carry sibling pairs at other floors (Mike napkin
+    // #100 — gold @ 3.0 lands as a second pair on the same surface). The
+    // halo contract is decoupled by *fg voice*, not by row index — pick the
+    // halo pair by name so a sibling landing does not break this audit.
+    const haloPair = contrastPairsFor('keepsake').find(
+      (p) => p.fg === 'archetype.halo',
+    );
+    expect(haloPair).toBeDefined();
+    expect(haloPair?.floor).toBe(HALO_AMBIENT_FLOOR);
   });
 
   it('the keepsake pair names voices the keepsake surface licenses (no drift)', () => {

@@ -324,28 +324,33 @@ export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> =
     { fg: 'voice.rose',   bg: 'worldview.rose',    floor: 4.5 }, // contrarian
     { fg: 'voice.mist',   bg: 'worldview.fog',     floor: 4.5 }, // fallback
   ],
-  // ─── Keepsake — `archetype.halo` over the live thermal surface ────────
+  // ─── Keepsake — two pairs on one surface, two distinct floors ────────
   //
-  // ONE pair, by design. The bg voice (`thermal.accent`) is a *symbolic*
-  // stand-in for "the live keepsake surface" — `keepsake` already licenses
-  // `thermal.accent` (see VOICE_LEDGER above), and the halo's reader-
-  // visible neighbour IS that surface. The actual contrast measurement
-  // resolves both surface anchors that exist in the canvas-safe ledger
-  // (`THERMAL.surface`, `THERMAL_WARM.surface`) — same two-anchor
-  // discipline as the chip audits (Mike napkin #95 §1: sample at the
-  // anchors that exist; do not invent a phase enum).
+  // Two floors on one surface: 1.5 ornament, 3.0 non-text signal. Same
+  // gem, different fitness functions. No genus until a third floor lands.
+  // (Elon §4.2 salvaged kernel; Mike napkin #100 §3.)
   //
-  // The pair declares the *contract* (halo voice ↔ surface, at the halo
-  // floor); the test in `__tests__/halo-contrast-audit.test.ts` expands it
-  // across `Object.keys(ARCHETYPE)` (5 voices × 2 anchors = 10 cells) so
-  // the centrality fence is the type system, not a hand-edited list.
+  // The bg voice (`thermal.accent`) is *symbolic* — a stand-in for "the
+  // live keepsake surface" that `keepsake` already licenses (see
+  // VOICE_LEDGER above). The actual measurement resolves both canvas-safe
+  // surface anchors (`THERMAL.surface`, `THERMAL_WARM.surface`) — same
+  // two-anchor discipline as the chip audits (Mike napkin #95 §1).
   //
-  // Floor: `HALO_AMBIENT_FLOOR` (1.5:1, intentionally sub-WCAG — see the
-  // constant's JSDoc above). The §0 lock-low assertion in the audit pins
-  // this *as a number*, so future harmonization PRs fail on math, not on
-  // narrative.
+  // Pair 1 — `archetype.halo` over surface @ HALO_AMBIENT_FLOOR (1.5:1):
+  //   Ornament you look *through*. Sub-WCAG by intent (see the constant's
+  //   JSDoc). The halo audit expands across `Object.keys(ARCHETYPE)` (5
+  //   voices × 2 anchors = 10 cells).
+  //
+  // Pair 2 — `archetype.gold` over surface @ WCAG_NONTEXT (3.0:1):
+  //   Signal you look *at*. The gem off-platform render must clear WCAG
+  //   1.4.11 against the live thermal surface at *both* anchors so a
+  //   future "soften the gold for taste" PR fails on a number, not a
+  //   taste argument. Gold is a single static hex (`BRAND.gold = #f0c674`),
+  //   so the gold audit is 1 voice × 2 anchors = 2 cells (Mike napkin
+  //   #100 §4.2 — symmetry of *shape*, not *cardinality*).
   keepsake: [
     { fg: 'archetype.halo', bg: 'thermal.accent', floor: HALO_AMBIENT_FLOOR },
+    { fg: 'archetype.gold', bg: 'thermal.accent', floor: WCAG_NONTEXT      },
   ],
 } as const;
 
