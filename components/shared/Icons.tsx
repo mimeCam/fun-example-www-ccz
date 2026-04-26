@@ -117,3 +117,13 @@ export function LinkIcon(props: Omit<GlyphProps, 'children'> = {}): JSX.Element 
     </Glyph>
   );
 }
+
+/**
+ * Check — the settled-state witness. Replaces the action glyph during
+ * the ~1200 ms confirmation pulse on async-action buttons (`ActionPressable`).
+ * Optical-center on the same grid axis as Copy/Download/Link so the row
+ * never "ticks" in width when one button enters `settled`. Tanya UX §5.1.
+ */
+export function CheckIcon(props: Omit<GlyphProps, 'children'> = {}): JSX.Element {
+  return <Glyph {...props}><path d="M5 12l5 5L20 7" /></Glyph>;
+}

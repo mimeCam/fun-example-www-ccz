@@ -14,7 +14,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/return/` — recognition-surface selector
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
 - `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, etc.)
-- `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, Icons, etc.
+- `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons, etc.
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, etc.
 - `scripts/` — build-time codegen
 

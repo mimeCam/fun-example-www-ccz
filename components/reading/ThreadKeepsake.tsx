@@ -22,6 +22,13 @@
  * (Tier 1, "the reader sends a thread to a friend without being asked
  * to"). Share leads, the rest cluster.
  *
+ * Async-action settled-state pulse (Mike #18 / Tanya #11):
+ * Copy / Save / Link each route through `<ActionPressable>` so the witness
+ * lands at the fingertip — glyph swaps to a checkmark, verb shifts to past
+ * tense ("Copied" / "Saved"), holds ~1200 ms, then quietly idles. The
+ * primary "Share this thread" CTA is **not** wrapped — the navigator.share
+ * sheet is its own ceremony (Krystle's primary-button exclusion).
+ *
  * Implementation notes:
  *  - Preview SVG is the SAME `buildThreadSVG` used by the inline plate AND
  *    `/api/og/thread`. Preview === unfurl (Mike §6.2).
@@ -34,10 +41,13 @@
  *
  * Credits: Paul K. ("must be beautiful in isolation"; Tier-1 share
  * outcome), Mike K. ("mirror the Thread can walk through"; preview ===
- * unfurl), Tanya D. (UX §4 — single-primary action layout, icon + verb
- * balance, modal motion discipline; UX §0 — the "loop's last syllable"
- * brief), Sid (this refactor — action collapse, SHARED checkpoint
- * emission, icon-set extraction).
+ * unfurl; #18 — `ActionPressable` napkin), Tanya D. (UX §4 — single-
+ * primary action layout, icon + verb balance, modal motion discipline;
+ * UX §0 — the "loop's last syllable" brief; #11 — the settled-state
+ * spec), Krystle C. (original keepsake-feedback covenant — primary
+ * excluded, ~1200 ms, fail-quiet recovery), Sid (this refactor — action
+ * collapse, SHARED checkpoint emission, icon-set extraction, ActionPressable
+ * adoption).
  */
 'use client';
 
@@ -52,9 +62,11 @@ import { copyWithFeedback, showCopyFeedback } from '@/lib/sharing/clipboard-util
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
+import { ActionPressable } from '@/components/shared/ActionPressable';
 import {
   CloseIcon, ShareIcon, CopyIcon, DownloadIcon, LinkIcon,
 } from '@/components/shared/Icons';
+import { useActionPhase, type UseActionPhaseResult } from '@/lib/hooks/useActionPhase';
 import { CHECKPOINTS, emitCheckpoint } from '@/lib/hooks/useLoopFunnel';
 
 interface ThreadKeepsakeProps {
@@ -64,7 +76,7 @@ interface ThreadKeepsakeProps {
 }
 
 /** Busy slot for the action buttons. One verb at a time. */
-type Busy = null | 'copy' | 'download' | 'share';
+type Busy = null | 'copy' | 'download' | 'share' | 'link';
 
 function filenameFor(snapshot: ThreadSnapshot): string {
   const safeSlug = snapshot.slug.replace(/[^a-z0-9-]/gi, '-').slice(0, 40);
@@ -175,9 +187,9 @@ function KeepsakeActions({ svg, snapshot, deepLink, unfurlUrl }: ActionsProps) {
     <div className="px-sys-6 pb-sys-6">
       <PrimaryShare onClick={a.onShare} busy={a.busy === 'share'} />
       <SecondaryRow
-        onCopy={a.onCopyImage} busyCopy={a.busy === 'copy'}
-        onSave={a.onDownload} busySave={a.busy === 'download'}
-        onLink={a.onCopyLink}
+        onCopy={a.onCopyImage} copySlot={a.copySlot}
+        onSave={a.onDownload}  saveSlot={a.saveSlot}
+        onLink={a.onCopyLink}  linkSlot={a.linkSlot}
       />
       {isDev && (
         <p className="mt-sys-4 text-mist/60 text-sys-micro break-all">
@@ -208,52 +220,55 @@ function PrimaryShare({ onClick, busy }: { onClick: () => void; busy: boolean })
 }
 
 interface SecondaryRowProps {
-  onCopy: () => void; busyCopy: boolean;
-  onSave: () => void; busySave: boolean;
-  onLink: () => void;
+  onCopy: () => void; copySlot: UseActionPhaseResult;
+  onSave: () => void; saveSlot: UseActionPhaseResult;
+  onLink: () => void; linkSlot: UseActionPhaseResult;
 }
 
 /**
  * Three icon-led ghost siblings — Copy / Save / Link. Verbs balance with
  * the primary's two-word verb (logic principle #14). Distribution is
  * centered-by-spacing, not centered-by-text (Tanya §4.4 alignment rule).
+ *
+ * Each slot owns its own `useActionPhase` so the settled-state witness
+ * lives at the fingertip independently per-button (Tanya §5 / Mike §4).
  */
 function SecondaryRow(p: SecondaryRowProps) {
   return (
     <div className="flex items-center justify-center gap-sys-3 flex-wrap">
-      <SecondaryAction onClick={p.onCopy} busy={p.busyCopy}
-        icon={<CopyIcon size={14} />} label="Copy" hint="Copy image" />
-      <SecondaryAction onClick={p.onSave} busy={p.busySave}
-        icon={<DownloadIcon size={14} />} label="Save" hint="Download PNG" />
-      <SecondaryAction onClick={p.onLink}
-        icon={<LinkIcon size={14} />} label="Link" hint="Copy link" />
+      <SecondaryAction onClick={p.onCopy} slot={p.copySlot}
+        icon={<CopyIcon size={14} />}
+        idleLabel="Copy" settledLabel="Copied" hint="Copy image" />
+      <SecondaryAction onClick={p.onSave} slot={p.saveSlot}
+        icon={<DownloadIcon size={14} />}
+        idleLabel="Save" settledLabel="Saved" hint="Download PNG" />
+      <SecondaryAction onClick={p.onLink} slot={p.linkSlot}
+        icon={<LinkIcon size={14} />}
+        idleLabel="Link" settledLabel="Copied" hint="Copy link" />
     </div>
   );
 }
 
 interface SecondaryActionProps {
   onClick: () => void;
-  busy?: boolean;
+  slot: UseActionPhaseResult;
   icon: JSX.Element;
-  label: string;
-  /** Long-form name surfaced via `aria-label` and `title` for tool-tip. */
+  idleLabel: string;
+  settledLabel: string;
   hint: string;
 }
 
-function SecondaryAction({ onClick, busy, icon, label, hint }: SecondaryActionProps) {
+function SecondaryAction(p: SecondaryActionProps) {
   return (
-    <Pressable
-      variant="ghost"
-      size="sm"
-      onClick={onClick}
-      disabled={!!busy}
-      aria-label={hint}
-      title={hint}
-      className="gap-sys-2"
-    >
-      {icon}
-      <span>{busy ? '…' : label}</span>
-    </Pressable>
+    <ActionPressable
+      onClick={p.onClick}
+      phase={p.slot.phase}
+      reduced={p.slot.reduced}
+      icon={p.icon}
+      idleLabel={p.idleLabel}
+      settledLabel={p.settledLabel}
+      hint={p.hint}
+    />
   );
 }
 
@@ -267,44 +282,66 @@ interface ActionHandlerInputs {
 
 /**
  * The four verbs the modal speaks, plus a single busy slot (one action at
- * a time). Pulled into its own hook so the render fn stays presentational
- * and each callback is independently grep-recoverable.
+ * a time) and per-slot phase machines for the three secondaries. Pulled
+ * into its own hook so the render fn stays presentational and each
+ * callback is independently grep-recoverable.
  */
 function useKeepsakeActions(inputs: ActionHandlerInputs) {
   const { svg, snapshot, deepLink } = inputs;
   const [busy, setBusy] = useState<Busy>(null);
-  const onCopyImage = useCallback(() => runCopyImage(svg, setBusy), [svg]);
-  const onDownload  = useCallback(() => runDownload(svg, snapshot, setBusy), [svg, snapshot]);
-  const onCopyLink  = useCallback(() => runCopyLink(deepLink), [deepLink]);
-  const onShare     = useCallback(
-    () => runShare(snapshot, deepLink, setBusy),
-    [snapshot, deepLink],
-  );
-  return { busy, onCopyImage, onDownload, onCopyLink, onShare };
+  const copySlot = useActionPhase(busy === 'copy');
+  const saveSlot = useActionPhase(busy === 'download');
+  const linkSlot = useActionPhase(busy === 'link');
+  const onCopyImage = useCallback(
+    () => runCopyImage(svg, setBusy, copySlot.pulse), [svg, copySlot.pulse]);
+  const onDownload  = useCallback(
+    () => runDownload(svg, snapshot, setBusy, saveSlot.pulse),
+    [svg, snapshot, saveSlot.pulse]);
+  const onCopyLink  = useCallback(
+    () => runCopyLink(deepLink, setBusy, linkSlot.pulse),
+    [deepLink, linkSlot.pulse]);
+  const onShare = useCallback(
+    () => runShare(snapshot, deepLink, setBusy), [snapshot, deepLink]);
+  return { busy, copySlot, saveSlot, linkSlot,
+    onCopyImage, onDownload, onCopyLink, onShare };
 }
 
-async function runCopyImage(svg: string, setBusy: (b: Busy) => void): Promise<void> {
+type Pulse = (ok: boolean) => void;
+
+async function runCopyImage(
+  svg: string, setBusy: (b: Busy) => void, pulse: Pulse,
+): Promise<void> {
   setBusy('copy');
   try {
     const ok = await copyPngToClipboard(svg);
     if (ok) emitCheckpoint(CHECKPOINTS.SHARED);
     showCopyFeedback(ok ? 'Keepsake copied.' : 'Copy unsupported — try Save.');
+    pulse(ok);
   } finally { setBusy(null); }
 }
 
 async function runDownload(
-  svg: string, snapshot: ThreadSnapshot, setBusy: (b: Busy) => void,
+  svg: string, snapshot: ThreadSnapshot,
+  setBusy: (b: Busy) => void, pulse: Pulse,
 ): Promise<void> {
   setBusy('download');
   try {
     await downloadPng(svg, filenameFor(snapshot));
     emitCheckpoint(CHECKPOINTS.SHARED);
-  } finally { setBusy(null); }
+    pulse(true);
+  } catch { pulse(false); } finally { setBusy(null); }
 }
 
-async function runCopyLink(deepLink: string): Promise<void> {
-  // copyWithFeedback already emits SHARED on the clipboard-utils path.
-  await copyWithFeedback(deepLink, 'Link copied — the thread travels with it.');
+async function runCopyLink(
+  deepLink: string, setBusy: (b: Busy) => void, pulse: Pulse,
+): Promise<void> {
+  setBusy('link');
+  try {
+    // copyWithFeedback already emits SHARED on the clipboard-utils path.
+    const ok = await copyWithFeedback(
+      deepLink, 'Link copied — the thread travels with it.');
+    pulse(ok);
+  } finally { setBusy(null); }
 }
 
 async function runShare(

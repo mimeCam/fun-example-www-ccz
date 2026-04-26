@@ -46,12 +46,22 @@ describe('ThreadKeepsake · single-primary action layout (Tanya UX §4.1)', () =
     expect(matches.length).toBe(1);
   });
 
-  it('a ghost Pressable variant carries the secondary cluster (Copy/Save/Link)', () => {
-    // One shared `<SecondaryAction>` calls `<Pressable variant="ghost">` once;
-    // three SecondaryAction mounts paint the cluster. Pin both shapes.
-    expect(SRC).toMatch(/variant="ghost"/);
+  it('the secondary cluster routes through ActionPressable (settled witness)', () => {
+    // One shared `<SecondaryAction>` wraps `<ActionPressable>`; three mounts
+    // paint the cluster. The ghost-variant chrome is owned by ActionPressable
+    // (single grep-able home for the affordance — Mike #18 §4).
+    expect(SRC).toMatch(/from\s+['"]@\/components\/shared\/ActionPressable['"]/);
+    expect(SRC).toMatch(/<ActionPressable\b/);
     const calls = SRC.match(/<SecondaryAction\b/g) ?? [];
     expect(calls.length).toBe(3);
+  });
+
+  it('primary Share is NOT wrapped in ActionPressable (scope guard)', () => {
+    // Primary CTA already has its own ceremony via navigator.share. The
+    // settled-state pulse is a *secondary* affordance — primary stays plain
+    // (Krystle's primary-button exclusion; Tanya UX §4.1 single-primary).
+    const primaryBlock = SRC.split('PrimaryShare')[1] ?? '';
+    expect(primaryBlock.split('SecondaryRow')[0]).not.toMatch(/ActionPressable/);
   });
 
   it('one icon Pressable exists for the close affordance', () => {
@@ -67,9 +77,16 @@ describe('ThreadKeepsake · verb discipline (logic principle #14)', () => {
   });
 
   it('secondary verbs are single words: Copy, Save, Link', () => {
-    expect(SRC).toMatch(/label="Copy"/);
-    expect(SRC).toMatch(/label="Save"/);
-    expect(SRC).toMatch(/label="Link"/);
+    expect(SRC).toMatch(/idleLabel="Copy"/);
+    expect(SRC).toMatch(/idleLabel="Save"/);
+    expect(SRC).toMatch(/idleLabel="Link"/);
+  });
+
+  it('settled verbs are past-tense witnesses (Tanya §5.2 — verb table)', () => {
+    // Width discipline: ±1 ch of the idle siblings.
+    // Copy → Copied, Save → Saved, Link → Copied.
+    expect(SRC).toMatch(/settledLabel="Copied"/);
+    expect(SRC).toMatch(/settledLabel="Saved"/);
   });
 
   it('header copy collapses to one sentence (Tanya §4 brief)', () => {
