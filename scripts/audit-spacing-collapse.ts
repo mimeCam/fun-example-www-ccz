@@ -25,15 +25,27 @@
  * portal short-circuit and the suspected compensating sibling, plus the
  * one-sentence remediation lens.
  *
+ * Comment honesty (Krystle #48 / Mike #62 §1):
+ *   The two regexes below run against a *scrubbed* version of each
+ *   source — `stripCommentsAndStrings` blanks comment + string bodies
+ *   while preserving length and newline grid, so a token that lives
+ *   only inside a docblock (e.g. `mt-sys-10` cited in prose) does not
+ *   read as code. Match indices still map to original-source line
+ *   numbers because the scrub is layout-preserving.
+ *
  * Credits: Mike K. (#2 §6.1 — the static-scanner punch-list, the
- * "report-only, not a gate" discipline, the regex shape), Elon M.
- * (the "audit other zero-height-portal-adjacent spacing sites" call
- * Mike credits in #2 §Credits), Tanya D. (#3 §5 — the lens this script
- * prints as the remediation hint).
+ * "report-only, not a gate" discipline, the regex shape; #62 §1, §6 —
+ * the shared `lib/source-scan/` substrate), Krystle Clear (#48 — the
+ * comment-aware regex plan), Elon M. (the "audit other zero-height-
+ * portal-adjacent spacing sites" call Mike credits in #2 §Credits),
+ * Tanya D. (#3 §5, #97 §1 — the invariant this script defends and the
+ * lens it prints as the remediation hint).
  */
 
 import { readFileSync, statSync, readdirSync } from 'fs';
 import { join, relative, resolve } from 'path';
+
+import { stripCommentsAndStrings } from '../lib/source-scan';
 
 // ─── Configuration — pure constants ──────────────────────────────────────
 
@@ -95,11 +107,17 @@ interface Finding {
   readonly marginLines: readonly number[];
 }
 
-/** Build a Finding from a file's source, or `null` when nothing matches. */
+/**
+ * Build a Finding from a file's source, or `null` when nothing matches.
+ * Regexes run against the *scrubbed* source so comment-borne tokens
+ * cannot fire; line numbers still resolve against the original because
+ * the scrub is layout-preserving (see header §"Comment honesty").
+ */
 function findingFor(file: string, source: string): Finding | null {
-  const portals = findAll(source, PORTAL_COLLAPSE);
+  const scrubbed = stripCommentsAndStrings(source);
+  const portals = findAll(scrubbed, PORTAL_COLLAPSE);
   if (portals.length === 0) return null;
-  const margins = findAll(source, TOP_MARGIN_CLASS);
+  const margins = findAll(scrubbed, TOP_MARGIN_CLASS);
   if (margins.length === 0) return null;
   return buildFinding(file, source, portals, margins);
 }

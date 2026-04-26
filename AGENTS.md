@@ -12,6 +12,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
 - `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, useThreadDepth, useLoopFunnel, useScrollRise)
 - `lib/content/` — markdown stripping pipeline (`stripMarkdownTokens`, `collapseWhitespace`, `excerpt`)
+- `lib/source-scan/` — build-time source scanners (`stripCommentsAndStrings`); shared substrate for `scripts/audit-*`
 - `lib/utils/reader-locale.ts` — reader-facing date formatting
 - `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, EmptySurface, SuspenseFade, CaptionMetric, CollapsibleSlot
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, ArticleProvenance, ReadProgressCaption
@@ -25,14 +26,13 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 **Posture suggests, posture does not dictate.** Do not add `motionByPosture()` or cross-ledger accessors — the correlation lives in the reviewer's head, not in the type system.
 
-**Margins for a collapsible portal live on the portal's envelope, not on its siblings.** If a child may render `null` for one reader class, wrap it in `<CollapsibleSlot top? bottom?>` — the envelope SSRs whether the inner paints or not. Spacing math may not silently assume the recognition-positive case (Tanya #3 §5, Mike #2 §5).
+**Margins for a collapsible portal live on the portal's envelope, not on its siblings.** If a child may render `null` for one reader class, wrap it in `<CollapsibleSlot top? bottom?>` — the envelope SSRs whether the inner paints or not. Spacing math may not silently assume the recognition-positive case (Tanya #3 §5, Mike #2 §5). `scripts/audit-spacing-collapse.ts` is the local guardrail; run it before sending a portal-shape PR.
 
 ## WIP
 - *(none)*
 
 ## Follow-ons (deferred)
 - Worldview taxonomy decision (4 chips, still arguably 3 voices). Chip glyph (`WORLDVIEW_GLYPHS` in `lib/design/worldview.ts`) carries the discriminator; collapse to 3 remains a future option touching `types/filter.ts` + `lib/design/worldview.ts` + glyph map.
-- `scripts/audit-spacing-collapse.ts` — local-only static scanner for portal-`null` + sibling-`mt-sys-N` collisions. Runs report-only; not in CI. Tune the regex when the next finding earns it (Mike #2 §6.5).
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.
