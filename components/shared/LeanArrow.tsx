@@ -46,7 +46,8 @@
  * pins (A) no caller `<EmptySurface>` label trails a directional glyph,
  * (B) the kernel anchor lives in this file, (C) no other `.tsx` inlines
  * a `.lean-arrow` span, (D) no `<TextLink>`/`<Pressable>`/
- * `<ActionPressable>` JSX-text child trails a raw `→ ↗ ⟶ › »`.
+ * `<ActionPressable>` JSX-text child trails a raw `→ ↗ ⟶ › »`, and
+ * (F) every load-bearing JSDoc claim above has a falsifiable test peer.
  *
  * The Address Test (Jason F. #8/#25/#49 — kept LOCAL as prose, not
  * doctrine): the component name, file path, CSS class, test pin, and

@@ -478,3 +478,90 @@ describe('lean-arrow-fence — Axis E · five utterances spell one verb', () => 
     expect(__filename.endsWith('lean-arrow-fence.test.ts')).toBe(true);
   });
 });
+
+// ─── Tests — Axis F · JSDoc prose claims have falsifiable test peers ──────
+//
+// LOCAL to this verb only · N=1 · not a sweep. Three sub-assertions pin
+// the load-bearing JSDoc claims that Axes A–E do NOT already cover. The
+// contract is closed at three; if a coder is tempted to add F.4, stop.
+// (Mike #29 napkin §"Three sub-assertions, not five"; Krystle, DoD #1.)
+//
+// Direct single-file reads (no walker pollution): the kernel and the CSS
+// are one path each — re-walking the tree would be cache pollution. The
+// scan cache is for tree-wide work (Axes A–D); F.* opens two files and
+// closes them. Failure formatter shape parity with formatLabelFailure /
+// formatDoorFailure: location, the offending bit, the prescription.
+
+const CSS_PATH = 'app/globals.css';
+
+interface JsdocViolation { claim: string; detail: string; prescription: string }
+
+function formatJsdocFailure(v: JsdocViolation): string {
+  return (
+    `  ${KERNEL_PATH} — JSDoc claim '${v.claim}' has no falsifiable peer\n\n` +
+    `    detail: ${v.detail}\n` +
+    `    ${v.prescription}`
+  );
+}
+
+/** F.1 — `no props ever`: no `LeanArrowProps` interface or type alias on the kernel. */
+function findPropsTypeDecl(src: string): string | null {
+  const stripped = preprocess(src);
+  const m = stripped.match(/\b(?:interface|type)\s+LeanArrowProps\b/);
+  return m === null ? null : m[0];
+}
+
+/** F.2 — `reduced-motion silenced`: a @media reduce block mentions `.lean-arrow`. */
+function reducedMotionMentionsLeanArrow(css: string): boolean {
+  const rx = /@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/g;
+  for (const m of css.matchAll(rx)) {
+    const inner = readBalancedBraces(css, (m.index ?? 0) + m[0].length - 1);
+    if (inner !== null && inner.includes('.lean-arrow')) return true;
+  }
+  return false;
+}
+
+/** F.3 — `forced-colors via currentColor`: the .lean-arrow rule sets no explicit color. */
+function leanArrowRuleExplicitColor(css: string): string | null {
+  const rule = css.match(/^\.lean-arrow\s*\{([\s\S]*?)\}/m);
+  if (rule === null) return null;
+  const decl = rule[1].match(/(?<![a-zA-Z-])color\s*:\s*([^;}\n]+)/);
+  if (decl === null) return null;
+  const value = decl[1].trim();
+  return /^currentColor\b/i.test(value) ? null : value;
+}
+
+describe('lean-arrow-fence — Axis F · JSDoc prose claims have falsifiable peers', () => {
+  const kernelSrc = readFileSync(join(ROOT, KERNEL_PATH), 'utf8');
+  const cssSrc = readFileSync(join(ROOT, CSS_PATH), 'utf8');
+
+  it('F.1 · `no props ever` — no LeanArrowProps interface/type is declared in the kernel', () => {
+    const decl = findPropsTypeDecl(kernelSrc);
+    if (decl !== null) throw new Error('\n' + formatJsdocFailure({
+      claim: 'no props ever',
+      detail: `kernel declares '${decl}' — props were re-introduced`,
+      prescription: 'Delete the declaration; the kernel is parameterless by construction (Mike #78).',
+    }));
+    expect(decl).toBeNull();
+  });
+
+  it('F.2 · `reduced-motion silenced` — globals.css @media reduce block mentions .lean-arrow', () => {
+    const ok = reducedMotionMentionsLeanArrow(cssSrc);
+    if (!ok) throw new Error('\n' + formatJsdocFailure({
+      claim: 'reduced-motion silenced',
+      detail: `no @media (prefers-reduced-motion: reduce) block in ${CSS_PATH} mentions .lean-arrow`,
+      prescription: 'Restore the override (globals.css:1224–1226) so the 2px translate zeros under reduced-motion.',
+    }));
+    expect(ok).toBe(true);
+  });
+
+  it('F.3 · `forced-colors via currentColor` — the .lean-arrow rule sets no explicit non-currentColor color', () => {
+    const explicit = leanArrowRuleExplicitColor(cssSrc);
+    if (explicit !== null) throw new Error('\n' + formatJsdocFailure({
+      claim: 'forced-colors via currentColor',
+      detail: `.lean-arrow rule sets explicit color: ${explicit}`,
+      prescription: 'Remove the color declaration; currentColor inheritance survives forced-colors via CanvasText.',
+    }));
+    expect(explicit).toBeNull();
+  });
+});
