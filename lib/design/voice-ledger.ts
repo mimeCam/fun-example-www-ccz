@@ -254,6 +254,52 @@ export interface ContrastPair {
   readonly floor: number;
 }
 
+// ─── Named WCAG floors + the halo's intentional sub-WCAG ambient floor ────
+//
+// Floors are *numbers in the type system*, not prose in a docblock — so a
+// future "harmonize the halo upward" PR fails on a typed `toBeLessThan`
+// assertion (Elon §3.2 salvaged kernel; Mike napkin #99 §0 "lock-low"
+// invariant; Tanya UX #85 §6 "the fence is encoded in the test, not in a
+// taxonomy"). The genus is deferred until a *third* halo-class consumer
+// lands under its own steam (rule of three; AGENTS.md §"Design System").
+
+/**
+ * WCAG 2.1 §1.4.3 contrast minimum for normal text — 4.5:1. Cited here so
+ * the halo's `< WCAG_AA_TEXT` invariant is *number-vs-number*, not
+ * comment-vs-comment. Pure constant.
+ */
+export const WCAG_AA_TEXT = 4.5;
+
+/**
+ * WCAG 2.1 §1.4.11 non-text contrast minimum for meaningful UI components
+ * — 3.0:1. Cited so the halo's lock-low test can name the floor it sits
+ * *below* (the halo is decorative ornament, not signal — Tanya UX #85 §1).
+ * Pure constant.
+ */
+export const WCAG_NONTEXT = 3.0;
+
+/**
+ * Halo ambient contrast floor — **1.5:1, intentionally below WCAG 1.4.11**
+ * (3:1 non-text). The halo is a *presence ornament*, not an information
+ * surface: a halo that demands attention has already failed (Tanya UX #85
+ * §1). The 1.5:1 floor is a UX promise — the room acknowledges the reader
+ * *without* asking them to look at the glow itself. The reader-invariant
+ * survives without the halo being perceptible: under
+ * `prefers-reduced-transparency` and `prefers-contrast: more`, the halo
+ * collapses to `none` (`ambient-surfaces.css` §"Gold halos") and the
+ * gem/text/glyph carry the legibility load.
+ *
+ * If a future "harmonization" PR lifts this floor toward the WCAG 4.5:1
+ * (text) or 3.0:1 (non-text) thresholds, the lock-low test in
+ * `__tests__/halo-contrast-audit.test.ts` §0 fails *first*, before any
+ * human review, and the failure points back at this JSDoc. That is the
+ * fence — not a docblock noun, but a typed assertion (Mike napkin #99
+ * §0; Elon §3.2 first-principles teardown).
+ *
+ * Pure constant.
+ */
+export const HALO_AMBIENT_FLOOR = 1.5;
+
 /**
  * Audit pairs per surface. The chip row encodes the four named worldview
  * voices + the `fog`/`mist` fallback (Tanya UX #62 §4.5: "the audit table
@@ -277,6 +323,29 @@ export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> =
     { fg: 'voice.cyan',   bg: 'worldview.cyan',    floor: 4.5 }, // practical
     { fg: 'voice.rose',   bg: 'worldview.rose',    floor: 4.5 }, // contrarian
     { fg: 'voice.mist',   bg: 'worldview.fog',     floor: 4.5 }, // fallback
+  ],
+  // ─── Keepsake — `archetype.halo` over the live thermal surface ────────
+  //
+  // ONE pair, by design. The bg voice (`thermal.accent`) is a *symbolic*
+  // stand-in for "the live keepsake surface" — `keepsake` already licenses
+  // `thermal.accent` (see VOICE_LEDGER above), and the halo's reader-
+  // visible neighbour IS that surface. The actual contrast measurement
+  // resolves both surface anchors that exist in the canvas-safe ledger
+  // (`THERMAL.surface`, `THERMAL_WARM.surface`) — same two-anchor
+  // discipline as the chip audits (Mike napkin #95 §1: sample at the
+  // anchors that exist; do not invent a phase enum).
+  //
+  // The pair declares the *contract* (halo voice ↔ surface, at the halo
+  // floor); the test in `__tests__/halo-contrast-audit.test.ts` expands it
+  // across `Object.keys(ARCHETYPE)` (5 voices × 2 anchors = 10 cells) so
+  // the centrality fence is the type system, not a hand-edited list.
+  //
+  // Floor: `HALO_AMBIENT_FLOOR` (1.5:1, intentionally sub-WCAG — see the
+  // constant's JSDoc above). The §0 lock-low assertion in the audit pins
+  // this *as a number*, so future harmonization PRs fail on math, not on
+  // narrative.
+  keepsake: [
+    { fg: 'archetype.halo', bg: 'thermal.accent', floor: HALO_AMBIENT_FLOOR },
   ],
 } as const;
 
