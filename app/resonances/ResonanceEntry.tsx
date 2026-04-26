@@ -29,6 +29,7 @@ import { alphaClassOf } from '@/lib/design/alpha';
 import { passageThermalClass } from '@/lib/design/typography';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { QuoteKeepsake } from '@/components/articles/QuoteKeepsake';
+import { resolveLauncherPaint } from '@/lib/resonances/visited-launcher';
 import type { QuoteCardData } from '@/lib/quote-cards/card-generator';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 
@@ -39,6 +40,21 @@ interface Props {
   closingLine?: string;
   /** Section-local position (0-based). Drives stagger delay. Omit to disable animation. */
   index?: number;
+  /**
+   * Has the reader Saved this resonance's quote-card *this session*?
+   * When true, the `<QuoteCardLauncher>` repaints in `gold/quiet`
+   * (the visited foreshadow; Tanya UIX #98, Mike #31 §1). Owned by
+   * `<ResonancesClient>`'s in-memory Set — refresh forgets, by intent.
+   */
+  visited?: boolean;
+  /**
+   * Fired when the reader hits Save (download) inside `<QuoteKeepsake>`
+   * and the file lands. Threaded straight into the Keepsake host's
+   * `onSaved` so the parent can mark this resonance visited. Save is
+   * the one artifact verb on this surface — no `onShared` / `onCopied`
+   * peer (Mike #31 §10).
+   */
+  onSaved?: () => void;
 }
 
 /** Small gem icon for the card label. */
@@ -63,7 +79,9 @@ function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean })
   );
 }
 
-export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine, index }: Props) {
+export default function ResonanceEntry({
+  resonance, timeAgo, faded, closingLine, index, visited, onSaved,
+}: Props) {
   // Scroll-rise: disabled when index is undefined (backward-compat with call-sites
   // that don't pass an index). When enabled, hides the card on mount and reveals
   // it with a 12px lift + opacity fade once 15% of the card enters the viewport.
@@ -82,7 +100,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine,
         <VitalityBar vitality={resonance.vitality} faded={faded} />
       </div>
       {!faded && resonance.quote && (
-        <QuoteCardLauncher onOpen={keepsake.open} />
+        <QuoteCardLauncher onOpen={keepsake.open} visited={visited} />
       )}
       {faded && closingLine && <ClosingLine line={closingLine} />}
       <QuoteKeepsake
@@ -90,6 +108,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine,
         onClose={keepsake.close}
         data={resonance.quote ? buildCardData(resonance) : null}
         deepLink={`/article/${resonance.articleId}`}
+        onSaved={onSaved}
       />
     </div>
   );
@@ -193,8 +212,18 @@ function buildCardData(r: ResonanceWithArticle): QuoteCardData {
  * Lives below the vitality bar so it never competes with the card's own
  * presence (Tanya §75 §2.4 — single primary on the surface; this is the
  * passage-link, not a primary CTA).
+ *
+ * `visited` repaints the launcher in `text-gold/quiet` for the rest of
+ * the session once the keepsake has been Saved (the visited foreshadow;
+ * Tanya UIX #98 §2). One pure resolver, one boolean, one class swap —
+ * no fork to a `VisitedQuoteCardLauncher` variant (Mike #31 §11). The
+ * `aria-label` is unchanged: the paint is the sentence, not a copy
+ * change (Tanya #98 §4).
  */
-function QuoteCardLauncher({ onOpen }: { onOpen: () => void }) {
+function QuoteCardLauncher(
+  { onOpen, visited }: { onOpen: () => void; visited?: boolean },
+) {
+  const paint = resolveLauncherPaint(visited === true);
   return (
     <div className="mt-sys-4 flex justify-end">
       <Pressable
@@ -202,7 +231,7 @@ function QuoteCardLauncher({ onOpen }: { onOpen: () => void }) {
         size="sm"
         onClick={onOpen}
         aria-label="Save this quote as a card"
-        className="text-mist/70 text-sys-micro"
+        className={`${paint} text-sys-micro`}
       >
         Save as card →
       </Pressable>

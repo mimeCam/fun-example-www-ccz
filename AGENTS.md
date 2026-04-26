@@ -16,6 +16,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, etc.)
 - `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons, etc.
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, etc.
+- `lib/resonances/` — visited-launcher paint resolver (session-scoped launcher repaint)
 - `components/articles/` — QuoteKeepsake (quote-card host #2 for direct-gesture asymmetry)
 - `scripts/` — build-time codegen
 

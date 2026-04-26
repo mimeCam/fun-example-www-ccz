@@ -74,6 +74,20 @@ interface QuoteKeepsakeProps {
   data: QuoteCardData | null;
   /** Optional deep-link to the originating article — drives the Link verb. */
   deepLink?: string;
+  /**
+   * Fired exactly once on a successful **Save** (download) — the one
+   * artifact-producing verb on this surface. Mounted by
+   * `<ResonanceEntry>` so the originating `<QuoteCardLauncher>` can
+   * repaint in `gold/quiet` for the rest of the session (the visited-
+   * foreshadow sentence; Tanya UIX #98 §0, Mike #31 §1).
+   *
+   * Deliberately NOT fired on Copy / Link / Share. Save is the artifact
+   * verb (a durable file lands in the reader's downloads); the other
+   * three are reach. If product later wants Share to also count, we add
+   * a second prop (`onShared`) — never a generic "anything happened"
+   * callback (Mike #31 §4).
+   */
+  onSaved?: () => void;
 }
 
 /** One verb at a time. Mirrors ThreadKeepsake's `Busy` slot vocabulary. */
@@ -87,7 +101,7 @@ type Busy = null | 'copy' | 'download' | 'share' | 'link';
  * reveal animation honest — Tanya #75 §3.4 "modal enter ≤ 150 ms").
  */
 export function QuoteKeepsake(props: QuoteKeepsakeProps): JSX.Element | null {
-  const { isOpen, onClose, data, deepLink } = props;
+  const { isOpen, onClose, data, deepLink, onSaved } = props;
   const dataUrl = useGeneratedCard(data, isOpen);
   if (!data) return null;
   return (
@@ -96,7 +110,8 @@ export function QuoteKeepsake(props: QuoteKeepsakeProps): JSX.Element | null {
       variant="center">
       <KeepsakeHeader onClose={onClose} />
       <KeepsakePreview dataUrl={dataUrl} title={data.articleTitle} />
-      <KeepsakeActions data={data} dataUrl={dataUrl} deepLink={deepLink ?? ''} />
+      <KeepsakeActions data={data} dataUrl={dataUrl}
+        deepLink={deepLink ?? ''} onSaved={onSaved} />
     </Threshold>
   );
 }
@@ -186,10 +201,13 @@ interface ActionsProps {
   data: QuoteCardData;
   dataUrl: string;
   deepLink: string;
+  /** Optional Save-success witness — propagates to `runDownload`. See
+   *  the file-level prop docs for the artifact-verb-only rationale. */
+  onSaved?: () => void;
 }
 
-function KeepsakeActions({ data, dataUrl, deepLink }: ActionsProps) {
-  const a = useQuoteActions({ data, dataUrl, deepLink });
+function KeepsakeActions({ data, dataUrl, deepLink, onSaved }: ActionsProps) {
+  const a = useQuoteActions({ data, dataUrl, deepLink, onSaved });
   return (
     <div className="px-sys-6 pb-sys-6">
       <PrimaryShare onClick={a.onShare} slot={a.shareSlot} />
@@ -285,6 +303,8 @@ interface ActionHandlerInputs {
   data: QuoteCardData;
   dataUrl: string;
   deepLink: string;
+  /** Save-success witness; threaded into `runDownload` only. */
+  onSaved?: () => void;
 }
 
 /**
@@ -293,7 +313,7 @@ interface ActionHandlerInputs {
  * ThreadKeepsake — the dialect is identical, only the work changes.
  */
 function useQuoteActions(inputs: ActionHandlerInputs) {
-  const { data, dataUrl, deepLink } = inputs;
+  const { data, dataUrl, deepLink, onSaved } = inputs;
   const [busy, setBusy] = useState<Busy>(null);
   const copySlot  = useActionPhase(busy === 'copy');
   const saveSlot  = useActionPhase(busy === 'download');
@@ -302,8 +322,8 @@ function useQuoteActions(inputs: ActionHandlerInputs) {
   const onCopy = useCallback(
     () => runCopyImage(dataUrl, setBusy, copySlot.pulse), [dataUrl, copySlot.pulse]);
   const onDownload = useCallback(
-    () => runDownload(dataUrl, data, setBusy, saveSlot.pulse),
-    [dataUrl, data, saveSlot.pulse]);
+    () => runDownload(dataUrl, data, setBusy, saveSlot.pulse, onSaved),
+    [dataUrl, data, saveSlot.pulse, onSaved]);
   const onCopyLink = useCallback(
     () => runCopyLink(deepLink, setBusy, linkSlot.pulse),
     [deepLink, linkSlot.pulse]);
@@ -333,9 +353,28 @@ async function runCopyImage(
   } finally { setBusy(null); }
 }
 
+/**
+ * Save (download) verb — the single artifact-producing path. On success
+ * we fire (in order):
+ *   1. `emitCheckpoint(SHARED)`  — reader-loop funnel parity
+ *   2. `pulse(ok)`               — fingertip witness lands first (room
+ *                                  voice silent — direct-gesture asymmetry)
+ *   3. `onSaved?.()`             — the room-scale visited foreshadow,
+ *                                  fired *after* pulse so the reader's
+ *                                  fingertip sees the receipt first and
+ *                                  discovers the launcher repaint when
+ *                                  they look back at the card (Mike #31
+ *                                  §7 PoI #1; Tanya #98 §3).
+ *
+ * Failure escalates via `showExportError('download')` (warn intent —
+ * the asymmetry contract). `onSaved` is NOT fired on failure: the visited
+ * paint marks a durable artifact in the reader's downloads, and a
+ * failed download is the absence of that artifact (Mike #31 §4).
+ */
 async function runDownload(
   dataUrl: string, data: QuoteCardData,
   setBusy: (b: Busy) => void, pulse: Pulse,
+  onSaved?: () => void,
 ): Promise<void> {
   setBusy('download');
   try {
@@ -343,6 +382,7 @@ async function runDownload(
     if (ok) emitCheckpoint(CHECKPOINTS.SHARED);
     else showExportError('download');
     pulse(ok);
+    if (ok) onSaved?.();
   } finally { setBusy(null); }
 }
 

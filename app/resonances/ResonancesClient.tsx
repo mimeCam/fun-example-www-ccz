@@ -5,6 +5,13 @@
  *
  * Now builds BookNarrationContext for data-driven EvolutionThread whispers
  * and ClosingLineContext for shaped resonances.
+ *
+ * Visited foreshadow (Tanya UIX #98, Mike #31): owns the in-memory Set
+ * of resonance ids whose quote-card has been Saved this session.
+ * Refresh forgets, by intent — the contract is session-scope, not
+ * persistence (Tanya §6, Mike §7.6). The Set is held as a tiny hook
+ * (`useVisitedLaunchers`) below; it stays here until a second
+ * consumer earns a lift (rule of three; Mike §7.3).
  */
 'use client';
 
@@ -107,6 +114,21 @@ function buildClosingCtx(r: ResonanceWithArticle): ClosingLineContext {
   };
 }
 
+/**
+ * Visited launchers — session-scoped membership Set keyed by resonance id.
+ * One owner (this hook on `ResonancesClient`). Refresh clears. No
+ * persistence, no localStorage, no new ledger (Tanya #98 §6, Mike
+ * #31 §7 PoI #3, Elon #31 §3.5: pragmatic-not-principled). ≤ 10 LOC.
+ */
+function useVisitedLaunchers() {
+  const [visited, setVisited] = useState<Set<string>>(() => new Set());
+  const markVisited = useCallback((id: string) => {
+    setVisited((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }, []);
+  const isVisited = useCallback((id: string) => visited.has(id), [visited]);
+  return { isVisited, markVisited };
+}
+
 /** Slot indicator: filled ◆ and empty ◇ diamonds. */
 function SlotIndicator({ used, total }: { used: number; total: number }) {
   return (
@@ -132,6 +154,7 @@ export default function ResonancesClient() {
   const [slots, setSlots] = useState<SlotLimits | null>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const { isVisited, markVisited } = useVisitedLaunchers();
 
   const fetchData = useCallback(async () => {
     const id = getAnonId();
@@ -216,7 +239,13 @@ export default function ResonancesClient() {
                     </p>
                   </div>
                 )}
-                <ResonanceEntry resonance={r} timeAgo={formatTimeAgo(r.createdAt)} index={i} />
+                <ResonanceEntry
+                  resonance={r}
+                  timeAgo={formatTimeAgo(r.createdAt)}
+                  index={i}
+                  visited={isVisited(r.id)}
+                  onSaved={() => markVisited(r.id)}
+                />
                 {/* Data-driven whisper between entries */}
                 {i < carrying.length - 1 && (
                   <EvolutionThread context={contexts[i]} />
