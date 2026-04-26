@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function ResonancesPage() {
   return (
-    <main className="min-h-screen px-sys-4 md:px-sys-6 py-sys-8">
+    <main id="main-content" className="min-h-screen px-sys-4 md:px-sys-6 py-sys-8">
       <ResonancesClient />
     </main>
   );

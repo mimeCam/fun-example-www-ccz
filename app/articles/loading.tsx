@@ -13,7 +13,7 @@ import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function ArticlesLoading() {
   return (
-    <main className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       <GemHome />
       <div className="max-w-2xl mx-auto px-sys-6 py-sys-10">
         <TitleBar />

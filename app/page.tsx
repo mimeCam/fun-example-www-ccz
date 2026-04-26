@@ -39,7 +39,7 @@ export default function Home({
   const { via } = decodeDeepLink(searchParams);
 
   return (
-    <main className="min-h-screen flex flex-col">
+    <main id="main-content" className="min-h-screen flex flex-col">
       <GemHome />
       <div className="flex-1 flex flex-col justify-center max-w-3xl
         mx-auto px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">

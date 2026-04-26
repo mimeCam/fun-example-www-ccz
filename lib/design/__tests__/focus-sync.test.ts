@@ -352,12 +352,16 @@ describe('reader-invariant convention token', () => {
  * one (per-theme, per-archetype) and bypass the single-ring contract.
  */
 describe('the ring is single-sited — one :focus-visible rule body', () => {
-  it('globals.css declares exactly two :focus-visible rule bodies (warm + forced-colors)', () => {
+  it('globals.css declares exactly two RING :focus-visible rule bodies (warm + forced-colors)', () => {
     // One warm-mode ring at top-level (the box-shadow composition) + one
     // scoped inside `@media (forced-colors: active)` (the outline fallback).
     // Both are the SAME ring — one posture per palette. A third would be
     // per-theme / per-archetype drift (the single-ring contract forbids it).
-    const matches = CSS.match(/:focus-visible\s*\{[\s\S]*?\}/g) ?? [];
+    //
+    // We MUST NOT count class-scoped variants like `.sys-skiplink:focus-visible`
+    // — those are transforms, not rings. The selector preceding `:focus-visible`
+    // must NOT carry a `.<class>` (i.e. the regex anchors on whitespace or `{`).
+    const matches = CSS.match(/(?:^|[\s,;{}])\s*:focus-visible\s*\{[\s\S]*?\}/g) ?? [];
     expect(matches.length).toBe(2);
   });
 
@@ -367,7 +371,7 @@ describe('the ring is single-sited — one :focus-visible rule body', () => {
     const idx = CSS.indexOf('@media (forced-colors: active)');
     expect(idx).toBeGreaterThan(0);
     const rest = CSS.slice(idx);
-    expect(/:focus-visible\s*\{[\s\S]*?\}/.test(rest)).toBe(true);
+    expect(/(?:^|[\s,;{}])\s*:focus-visible\s*\{[\s\S]*?\}/.test(rest)).toBe(true);
   });
 
   it('globals.css declares exactly one :focus:not(:focus-visible) escape', () => {

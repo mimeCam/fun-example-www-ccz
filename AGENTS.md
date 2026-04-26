@@ -12,7 +12,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/return/` — recognition-surface selector
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
 - `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, etc.)
-- `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, EmptySurface, etc.
+- `components/shared/` — Threshold, Pressable, Field, TextLink, Skeleton, Toast, EmptySurface, SkipLink, etc.
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, etc.
 - `scripts/` — build-time codegen
 
@@ -24,6 +24,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Portal margins live on the envelope.** Wrap nullable children in `<CollapsibleSlot>`. Run `scripts/audit-spacing-collapse.ts` before portal-shape PRs.
 - **Empty rooms speak in registers, not variants.** Copy varies by reader; ornament varies by room. Halo tint is per-room, not per-archetype.
 - **Ceremony quiet — gate at the host, not at the call site.** During `useCeremonyQuiet()` (gifting phase) output surfaces defer. Toast suppresses in `<ToastHost>`; thermal crossing pulses suppress in `onCrossing()`. Input-side surfaces (popovers opening from a new gesture) may guard per-instance. The silence is the design.
+- **Reader-invariant chrome — `id="main-content"` is the SkipLink's landmark.** Every route's top-level wrapper carries the id (`<main>`, `<article>`, or wrapper `<div>` for the mirror). The audit lives in `lib/sharing/__tests__/trust-promise-honored.test.ts`; a route shipping without the landmark fails CI. SkipLink mounts once, in `app/layout.tsx`, as the first child of `<body>`. CSS-only slide; works pre-hydration.
 
 ## WIP
 - *(none)*

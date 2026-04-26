@@ -65,7 +65,7 @@ export default function MirrorPage() {
 
   const data = mirror ?? quickMirror;
   if (data) return (
-    <div className="min-h-screen p-sys-8">
+    <div id="main-content" className="min-h-screen p-sys-8">
       <GemHome />
       <div className="flex flex-col items-center justify-center min-h-[85vh]">
         {mirror
@@ -81,7 +81,7 @@ export default function MirrorPage() {
   );
 
   if (loading) return (
-    <div className="min-h-screen p-sys-8">
+    <div id="main-content" className="min-h-screen p-sys-8">
       <GemHome />
       {/* Loading surface — routed through <Skeleton variant="card"> with
           geometry pinned to MirrorRevealCard (max-w-md, ceremony posture

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import { AmbientNav } from "@/components/navigation/AmbientNav";
+import { SkipLink } from "@/components/shared/SkipLink";
 import { ThermalLayout } from "@/components/thermal/ThermalLayout";
 import { INLINE_RESTORE_SCRIPT } from "@/lib/thermal/inline-restore";
 import "./globals.css";
@@ -42,6 +43,12 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: INLINE_RESTORE_SCRIPT }} />
       </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-sans antialiased bg-background`}>
+        {/* SkipLink — cold-start handshake. MUST stay the first child of
+            <body> so a keyboard reader's first Tab lands here before any
+            other surface (Mike napkin §1, Tanya UX §2.3 — first focusable,
+            robustly). Tab-order test asserts on document.body.firstElementChild.
+            CSS-only slide-in; works pre-hydration. Closes TRUST_INVARIANTS[1]. */}
+        <SkipLink target="#main-content" />
         <ThermalLayout>
           {children}
           <AmbientNav />

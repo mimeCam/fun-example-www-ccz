@@ -499,6 +499,40 @@
   }
 }
 
+/* ─── SkipLink — cold-start handshake (TRUST_INVARIANTS[1]) ────────────────
+   // reader-invariant — skip-link surface is byte-identical at every thermal
+   // stop, archetype-blind, thermal-blind. A keyboard reader's first Tab
+   // keystroke lands on this rule; the slide-in is CSS-only so it works
+   // before hydration. Reuses --sys-focus-ink (the focus ring's ink) and
+   // --sys-z-overlay (system-level interrupt rung). Zero new tokens.
+   TS mirror:    components/shared/SkipLink.tsx
+   Sync guard:   lib/design/__tests__/skip-link-sync.test.ts
+   Forced-colors override is inherited from the global @media block above —
+   the swap to `outline: 2px solid Highlight` already covers this surface. */
+.sys-skiplink {
+  position: fixed;
+  top: var(--sys-space-3);
+  left: var(--sys-space-3);
+  z-index: var(--sys-z-overlay);
+  padding: var(--sys-space-3) var(--sys-space-5);
+  background: var(--mist);
+  color: var(--void-deep);
+  border-radius: var(--sys-radius-full);
+  font-size: var(--sys-text-caption);
+  font-weight: var(--sys-weight-accent);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--sys-space-3)));
+  transition: transform var(--sys-time-enter) var(--sys-ease-out);
+}
+.sys-skiplink:focus-visible {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sys-skiplink { transition: none; }
+  .sys-skiplink:focus-visible { transform: translateY(0); }
+}
+
 /* Smooth scroll — the room turns, it doesn't jump. The scrollbar's paint
    (width, thumb colour, track) lives in ambient-surfaces.css. */
 html {

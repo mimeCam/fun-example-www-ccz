@@ -48,6 +48,7 @@ export const metadata: Metadata = {
 export default function TrustPage(): JSX.Element {
   return (
     <main
+      id="main-content"
       className="min-h-screen flex flex-col bg-background"
       aria-labelledby="on-trust-title"
     >

@@ -11,7 +11,7 @@ import { Skeleton } from '@/components/shared/Skeleton';
 
 export default function ResonancesLoading() {
   return (
-    <main className="min-h-screen px-sys-4 md:px-sys-6 py-sys-8">
+    <main id="main-content" className="min-h-screen px-sys-4 md:px-sys-6 py-sys-8">
       <div className="max-w-2xl mx-auto">
         <TitleSkeleton />
         <Entries />

@@ -21,7 +21,7 @@ export default function ArticlesPage() {
   const articles = getAllArticles();
 
   return (
-    <main className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       <GemHome />
       {/* In-page boundary: route-level loading.tsx already covers the cold
           fallback (its Skeleton wears the same breath cadence). The fade

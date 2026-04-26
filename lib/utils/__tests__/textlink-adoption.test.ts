@@ -24,9 +24,16 @@ import { join, relative, sep } from 'node:path';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
-/** The one module that legitimately renders a raw `<a>`. */
+/** The two modules that legitimately render a raw `<a>`. */
 const ANCHOR_ALLOW = new Set<string>([
   'components/shared/TextLink.tsx',
+  // SkipLink — the cold-start handshake. A reader-invariant chrome surface
+  // mounted as the first child of <body>; it pre-dates hydration, owns its
+  // own CSS class (`.sys-skiplink`), and routes through a hash anchor (not
+  // through React Router / next/link). Routing prose through `<TextLink>`
+  // would force a client-component primitive on a server-only surface that
+  // MUST work pre-hydration (Mike napkin §"Architecture", Tanya UX §1).
+  'components/shared/SkipLink.tsx',
 ]);
 
 /**

@@ -126,7 +126,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
       <GemHome quiet />
       {/* Selection popover — gem blooms above highlighted text (pointer devices only) */}
       <SelectionPopover articleId={params.id} articleTitle={article.title} />
-      <article className="min-h-screen">
+      <article id="main-content" className="min-h-screen">
         <div className="max-w-prose mx-auto px-sys-7">
           {/* Paper-only greeting bow — hidden on screen, lands inline at the
               top of the printed page. Pairs with ReadersMark (parting bow)

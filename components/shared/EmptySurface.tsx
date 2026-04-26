@@ -90,7 +90,11 @@ export interface EmptySurfaceProps {
 
 export function EmptySurface(props: EmptySurfaceProps): JSX.Element {
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    // The `id="main-content"` is the SkipLink's landmark target — every
+    // route that paints an EmptySurface (404, error, empty-mirror,
+    // empty-resonances) honours the cold-start handshake. Audited by
+    // `lib/sharing/__tests__/trust-promise-honored.test.ts`.
+    <main id="main-content" className="min-h-screen flex flex-col bg-background">
       <GemHome />
       <Column>
         <Halo tint={props.tint ?? 'gold'} />
