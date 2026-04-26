@@ -359,9 +359,13 @@ async function runCopyLink(
     // Quiet-on-success: the Link button's pulse(ok) is the receipt.
     // Failure still toasts (warn) — see copyWithFeedback's contract.
     // copyWithFeedback emits SHARED on the clipboard-utils path.
+    // `announce: 'fingertip'` is **explicit** here (Mike #voice-peer §4
+    // axis A) — the fence in `lib/sharing/__tests__/voice-call-site-
+    // fence.test.ts` fails the build if this literal goes missing.
     const ok = await copyWithFeedback(deepLink, {
       successMessage: 'Link copied — the thread travels with it.',
       failureMessage: "Couldn't copy — try Save instead.",
+      announce: 'fingertip',
     });
     pulse(ok);
   } finally { setBusy(null); }

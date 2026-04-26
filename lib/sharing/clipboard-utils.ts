@@ -138,11 +138,19 @@ export function isClipboardSupported(): boolean {
 
 /**
  * Where the copy outcome should announce itself.
- *   `'fingertip'` — default. The caller owns the witness (an
- *                   `<ActionPressable>` pulse, a button label flip, etc.).
- *                   Nothing toasts on success; failure still escalates.
+ *   `'fingertip'` — the caller owns the witness (an `<ActionPressable>`
+ *                   pulse, a button label flip, etc.). Nothing toasts on
+ *                   success; failure still escalates.
  *   `'room'`      — explicit opt-in for surfaces with no fingertip
  *                   witness. Both success AND failure toast.
+ *
+ * **Explicit at every call site** (Mike #voice-peer §4 axis A — the
+ * regression lint at `lib/sharing/__tests__/voice-call-site-fence.test.ts`).
+ * The helper still defaults `announce` to `'fingertip'` if absent so unit
+ * tests and helper-internal call paths stay terse, but every reader-
+ * facing call site under `app/` and `components/` MUST spell the literal.
+ * The default lives in the helper; the *decision* lives at the call site.
+ * Voice drift = pause drift (Paul K., "Protect the Pause").
  *
  * Failure ALWAYS toasts regardless of `announce` — the contract is
  * "failure escalates one level" (Tanya §2.1). A failed copy with no

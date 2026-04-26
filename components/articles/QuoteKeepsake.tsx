@@ -396,6 +396,12 @@ async function tryDownload(dataUrl: string, data: QuoteCardData): Promise<boolea
  * Copy-the-deep-link verb. `copyWithFeedback`'s default-quiet covenant
  * already honours the asymmetry (success silent, failure warn), so the
  * Link slot adopts it byte-for-byte from ThreadKeepsake (Mike #21 / Tanya #10).
+ *
+ * `announce: 'fingertip'` is declared **explicitly** at the call site
+ * (Mike #voice-peer §4 axis A) — the helper still defaults to fingertip,
+ * but the choice must be visible here, not inferred. Voice drift = pause
+ * drift; the fence in `lib/sharing/__tests__/voice-call-site-fence.test.ts`
+ * fails the build if this literal goes missing.
  */
 async function runCopyLink(
   deepLink: string, setBusy: (b: Busy) => void, pulse: Pulse,
@@ -406,6 +412,7 @@ async function runCopyLink(
     const ok = await copyWithFeedback(deepLink, {
       successMessage: 'Link copied — the quote travels with it.',
       failureMessage: "Couldn't copy — try Save instead.",
+      announce: 'fingertip',
     });
     pulse(ok);
   } finally { setBusy(null); }

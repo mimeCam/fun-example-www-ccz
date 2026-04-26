@@ -52,13 +52,28 @@ function primaryShareBody(): string {
   return next < 0 ? tail : tail.slice(0, next + 1);
 }
 
-/** Slice an `async function <name>(...)` body up to the next `async function`. */
+/**
+ * Slice an `async function <name>(...) { … }` declaration body via
+ * balanced-brace reading. The earlier "stop at next async function"
+ * shape captured the JSDoc that PRECEDES the next function — fragile
+ * once that JSDoc started naming `announce: 'room'` in prose
+ * (Sid voice-peer §5 — explicit announce at every share call site).
+ */
 function bodyOf(name: string): string {
   const start = SRC.search(new RegExp(`async\\s+function\\s+${name}\\b`));
   if (start < 0) return '';
-  const tail = SRC.slice(start);
-  const next = tail.slice(1).search(/\basync\s+function\b/);
-  return next < 0 ? tail : tail.slice(0, next + 1);
+  const open = SRC.indexOf('{', start);
+  return open < 0 ? '' : SRC.slice(start, sliceMatchingBrace(open) + 1);
+}
+
+/** Walk forward from an opening `{` and return the index of its match. */
+function sliceMatchingBrace(open: number): number {
+  let depth = 0;
+  for (let i = open; i < SRC.length; i++) {
+    if (SRC[i] === '{') depth++;
+    else if (SRC[i] === '}' && --depth === 0) return i;
+  }
+  return SRC.length - 1;
 }
 
 // ─── 1 · Single primary + 3 secondaries ──────────────────────────────────
