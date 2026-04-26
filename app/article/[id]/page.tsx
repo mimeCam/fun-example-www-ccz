@@ -11,6 +11,7 @@ import { SelectionPopover } from '@/components/resonances/SelectionPopover';
 import { StratifiedRenderer } from '@/components/content/StratifiedRenderer';
 import { NextRead } from '@/components/reading/NextRead';
 import { CompletionShimmer } from '@/components/reading/CompletionShimmer';
+import { KeepsakePlate } from '@/components/reading/KeepsakePlate';
 import { ReadersMark } from '@/components/reading/ReadersMark';
 import { ArticleProvenance } from '@/components/reading/ArticleProvenance';
 import { ReadProgressCaption } from '@/components/reading/ReadProgressCaption';
@@ -153,6 +154,11 @@ function ArticleContent({ params }: { params: { id: string } }) {
           </div>
 
           <CompletionShimmer />
+          {/* Coda act 1 — the Plate: a live preview of the reader's own
+              keepsake. Mounts only when the ceremony reaches `gifting`
+              (KeepsakePlate guards internally). The page's only solid
+              CTA at completion. Tanya UX #74 §2.1, Mike #41 §1. */}
+          <KeepsakePlate articleId={params.id} title={article.title} />
           {recommendation && (
             <NextRead
               article={recommendation.article}

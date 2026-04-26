@@ -7,7 +7,6 @@ import { GemIcon } from '@/components/shared/GemIcon';
 import { ResonanceShimmer } from '@/components/resonances/ResonanceShimmer';
 import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceCeremony';
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
-import { KeepsakeLauncher } from '@/components/reading/KeepsakeLauncher';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
 import { Field } from '@/components/shared/Field';
@@ -144,8 +143,6 @@ export function ResonanceDrawer({
             shimmerIntensity={intensity}
             showShimmer={showShimmer}
             shimmerSettled={phase === 'settled'}
-            articleId={articleId}
-            articleTitle={articleTitle}
           />
         ) : slotsAvailable ? (
           <DrawerForm
@@ -226,16 +223,19 @@ function SlotIndicator({ used, total, pulsing }: {
 }
 
 function CeremonyContent({
-  quote, shimmerIntensity, showShimmer, shimmerSettled, articleId, articleTitle,
+  quote, shimmerIntensity, showShimmer, shimmerSettled,
 }: {
   quote: string;
   shimmerIntensity: 'subtle' | 'warm' | 'rich';
   showShimmer: boolean;
   shimmerSettled: boolean;
-  articleId: string;
-  articleTitle: string;
 }) {
   const settledClass = shimmerSettled ? 'resonance-shimmer--settled' : '';
+
+  // Note: the keepsake CTA used to mount HERE (only for note-writers).
+  // It now lives inline at the article Coda as `<KeepsakePlate/>` so
+  // every reader who finishes earns the artifact, not only those who
+  // wrote a resonance note. Tanya UX #74 §1, Mike #41 §0.
 
   return (
     <div className="resonance-success-enter">
@@ -249,8 +249,6 @@ function CeremonyContent({
         </ResonanceShimmer>
       )}
       <SuccessMessage />
-      {/* CTA mounts only once the ceremony settles — defers mirror fetch + keepsake code until earned. */}
-      {shimmerSettled && <KeepsakeLauncher articleId={articleId} articleTitle={articleTitle} />}
     </div>
   );
 }
