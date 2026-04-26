@@ -135,11 +135,15 @@ function measuredRatio(pair: ContrastPair, anchor: { hex: string }): number {
 describe('chip-contrast-audit · WCAG 4.5:1 floor (Krystle §audit-spec)', () => {
   const PAIRS = contrastPairsFor('chip');
 
-  it('CONTRAST_PAIRS.chip carries the worldview pairs (genus deferred to rule-of-three)', () => {
+  it('CONTRAST_PAIRS.chip carries the worldview pairs (genus deferred — shape ≠ role)', () => {
     // Mike napkin #99: `keepsake` joined the manifest for the halo ambient
-    // floor — two rows now, still under the rule-of-three threshold so no
-    // `ContrastFamily` genus is extracted (Tanya UX #85 §2 anti-bloat).
-    expect(Object.keys(CONTRAST_PAIRS)).toEqual(['chip', 'keepsake']);
+    // floor (two rows). Mike napkin #101 / Sid (2026-04-26): `thread` joined
+    // for the `thermal.accent` ambient floor (three rows). Three siblings
+    // sit side-by-side; the genus is still deferred because they share
+    // *shape* (one fg over one bg at one floor) but not *role* (text-
+    // legibility / signal-gem / ambient-cue). Polymorphism is a killer
+    // (Mike napkin #54).
+    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
     expect(PAIRS.length).toBeGreaterThanOrEqual(4);
   });
 

@@ -301,6 +301,50 @@ export const WCAG_NONTEXT = 3.0;
 export const HALO_AMBIENT_FLOOR = 1.5;
 
 /**
+ * Thread ambient contrast floor — **1.5:1, intentionally below WCAG 1.4.11**
+ * (3:1 non-text). Same lock-LOW doctrine as `HALO_AMBIENT_FLOOR`, applied
+ * to the live `thermal.accent` voice the Golden Thread paints
+ * (`--token-accent`, lerp violet → gold).
+ *
+ * **Why sub-WCAG, not signal-tier (3.0:1)** — the team's first plan
+ * (Mike napkin #101) called for 3.0:1, by analogy to the keepsake-gold
+ * gem (signal you look *at*). Empirical math (this implementation, ~2026-
+ * 04-26) revealed the dormant cell is `contrast(#7b2cbf, #16213e) ≈ 2.24:1`
+ * — below 3.0:1 in the existing canvas-safe palette (Tanya UX #35 §2.1
+ * pins these endpoints). The 1.96:1 reality is already DOCUMENTED at
+ * `__tests__/ambient-surfaces.test.ts:132` for the caret floor; the thread
+ * audit honours that doctrine instead of forcing a palette mutation.
+ *
+ * **Conceptually, the thread at dormant is ambient-register, not signal-
+ * register.** Tanya UX #35 §2.2: "perceived warmth lives in HSL, not in
+ * WCAG — a 60° hue rotation crosses JND on a dark surface; luminance
+ * contrast is the wrong instrument for the wrong measurement." The thread
+ * at dormant is *the room beginning to know you're here* — a presence cue,
+ * not a loud signal. As score climbs to 100, the warm cell reaches
+ * `contrast(#f0c674, #1e2a3e) ≈ 8.95:1` — far above WCAG 1.4.3 (text,
+ * 4.5:1). The thread *crosses* signal-tier on its own; the audit only
+ * enforces the floor below which the cue is no longer perceptible.
+ *
+ * **One register, never staggered.** Tanya UX #62 §2 / #35 §2.3: a two-
+ * floor split (cold/warm) was rejected at design time. One floor, two
+ * cells, both clear it; the receipt prints BOTH ratios so the warming
+ * spread is legible *as numbers* — Tanya's two-cell glyph (#35 §3.2) is
+ * the killer-feature surface. Drift in either anchor surfaces in AGENTS.md
+ * the moment the spread collapses.
+ *
+ * If a future "harmonize the thread to signal-tier" PR lifts this floor
+ * toward 3.0:1 or higher, the lock-low test in
+ * `__tests__/thread-contrast-audit.test.ts` §0 fails *first*, before any
+ * human review, and the failure points back at this JSDoc. The fix path
+ * (lifting `ACCENT.dormant` brighter, in `lib/thermal/thermal-tokens.ts`)
+ * is a deliberate palette change, not a silent harmonization (Mike napkin
+ * #99 §0 lock-low doctrine; Elon §3.2; Tanya UX #85 §6).
+ *
+ * Pure constant.
+ */
+export const THREAD_AMBIENT_FLOOR = 1.5;
+
+/**
  * Audit pairs per surface. The chip row encodes the four named worldview
  * voices + the `fog`/`mist` fallback (Tanya UX #62 §4.5: "the audit table
  * should include the fallback pair, not just the four named voices, so
@@ -351,6 +395,39 @@ export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> =
   keepsake: [
     { fg: 'archetype.halo', bg: 'thermal.accent', floor: HALO_AMBIENT_FLOOR },
     { fg: 'archetype.gold', bg: 'thermal.accent', floor: WCAG_NONTEXT      },
+  ],
+  // ─── Thread — one voice, two anchors, two ratios in one receipt ──────
+  //
+  // The fifth contrast-audit sibling. Same *floor* shape as the four
+  // shipped audits (chip / archetype-chip / halo / keepsake-gold), one
+  // floor, two anchor cells, atomic fail-path. The (fg, bg) is symbolic
+  // — same shape as the keepsake row — `bg: 'thermal.accent'` stands in
+  // for "the live thread surface" (`thread` already licenses
+  // `thermal.accent` in VOICE_LEDGER above). Actual measurement resolves
+  // both canvas-safe surface anchors (`THERMAL.surface`,
+  // `THERMAL_WARM.surface`).
+  //
+  // The thread paints `--token-accent` directly (`color-mix` decoration
+  // in `ambient-surfaces.css` collapses to opaque under `prefers-
+  // contrast: more`); no compositeOver step (Mike napkin #101 §5 #3).
+  // The fg hex at each anchor is the lerp endpoint:
+  //   t = 0  →  ACCENT.dormant = '#7b2cbf'
+  //   t = 1  →  ACCENT.warm    = '#f0c674'
+  // Two cells today (1 voice × 2 anchors) — symmetry of *shape*, not
+  // *cardinality* (Mike #100 §4.2 pinned trap). NO sweep, NO bridge
+  // resolver, NO per-cell knob, NO `'envelope'` audit-shape tag, NO
+  // `Δ_PERCEIVABLE` constant, NO cold/warm two-floor split (all rejected
+  // at design time — Mike #101 §1; Tanya UX #35 §3.3).
+  //
+  // The §3 receipt prints BOTH cells side-by-side — the only departure
+  // from the four shipped siblings, and the salvaged kernel from Elon
+  // (#69 §4 / Tanya UX #35 §3.2). The dynamism becomes visible in
+  // AGENTS.md *as numbers* without inventing a vocabulary for it. If a
+  // future PR collapses the spread, the receipt makes it loud — that
+  // would be the second envelope-shaped data point. Three of those, *then*
+  // genus extraction (rule of three).
+  thread: [
+    { fg: 'thermal.accent', bg: 'thermal.accent', floor: THREAD_AMBIENT_FLOOR },
   ],
 } as const;
 

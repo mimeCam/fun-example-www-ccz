@@ -280,11 +280,15 @@ describe('keepsake-gold-contrast-audit · §2 LICENSE (the gold voice belongs to
     expect(fgs).toEqual(['archetype.gold', 'archetype.halo']);
   });
 
-  it('CONTRAST_PAIRS still holds two ROWS today (chip + keepsake); genus deferred', () => {
-    // Pair count grew (1 → 2 in the keepsake row); row count did not. The
-    // four-sibling audit table is row-level discipline; in-row pair growth
-    // is voice-level discipline.
-    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake']);
+  it('CONTRAST_PAIRS holds three ROWS today (chip + keepsake + thread); genus deferred', () => {
+    // Pair count grew (1 → 2 in the keepsake row); row count grew when
+    // the thread audit landed (Mike napkin #101 / Sid 2026-04-26). The
+    // five-sibling audit table is row-level + in-row discipline:
+    //   chip       (4 worldview pairs + fallback)  →  text-legibility
+    //   keepsake   (halo + gold pairs)             →  ornament + signal
+    //   thread     (one thermal.accent pair)       →  ambient cue
+    // Distinct roles, shared shape — genus deferred until shared *role*.
+    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
   });
 });
 

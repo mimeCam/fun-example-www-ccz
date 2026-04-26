@@ -273,11 +273,14 @@ describe('halo-contrast-audit · §2 LICENSE (the halo voice belongs to keepsake
     }
   });
 
-  it('CONTRAST_PAIRS holds two rows today (chip + keepsake); genus deferred', () => {
-    // Rule of three: a third halo-class consumer (orb fill, ceremony wash,
-    // marginalia tint) earns the `ContrastFamily` extraction. Until then,
-    // two siblings sit honestly side-by-side. (Mike napkin #99 §5 #7.)
-    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake']);
+  it('CONTRAST_PAIRS holds three rows today (chip + keepsake + thread); genus deferred', () => {
+    // Mike napkin #101 / Sid (2026-04-26): `thread` joined the manifest as
+    // the fifth contrast-audit sibling (one fg, two anchors, ambient floor
+    // — same lock-LOW doctrine as halo). Three siblings now, but the
+    // `ContrastFamily` genus is STILL deferred because they share *shape*
+    // (one fg over one bg at one floor) and not *role* (text-legibility /
+    // signal-gem / ambient-cue). Polymorphism is a killer (Mike #54).
+    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
   });
 });
 

@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, four sibling contrast audits
+- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, five sibling contrast audits
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store
@@ -33,6 +33,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - Archetype chip: worst-case `5.36:1` @ warm, floor 4.5:1
 - Halo ambient: worst-case `3.14:1` @ warm, floor 1.5:1 (intentionally sub-WCAG; ornament, not signal)
 - Keepsake gold: worst-case `8.95:1` @ warm, floor 3.0:1 (WCAG 1.4.11 non-text; signal)
+- Thread accent: cold `2.24:1` · warm `8.95:1`, floor 1.5:1 (intentionally sub-WCAG ambient cue; signal at warm — the spread is the killer feature)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

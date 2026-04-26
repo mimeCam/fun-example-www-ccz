@@ -155,12 +155,17 @@ describe('ledger invariants', () => {
 describe('CONTRAST_PAIRS — every (fg, bg) is in licenseFor(surface)', () => {
   // Mike napkin #95 §4 — `chip` was the only row.
   // Mike napkin #99 §3 — added `keepsake` for the halo ambient floor.
-  // Two rows now; rule of three says we still don't extract a `ContrastFamily`
-  // genus until a *third* surface lands under its own steam (Tanya UX #85
-  // §2 "anti-bloat rule"). Until then, two siblings sit honestly side-by-
-  // side in the same Record.
-  it('two rows today: `chip` (worldview) + `keepsake` (halo); genus deferred to rule-of-three', () => {
-    expect(Object.keys(CONTRAST_PAIRS)).toEqual(['chip', 'keepsake']);
+  // Mike napkin #101 / Sid (this implementation, 2026-04-26) — added
+  // `thread` for the `thermal.accent` ambient floor (the fifth sibling).
+  // Three rows now — *exactly* the rule-of-three threshold — but the
+  // `ContrastFamily` genus is STILL deferred: chip/keepsake/thread share
+  // *shape* (one fg over one bg at one floor), they do not share *role*
+  // (text legibility / signal gem / ambient cue). Genus extraction needs
+  // shared role, not shared shape (Mike napkin #54 — "polymorphism is a
+  // killer"). Three siblings sit honestly side-by-side; a fourth sibling
+  // with a fourth distinct role earns the genus, not before.
+  it('three rows today: `chip` + `keepsake` + `thread`; genus deferred (shape ≠ role)', () => {
+    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
   });
 
   (Object.keys(CONTRAST_PAIRS) as Surface[]).forEach((surface) => {
@@ -175,8 +180,10 @@ describe('CONTRAST_PAIRS — every (fg, bg) is in licenseFor(surface)', () => {
   });
 
   it('contrastPairsFor returns empty for surfaces without rows (no crash)', () => {
-    expect(contrastPairsFor('thread')).toEqual([]);
+    // `thread` joined the manifest in this PR (Mike napkin #101); `letter`
+    // remains paired-row-free until its own concrete consumer lands.
     expect(contrastPairsFor('letter')).toEqual([]);
+    expect(contrastPairsFor('whisper')).toEqual([]);
   });
 });
 
