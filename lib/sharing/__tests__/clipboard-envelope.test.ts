@@ -22,6 +22,12 @@ import {
   buildClipboardPayload, buildBlockquoteHtml, escapeHtml,
   isMultiMimeSupported,
 } from '@/lib/sharing/clipboard-envelope';
+import { assertTrustAnchor } from './_helpers';
+
+// Mike #70 §A — the file-backed link from /trust bullet #3 to its audit.
+// `TRUST_INVARIANTS[2]` is "The share envelope’s left rule"; the substantive
+// audit is the §"HTML MIME is a semantic blockquote" case at line 91-95.
+assertTrustAnchor(2, 'The share envelope’s left rule');
 
 // ─── 1. Byte-identity ──────────────────────────────────────────────────────
 

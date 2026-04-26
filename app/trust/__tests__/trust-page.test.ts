@@ -31,6 +31,12 @@ import {
   TRUST_INVARIANTS,
   invariantCount,
 } from '@/lib/sharing/trust-copy';
+import { assertTrustAnchor } from '@/lib/sharing/__tests__/_helpers';
+
+// Mike #70 §A — the file-backed link from /trust bullet #5 to its audit.
+// `TRUST_INVARIANTS[4]` is "This page"; the substantive audit is this entire
+// module, which locks the page's reader-invariant copy + palette + tags.
+assertTrustAnchor(4, 'This page');
 
 const PAGE_PATH = resolve(__dirname, '../page.tsx');
 const COPY_PATH = resolve(__dirname, '../../../lib/sharing/trust-copy.ts');

@@ -37,6 +37,12 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { FOCUS_INK, FOCUS_INK_CSS } from '../focus';
 import { THERMAL } from '../color-constants';
+import { assertTrustAnchor } from '@/lib/sharing/__tests__/_helpers';
+
+// Mike #70 §A — the file-backed link from /trust bullet #1 to its audit.
+// `TRUST_INVARIANTS[0]` is "The focus ring"; this module audits its byte-
+// identity. A trust-copy edit that breaks the anchor fails CI before merge.
+assertTrustAnchor(0, 'The focus ring');
 
 const CSS = readFileSync(
   resolve(__dirname, '../../../app/globals.css'),

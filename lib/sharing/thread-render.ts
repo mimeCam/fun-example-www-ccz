@@ -196,11 +196,26 @@ function titleText(title: string): string {
     font-size="56" font-weight="600" fill="${BRAND.gold}">${safe}</text>`;
 }
 
+/**
+ * Tabular + lining figures for any line whose meaning depends on byte-stable
+ * digit alignment across readers — the keepsake's attribution date and the
+ * stats line. Two screenshots from two readers, stacked vertically, will land
+ * their digits in the same column. The rendering is the receipt that the
+ * format already promises (Tanya #77 §2.2 — `tnum` aligns advance widths,
+ * `lnum` forces lining figures so 0–9 share baseline + cap-height).
+ *
+ * Single quotes inside the CSS value because the surrounding SVG attribute
+ * uses double quotes; both forms are valid CSS but mixing them keeps the
+ * builder string parseable without escapes.
+ */
+const NUMERIC_FEATURES = `font-feature-settings: 'tnum' 1, 'lnum' 1`;
+
 function attributionLine(key: ArchetypeKey | null, ts: number): string {
   const who = esc(archetypeLabel(key));
   const when = esc(formatDate(ts));
   return `<text x="200" y="260" font-family="'Inter', system-ui, sans-serif"
-    font-size="24" font-weight="400" fill="${BRAND.mist}" opacity="0.85">
+    font-size="24" font-weight="400" fill="${BRAND.mist}" opacity="0.85"
+    style="${NUMERIC_FEATURES}">
     ${who} · ${when}</text>`;
 }
 
@@ -209,7 +224,8 @@ function statsLine(snapshot: ThreadSnapshot): string {
   const d = Math.round(snapshot.depth);
   const w = Math.round(snapshot.thermal * 100);
   return `<text x="200" y="${OG_HEIGHT - 96}" font-family="'Inter', system-ui, sans-serif"
-    font-size="18" fill="${BRAND.mist}" opacity="0.7">
+    font-size="18" fill="${BRAND.mist}" opacity="0.7"
+    style="${NUMERIC_FEATURES}">
     <tspan>depth ${d}%</tspan>
     <tspan dx="24">warmth ${w}%</tspan>
   </text>`;

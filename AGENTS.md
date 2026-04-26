@@ -25,6 +25,12 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Empty rooms speak in registers, not variants.** Copy varies by reader; ornament varies by room. Halo tint is per-room, not per-archetype.
 - **Ceremony quiet — gate at the host, not at the call site.** During `useCeremonyQuiet()` (gifting phase) output surfaces defer. Toast suppresses in `<ToastHost>`; thermal crossing pulses suppress in `onCrossing()`. Input-side surfaces (popovers opening from a new gesture) may guard per-instance. The silence is the design.
 - **Reader-invariant chrome — `id="main-content"` is the SkipLink's landmark.** Every route's top-level wrapper carries the id (`<main>`, `<article>`, or wrapper `<div>` for the mirror). The audit lives in `lib/sharing/__tests__/trust-promise-honored.test.ts`; a route shipping without the landmark fails CI. SkipLink mounts once, in `app/layout.tsx`, as the first child of `<body>`. CSS-only slide; works pre-hydration.
+- **Reader-invariant promise → audit pairings.** `TRUST_INVARIANTS` (`lib/sharing/trust-copy.ts`) ships exactly five reader-verifiable surfaces; each is anchored to a real audit module via `assertTrustAnchor(i, label)` in `lib/sharing/__tests__/_helpers.ts`. A grep for `assertTrustAnchor(` returns five hits — one per index, one per audit. (Mike #70 §A — *no ninth ledger*; the type-pinned tuple is the only registry.)
+  - `[0]` "The focus ring" → `lib/design/__tests__/focus-ink-byte-identity.test.ts`
+  - `[1]` "The skip-link" → `lib/sharing/__tests__/trust-promise-honored.test.ts`
+  - `[2]` "The share envelope’s left rule" → `lib/sharing/__tests__/clipboard-envelope.test.ts`
+  - `[3]` "The thread keepsake’s timestamp" → `lib/sharing/__tests__/thread-render.test.ts` (locale/TZ/DST sweep, Mike #70 §B)
+  - `[4]` "This page" → `app/trust/__tests__/trust-page.test.ts`
 
 ## WIP
 - *(none)*

@@ -39,6 +39,12 @@ import {
   SKIPLINK_TEXT,
   SKIPLINK_CLASS,
 } from '@/components/shared/SkipLink';
+import { assertTrustAnchor } from './_helpers';
+
+// Mike #70 §A — the file-backed link from /trust bullet #2 to its audit.
+// `TRUST_INVARIANTS[1]` is "The skip-link"; the substantive audit is the
+// rest of this module (single-mount, landmark coverage, locked copy).
+assertTrustAnchor(1, 'The skip-link');
 
 const ROOT = resolve(__dirname, '../../..');
 const LAYOUT_SRC = readFileSync(join(ROOT, 'app/layout.tsx'), 'utf-8');
