@@ -53,6 +53,10 @@ describe('color-constants ↔ globals.css sync', () => {
   it('BRAND.cyan matches --cyan', () => {
     expect(CSS).toContain(`--cyan: ${BRAND.cyan}`);
   });
+
+  it('BRAND.accentViolet matches --accent-violet (Tailwind text-accent painter)', () => {
+    expect(CSS).toContain(`--accent-violet: ${BRAND.accentViolet}`);
+  });
 });
 
 describe('color-constants ↔ thermal-tokens.ts anchor sync', () => {
@@ -124,6 +128,7 @@ describe('color-constants structure', () => {
     expect(BRAND).toHaveProperty('fog');
     expect(BRAND).toHaveProperty('rose');
     expect(BRAND).toHaveProperty('cyan');
+    expect(BRAND).toHaveProperty('accentViolet');
   });
 
   it('cssOr returns fallback when document is unavailable', () => {

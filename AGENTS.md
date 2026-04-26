@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index) + ambient-surfaces CSS + print-surface CSS + contrast helpers + worldview chip manifest + voice-ledger (Surface→Voice fence)
+- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index) + ambient-surfaces CSS + print-surface CSS + contrast helpers + worldview chip manifest + voice-ledger (Surface→Voice fence) + WCAG contrast pairs (`CONTRAST_PAIRS`)
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/mirror/` — archetype scoring + archetype-store
 - `lib/return/` — recognition-surface selector (`letter` | `whisper` | `silent`)
@@ -30,7 +30,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Follow-ons (deferred)
 - Worldview taxonomy decision (4 chips, still arguably 3 voices). The chip glyph (`WORLDVIEW_GLYPHS` in `lib/design/worldview.ts`) carries the discriminator at chip size; collapse to 3 worldviews remains a future option that would touch `types/filter.ts` + `lib/design/worldview.ts` + the glyph map together.
-- Worldview chip contrast measurement — `text-accent` over `bg-primary/30` over `--bg-surface` at thermal `cool`/`luminous` extremes (Tanya UX #10 §2.8). Floor 4.5:1; if any pair fails, drop the family alpha for all four chips (one register, four voices).
+- ~~Worldview chip contrast measurement~~ — completed 2026-04-26: audit built (`chip-contrast-audit.test.ts`), chip background alpha stepped `muted` (0.30) → `hairline` (0.10) atomically, all pairs clear WCAG 4.5:1 at both thermal anchors.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

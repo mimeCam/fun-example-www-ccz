@@ -38,6 +38,7 @@ import {
   WORLDVIEW_FALLBACK_BG,
   worldviewChipClass,
   worldviewChipLabel,
+  worldviewChipGlyphClass,
 } from '../worldview';
 import {
   ALPHA_COLOR_FAMILIES,
@@ -155,6 +156,28 @@ describe('worldviewChipLabel — fallback lives inside the helper', () => {
     ALL_WORLDVIEWS.forEach((w) => {
       expect(WORLDVIEW_CHIP_LABELS[w][0]).toMatch(/[A-Z]/);
     });
+  });
+});
+
+// ─── 4b · Glyph optical compensation (Tanya UX #62 §4.1) ──────────────────
+
+describe('worldviewChipGlyphClass — per-glyph optical lift, JIT-safe literal', () => {
+  it('technical earns the `▣` filled-glyph 0.5px lift', () => {
+    const cls = worldviewChipGlyphClass('technical');
+    expect(cls).toContain('mr-sys-1');
+    expect(cls).toContain('relative');
+    expect(cls).toContain('-top-[0.5px]');
+  });
+
+  it.each(['philosophical', 'practical', 'contrarian'] as const)(
+    '%s carries no optical nudge (line-only or directional glyph)',
+    (w) => {
+      expect(worldviewChipGlyphClass(w)).toBe('mr-sys-1');
+    },
+  );
+
+  it('undefined falls back to the bare base spacing (fallback dot)', () => {
+    expect(worldviewChipGlyphClass(undefined)).toBe('mr-sys-1');
   });
 });
 

@@ -213,3 +213,78 @@ export function ledgerInvariantHolds(): boolean {
     return new Set(row).size === row.length;
   });
 }
+
+// ─── Contrast pairs — typed (fg, bg, floor) audit triples ─────────────────
+//
+// Promotes Krystle's worldview-chip contrast follow-on (AGENTS.md §"Follow-
+// ons" #2; Tanya UX #10 §2.8) from prose to data, *next to the voices it
+// constrains*. Mike napkin #95 §"Why this scope, not Paul's reframe":
+// pairing data must live somewhere to feed `contrast(a, b)` (`lib/design/
+// contrast.ts:31`); the smallest defensible home is here, ledger-adjacent,
+// gated by `Surface`. Elon's salvaged kernel — store the triples, do not
+// invent a phase enum, do not cross-ledger-accessor into `lib/thermal/`.
+//
+// `Partial<Record<Surface, …>>` reads honestly: today only `chip` carries
+// audit pairs (rule of three — AGENTS.md §"Design System"). Other surfaces
+// earn rows when a *second* concrete consumer shows up (keepsake legibility
+// at thermal extremes, Golden Thread fill — separate PRs).
+//
+// Atomic fail-path is a property of the *data*, not the test: if any chip
+// pair drops below its floor at either thermal anchor, the *family* alpha
+// rung steps as one register — all four chips together — manual one-line
+// edit in `lib/design/worldview.ts` (Tanya UX #62 §2: one register, four
+// voices, never staggered). No per-chip override knob; that footgun was
+// rejected at design time (Mike napkin #54 — "polymorphism is a killer").
+
+/**
+ * One audit triple — foreground voice over background voice with a WCAG
+ * floor. The two voices are *symbolic*: the test resolves each to its
+ * actual painted hex and composites the bg using `ALPHA.muted` (the
+ * alpha rung the chip family sits on today; `lib/design/worldview.ts`).
+ *
+ * `floor`: 4.5 for normal text (WCAG 2.1 §1.4.3 AA). The 3:1 floor
+ * (non-text / UI components) is correct WCAG and *will* matter for
+ * keepsake gold orb + Golden Thread fill — but those are separate
+ * surfaces, separate PRs. Mike napkin #95 §"Don't add a floor: 3 row
+ * in this PR." Empirical scope discipline.
+ */
+export interface ContrastPair {
+  readonly fg: Voice;
+  readonly bg: Voice;
+  readonly floor: number;
+}
+
+/**
+ * Audit pairs per surface. The chip row encodes the four named worldview
+ * voices + the `fog`/`mist` fallback (Tanya UX #62 §4.5: "the audit table
+ * should include the fallback pair, not just the four named voices, so
+ * the fallback never becomes the *only* unreadable chip on the page").
+ *
+ * Five rows × two thermal anchors (`THERMAL.surface`, `THERMAL_WARM.
+ * surface`) = ten assertions in `chip-contrast-audit.test.ts`. Still
+ * trivial; covers "thermal extremes" without inventing a phase enum.
+ *
+ * NOTE: `technical` and `philosophical` paint identical (fg, bg) today
+ * (`lib/design/worldview.ts` — both routed to `voice.accent` over
+ * `worldview.primary`). The dedupe is honest, but the audit lists both
+ * rows so a future split (philosophical → its own family — see AGENTS.
+ * md taxonomy follow-on) cannot ship without re-running the floor.
+ */
+export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> = {
+  chip: [
+    { fg: 'voice.accent', bg: 'worldview.primary', floor: 4.5 }, // technical
+    { fg: 'voice.accent', bg: 'worldview.primary', floor: 4.5 }, // philosophical
+    { fg: 'voice.cyan',   bg: 'worldview.cyan',    floor: 4.5 }, // practical
+    { fg: 'voice.rose',   bg: 'worldview.rose',    floor: 4.5 }, // contrarian
+    { fg: 'voice.mist',   bg: 'worldview.fog',     floor: 4.5 }, // fallback
+  ],
+} as const;
+
+/**
+ * Audit pairs licensed for a surface. Pure, ≤ 10 LOC. Returns an empty
+ * readonly array for surfaces without pairing data (rule-of-three: only
+ * `chip` qualifies today). Callers iterate; no surface crashes the audit.
+ */
+export function contrastPairsFor(surface: Surface): readonly ContrastPair[] {
+  return CONTRAST_PAIRS[surface] ?? [];
+}

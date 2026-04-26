@@ -312,9 +312,13 @@ describe('color ledger — exports match the AGENTS.md contract', () => {
     );
   });
 
-  it('BRAND carries the nine static-token keys', () => {
+  it('BRAND carries the ten static-token keys', () => {
+    // `accentViolet` joined the static-brand inventory in the chip-contrast
+    // audit PR (Mike napkin #95) so canvas-safe consumers can resolve the
+    // colour Tailwind paints under `text-accent` (see `tailwind.config.ts`
+    // → `accent: var(--accent-violet)`) without scraping CSS at runtime.
     expect(Object.keys(BRAND).sort()).toEqual([
-      'amber', 'cyan', 'fog', 'gold', 'mist',
+      'accentViolet', 'amber', 'cyan', 'fog', 'gold', 'mist',
       'primary', 'rose', 'secondary', 'void',
     ]);
   });

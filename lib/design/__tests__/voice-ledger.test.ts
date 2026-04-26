@@ -24,6 +24,8 @@
 
 import {
   VOICE_LEDGER,
+  CONTRAST_PAIRS,
+  contrastPairsFor,
   licenseFor,
   permits,
   familiesFor,
@@ -148,7 +150,31 @@ describe('ledger invariants', () => {
   });
 });
 
-// ─── 5 · Snapshot pin — the ledger as system-of-record ────────────────────
+// ─── 5 · CONTRAST_PAIRS — every paired voice is licensed by its surface ───
+
+describe('CONTRAST_PAIRS — every (fg, bg) is in licenseFor(surface)', () => {
+  it('rule of three: only `chip` carries pairs today (Mike napkin #95 §4)', () => {
+    expect(Object.keys(CONTRAST_PAIRS)).toEqual(['chip']);
+  });
+
+  (Object.keys(CONTRAST_PAIRS) as Surface[]).forEach((surface) => {
+    const licensed = new Set<Voice>(licenseFor(surface));
+    contrastPairsFor(surface).forEach((pair) => {
+      it(`${surface} pair (${pair.fg}, ${pair.bg}) names licensed voices`, () => {
+        expect(licensed.has(pair.fg)).toBe(true);
+        expect(licensed.has(pair.bg)).toBe(true);
+        expect(pair.floor).toBeGreaterThan(0);
+      });
+    });
+  });
+
+  it('contrastPairsFor returns empty for surfaces without rows (no crash)', () => {
+    expect(contrastPairsFor('thread')).toEqual([]);
+    expect(contrastPairsFor('keepsake')).toEqual([]);
+  });
+});
+
+// ─── 6 · Snapshot pin — the ledger as system-of-record ────────────────────
 
 describe('voice-ledger — snapshot pin (any change is a deliberate review)', () => {
   it('VOICE_LEDGER shape is byte-pinned', () => {

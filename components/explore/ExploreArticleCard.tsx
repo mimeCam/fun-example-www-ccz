@@ -16,6 +16,7 @@ import {
   worldviewChipClass,
   worldviewChipLabel,
   worldviewChipGlyph,
+  worldviewChipGlyphClass,
 } from '@/lib/design/worldview';
 
 interface ExploreArticleCardProps {
@@ -153,8 +154,15 @@ export default function ExploreArticleCard({
                   chip size when color alone collapses (color-blindness,
                   small text, sunlight). `aria-hidden` so the screen
                   reader hears the label, not the shape name. */}
-              <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent ${worldviewChipClass(article.worldview)}`}>
-                <span aria-hidden="true" className="mr-sys-1">{worldviewChipGlyph(article.worldview)}</span>
+              {/* Tanya UX #62 §4.2: `align-baseline` keeps the chip on the
+                  same x-height as the `<CaptionMetric>` neighbour — without
+                  it the rounded `py-sys-1` leaves a 1px optical drop. */}
+              {/* Tanya UX #62 §4.1: glyph optical lift via
+                  `worldviewChipGlyphClass` — `▣` is filled and visibly
+                  sinks vs label at `text-sys-micro`; one Tailwind utility
+                  handles the compensation without a per-glyph component. */}
+              <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent align-baseline ${worldviewChipClass(article.worldview)}`}>
+                <span aria-hidden="true" className={worldviewChipGlyphClass(article.worldview)}>{worldviewChipGlyph(article.worldview)}</span>
                 {worldviewChipLabel(article.worldview)}
               </span>
             </>

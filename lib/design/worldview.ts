@@ -46,18 +46,29 @@
 import { alphaClassOf } from '@/lib/design/alpha';
 import type { FilterType } from '@/types/filter';
 
-// ─── Chip backgrounds — one register, four voices (muted rung, /30 alpha) ──
+// ─── Chip backgrounds — one register, four voices (hairline rung, /10) ───
 
 /**
- * Tailwind class string for each worldview chip — `bg-<family>/30 text-<voice>`.
+ * Tailwind class string for each worldview chip — `bg-<family>/10 text-<voice>`.
  *
- * All four backgrounds resolve to the `muted` (0.30) rung — "the tag is
- * ambient chrome; the worldview is the voice." The text color carries the
- * voice. Routes through `alphaClassOf` so the JIT-visible literal is owned
- * by the alpha ledger, not by handwritten strings.
+ * All four backgrounds resolve to the `hairline` (0.10) rung — "the tag is
+ * geometry; the worldview is the voice." The text color carries the voice.
+ * Routes through `alphaClassOf` so the JIT-visible literal is owned by the
+ * alpha ledger, not by handwritten strings.
+ *
+ * **Fall-path receipt (2026-04-26):** the family rung stepped *muted (0.30)
+ * → hairline (0.10)* atomically — all four chips + the `fog`/`mist`
+ * fallback together — when `chip-contrast-audit.test.ts` proved the `cyan`
+ * and `rose` pairs dipped below the WCAG 4.5:1 floor against
+ * `THERMAL.surface` and `THERMAL_WARM.surface` at the prior rung
+ * (worst case before step: `voice.rose / worldview.rose @ warm = 3.52:1`).
+ * After the step every pair clears the floor with headroom (see the
+ * audit's worst-case console line). One register, four voices, one PR
+ * — Tanya UX #62 §2 ("no per-chip override; the audit catches, the human
+ * steps"); Krystle's audit-spec; Mike napkin #95 §"Atomic fail-path".
  *
  * Family map (Tanya UX #10 §2.2 — Krystle/Jason realignment lands here):
- *   technical     → primary bg / accent text  (violet on muted-violet)
+ *   technical     → primary bg / accent text  (violet on hairline-violet)
  *   philosophical → primary bg / accent text  (was `text-primary`; flipped
  *                   to share `accent` with technical so the chip stops
  *                   asserting two perceptually-identical violets)
@@ -73,10 +84,10 @@ import type { FilterType } from '@/types/filter';
  * `types/filter.ts` together — see AGENTS.md follow-ons.
  */
 export const WORLDVIEW_COLORS: Record<FilterType, string> = {
-  technical:     `${alphaClassOf('primary', 'muted', 'bg')} text-accent`,
-  philosophical: `${alphaClassOf('primary', 'muted', 'bg')} text-accent`,
-  practical:     `${alphaClassOf('cyan',    'muted', 'bg')} text-cyan`,
-  contrarian:    `${alphaClassOf('rose',    'muted', 'bg')} text-rose`,
+  technical:     `${alphaClassOf('primary', 'hairline', 'bg')} text-accent`,
+  philosophical: `${alphaClassOf('primary', 'hairline', 'bg')} text-accent`,
+  practical:     `${alphaClassOf('cyan',    'hairline', 'bg')} text-cyan`,
+  contrarian:    `${alphaClassOf('rose',    'hairline', 'bg')} text-rose`,
 };
 
 // ─── Chip glyphs — semiotic discriminator (Tanya UX #10 §2.3) ─────────────
@@ -178,4 +189,34 @@ export function worldviewChipLabel(w?: FilterType): string {
 export function worldviewChipGlyph(w?: FilterType): string {
   if (w === undefined) return WORLDVIEW_FALLBACK_GLYPH;
   return WORLDVIEW_GLYPHS[w] ?? WORLDVIEW_FALLBACK_GLYPH;
+}
+
+// ─── Glyph optical compensation (Tanya UX #62 §4.1) ───────────────────────
+
+/**
+ * Per-glyph Tailwind nudge utilities. Filled glyphs (`▣`) sit visibly
+ * lower than line-only glyphs (`◇`, `◯`) at `text-sys-micro` because
+ * their ink density centres below the optical line. A 0.5px lift
+ * brings `▣` onto the same baseline rhythm as the others.
+ *
+ * `▲` (Practical) deliberately gets no nudge — its downward point reads
+ * as "forward," and that suits the worldview voice (Tanya §4.1 table).
+ *
+ * One Tailwind utility, no per-glyph component, no ceremony. The
+ * `relative -top-[0.5px]` literal must appear verbatim in source for
+ * the JIT scanner to emit it (no template interpolation).
+ */
+const WORLDVIEW_GLYPH_NUDGE: Partial<Record<FilterType, string>> = {
+  technical: 'relative -top-[0.5px]',
+};
+
+/**
+ * Glyph-span className for the chip leadin — base spacing + per-glyph
+ * optical compensation. Pure, ≤ 10 LOC. The chip call site spreads
+ * this onto the `<span aria-hidden>` that wraps the glyph character.
+ */
+export function worldviewChipGlyphClass(w?: FilterType): string {
+  const base = 'mr-sys-1';
+  const nudge = w ? (WORLDVIEW_GLYPH_NUDGE[w] ?? '') : '';
+  return nudge ? `${base} ${nudge}` : base;
 }

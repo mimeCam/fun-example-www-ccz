@@ -45,6 +45,13 @@ export const BRAND = {
   void:    '#0d0d1a',
   primary: '#7b2cbf',
   secondary: '#9d4edd',
+  // The static brand violet Tailwind paints under `text-accent` /
+  // `border-accent` (see `tailwind.config.ts` → `accent: var(--accent-
+  // violet)`). NOT thermal — `--token-accent` lerps violet→gold; this
+  // one is fixed. Mirrored here so canvas-safe consumers (and the
+  // chip-contrast audit, Mike napkin #95) can resolve `voice.accent`
+  // to its actual painted hex without scraping CSS at runtime.
+  accentViolet: '#c77dff',
 } as const;
 
 // ─── Archetype colors (match --arch-* in globals.css) ───
