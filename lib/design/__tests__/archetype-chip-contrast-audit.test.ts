@@ -175,10 +175,11 @@ function measuredRatio(k: ArchetypeKey, anchor: SurfaceAnchor): number {
  * WCAG 1.4.3 AA floor for normal text. Receipt (2026-04-26): after
  * lifting `BRAND.secondary` `#9d4edd → #bc8cf0` (napkin #98), `faithful`
  * @ warm now reads 5.60:1 — no longer the worst cell. The new worst-case
- * is `Explorer (accent) @ warm = 5.36:1` (0.86 of headroom over the
+ * is `Explorer (accent) @ warm = 5.24:1` (0.74 of headroom over the
  * floor); every cell clears with margin and the atomic-fail-path lever
  * (one rung-step in `archetype-accents.ts`) remains unspent for the next
- * regression.
+ * regression. (Receipt drift reconciled — Mike #103 §6 flag #2; AGENTS.md
+ * matches `worstCell()` output, Sid 2026-04-26.)
  */
 const FLOOR = 4.5;
 

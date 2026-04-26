@@ -1,7 +1,8 @@
 /**
  * svg-to-png — rasterize an SVG string to a PNG blob on the client.
  *
- * Used by ThreadKeepsake for "Copy image" and "Download" buttons.
+ * Used by ThreadKeepsake for "Copy" (image) and "Save" (download PNG)
+ * secondary actions — siblings of the "Share this thread" primary CTA.
  * No round-trip to the server — keeps copy instant on a café Wi-Fi.
  * DPR handling mirrors lib/quote-cards/card-generator for parity.
  */
