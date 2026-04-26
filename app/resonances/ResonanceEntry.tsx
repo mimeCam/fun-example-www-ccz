@@ -222,7 +222,7 @@ function buildCardData(r: ResonanceWithArticle): QuoteCardData {
  * change (Tanya #98 §4).
  *
  * The `<LeanArrow />` kernel (`components/shared/LeanArrow.tsx`) wears
- * `.plate-caption-arrow` so the site-wide nudge rule (`globals.css`,
+ * `.lean-arrow` so the site-wide nudge rule (`globals.css`,
  * detached from `.plate-destination` per Mike #43 §6 + Tanya UX §5)
  * translates the arrow 2px right on `:focus-within`. The launcher itself
  * stays a ghost — no halo, no dwell, no elevation. Only the glyph leans.

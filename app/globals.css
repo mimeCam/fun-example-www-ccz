@@ -975,12 +975,12 @@ body {
   100% { box-shadow: var(--sys-elev-rest); }
 }
 
-/* ─── Caption-Arrow Nudge — site-wide direct-gesture verb ─────────────────
+/* ─── Lean-Arrow Nudge — site-wide direct-gesture verb ────────────────────
    The third tense of the gesture grammar (thread → paint → nudge). When a
    reader's keyboard focus, finger, or cursor enters a focusable surface
-   that contains a `.plate-caption-arrow` span, the glyph leans 2px toward
-   where the gesture is going to land. Sub-perceptual; the reader will only
-   notice if we take it away.
+   that contains a `.lean-arrow` span, the glyph leans 2px toward where the
+   gesture is going to land. Sub-perceptual; the reader will only notice if
+   we take it away.
 
    Originally lived under `.plate-destination` (KeepsakePlate-only). Caller
    #2 (QuoteCardLauncher in app/resonances/ResonanceEntry.tsx) revealed the
@@ -1001,12 +1001,12 @@ body {
    no class rename), Tanya D. (UX spec — "the lean is the only thing they
    share", focus-not-hover discipline), Elon M. (caught the no-op trap that
    would have shipped a placebo), Paul K. (DoD: invisible until missing). */
-.plate-caption-arrow {
+.lean-arrow {
   display: inline-block;
   transition: transform var(--sys-time-crossfade) var(--sys-ease-out);
 }
-:focus-within > .plate-caption-arrow,
-:focus-within .plate-caption-arrow {
+:focus-within > .lean-arrow,
+:focus-within .lean-arrow {
   transform: translateX(2px);
 }
 /* The arrow-nudge reduced-motion override is appended at the foot of the
@@ -1221,8 +1221,8 @@ body {
   .plate-destination::after {
     animation: none !important;
   }
-  :focus-within > .plate-caption-arrow,
-  :focus-within .plate-caption-arrow {
+  :focus-within > .lean-arrow,
+  :focus-within .lean-arrow {
     transform: none !important;
   }
   .thermal-typography {

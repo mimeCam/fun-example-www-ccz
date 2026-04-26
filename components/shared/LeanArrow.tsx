@@ -45,21 +45,32 @@
  * Adoption fence: `components/shared/__tests__/lean-arrow-fence.test.ts`
  * pins (A) no caller `<EmptySurface>` label trails a directional glyph,
  * (B) the kernel anchor lives in this file, (C) no other `.tsx` inlines
- * a `.plate-caption-arrow` span, (D) no `<TextLink>`/`<Pressable>`/
+ * a `.lean-arrow` span, (D) no `<TextLink>`/`<Pressable>`/
  * `<ActionPressable>` JSX-text child trails a raw `→ ↗ ⟶ › »`.
+ *
+ * The Address Test (Jason F. #8/#25/#49 — kept LOCAL as prose, not
+ * doctrine): the component name, file path, CSS class, test pin, and
+ * JSDoc prose all spell `lean-arrow`. When a future verb-primitive
+ * earns graduation, match this five-utterance shape — that is how the
+ * address stays honest. Promote to project doctrine on the third
+ * independent verb (Mike rule of three; Tanya UIX §3.2), not the first;
+ * a registry of one is not a registry.
  *
  * Credits: Krystle C. (brief #61 — diagnosed the orphan at
  * `ResonancesClient.tsx:205` and scoped the kernel-promotion + fence-
- * widening shape), Mike K. (#48 napkin §5 — kernel architecture; #80
- * §5 — local JSDoc not project doctrine; #78 — one stateless kernel,
- * N callers), Tanya D. (UX §5.1 — leading-space-inside trick; §3
- * semantic gate; §4 reduced-motion still-renders), Jason F. (#25/#49
- * — verb-primitive framing, kept here as local prose), Elon M. (#22
+ * widening shape; #32 — named the seven-file evidence trail and the
+ * grep-graveyard the rename retires), Mike K. (#48 napkin §5 — kernel
+ * architecture; #80 §5 — local JSDoc not project doctrine; #78 — one
+ * stateless kernel, N callers; #87 napkin §6 — Address Test stays
+ * local-as-prose, no sweep), Tanya D. (UX §5.1 — leading-space-inside
+ * trick; §3 semantic gate; §4 reduced-motion still-renders; UIX #79
+ * §3.2 — one-sentence JSDoc, no grid), Jason F. (#25/#49 — verb-
+ * primitive framing, "five utterances spell one verb"), Elon M. (#22
  * — first-principles read on rule-of-one wearing rule-of-three's
- * coat; doctrine paragraph declined), Paul K. (#94 — felt-coherence
- * stake, four-bullet falsifiable DoD).
+ * coat; #37 — registry-of-one rejection of the sweep), Paul K. (#94 —
+ * felt-coherence stake, four-bullet falsifiable DoD).
  */
 
 export function LeanArrow(): JSX.Element {
-  return <span aria-hidden="true" className="plate-caption-arrow">{' →'}</span>;
+  return <span aria-hidden="true" className="lean-arrow">{' →'}</span>;
 }

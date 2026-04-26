@@ -9,7 +9,7 @@
  *     and the room loses its single voice (Tanya §2 — the felt-coherence
  *     stake; Krystle #61 — the orphan-class regression named at
  *     `ResonancesClient.tsx:205`).
- *   • A future caller hand-rolls a second `<span class="plate-caption-arrow">`
+ *   • A future caller hand-rolls a second `<span class="lean-arrow">`
  *     somewhere outside `LeanArrow.tsx` — the kernel is no longer the
  *     single import surface, the JSDoc no longer reaches every site, and
  *     the next contributor has two patterns to choose from (Mike #78 —
@@ -29,14 +29,24 @@
  *
  *   Axis B — Primitive fence (retargeted to the kernel).
  *     `components/shared/LeanArrow.tsx` is the kernel anchor: it renders
- *     a single `<span class="plate-caption-arrow" aria-hidden>` and
- *     nothing else does (Mike #78 — one kernel; #80 — the kernel lives
- *     in its own file, not inside `EmptySurface`).
+ *     a single `<span class="lean-arrow" aria-hidden>` and nothing else
+ *     does (Mike #78 — one kernel; #80 — the kernel lives in its own
+ *     file, not inside `EmptySurface`).
  *
- *   Axis C — Universality fence (NEW).
- *     The literal `.plate-caption-arrow` appears in exactly ONE `.tsx`
- *     file outside CSS / tests: `components/shared/LeanArrow.tsx`. Any
- *     hand-rolled clone of the span anywhere else fails the build.
+ *   Axis C — Universality fence.
+ *     The literal `.lean-arrow` appears in exactly ONE `.tsx` file
+ *     outside CSS / tests: `components/shared/LeanArrow.tsx`. Any hand-
+ *     rolled clone of the span anywhere else fails the build.
+ *
+ *   Axis E — Address Test (LOCAL to this verb only; Mike #87 §6, Tanya
+ *     UIX #79 §3.2). The five utterances of this verb-primitive — kernel
+ *     file path, exported symbol, rendered className, top-level CSS
+ *     class, and this fence file's name — must all spell `lean-arrow`.
+ *     Five short string-content lints, scoped to the kernel only. NOT a
+ *     sweep across `components/shared/`: the population of verb-primitives
+ *     is N=1; a registry of one is not a registry. When verb #2 graduates,
+ *     it earns its own per-verb fence; when verb #3 graduates, the
+ *     pattern factors out (Mike rule of three).
  *
  *   Axis D — Forward-door fence (NEW).
  *     No raw trailing `→ ↗ ⟶ › »` inside JSX text children of
@@ -279,12 +289,12 @@ const KERNEL_PATH = 'components/shared/LeanArrow.tsx';
 describe('lean-arrow-fence — Axis B · <LeanArrow /> kernel owns the span', () => {
   const src = readFileSync(join(ROOT, KERNEL_PATH), 'utf8');
 
-  it('the kernel renders a `.plate-caption-arrow` span (the kernel anchor)', () => {
-    expect(src).toMatch(/className=['"]plate-caption-arrow['"]/);
+  it('the kernel renders a `.lean-arrow` span (the kernel anchor)', () => {
+    expect(src).toMatch(/className=['"]lean-arrow['"]/);
   });
 
   it('the arrow span is marked `aria-hidden` (decorative, not announced)', () => {
-    const span = src.match(/<span[^>]*plate-caption-arrow[^>]*>/);
+    const span = src.match(/<span[^>]*lean-arrow[^>]*>/);
     expect(span).not.toBeNull();
     expect(span![0]).toMatch(/aria-hidden/);
   });
@@ -304,16 +314,16 @@ describe('lean-arrow-fence — Axis B · <LeanArrow /> kernel owns the span', ()
 
 // ─── Tests — Axis C · universality (the kernel is the only span site) ────
 
-describe('lean-arrow-fence — Axis C · `.plate-caption-arrow` lives in exactly one .tsx', () => {
+describe('lean-arrow-fence — Axis C · `.lean-arrow` lives in exactly one .tsx', () => {
   function spanCarriers(): string[] {
-    const rx = /<span[^>]*plate-caption-arrow[^>]*>/;
+    const rx = /<span[^>]*lean-arrow[^>]*>/;
     return preloadAll()
       .filter(({ rel }) => rel.endsWith('.tsx'))
       .filter(({ src }) => rx.test(src))
       .map(({ rel }) => rel);
   }
 
-  it('exactly one .tsx file in the scanned tree inlines a `.plate-caption-arrow` span', () => {
+  it('exactly one .tsx file in the scanned tree inlines a `.lean-arrow` span', () => {
     expect(spanCarriers()).toEqual([KERNEL_PATH]);
   });
 
@@ -431,5 +441,40 @@ describe('lean-arrow-fence — Axis D · forward-door JSX children carry no raw 
       .filter(({ rel }) => rel.endsWith('.tsx'))
       .reduce((n, { src }) => n + (src.match(rx)?.length ?? 0), 0);
     expect(total).toBeGreaterThanOrEqual(2);
+  });
+});
+
+// ─── Tests — Axis E · the verb's five utterances spell `lean-arrow` ───────
+//
+// Local to THIS verb only — not a sweep across `components/shared/` (the
+// other 16 files there are nouns; sweeping nouns by a verb-rule is a
+// category error). When verb #2 graduates, it earns its own per-verb
+// fence; when verb #3 graduates, the pattern factors into a shared helper.
+// Until then, the address book stays honest by repetition. Five short
+// assertions, all string-content lints. (Mike #87 §6, Tanya UIX #79 §3.2.)
+
+describe('lean-arrow-fence — Axis E · five utterances spell one verb', () => {
+  it('utterance #1 — kernel file path is `components/shared/LeanArrow.tsx`', () => {
+    expect(KERNEL_PATH).toBe('components/shared/LeanArrow.tsx');
+    expect(preloadAll().some(({ rel }) => rel === KERNEL_PATH)).toBe(true);
+  });
+
+  it('utterance #2 — kernel exports a parameterless `LeanArrow` symbol', () => {
+    const src = readFileSync(join(ROOT, KERNEL_PATH), 'utf8');
+    expect(src).toMatch(/export\s+function\s+LeanArrow\s*\(\s*\)/);
+  });
+
+  it('utterance #3 — kernel renders className="lean-arrow"', () => {
+    const src = readFileSync(join(ROOT, KERNEL_PATH), 'utf8');
+    expect(src).toMatch(/className=['"]lean-arrow['"]/);
+  });
+
+  it('utterance #4 — `app/globals.css` declares `.lean-arrow` at top level', () => {
+    const css = readFileSync(join(ROOT, 'app/globals.css'), 'utf8');
+    expect(css).toMatch(/^\.lean-arrow\s*\{/m);
+  });
+
+  it('utterance #5 — this fence file is named `lean-arrow-fence.test.ts`', () => {
+    expect(__filename.endsWith('lean-arrow-fence.test.ts')).toBe(true);
   });
 });

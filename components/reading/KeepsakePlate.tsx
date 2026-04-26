@@ -179,7 +179,7 @@ function PlateThumbnail({ snapshot }: { snapshot: ThreadSnapshot }) {
  *
  * The `→` glyph is rendered by the `<LeanArrow />` kernel
  * (`components/shared/LeanArrow.tsx`) — one stateless kernel, N callers
- * (Mike #78). The kernel owns the `.plate-caption-arrow` span (decorative,
+ * (Mike #78). The kernel owns the `.lean-arrow` span (decorative,
  * `aria-hidden`) so the site-wide nudge rule translates a single character
  * 2px right on `:focus-within` without animating the whole `<p>`. Screen
  * readers continue to announce "Keep this thread" cleanly; the arrow is

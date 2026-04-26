@@ -12,7 +12,7 @@
  * elevation rung). This pin enforces five things:
  *
  *   1. KeepsakePlate.tsx applies the class through `plateClass()` and
- *      paints the `<span class="plate-caption-arrow" aria-hidden>` that
+ *      paints the `<span class="lean-arrow" aria-hidden>` that
  *      the rule targets — adoption is what makes the rule load-bearing.
  *
  *   2. Every `box-shadow` and keyframe stop in the `.plate-destination`
@@ -111,7 +111,7 @@ function shadowCarriesLiteral(body: string): boolean {
 // ─── 1 · Adoption — KeepsakePlate.tsx wires the rule + LeanArrow kernel ───
 
 /**
- * After Mike #80, the `.plate-caption-arrow` span no longer lives in
+ * After Mike #80, the `.lean-arrow` span no longer lives in
  * `KeepsakePlate.tsx` — it was hoisted into the `<LeanArrow />` kernel at
  * `components/shared/LeanArrow.tsx`. The plate's two adoption signals are
  * now (1) the `.plate-destination` class on the surface and (2) the
@@ -137,11 +137,11 @@ describe('plate-destination — KeepsakePlate.tsx adopts the rule', () => {
     expect(tsx).toMatch(/<LeanArrow\s*\/>/);
   });
 
-  it('KeepsakePlate.tsx does NOT hand-roll a `.plate-caption-arrow` span', () => {
+  it('KeepsakePlate.tsx does NOT hand-roll a `.lean-arrow` span', () => {
     // The kernel is the only inlining site (Axis C of lean-arrow-fence).
     // If a future contributor restores the inline span here, the kernel's
     // aria-hidden + leading-space-inside contract starts drifting.
-    expect(tsx).not.toMatch(/className=['"]plate-caption-arrow['"]/);
+    expect(tsx).not.toMatch(/className=['"]lean-arrow['"]/);
   });
 });
 
@@ -278,7 +278,7 @@ describe('plate-destination — reduced motion silences halo (the plate-only cer
   it('the halo override lives inside a @media (prefers-reduced-motion: reduce) block', () => {
     // The arrow-nudge reduced-motion override moved to a site-wide selector
     // when caller #2 (QuoteCardLauncher) adopted the rule — see
-    // plate-caption-arrow.test.ts for the new scope. The plate-only halo
+    // lean-arrow-css.test.ts for the new scope. The plate-only halo
     // ceremony stays pinned here because halo IS plate-only doctrine.
     const mediaOpen = css.indexOf('@media (prefers-reduced-motion: reduce)');
     const haloOverride = css.indexOf('.plate-destination::after', mediaOpen);

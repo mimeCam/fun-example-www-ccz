@@ -26,6 +26,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Design System Rules
 **Direct-gesture asymmetry.** When a user gesture has a fingertip-local witness (an `<ActionPressable>` or equivalent: glyph swap + verb tense flip + same-source `<PhaseAnnouncement>` sr-only peer), success stays at the fingertip — no toast. Failure escalates one level to the room (warn-intent toast) because the reader needs to know when the contract breaks. Surfaces with no fingertip witness (e.g. `runShare`'s `navigator.share` failover) opt in to the room voice explicitly via `copyWithFeedback(text, { announce: 'room' })`. *Primary buttons are not exempt. If a fingertip witness fits the verb, the primary uses it too — visual prominence does not change the witness selection.* Prose, not a token — the registry earns its keep on the third independent reintroduction (Mike rule of three; doctrine: Mike #70 §A — *"no ninth ledger; the type-pinned tuple is the only registry"*).
 
+**Verb-primitives spell the same word in component name, file path, CSS class, test pin, and JSDoc — drift is debt.** Today's only verb is `<LeanArrow />`/`.lean-arrow` (Krystle #32, Mike #87, Tanya UIX #79); the local *Address Test* for that one verb lives as prose in `LeanArrow.tsx` JSDoc and as Axis E in `lean-arrow-fence.test.ts`. Do NOT promote the rule to project doctrine, nor sweep `components/shared/` (mostly nouns), until verb-primitive #3 graduates — then factor out a shared fence helper (rule of three).
+
 ## WIP
 - *(none)*
 

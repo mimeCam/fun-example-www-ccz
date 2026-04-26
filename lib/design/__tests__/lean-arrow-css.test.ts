@@ -1,6 +1,6 @@
 /**
- * plate-caption-arrow — universality + dual-adoption guard for the
- * site-wide direct-gesture nudge ("the third tense of the gesture grammar":
+ * lean-arrow-css — universality + dual-adoption guard for the site-wide
+ * direct-gesture nudge ("the third tense of the gesture grammar":
  * thread → paint → nudge / present → perfect → future).
  *
  * Pre-PR, the rule lived under `.plate-destination .plate-caption-arrow`
@@ -14,16 +14,23 @@
  * nudge on `:focus-within` alone. Halo / dwell / entrance ceremony stay
  * plate-only above; only the gesture verb is universal.
  *
+ * Krystle #32 / Mike #87 / Tanya UIX #79 then retired the legacy class
+ * name `.plate-caption-arrow` (a noun-shaped grep-graveyard for what is
+ * actually a verb) in favor of `.lean-arrow` — the verb-primitive's
+ * fourth utterance under the Address Test (kernel file, exported symbol,
+ * className, top-level CSS class, fence file all spell `lean-arrow`).
+ * This file is itself utterance #5 on the design-system test side.
+ *
  * This file pins five things — the test five-block matches the architect's
  * map (#43 §5) and the UX acceptance gates (UIX §8):
  *
  *   1. Universality — the rule is declared at top level (no
  *      `.plate-destination` ancestor) so any focusable surface that
- *      contains a `.plate-caption-arrow` span gets the lean.
+ *      contains a `.lean-arrow` span gets the lean.
  *
  *   2. Adoption — both `KeepsakePlate.tsx` (caller #1, plate) AND
  *      `ResonanceEntry.tsx` (caller #2, launcher) wrap the `→` glyph
- *      in `<span class="plate-caption-arrow" aria-hidden>`.
+ *      in `<span class="lean-arrow" aria-hidden>`.
  *
  *   3. Token discipline — the timing routes through
  *      `--sys-time-crossfade` and `--sys-ease-out` only. No new ease
@@ -33,9 +40,9 @@
  *      site-wide selector inside the universal `prefers-reduced-motion`
  *      block. The focus ring still lands; the ornament does not perform.
  *
- *   5. Source order — the universal `.plate-caption-arrow` rule sits
- *      AFTER the `.plate-destination` family so the cascade stays
- *      defensive (the plate's halo ceremony is unaffected).
+ *   5. Source order — the universal `.lean-arrow` rule sits AFTER
+ *      the `.plate-destination` family so the cascade stays defensive
+ *      (the plate's halo ceremony is unaffected).
  *
  * Pattern-clone of `plate-destination.test.ts` — same `ruleBody()` helper
  * shape; do NOT extract to a shared `_helpers.ts` until a third caller
@@ -87,18 +94,18 @@ function rulePos(css: string, selector: string): number {
 
 /** True iff a focus-within rule for the arrow exists at top level (no ancestor). */
 function topLevelFocusWithinExists(css: string): boolean {
-  const a = rulePos(css, ':focus-within > .plate-caption-arrow,\n:focus-within .plate-caption-arrow');
-  const b = rulePos(css, ':focus-within .plate-caption-arrow');
+  const a = rulePos(css, ':focus-within > .lean-arrow,\n:focus-within .lean-arrow');
+  const b = rulePos(css, ':focus-within .lean-arrow');
   return a !== -1 || b !== -1;
 }
 
 // ─── 1 · Universality — rule fires at any :focus-within boundary ───────────
 
-describe('plate-caption-arrow — declared at top level (no .plate-destination ancestor)', () => {
+describe('lean-arrow-css — declared at top level (no .plate-destination ancestor)', () => {
   const css = readFile(CSS_PATH);
 
-  it('the at-rest rule is declared as `.plate-caption-arrow` (no ancestor)', () => {
-    const body = ruleBody(css, '.plate-caption-arrow');
+  it('the at-rest rule is declared as `.lean-arrow` (no ancestor)', () => {
+    const body = ruleBody(css, '.lean-arrow');
     expect(body).not.toBe('');
     expect(body).toMatch(/display:\s*inline-block/);
     expect(body).toMatch(/transition:\s*transform\s+var\(--sys-time-crossfade\)\s+var\(--sys-ease-out\)/);
@@ -109,18 +116,25 @@ describe('plate-caption-arrow — declared at top level (no .plate-destination a
   });
 
   it('the focus-within rule body translates the glyph 2px right', () => {
-    // The dual-selector pair (`> .plate-caption-arrow` + descendant) is one
-    // CSS rule with two selectors. ruleBody finds the body via the second
+    // The dual-selector pair (`> .lean-arrow` + descendant) is one CSS
+    // rule with two selectors. ruleBody finds the body via the second
     // (descendant) selector head — same body applies to both.
-    const body = ruleBody(css, ':focus-within .plate-caption-arrow');
+    const body = ruleBody(css, ':focus-within .lean-arrow');
     expect(body).toMatch(/transform:\s*translateX\(2px\)/);
   });
 
-  it('the legacy parent-scoped rule (`.plate-destination .plate-caption-arrow`) is gone', () => {
+  it('the legacy parent-scoped rule (`.plate-destination .lean-arrow`) is gone', () => {
     // The kernel detach is load-bearing: if a contributor restores the
     // ancestor coupling, caller #2 silently regresses to a no-op.
-    expect(rulePos(css, '.plate-destination .plate-caption-arrow')).toBe(-1);
-    expect(rulePos(css, '.plate-destination:focus-within .plate-caption-arrow')).toBe(-1);
+    expect(rulePos(css, '.plate-destination .lean-arrow')).toBe(-1);
+    expect(rulePos(css, '.plate-destination:focus-within .lean-arrow')).toBe(-1);
+  });
+
+  it('the retired class name `.plate-caption-arrow` no longer appears in CSS', () => {
+    // The Krystle #32 / Mike #87 / Tanya UIX #79 rename: the noun-shaped
+    // grep-graveyard is gone. Any contributor grepping `lean-arrow` lands
+    // in the kernel, the rule, this test, and the JSDoc — one address.
+    expect(css).not.toContain('plate-caption-arrow');
   });
 });
 
@@ -137,7 +151,7 @@ describe('plate-caption-arrow — declared at top level (no .plate-destination a
  * `:focus-within` lean (KeepsakePlate's Coda surface, ResonanceEntry's
  * QuoteCardLauncher) stay wired to the kernel after the promotion.
  */
-describe('plate-caption-arrow — both callers consume the LeanArrow kernel', () => {
+describe('lean-arrow-css — both callers consume the LeanArrow kernel', () => {
   const plateTsx = readFile(PLATE_PATH);
   const launcherTsx = readFile(LAUNCHER_PATH);
 
@@ -161,12 +175,12 @@ describe('plate-caption-arrow — both callers consume the LeanArrow kernel', ()
     expect(launcherTsx).toMatch(/<LeanArrow\s*\/>/);
   });
 
-  it('neither caller hand-rolls a `.plate-caption-arrow` span (kernel is the only site)', () => {
+  it('neither caller hand-rolls a `.lean-arrow` span (kernel is the only site)', () => {
     // The site-wide invariant: the literal class lives in exactly one
     // .tsx (LeanArrow.tsx). Caller-side regression — re-inlining the
     // span — is caught here AND by lean-arrow-fence Axis C.
-    expect(plateTsx).not.toMatch(/className=['"]plate-caption-arrow['"]/);
-    expect(launcherTsx).not.toMatch(/className=['"]plate-caption-arrow['"]/);
+    expect(plateTsx).not.toMatch(/className=['"]lean-arrow['"]/);
+    expect(launcherTsx).not.toMatch(/className=['"]lean-arrow['"]/);
   });
 
   it('caller #2 does NOT carry the .plate-destination class (no ceremony import)', () => {
@@ -179,9 +193,9 @@ describe('plate-caption-arrow — both callers consume the LeanArrow kernel', ()
 
 // ─── 3 · Token discipline — only ledger ease/timing on the rule ────────────
 
-describe('plate-caption-arrow — only ledger Motion atoms on the rule', () => {
+describe('lean-arrow-css — only ledger Motion atoms on the rule', () => {
   const css = readFile(CSS_PATH);
-  const body = ruleBody(css, '.plate-caption-arrow');
+  const body = ruleBody(css, '.lean-arrow');
 
   it('the transition routes through --sys-time-crossfade (Motion ledger)', () => {
     expect(body).toContain('var(--sys-time-crossfade)');
@@ -210,20 +224,20 @@ describe('plate-caption-arrow — only ledger Motion atoms on the rule', () => {
 
 // ─── 4 · Reduced motion — site-wide nudge is silenced ──────────────────────
 
-describe('plate-caption-arrow — reduced motion zeros the focus-within transform', () => {
+describe('lean-arrow-css — reduced motion zeros the focus-within transform', () => {
   const css = readFile(CSS_PATH);
 
   it('a reduced-motion override zeros transform on the site-wide selector', () => {
     // The override matches the new scope (any focusable ancestor), so
     // both KeepsakePlate AND QuoteCardLauncher silence on the same beat.
     expect(css).toMatch(
-      /:focus-within\s+\.plate-caption-arrow\s*\{[^}]*transform:\s*none\s*!important/,
+      /:focus-within\s+\.lean-arrow\s*\{[^}]*transform:\s*none\s*!important/,
     );
   });
 
   it('the override lives inside a @media (prefers-reduced-motion: reduce) block', () => {
     const mediaOpen = css.indexOf('@media (prefers-reduced-motion: reduce)');
-    const overrideAt = css.indexOf(':focus-within .plate-caption-arrow', mediaOpen);
+    const overrideAt = css.indexOf(':focus-within .lean-arrow', mediaOpen);
     expect(mediaOpen).toBeGreaterThan(-1);
     expect(overrideAt).toBeGreaterThan(mediaOpen);
   });
@@ -234,21 +248,21 @@ describe('plate-caption-arrow — reduced motion zeros the focus-within transfor
     // under reduced-motion. Both must silence on the same selector.
     const mediaOpen = css.indexOf('@media (prefers-reduced-motion: reduce)');
     const block = css.slice(mediaOpen);
-    expect(block).not.toMatch(/\.plate-destination:focus-within\s+\.plate-caption-arrow/);
+    expect(block).not.toMatch(/\.plate-destination:focus-within\s+\.lean-arrow/);
   });
 });
 
 // ─── 5 · Source order — universal rule sits AFTER .plate-destination family
 
-describe('plate-caption-arrow — declared after the .plate-destination family', () => {
+describe('lean-arrow-css — declared after the .plate-destination family', () => {
   const css = readFile(CSS_PATH);
 
-  it('the at-rest .plate-caption-arrow rule appears AFTER `.plate-destination {`', () => {
+  it('the at-rest .lean-arrow rule appears AFTER `.plate-destination {`', () => {
     // Defensive cascade: the universal rule is declared after the plate's
     // family so any future plate-only override on the arrow (should one
     // ever land) wins via specificity OR source order without surprise.
     const plateAt = rulePos(css, '.plate-destination');
-    const arrowAt = rulePos(css, '.plate-caption-arrow');
+    const arrowAt = rulePos(css, '.lean-arrow');
     expect(plateAt).toBeGreaterThan(-1);
     expect(arrowAt).toBeGreaterThan(-1);
     expect(arrowAt).toBeGreaterThan(plateAt);
@@ -258,7 +272,7 @@ describe('plate-caption-arrow — declared after the .plate-destination family',
     // Halo ceremony (plate-only) precedes the gesture verb (site-wide).
     // If a future contributor reorders these, the test catches the slip.
     const dwellAt = css.indexOf('@keyframes plateDestinationDwell');
-    const arrowAt = rulePos(css, '.plate-caption-arrow');
+    const arrowAt = rulePos(css, '.lean-arrow');
     expect(dwellAt).toBeGreaterThan(-1);
     expect(arrowAt).toBeGreaterThan(dwellAt);
   });
