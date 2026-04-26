@@ -6,6 +6,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
 - `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, eight sibling contrast audits
+- `lib/design/hue.ts` — canonical hex↔RGB↔HSL kernel + `circularHueDelta`. Contrast, thermal-tokens, and focus-ink physics route through it. Drift = `npx jest` red.
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store
@@ -55,6 +56,12 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - Thread accent: cold `2.24:1` · warm `8.95:1`, floor 1.5:1 (intentionally sub-WCAG ambient cue; signal at warm — the spread is the killer feature)
 - SkipLink (static): `6.60:1` at both anchors, floor 4.5:1 (paint-byte-identical at both thermal anchors)
 - TextLink (passage): rest `5.36:1` · hover-gold `8.95:1` · hover-rose `6.13:1` (worst-case across destination accents) @ warm, floor 4.5:1 (WCAG 1.4.3 — the foreshadow gesture being honest about itself)
+
+### Archetype Hue Distance (1)
+
+> Hue-Δ (degrees), not contrast ratio. Shape decides group (Tanya UX #60 §3).
+
+- Archetype chip (NextRead): worst-case `5.35°` @ accent↔secondary, floor 4° (calibrated; 15° target deferred to palette nudge)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

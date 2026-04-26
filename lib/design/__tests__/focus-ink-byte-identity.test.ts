@@ -37,6 +37,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { FOCUS_INK, FOCUS_INK_CSS } from '../focus';
 import { THERMAL } from '../color-constants';
+import { circularHueDelta, hexToHsl } from '../hue';
 
 // Note (Mike #103 §5 file #5 — Sid 2026-04-26): the index-0 trust-anchor
 // helper invocation USED to live here. With the focus-ring contrast audit
@@ -88,35 +89,13 @@ function matchesOf(block: string, prefix: string): string[] {
   return block.match(rx) ?? [];
 }
 
-// ─── Helpers — kinship gate (HSL math), ≤10 LOC each ────────────────────
-// Private to this file. Promote to `lib/design/contrast.ts` on the SECOND
-// caller, never the first (Mike rule of three #78 §6 #1; Elon §3).
-
-/** `#rrggbb` → [r,g,b] each in [0,1]. Pure. */
-function hexToRgb(hex: string): [number, number, number] {
-  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex);
-  if (!m) throw new Error(`hexToRgb: bad hex: ${hex}`);
-  return [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255];
-}
-
-/** `#rrggbb` → { h:[0,360), s:[0,100], l:[0,100] }. Pure. */
-function hexToHsl(hex: string): { h: number; s: number; l: number } {
-  const [r, g, b] = hexToRgb(hex);
-  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
-  const l = (mx + mn) / 2;
-  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
-  let h = 0;
-  if (d !== 0 && mx === r) h = ((g - b) / d + 6) % 6;
-  else if (d !== 0 && mx === g) h = (b - r) / d + 2;
-  else if (d !== 0) h = (r - g) / d + 4;
-  return { h: ((h * 60) + 360) % 360, s: s * 100, l: l * 100 };
-}
-
-/** Circular hue distance — survives the 0°/360° wrap. Pure. */
-function circularHueDelta(a: number, b: number): number {
-  const raw = Math.abs(a - b) % 360;
-  return Math.min(raw, 360 - raw);
-}
+// ─── Helpers — kinship gate ─────────────────────────────────────────────
+// `hexToHsl` and `circularHueDelta` are imported from `lib/design/hue.ts`
+// — the canonical kernel (Mike napkin / Sid 2026-04-26). The previous
+// inline trio (RGB-01, HSL, Δh) was duplicated in three places at three
+// unit conventions; promotion to `hue.ts` closes the unit drift Elon
+// sniffed at (#54 §3). Only `.h` is read here, so the s/l unit shift
+// (was [0,100], now [0,1]) is irrelevant to this gate.
 
 // ─── Tests — the three physics assertions ─────────────────────────────────
 

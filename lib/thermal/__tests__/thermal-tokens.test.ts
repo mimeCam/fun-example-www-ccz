@@ -93,7 +93,11 @@ describe('computeThermalTokens — output tokens', () => {
   });
 
   it('uses HSL interpolation for color tokens', () => {
-    expect(SRC).toContain('function hexToHsl');
+    // `hexToHsl` is imported from `lib/design/hue.ts` post-promotion (Sid
+    // 2026-04-26 — rule of three: chip / thermal / focus-ink physics).
+    // The other two stay local because they are thermal-specific.
+    expect(SRC).toContain("from '@/lib/design/hue'");
+    expect(SRC).toContain('hexToHsl');
     expect(SRC).toContain('function lerpHsl');
     expect(SRC).toContain('function hslToHex');
   });

@@ -8,8 +8,15 @@
  *
  * No DOM, no Canvas. Pure math, per WCAG 2.1 §1.4.3.
  *
+ * **Hex parsing is delegated to `lib/design/hue.ts`** — the canonical
+ * 0..1 kernel. `hexToRgb` here is now a 4-line shim around `hexToRgb255`;
+ * one unit, one source of truth (Mike napkin / Sid 2026-04-26 — kills the
+ * 0..255 vs 0..1 unit drift Elon sniffed at, #54 §3).
+ *
  * Credits: Mike K. (napkin §3 — extract-and-share), Elon M. (encode-as-math).
  */
+
+import { hexToRgb255 } from './hue';
 
 // ─── sRGB → linear luminance ──────────────────────────────────────────────
 
@@ -45,12 +52,13 @@ export function compositeOver(top: string, bg: string, alpha: number): string {
 
 // ─── Hex ↔ RGB (small, exported so tests can assert sanity cheaply) ───────
 
+/**
+ * `#rrggbb` → [r, g, b] each in [0, 255]. Pure, ≤ 10 LOC. Shim over
+ * `hexToRgb255` in `lib/design/hue.ts` — the canonical 0..1 kernel lives
+ * there; this re-export keeps the WCAG path on its native 0..255 ints.
+ */
 export function hexToRgb(hex: string): [number, number, number] {
-  return [
-    parseInt(hex.slice(1, 3), 16),
-    parseInt(hex.slice(3, 5), 16),
-    parseInt(hex.slice(5, 7), 16),
-  ];
+  return hexToRgb255(hex);
 }
 
 export function rgbToHex(r: number, g: number, b: number): string {

@@ -19,6 +19,7 @@
  */
 
 import type { ThermalState } from './thermal-score';
+import { hexToHsl, type HSL } from '@/lib/design/hue';
 
 export type ThermalTokens = Record<string, string>;
 
@@ -67,27 +68,13 @@ export const SPACING_SCALE_REF = 6;     // normalization reference step
 export const SPACING_THRESHOLD = 25;    // dormant cutoff — zero lift below this
 
 // ─── HSL interpolation ────────────────────────────────────
-
-interface HSL { h: number; s: number; l: number }
-
-function hexToHsl(hex: string): HSL {
-  const r = parseInt(hex.slice(1, 3), 16) / 255;
-  const g = parseInt(hex.slice(3, 5), 16) / 255;
-  const b = parseInt(hex.slice(5, 7), 16) / 255;
-  const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  const l = (max + min) / 2;
-  if (max === min) return { h: 0, s: 0, l };
-  const d = max - min;
-  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-  const h = hueFromRgb(r, g, b, max, d);
-  return { h, s, l };
-}
-
-function hueFromRgb(r: number, g: number, b: number, max: number, d: number): number {
-  if (max === r) return ((g - b) / d + (g < b ? 6 : 0)) * 60;
-  if (max === g) return ((b - r) / d + 2) * 60;
-  return ((r - g) / d + 4) * 60;
-}
+//
+// `hexToHsl` is imported from `lib/design/hue.ts` — the canonical kernel
+// (Mike napkin / Sid 2026-04-26). One unit, one source of truth: rotating
+// the math here AND in the focus-ink physics test was unit drift waiting
+// to bite (Elon §3). The lerp + hex emit stay local because they are
+// thermal-system specific (Mike #78 §6 #1: rule of three is the gate, not
+// the goal — only the trio HSL helpers had crossed it).
 
 function lerpHsl(a: HSL, b: HSL, t: number): HSL {
   let dh = b.h - a.h;
