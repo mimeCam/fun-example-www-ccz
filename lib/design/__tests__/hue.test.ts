@@ -32,6 +32,7 @@ import {
   hexToRgb255,
   hexToHsl,
   circularHueDelta,
+  oklchDeltaE,
 } from '../hue';
 import { BRAND, THERMAL, THERMAL_WARM, ARCHETYPE } from '../color-constants';
 
@@ -162,5 +163,39 @@ describe('hue · the project palette parses cleanly', () => {
 
   it.each(ANCHORS)('hexToHsl(%s) does not throw', (hex) => {
     expect(() => hexToHsl(hex)).not.toThrow();
+  });
+});
+
+// ─── 6 · oklchDeltaE — perceptual sibling to circularHueDelta ────────────
+//
+// The eyeball, not the wheel (Mike napkin POI #5 / Tanya UX §3.2 / Elon §6).
+// Property tests, not a fence — `oklchDeltaE` is a REPL helper for the next
+// palette PR, not a test gate this sprint. The properties below pin its
+// shape so a future caller leaning on it inherits a kernel that behaves.
+
+describe('hue · oklchDeltaE — perceptual property tests', () => {
+  it('identity → 0 (any hex is zero distance from itself)', () => {
+    for (const hex of ['#000000', '#ffffff', '#dc6cff', '#bc8cf0']) {
+      expect(oklchDeltaE(hex, hex)).toBeCloseTo(0, 6);
+    }
+  });
+
+  it('symmetric: oklchDeltaE(a, b) === oklchDeltaE(b, a)', () => {
+    const a = '#dc6cff', b = '#bc8cf0';
+    expect(oklchDeltaE(a, b)).toBeCloseTo(oklchDeltaE(b, a), 8);
+  });
+
+  it('non-negative (Euclidean distance is unsigned)', () => {
+    for (const [a, b] of [['#000000', '#ffffff'], ['#dc6cff', '#bc8cf0']]) {
+      expect(oklchDeltaE(a, b)).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  it('post-lift sibling violets clear the ≥ 5 perceptual gate (Tanya UX §3.2)', () => {
+    // BRAND.accentViolet (#dc6cff) ↔ BRAND.secondary (#bc8cf0). Pre-lift
+    // sat at ≈ 4.61; post-lift reads ≈ 8.74. The gate is the eyeball check
+    // Tanya UX §3.2 named non-negotiable; the audit is HSL Δh on the wheel.
+    const dE = oklchDeltaE(BRAND.accentViolet, BRAND.secondary);
+    expect(dE).toBeGreaterThanOrEqual(5);
   });
 });

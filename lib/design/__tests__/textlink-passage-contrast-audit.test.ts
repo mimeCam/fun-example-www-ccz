@@ -39,7 +39,7 @@
  *   §1 FLOOR — every (paint × thermal anchor) cell ≥ TEXTLINK_PASSAGE_
  *      FLOOR. Three voices × two anchors = SIX cells today. The fg hex
  *      at each cell:
- *        rest        — voice.accent       = BRAND.accentViolet ('#c77dff')
+ *        rest        — voice.accent       = BRAND.accentViolet ('#dc6cff')
  *        hover-gold  — archetype.gold     = BRAND.gold         ('#f0c674')
  *        hover-rose  — worldview.rose     = BRAND.rose         ('#e88fa7')
  *      NO `gesture` axis sweep, NO per-variant timing branch — three
@@ -150,8 +150,9 @@ import { resolveLinkColor } from '@/lib/utils/link-phase';
 // the values. Same mirror pattern as the thread audit (`ACCENT_COLD`
 // block).
 
-/** Rest paint — `voice.accent` resolves to `BRAND.accentViolet` (`#c77dff`). */
-const REST_HEX = '#c77dff';
+/** Rest paint — `voice.accent` resolves to `BRAND.accentViolet` (`#dc6cff`,
+ *  post 15°-lift Sid 2026-04-26 / Mike napkin #100 / Tanya UX #12). */
+const REST_HEX = '#dc6cff';
 
 /** Hover paint when destination is `/mirror` — `BRAND.gold` (`#f0c674`). */
 const GOLD_HEX = '#f0c674';
@@ -288,14 +289,16 @@ describe('textlink-passage-contrast-audit · §0 LOCK (the floor is named, not a
 // trap, killed at design time).
 
 describe('textlink-passage-contrast-audit · §1 FLOOR (each cell clears the text floor)', () => {
-  it('REST_HEX mirrors color-constants.ts BRAND.accentViolet (#c77dff)', () => {
+  it('REST_HEX mirrors color-constants.ts BRAND.accentViolet (#dc6cff)', () => {
     // The rest hex is `voice.accent` — `BRAND.accentViolet` from the
     // color-constants ledger. If a future PR mutes the brand violet for
     // taste, this pin trips first and forces a deliberate review of the
     // audit's hex mirror. (`color-constants-sync.test.ts` already pins
     // BRAND.accentViolet to `app/globals.css` — this is the audit's
     // local mirror, same shape as the thread audit's `ACCENT_COLD` pin.)
-    expect(REST_HEX).toBe('#c77dff');
+    // Lifted `#c77dff` → `#dc6cff` on the 15° sibling-violet spread
+    // (Sid 2026-04-26, Mike napkin #100, Tanya UX #12).
+    expect(REST_HEX).toBe('#dc6cff');
     expect(REST_HEX).toBe(BRAND.accentViolet);
   });
 

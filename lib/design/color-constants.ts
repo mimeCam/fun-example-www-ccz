@@ -46,7 +46,7 @@ export const BRAND = {
   primary: '#7b2cbf',
   secondary: '#bc8cf0',
   // Calibrated for `archetype-chip-contrast-audit` (≥ 4.5:1 vs THERMAL_WARM.surface,
-  // the painted hex over the warm anchor — Faithful Reader voice).
+  // the painted hex over the warm anchor — Explorer voice on the NextRead chip).
   // Before nudging for taste, read that test file's calibration block.
   // The static brand violet Tailwind paints under `text-accent` /
   // `border-accent` (see `tailwind.config.ts` → `accent: var(--accent-
@@ -54,7 +54,21 @@ export const BRAND = {
   // one is fixed. Mirrored here so canvas-safe consumers (and the
   // chip-contrast audit, Mike napkin #95) can resolve `voice.accent`
   // to its actual painted hex without scraping CSS at runtime.
-  accentViolet: '#c77dff',
+  //
+  // Receipt of the 15° lift (Sid 2026-04-26, Mike napkin #100, Tanya UX
+  // §3.1): nudged `#c77dff` → `#dc6cff` — a single ~10.6° push outward
+  // toward warmer magenta (HSL 274.15° → 285.71°). `BRAND.secondary`
+  // (the Faithful Reader voice, the *fixed star*) stays at `#bc8cf0`.
+  // The asymmetric nudge is the design choice: one chip claims new
+  // territory, the other anchors. After the lift the violet pair sits
+  // 16.91° apart on the wheel (OKLab ΔE ≈ 8.74 — perceptually distinct
+  // on a real screen, well above Tanya's ≥ 5 gate). All eight contrast
+  // audits stay green; worst-case warm chip @ 5.02:1 (floor 4.5:1).
+  // `--sys-focus-ink` deliberately stays at `#c77dff` — the focus ring
+  // is reader-invariant chrome and does NOT track this static brand
+  // violet (Mike #62; lib/design/focus.ts). The textual independence
+  // earned in #62 is the budget this lift spends.
+  accentViolet: '#dc6cff',
 } as const;
 
 // ─── Archetype colors (match --arch-* in globals.css) ───

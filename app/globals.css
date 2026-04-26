@@ -81,7 +81,20 @@
   --void-deep: #0d0d1a;
   --primary: #7b2cbf;
   --secondary: #bc8cf0;
-  --accent-violet: #c77dff;
+  /* Explorer voice on the NextRead farewell chip — also paints
+     `text-accent` / `border-accent` everywhere via Tailwind.
+     Receipt of the 15° lift (Sid 2026-04-26, Mike napkin #100, Tanya
+     UX §3.1): `#c77dff` → `#dc6cff`, a one-step ~10.6° outward nudge
+     toward warmer magenta. The sibling violet `--secondary` stays
+     anchored — asymmetric by design (the Faithful chip is the fixed
+     star). Hue separation lifted from 5.35° → 16.91°; OKLab ΔE ≈ 8.74.
+     `--sys-focus-ink` stays at `#c77dff` — the focus ring is reader-
+     invariant chrome and is independent of this static brand violet
+     (Mike #62; see `lib/design/focus.ts` and the focus-ink declaration
+     below). Sync mirrors: `lib/design/color-constants.ts#BRAND.accentViolet`.
+     Sync guards: `color-constants-sync.test.ts` (CSS↔TS),
+     `archetype-hue-distance.test.ts` (15° floor receipt). */
+  --accent-violet: #dc6cff;
 
   /* Archetype identity tokens — single source of truth for all archetype colors.
      Used by paragraph hover, mirror cards, extensions, and share cards. */

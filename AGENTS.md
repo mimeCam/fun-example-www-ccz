@@ -6,7 +6,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
 - `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, eight sibling contrast audits
-- `lib/design/hue.ts` — canonical hex↔RGB↔HSL kernel + `circularHueDelta`. Contrast, thermal-tokens, and focus-ink physics route through it. Drift = `npx jest` red.
+- `lib/design/hue.ts` — canonical hex↔RGB↔HSL kernel + `circularHueDelta` + `oklchDeltaE` (perceptual sibling, not a test gate; palette-PR REPL helper). Contrast, thermal-tokens, and focus-ink physics route through it. Drift = `npx jest` red.
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store
@@ -50,18 +50,18 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ### Thermal Voices (7)
 - Worldview chip: worst-case `4.98:1` @ warm, floor 4.5:1
-- Archetype chip: worst-case `5.36:1` @ warm, floor 4.5:1
+- Archetype chip: worst-case `5.24:1` @ warm, floor 4.5:1 (post 15°-lift; explorer accent #c77dff → #dc6cff)
 - Halo ambient: worst-case `3.14:1` @ warm, floor 1.5:1 (intentionally sub-WCAG; ornament, not signal)
 - Keepsake gold: worst-case `8.95:1` @ warm, floor 3.0:1 (WCAG 1.4.11 non-text; signal)
 - Thread accent: cold `2.24:1` · warm `8.95:1`, floor 1.5:1 (intentionally sub-WCAG ambient cue; signal at warm — the spread is the killer feature)
 - SkipLink (static): `6.60:1` at both anchors, floor 4.5:1 (paint-byte-identical at both thermal anchors)
-- TextLink (passage): rest `5.36:1` · hover-gold `8.95:1` · hover-rose `6.13:1` (worst-case across destination accents) @ warm, floor 4.5:1 (WCAG 1.4.3 — the foreshadow gesture being honest about itself)
+- TextLink (passage): rest `5.24:1` · hover-gold `8.95:1` · hover-rose `6.13:1` (worst-case across destination accents) @ warm, floor 4.5:1 (WCAG 1.4.3 — the foreshadow gesture being honest about itself; rest hex tracked accentViolet through the 15° lift)
 
 ### Archetype Hue Distance (1)
 
 > Hue-Δ (degrees), not contrast ratio. Shape decides group (Tanya UX #60 §3).
 
-- Archetype chip (NextRead): worst-case `5.35°` @ accent↔secondary, floor 4° (calibrated; 15° target deferred to palette nudge)
+- Archetype chip (NextRead): worst-case `16.91°` @ accent↔secondary, floor 15° (sibling violets distinguishable on shared surface; verified in OKLab ΔE ≈ 8.74 across both thermal anchors — Mike napkin #100, Tanya UX #12, Sid 2026-04-26)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

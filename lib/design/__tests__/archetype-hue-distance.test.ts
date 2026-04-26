@@ -12,23 +12,32 @@
  *
  * The fence: on each surface that paints ≥ 2 archetype families, the
  * minimum circular hue distance between any two of those families must
- * clear `HUE_FLOOR_DEG` (4°). The floor is empirical — today's tightest
- * pair sits at ~5.35° (`accent` = `#c77dff` ↔ `secondary` = `#bc8cf0`,
- * both in the violet hue family by intent) — so 4° is "today's reality
- * minus ~1.35° margin," not eyeballed (Mike #78 §6 #6: floors are
- * calibrated, not vibe-checked).
+ * clear `HUE_FLOOR_DEG` (15°). The floor is architectural — sibling
+ * violets that share a surface must distinguish on a real screen, not
+ * merge into "some violet pill with different copy" (Tanya UX #12 §2).
+ * Today's tightest pair sits at ~16.91° (`accent` = `#dc6cff` ↔
+ * `secondary` = `#bc8cf0`, both in the violet hue family by intent —
+ * the Explorer / Faithful Reader voices on the NextRead farewell chip).
  *
- * **Receipt of the discovery (Sid 2026-04-26).** Mike's napkin sketched
- * a 15° floor; the empirical reality is ~5.35°. The two violet siblings
- * — Tailwind's `accent` (Explorer voice) and `secondary` (Faithful
- * Reader voice) — sit closer on the wheel than the napkin assumed. The
- * audit pins today's spread at 4° and surfaces the discovery as a number
- * (snapshot §4) rather than going red on commit zero (Mike's "an
- * assertion that goes red on commit zero is a sentence pretending to be
- * code"). A future palette nudge that wants the napkin's 15° target
- * lands as a deliberate brand change in `lib/design/color-constants.ts`
- * (`BRAND.accentViolet` or `BRAND.secondary`) — out of scope this sprint
- * per Krystle / Mike POI #3.
+ * **Receipt of the lift (Sid 2026-04-26, Mike napkin #100, Tanya UX #12).**
+ * The 15° floor is now load-bearing: it ratifies Tanya's single-nudge
+ * shift of `BRAND.accentViolet` `#c77dff → #dc6cff` (the `accent`
+ * Explorer chip pushed outward toward warmer magenta; `BRAND.secondary`
+ * stays anchored — asymmetric by design, the Faithful chip is the
+ * fixed star). Hue separation lifted from `5.35° → 16.91°`; OKLab ΔE
+ * (perceptual sanity, Tanya §3.2 / Elon §6) reads ≈ 8.74 — well above
+ * the ≥ 5 eyeball gate. All eight contrast audits stay green;
+ * worst-case warm chip @ `5.02:1` (floor 4.5:1).
+ *
+ * **Receipt of the discovery (Sid 2026-04-26 — historical, archived
+ * per Mike POI #9).** Before the lift, the audit pinned `HUE_FLOOR_DEG`
+ * at 4° because the empirical reality was ~5.35°. The 4° fence was
+ * "today's reality minus ~1.35° margin" — honest at commit time, but
+ * paid debt the moment the lift landed. The 15° floor now stands as
+ * the architectural truth, not the calibrated one. (Elon's "an assertion
+ * that goes red on commit zero is a sentence pretending to be code"
+ * works in reverse too: a receipt that *was* honest deserves to be
+ * archived, not rewritten.)
  *
  * **Per-surface, not global.** Elon §4 (via Mike napkin) — Jason's
  * "every voice on the wheel is safely far from every other voice"
@@ -78,13 +87,14 @@ import { BRAND } from '../color-constants';
 /**
  * Minimum acceptable circular hue distance between any two archetype
  * families that share a surface, in degrees. Today's tightest pair sits
- * at ~5.35° (`accent` ↔ `secondary`, both violet by brand intent); 4°
- * is today-minus-~1.35° margin so a future palette nudge that shaves any
- * meaningful slice off the spread fails here, before the chip ships
- * voices that have collapsed onto each other (see docblock §"Receipt of
- * the discovery"). Empirical, not eyeballed.
+ * at ~16.91° (`accent` = `#dc6cff` ↔ `secondary` = `#bc8cf0`, both
+ * violet by brand intent post-lift); 15° is the architectural fence so
+ * a future palette nudge that shaves any meaningful slice off the
+ * sibling-violet spread fails here, before the chip ships voices that
+ * have collapsed onto each other (see docblock §"Receipt of the lift").
+ * Architectural, not calibrated — *the floor is the architecture*.
  */
-const HUE_FLOOR_DEG = 4;
+const HUE_FLOOR_DEG = 15;
 
 // ─── Family → painted hex resolver ───────────────────────────────────────
 

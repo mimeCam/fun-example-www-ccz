@@ -3,10 +3,10 @@
 exports[`archetype-hue-distance · snapshot pin (Δh receipt) per-surface Δh table is byte-pinned (numbers, not adjectives) 1`] = `
 {
   "chip": {
-    "accent↔amber": "122.55°",
-    "accent↔rose": "69.67°",
-    "accent↔secondary": "5.35°",
-    "cyan↔accent": "98.41°",
+    "accent↔amber": "110.99°",
+    "accent↔rose": "58.11°",
+    "accent↔secondary": "16.91°",
+    "cyan↔accent": "109.97°",
     "cyan↔amber": "139.04°",
     "cyan↔rose": "168.07°",
     "cyan↔secondary": "93.05°",

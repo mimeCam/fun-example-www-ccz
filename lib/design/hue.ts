@@ -94,3 +94,50 @@ export function circularHueDelta(a: number, b: number): number {
   const raw = Math.abs(a - b) % 360;
   return Math.min(raw, 360 - raw);
 }
+
+// ─── OKLab perceptual distance — the eyeball, sibling to the wheel ───────
+//
+// HSL Δh is the audit kernel; OKLab ΔE is the eyeball (Mike napkin POI #5,
+// Elon §6, Tanya UX §3.2). HSL 15° is a hue floor — at low chroma or extreme
+// lightness two colours 15° apart can still look near-identical. OKLab is
+// perceptually uniform; Euclidean distance in its space tracks "how different
+// these read on a real screen." Pure, no DOM, no deps. NOT a test gate this
+// sprint — sibling helper for palette-PR REPL sanity checks (Mike POI #5,
+// not a fence). Promote to an audit when a third surface needs it (rule of
+// three). Spec: Björn Ottosson, https://bottosson.github.io/posts/oklab/.
+
+/** sRGB channel [0,1] → linear-light [0,1]. Pure, ≤ 10 LOC. */
+function srgbToLinear(c: number): number {
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+
+/** sRGB linear triple → OKLab [L, a, b]. Pure, ≤ 10 LOC. */
+function linearRgbToOklab(R: number, G: number, B: number): [number, number, number] {
+  const l = Math.cbrt(0.4122214708 * R + 0.5363325363 * G + 0.0514459929 * B);
+  const m = Math.cbrt(0.2119034982 * R + 0.6806995451 * G + 0.1073969566 * B);
+  const s = Math.cbrt(0.0883024619 * R + 0.2817188376 * G + 0.6299787005 * B);
+  return [
+    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
+  ];
+}
+
+/** `#rrggbb` → OKLab [L, a, b]. Pure, ≤ 10 LOC. */
+function hexToOklab(hex: string): [number, number, number] {
+  const [r, g, b] = hexToRgb01(hex);
+  return linearRgbToOklab(srgbToLinear(r), srgbToLinear(g), srgbToLinear(b));
+}
+
+/**
+ * Perceptual ΔE between two hexes in OKLab Euclidean distance, scaled ×100
+ * so the number reads on the familiar ΔE2000-ish scale (≥ 5 = "moderately
+ * different on a real screen"). Pure, ≤ 10 LOC. Sibling to `circularHueDelta`
+ * — same kernel module, different question.
+ */
+export function oklchDeltaE(hexA: string, hexB: string): number {
+  const A = hexToOklab(hexA);
+  const B = hexToOklab(hexB);
+  const dL = A[0] - B[0], da = A[1] - B[1], db = A[2] - B[2];
+  return Math.sqrt(dL * dL + da * da + db * db) * 100;
+}
