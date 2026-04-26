@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, five sibling contrast audits
+- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, seven sibling contrast audits
   - *Numeric typography (tabular + lining figures) lives in `lib/design/typography.ts` via `numericFeatureStyle()` (SVG/canvas) and in `<CaptionMetric>` (DOM). One adoption test pins both homes.*
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
@@ -43,6 +43,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - Keepsake gold: worst-case `8.95:1` @ warm, floor 3.0:1 (WCAG 1.4.11 non-text; signal)
 - Thread accent: cold `2.24:1` · warm `8.95:1`, floor 1.5:1 (intentionally sub-WCAG ambient cue; signal at warm — the spread is the killer feature)
 - SkipLink (static): `6.60:1` at both anchors, floor 4.5:1 (reader-invariant chrome — copy/paint identical at both thermal anchors)
+- TextLink (passage): rest `5.36:1` · hover-gold `8.95:1` · hover-rose `6.13:1` (worst-case across destination accents) @ warm, floor 4.5:1 (WCAG 1.4.3 — the foreshadow gesture being honest about itself)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

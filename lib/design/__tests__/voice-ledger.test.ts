@@ -41,6 +41,7 @@ import {
 
 const ALL_SURFACES: readonly Surface[] = [
   'chip', 'thread', 'ceremony', 'keepPlate', 'keepsake', 'letter', 'whisper',
+  'textLink',
 ] as const;
 
 /** Every voice referenced anywhere in the ledger, deduped. */
@@ -58,7 +59,7 @@ describe('voice-ledger — exhaustive over Surface', () => {
     expect(Array.isArray(VOICE_LEDGER[s])).toBe(true);
   });
 
-  it('VOICE_LEDGER keys are exactly the seven Surface members', () => {
+  it('VOICE_LEDGER keys are exactly the eight Surface members', () => {
     expect(new Set(Object.keys(VOICE_LEDGER))).toEqual(new Set(ALL_SURFACES));
   });
 
@@ -155,17 +156,21 @@ describe('ledger invariants', () => {
 describe('CONTRAST_PAIRS — every (fg, bg) is in licenseFor(surface)', () => {
   // Mike napkin #95 §4 — `chip` was the only row.
   // Mike napkin #99 §3 — added `keepsake` for the halo ambient floor.
-  // Mike napkin #101 / Sid (this implementation, 2026-04-26) — added
-  // `thread` for the `thermal.accent` ambient floor (the fifth sibling).
-  // Three rows now — *exactly* the rule-of-three threshold — but the
-  // `ContrastFamily` genus is STILL deferred: chip/keepsake/thread share
-  // *shape* (one fg over one bg at one floor), they do not share *role*
-  // (text legibility / signal gem / ambient cue). Genus extraction needs
-  // shared role, not shared shape (Mike napkin #54 — "polymorphism is a
-  // killer"). Three siblings sit honestly side-by-side; a fourth sibling
-  // with a fourth distinct role earns the genus, not before.
-  it('three rows today: `chip` + `keepsake` + `thread`; genus deferred (shape ≠ role)', () => {
-    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
+  // Mike napkin #101 — added `thread` for the `thermal.accent` ambient
+  // floor (the fifth sibling).
+  // Mike napkin #45 / Sid (this implementation, 2026-04-26) — added
+  // `textLink` for the `passage` foreshadow gesture at WCAG 1.4.3 (the
+  // seventh sibling). Four rows now — past the rule-of-three threshold
+  // — but the `ContrastFamily` genus is STILL deferred: chip/keepsake/
+  // thread/textLink share *shape* (one fg over one bg at one floor),
+  // they do not share *role* (text legibility / signal gem / ambient
+  // cue / foreshadow gesture). Genus extraction needs shared role, not
+  // shared shape (Mike napkin #54 — "polymorphism is a killer"). Four
+  // siblings sit honestly side-by-side; a fifth sibling with a fifth
+  // distinct role earns the genus, not before.
+  it('four rows today: `chip` + `keepsake` + `thread` + `textLink`; genus deferred (shape ≠ role)', () => {
+    expect(Object.keys(CONTRAST_PAIRS).sort())
+      .toEqual(['chip', 'keepsake', 'textLink', 'thread'].sort());
   });
 
   (Object.keys(CONTRAST_PAIRS) as Surface[]).forEach((surface) => {

@@ -58,6 +58,12 @@
  *   keepsake  — full ThreadKeepsake SVG (the gift opened)
  *   letter    — ReturnLetter recognition (the welcome back)
  *   whisper   — RecognitionWhisper ambient (the half-remembered hello)
+ *   textLink  — `<TextLink>` reading surface (the foreshadow); the
+ *               `passage` variant crossfades to the destination room's
+ *               accent on hover, so the reader feels the next room
+ *               *before* the click — the site's single foreshadow
+ *               gesture (Tanya UX #46 §0; Mike napkin #45 — the seventh
+ *               sibling, ratifying Krystle's seed).
  */
 export type Surface =
   | 'chip'
@@ -66,7 +72,8 @@ export type Surface =
   | 'keepPlate'
   | 'keepsake'
   | 'letter'
-  | 'whisper';
+  | 'whisper'
+  | 'textLink';
 
 // ─── Voices — the only paint atoms the system admits ──────────────────────
 
@@ -114,6 +121,31 @@ export const VOICE_LEDGER: Record<Surface, readonly Voice[]> = {
   keepsake:  ['thermal.accent', 'archetype.gold', 'archetype.halo', 'recognition.mist'],
   letter:    ['recognition.accent', 'recognition.mist'],
   whisper:   ['recognition.mist', 'archetype.gold'],
+  // ─── textLink — the foreshadow gesture (Tanya UX #46 §2) ───────────
+  // Four voices on one surface — the live runtime paint at rest plus the
+  // static + destination accents the audit measures:
+  //   • thermal.accent     — runtime rest paint: the link emits
+  //                          `color: var(--token-accent)` at idle
+  //                          (`link-phase.ts:120`). Same "live thermal
+  //                          surface" convention the keepsake + thread
+  //                          rows use — license-licensed so the symbolic
+  //                          bg in CONTRAST_PAIRS resolves cleanly.
+  //   • voice.accent       — static brand accent the audit defends as the
+  //                          rest-paint floor. `var(--token-accent)`
+  //                          inherits BRAND.accentViolet's WCAG floor as
+  //                          its canvas-safe fallback (Mike napkin #45
+  //                          §1; the live thermal lerp is audited by the
+  //                          thread sibling at the ambient floor).
+  //   • archetype.gold     — hover paint when destination is `/mirror`
+  //                          (resolveRoomForPath → 'gold' → `var(--gold)`).
+  //   • worldview.rose     — hover paint when destination is `/resonances`
+  //                          (resolveRoomForPath → 'rose' → `var(--rose)`).
+  // The `inline` and `quiet` variants paint subsets of these voices
+  // (voice.accent / voice.mist) — already covered by the chip audit's
+  // `voice.accent`/`voice.mist` rows over the same anchors. textLink's
+  // row pins what is *new* here: the destination-accent foreshadow paint.
+  // (Mike napkin #45 §"Points of interest #2"; Tanya UX #46 §4.)
+  textLink:  ['thermal.accent', 'voice.accent', 'archetype.gold', 'worldview.rose'],
 } as const;
 
 // ─── Helpers — pure, each ≤ 10 LOC ─────────────────────────────────────────
@@ -345,6 +377,35 @@ export const HALO_AMBIENT_FLOOR = 1.5;
 export const THREAD_AMBIENT_FLOOR = 1.5;
 
 /**
+ * TextLink `passage` foreshadow contrast floor — **4.5:1, AT WCAG 1.4.3
+ * (text)** by intent. Different rationale from `HALO_AMBIENT_FLOOR` and
+ * `THREAD_AMBIENT_FLOOR` (lock-LOW ambient cues): the `passage` link is
+ * *body-rank text* the reader reads, not an ornament they look through.
+ * The killer-feature gesture (foreshadow into the destination room) is
+ * meaningful only if the word is legible at both ends of the crossfade.
+ *
+ * **Why text-floor, not ambient-floor.** The link is a glyph the reader
+ * commits to clicking; legibility is the load-bearing affordance (Tanya
+ * UX #46 §9). A future PR that softens `BRAND.gold` or `BRAND.rose` for
+ * taste, or that nudges `BRAND.accentViolet` toward the surface, fails
+ * HERE first — by name — with a pointer to this JSDoc and to
+ * `__tests__/textlink-passage-contrast-audit.test.ts` §0.
+ *
+ * **Atomic fail-path.** If a cell drops below 4.5:1, the *fix* lives in
+ * `lib/design/color-constants.ts` (`BRAND.gold` / `BRAND.rose` /
+ * `BRAND.accentViolet`) — never a per-cell override knob, never a
+ * `gesture` axis. One register, never staggered (Tanya UX #62 §2; Mike
+ * napkin #45 §"Points of interest #5").
+ *
+ * Equal to `WCAG_AA_TEXT` today by design — kept as a *named* constant so
+ * a future "harmonize to non-text" PR has to delete the name, not just
+ * a number, to weaken the fence (Sid 2026-04-26 §0 LOCK pattern).
+ *
+ * Pure constant.
+ */
+export const TEXTLINK_PASSAGE_FLOOR = WCAG_AA_TEXT;
+
+/**
  * Audit pairs per surface. The chip row encodes the four named worldview
  * voices + the `fog`/`mist` fallback (Tanya UX #62 §4.5: "the audit table
  * should include the fallback pair, not just the four named voices, so
@@ -428,6 +489,38 @@ export const CONTRAST_PAIRS: Partial<Record<Surface, readonly ContrastPair[]>> =
   // genus extraction (rule of three).
   thread: [
     { fg: 'thermal.accent', bg: 'thermal.accent', floor: THREAD_AMBIENT_FLOOR },
+  ],
+  // ─── textLink — three foreshadow voices, two anchors, one floor ──────
+  //
+  // The seventh contrast-audit sibling (Mike napkin #45). Same *floor*
+  // shape as the six shipped audits, one floor (4.5:1), but THREE fg
+  // voices — the destination-accent matrix the `passage` variant paints:
+  //   • voice.accent       — rest paint over the surface (static brand
+  //                          accent the link inherits when the thermal
+  //                          token has not been overridden).
+  //   • archetype.gold     — hover paint when the destination is `/mirror`
+  //                          (room → 'gold' → `var(--gold)` → BRAND.gold).
+  //   • worldview.rose     — hover paint when the destination is
+  //                          `/resonances` (room → 'rose' → `var(--rose)`
+  //                          → BRAND.rose).
+  //
+  // The (fg, bg) bg slot uses `thermal.accent` *symbolically* — same shape
+  // as the keepsake and thread rows — to mean "the live thermal surface".
+  // The actual measurement resolves both canvas-safe surface anchors
+  // (`THERMAL.surface`, `THERMAL_WARM.surface`) — same two-anchor
+  // discipline as every sibling audit (Mike napkin #95 §1).
+  //
+  // Three voices × two anchors = SIX cells. NO new abstraction, NO
+  // `gesture` axis, NO per-cell knob, NO genus extraction (rule of three
+  // applies to *role*, not *shape* — Mike napkin #54 / #45).
+  //
+  // The §3 receipt prints the worst-case cell per voice (three numbers,
+  // one line) — the spread legible *as numbers* for AGENTS.md, mirroring
+  // the thread audit's two-cell glyph (Tanya UX #35 §3.2 / #46 §10).
+  textLink: [
+    { fg: 'voice.accent',   bg: 'thermal.accent', floor: TEXTLINK_PASSAGE_FLOOR },
+    { fg: 'archetype.gold', bg: 'thermal.accent', floor: TEXTLINK_PASSAGE_FLOOR },
+    { fg: 'worldview.rose', bg: 'thermal.accent', floor: TEXTLINK_PASSAGE_FLOOR },
   ],
 } as const;
 

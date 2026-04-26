@@ -137,13 +137,15 @@ describe('chip-contrast-audit · WCAG 4.5:1 floor (Krystle §audit-spec)', () =>
 
   it('CONTRAST_PAIRS.chip carries the worldview pairs (genus deferred — shape ≠ role)', () => {
     // Mike napkin #99: `keepsake` joined the manifest for the halo ambient
-    // floor (two rows). Mike napkin #101 / Sid (2026-04-26): `thread` joined
-    // for the `thermal.accent` ambient floor (three rows). Three siblings
-    // sit side-by-side; the genus is still deferred because they share
-    // *shape* (one fg over one bg at one floor) but not *role* (text-
-    // legibility / signal-gem / ambient-cue). Polymorphism is a killer
-    // (Mike napkin #54).
-    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
+    // floor (two rows). Mike napkin #101: `thread` joined for the
+    // `thermal.accent` ambient floor (three rows). Mike napkin #45 /
+    // Sid (2026-04-26): `textLink` joined for the `passage` foreshadow
+    // gesture (four rows). Four siblings sit side-by-side; the genus is
+    // still deferred because they share *shape* (one fg over one bg at
+    // one floor) but not *role* (text-legibility / signal-gem / ambient-
+    // cue / foreshadow-gesture). Polymorphism is a killer (Mike #54).
+    expect(Object.keys(CONTRAST_PAIRS).sort())
+      .toEqual(['chip', 'keepsake', 'textLink', 'thread'].sort());
     expect(PAIRS.length).toBeGreaterThanOrEqual(4);
   });
 

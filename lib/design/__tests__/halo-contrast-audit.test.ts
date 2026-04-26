@@ -273,14 +273,18 @@ describe('halo-contrast-audit · §2 LICENSE (the halo voice belongs to keepsake
     }
   });
 
-  it('CONTRAST_PAIRS holds three rows today (chip + keepsake + thread); genus deferred', () => {
-    // Mike napkin #101 / Sid (2026-04-26): `thread` joined the manifest as
-    // the fifth contrast-audit sibling (one fg, two anchors, ambient floor
-    // — same lock-LOW doctrine as halo). Three siblings now, but the
-    // `ContrastFamily` genus is STILL deferred because they share *shape*
-    // (one fg over one bg at one floor) and not *role* (text-legibility /
-    // signal-gem / ambient-cue). Polymorphism is a killer (Mike #54).
-    expect(Object.keys(CONTRAST_PAIRS).sort()).toEqual(['chip', 'keepsake', 'thread']);
+  it('CONTRAST_PAIRS holds four rows today (chip + keepsake + thread + textLink); genus deferred', () => {
+    // Mike napkin #101: `thread` joined the manifest as the fifth contrast-
+    // audit sibling (one fg, two anchors, ambient floor — same lock-LOW
+    // doctrine as halo). Mike napkin #45 / Sid (2026-04-26): `textLink`
+    // joined as the seventh sibling (three fgs, two anchors, text floor —
+    // foreshadow gesture). Four siblings now, but the `ContrastFamily`
+    // genus is STILL deferred because they share *shape* (one fg over one
+    // bg at one floor) and not *role* (text-legibility / signal-gem /
+    // ambient-cue / foreshadow-gesture). Polymorphism is a killer (Mike
+    // #54).
+    expect(Object.keys(CONTRAST_PAIRS).sort())
+      .toEqual(['chip', 'keepsake', 'textLink', 'thread'].sort());
   });
 });
 

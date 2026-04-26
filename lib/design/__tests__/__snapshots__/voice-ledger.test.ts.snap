@@ -29,6 +29,12 @@ exports[`voice-ledger — snapshot pin (any change is a deliberate review) VOICE
     "recognition.accent",
     "recognition.mist",
   ],
+  "textLink": [
+    "thermal.accent",
+    "voice.accent",
+    "archetype.gold",
+    "worldview.rose",
+  ],
   "thread": [
     "thermal.accent",
   ],
