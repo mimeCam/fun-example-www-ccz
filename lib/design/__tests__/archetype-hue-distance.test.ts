@@ -79,8 +79,14 @@
  * collision" — the audit makes mechanical).
  */
 
-import { circularHueDelta, hexToHsl } from '../hue';
 import { BRAND } from '../color-constants';
+import {
+  deltaHue,
+  deltaTable,
+  familyPairs,
+  surfaceReceipt,
+  worstPair,
+} from '../hue-distance';
 
 // ─── Floors — calibrated, not eyeballed ──────────────────────────────────
 
@@ -129,45 +135,15 @@ const ARCHETYPE_SURFACES: Record<string, readonly string[]> = {
   chip: ['cyan', 'accent', 'secondary', 'rose', 'amber'],
 };
 
-// ─── Helpers — pure, ≤ 10 LOC each ───────────────────────────────────────
-
-/** Hue (degrees) of a Tailwind family's painted hex. Pure. */
-function hueOf(family: string): number {
-  const hex = FAMILY_HEX[family];
-  if (!hex) throw new Error(`archetype-hue-distance: unknown family ${family}`);
-  return hexToHsl(hex).h;
-}
-
-/** Δh between two families' painted hexes — circular, [0, 180]. Pure. */
-function deltaHue(a: string, b: string): number {
-  return circularHueDelta(hueOf(a), hueOf(b));
-}
-
-/** Every unordered pair from a list of families. Pure, ≤ 10 LOC. */
-function familyPairs(families: readonly string[]): Array<[string, string]> {
-  const out: Array<[string, string]> = [];
-  for (let i = 0; i < families.length; i++) {
-    for (let j = i + 1; j < families.length; j++) out.push([families[i], families[j]]);
-  }
-  return out;
-}
-
-/** Δh table for one surface — `{ "<a>↔<b>": "X.XX°", … }`. Pure, ≤ 10 LOC. */
-function deltaTable(families: readonly string[]): Record<string, string> {
-  return Object.fromEntries(
-    familyPairs(families).map(([a, b]) => [`${a}↔${b}`, `${deltaHue(a, b).toFixed(2)}°`]),
-  );
-}
-
-/** Worst (smallest) Δh on a surface, plus the pair that produced it. Pure. */
-function worstPair(families: readonly string[]): { pair: string; dh: number } {
-  let worst = { pair: '', dh: Infinity };
-  for (const [a, b] of familyPairs(families)) {
-    const dh = deltaHue(a, b);
-    if (dh < worst.dh) worst = { pair: `${a}↔${b}`, dh };
-  }
-  return worst;
-}
+// ─── Helpers — imported from `lib/design/hue-distance.ts` ────────────────
+//
+// Five pure helpers (`deltaHue`, `familyPairs`, `deltaTable`, `worstPair`,
+// `surfaceReceipt`) used to live inline here; they were lifted to the
+// shared kernel when the worldview audit landed (Mike napkin §"Sibling
+// Voice Hue Distance (2)" — *one stateless kernel, two callers, no class
+// hierarchy*). Drift between two cloned audits would silently matter;
+// the kernel is the fence. Floors stay per-audit (the floor is the
+// architecture, not a paint value — Mike POI #6).
 
 // ─── 1 · Floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────────
 
@@ -175,7 +151,7 @@ describe(`archetype-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, (
   for (const [surface, families] of Object.entries(ARCHETYPE_SURFACES)) {
     for (const [a, b] of familyPairs(families)) {
       it(`${surface} · Δh(${a}, ${b}) ≥ ${HUE_FLOOR_DEG}°`, () => {
-        expect(deltaHue(a, b)).toBeGreaterThanOrEqual(HUE_FLOOR_DEG);
+        expect(deltaHue(a, b, FAMILY_HEX)).toBeGreaterThanOrEqual(HUE_FLOOR_DEG);
       });
     }
   }
@@ -186,7 +162,7 @@ describe(`archetype-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, (
 describe('archetype-hue-distance · worst-case receipt (per surface)', () => {
   for (const [surface, families] of Object.entries(ARCHETYPE_SURFACES)) {
     it(`${surface} · worst Δh clears the floor (mirrors §1 by design)`, () => {
-      const { pair, dh } = worstPair(families);
+      const { pair, dh } = worstPair(families, FAMILY_HEX);
       // eslint-disable-next-line no-console
       console.log(
         `[archetype-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${pair} (floor ${HUE_FLOOR_DEG}°)`,
@@ -225,11 +201,13 @@ describe('archetype-hue-distance · resolver invariants', () => {
 
 describe('archetype-hue-distance · snapshot pin (Δh receipt)', () => {
   it('per-surface Δh table is byte-pinned (numbers, not adjectives)', () => {
-    const receipt = Object.fromEntries(
-      Object.entries(ARCHETYPE_SURFACES).map(
-        ([surface, families]) => [surface, deltaTable(families)],
-      ),
-    );
-    expect(receipt).toMatchSnapshot();
+    expect(surfaceReceipt(ARCHETYPE_SURFACES, FAMILY_HEX)).toMatchSnapshot();
+  });
+
+  // Direct-table sanity — a deltaTable call shaped like the kernel's per-row
+  // projection; pins the import surface so a future kernel rename is loud.
+  it('deltaTable matches the snapshot row for the chip surface', () => {
+    const direct = deltaTable(ARCHETYPE_SURFACES.chip, FAMILY_HEX);
+    expect(direct).toEqual(surfaceReceipt(ARCHETYPE_SURFACES, FAMILY_HEX).chip);
   });
 });
