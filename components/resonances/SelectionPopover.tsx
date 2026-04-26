@@ -9,7 +9,7 @@ import type { PopoverPosition } from '@/lib/hooks/usePopoverPosition';
 import { SelectionPopoverTrigger } from './SelectionPopoverTrigger';
 import { ResonanceDrawer } from './ResonanceDrawer';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
-import { useCeremony } from '@/components/reading/CeremonySequencer';
+import { useCeremonyQuiet } from '@/lib/hooks/useCeremonyQuiet';
 
 /** Enter / exit dwells for the popover. `hover` matches depth gestures
  *  across the site; exit runs on `crossfade` plus one reduced-motion
@@ -128,19 +128,20 @@ export function SelectionPopover({ articleId, articleTitle }: Props) {
   const { selection } = useTextSelection({ enabled: isPointer });
   const { isFull, refresh } = useSlotStatus();
   const { isOpen, open, close } = useDrawerState();
-  // Coda-overlay guard (Tanya UX #62 §8 #2): the popover dismisses during
-  // the `gifting` phase so a closing-paragraph highlight cannot land the
-  // gem-pill on top of the Plate's reveal. Outside the article-page
-  // sequencer the hook returns `phase: 'idle'`, so the guard is a no-op.
-  const { phase: ceremonyPhase } = useCeremony();
-  const isGifting = ceremonyPhase === 'gifting';
+  // Input-side quiet gate (Tanya §5 — legitimate per-instance exception):
+  // the popover is the one surface that stays gated at the call site
+  // because it's an *input* concern — a fresh selection-gesture during
+  // the keepsake reveal must not open a new popover. Output surfaces go
+  // through the host (`<ToastHost>`) and the bus (`onCrossing`); this
+  // one stays here on purpose. See AGENTS.md "useCeremonyQuiet" rule.
+  const isQuiet = useCeremonyQuiet();
 
   const capturedQuoteRef = useRef('');
   const lastPositionRef  = useRef<PopoverPosition | null>(null);
 
   // Show popover only when text is selected AND drawer isn't already open
   // AND the ceremony is not actively presenting the keepsake.
-  const showPopover = !!selection && !isOpen && !isGifting;
+  const showPopover = !!selection && !isOpen && !isQuiet;
   const phase = usePopoverPhase(showPopover);
 
   // Cache the last known position so exit animation can play after selection clears

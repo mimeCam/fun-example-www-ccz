@@ -13,6 +13,7 @@
  */
 
 import type { ThermalState } from './thermal-score';
+import { getCeremonyQuiet } from '@/lib/ceremony/quiet-store';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -74,13 +75,25 @@ export function emitCrossing(from: ThermalState, to: ThermalState): void {
   window.dispatchEvent(new CustomEvent(STATE_CROSSING_EVENT, { detail }));
 }
 
-/** Subscribe to crossing events. Returns cleanup. SSR-safe. */
+/**
+ * Subscribe to crossing events. Returns cleanup. SSR-safe.
+ *
+ * Quiet-zone gate (Mike §6.3 / Tanya §4): while `getCeremonyQuiet()` is
+ * `true` (the ~700ms `gifting` window), the listener wrapper drops the
+ * payload before any subscriber sees it. This is the **subscription-side
+ * drop** the napkin called for — the bus still dispatches, the gradient
+ * still computes, but no flash and no crossing pulse paint over the
+ * KeepsakePlate. A missed crossing during the reveal is the desired
+ * behavior; the GoldenThread carries thermal continuity via CSS classes.
+ */
 export function onCrossing(
   handler: (c: ThermalStateCrossing) => void,
 ): () => void {
   if (typeof window === 'undefined') return () => {};
-  const listener = (e: Event) =>
+  const listener = (e: Event) => {
+    if (getCeremonyQuiet()) return;
     handler((e as CustomEvent<ThermalStateCrossing>).detail);
+  };
   window.addEventListener(STATE_CROSSING_EVENT, listener);
   return () => window.removeEventListener(STATE_CROSSING_EVENT, listener);
 }

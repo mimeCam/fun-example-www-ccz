@@ -25,6 +25,7 @@ import {
   subscribeToast, getCurrentToast,
   toastDismiss, type ToastMsg,
 } from '@/lib/sharing/toast-store';
+import { useCeremonyQuiet } from '@/lib/hooks/useCeremonyQuiet';
 import { Toast } from './Toast';
 
 /** Empty server snapshot — store is null until the first client write. */
@@ -57,10 +58,16 @@ function useSingletonGuard(): void {
 
 export function ToastHost(): JSX.Element | null {
   useSingletonGuard();
-  const target = usePortalTarget();
+  const target  = usePortalTarget();
   const current = useSyncExternalStore(subscribeToast, getCurrentToast, getServerSnapshot);
+  // Quiet-zone gate (Mike §6.2 / Tanya §5): during the keepsake reveal we
+  // hand the host an empty slot. The toast is dropped, not deferred — a
+  // late confirmation is a lie about a copy the reader already moved past.
+  // Live region stays mounted so ARIA focus path is preserved.
+  const quiet   = useCeremonyQuiet();
+  const visible = quiet ? null : current;
   if (!target) return null;
-  return createPortal(<HostTree current={current} />, target);
+  return createPortal(<HostTree current={visible} />, target);
 }
 
 interface TreeProps { current: ToastMsg | null }

@@ -21,6 +21,7 @@
 import { useState, useEffect, useRef, createContext, useContext, type ReactNode } from 'react';
 import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
 import { CEREMONY, MOTION } from '@/lib/design/motion';
+import { setCeremonyQuiet } from '@/lib/ceremony/quiet-store';
 
 /** Ceremony phases — four active states after idle. */
 export type CeremonyPhase =
@@ -110,6 +111,14 @@ export function CeremonySequencer({ triggered, confidence, onRefresh, children }
 
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
   }, [triggered]);
+
+  // Mirror `phase === 'gifting'` into the module-level quiet-store so
+  // surfaces *outside* this provider's React subtree (`<ToastHost>`,
+  // `emitCrossing()`) can defer by construction. See lib/ceremony/quiet-store.
+  useEffect(() => {
+    setCeremonyQuiet(phase === 'gifting');
+    return () => setCeremonyQuiet(false);
+  }, [phase]);
 
   const state: CeremonyState = { phase, intensity, confidence };
 

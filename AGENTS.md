@@ -7,6 +7,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/thermal/` — score engine, tokens, ceremony
 - `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, four sibling contrast audits
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
+- `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store
 - `lib/return/` — recognition-surface selector
 - `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
@@ -22,6 +23,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Posture suggests, does not dictate.** No `motionByPosture()` or cross-ledger accessors.
 - **Portal margins live on the envelope.** Wrap nullable children in `<CollapsibleSlot>`. Run `scripts/audit-spacing-collapse.ts` before portal-shape PRs.
 - **Empty rooms speak in registers, not variants.** Copy varies by reader; ornament varies by room. Halo tint is per-room, not per-archetype.
+- **Ceremony quiet — gate at the host, not at the call site.** During `useCeremonyQuiet()` (gifting phase) output surfaces defer. Toast suppresses in `<ToastHost>`; thermal crossing pulses suppress in `onCrossing()`. Input-side surfaces (popovers opening from a new gesture) may guard per-instance. The silence is the design.
 
 ## WIP
 - *(none)*
