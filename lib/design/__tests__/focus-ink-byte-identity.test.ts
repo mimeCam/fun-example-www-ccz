@@ -132,11 +132,15 @@ describe('focus-ink byte-identity — the physics gate', () => {
     expect(/FOCUS_INK\s*=\s*'#[0-9a-fA-F]{6}'/.test(focusModule)).toBe(true);
   });
 
-  it('FOCUS_INK equals THERMAL.accent today by design, not by reference', () => {
-    // Today's palette lines them up. If a future PR moves THERMAL.accent and
-    // this equality breaks, the choice is intentional: move the ink too (and
-    // re-approve WCAG), or fork it (and document why). See Mike #62 §2.
-    expect(FOCUS_INK).toBe(THERMAL.accent);
+  it('FOCUS_INK is INTENTIONALLY DIFFERENT from THERMAL.accent (WCAG-lift fork)', () => {
+    // Post-WCAG-lift fork (Sid 2026-04-26 — Mike napkin / Tanya UX #12).
+    // The two literals were textually independent (Mike #62 doctrine)
+    // exactly so this divergence could happen without silent drag.
+    // FOCUS_INK = '#c77dff' clears WCAG SC 1.4.11 (3.0:1 non-text) at both
+    // thermal anchors; THERMAL.accent = '#7b2cbf' stays put so the thread
+    // killer-feature spread (`2.24 → 8.95`) is preserved. See focus.ts
+    // JSDoc §"WCAG 1.4.11 ship".
+    expect(FOCUS_INK).not.toBe(THERMAL.accent);
   });
 });
 

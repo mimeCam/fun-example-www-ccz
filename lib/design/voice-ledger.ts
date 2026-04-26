@@ -444,48 +444,28 @@ export const THREAD_AMBIENT_FLOOR = 1.5;
 export const TEXTLINK_PASSAGE_FLOOR = WCAG_AA_TEXT;
 
 /**
- * Focus-ring painted contrast floor — **1.65:1, intentionally below WCAG
- * 1.4.11** (3:1 non-text) by *current palette* (Sid 2026-04-26, mirroring
- * the lock-LOW pattern of `THREAD_AMBIENT_FLOOR`). The painted ring is
- * `FOCUS_INK × 80% over surface`; the dormant violet `#7b2cbf` over
- * `THERMAL.surface = #16213e` measures `1.86:1`, and the same ink over
- * `THERMAL_WARM.surface = #1e2a3e` measures `1.71:1`. Both clear `1.65:1`,
- * neither clears `WCAG_NONTEXT (3.0:1)` today.
+ * Focus-ring painted contrast floor — **3.0:1, the WCAG SC 1.4.11
+ * contract floor for non-text UI components**. Post-palette-lift (Sid
+ * 2026-04-26): `FOCUS_INK` lifted from `#7b2cbf` → `#c77dff` so the
+ * painted ring (`FOCUS_INK × 80% over surface`) measures `4.29:1` over
+ * `THERMAL.surface = #16213e` and `3.94:1` over `THERMAL_WARM.surface
+ * = #1e2a3e`. Both anchors clear the contract floor with ≥0.94 headroom.
  *
- * **Why a documented painted floor, not the WCAG_NONTEXT contract floor.**
- * The 3:1 contract is named in `lib/design/focus.ts` JSDoc (item #4),
- * named in Mike #103 §6 #3, and ALREADY tracked by
- * `lib/utils/__tests__/contrast.test.ts` (`PALETTE_FLOOR = 1.65`) with an
- * explicit `TODO(palette-tuning, follow-up sprint)` to lift the dormant
- * accent to a brighter violet that clears 3:1 against both anchors. This
- * audit MIRRORS that documented floor verbatim — the same number, in the
- * same source-of-truth file (`voice-ledger.ts`), gated by the same
- * structural fence (the row's type and the §1 LOCK assertion).
+ * **Why this constant still exists** — the name "painted" still earns its
+ * keep: the floor is on the *painted* ring, not on the raw ink. Equal to
+ * `WCAG_NONTEXT` today by design — kept as a *named* constant so a future
+ * "soften the ring for taste" PR has to delete the name, not just a
+ * number, to weaken the fence (Sid 2026-04-26 §0 LOCK pattern; same
+ * doctrine as `TEXTLINK_PASSAGE_FLOOR === WCAG_AA_TEXT`).
  *
- * **Atomic fail-path on palette lift.** When the palette PR lands, ALL of
- * the following move together:
- *   • lift `BRAND.accentViolet` / dormant accent in `lib/design/color-
- *     constants.ts` and `lib/thermal/thermal-tokens.ts`,
- *   • raise `PALETTE_FLOOR` → `3.0` (rename `WCAG_NON_TEXT_FLOOR`) in
- *     `lib/utils/__tests__/contrast.test.ts`,
- *   • raise `FOCUS_RING_PAINTED_FLOOR` → `WCAG_NONTEXT` in *this* file,
- *   • update the `focus-ring-contrast-audit` §1 LOCK assertion (one
- *     line — the floor identity changes from this constant to
- *     `WCAG_NONTEXT`),
- *   • update the AGENTS.md receipt line (the `1.71:1` and `1.86:1`
- *     numbers move).
- * The `// reader-invariant` tag in `globals.css` is the grep anchor; the
- * type lock here is the fence; the §1 LOCK assertion is the alarm.
- *
- * **The brand survives the lift.** `ReaderInvariantPair` (`invariant:
- * true`) is independent of the floor numeric — the SHAPE invariant
- * (one cell, not a `{cold, warm}` tuple) is what the type pins; the
- * floor is the *target*. Lifting the palette raises the floor; it does
- * NOT widen the row to two cells.
+ * **The brand survives.** `ReaderInvariantPair` (`invariant: true`) is
+ * independent of the floor numeric — the SHAPE invariant (one cell, not
+ * a `{cold, warm}` tuple) is what the type pins; the floor is the
+ * *target*. The lift raised the number; it did NOT widen the row.
  *
  * Pure constant.
  */
-export const FOCUS_RING_PAINTED_FLOOR = 1.65;
+export const FOCUS_RING_PAINTED_FLOOR = WCAG_NONTEXT;
 
 /**
  * Audit pairs per surface. The chip row encodes the four named worldview
@@ -623,14 +603,12 @@ export const CONTRAST_PAIRS: Partial<Record<ContrastPairsKey, readonly (Contrast
   // NOT invent a `bg: 'reader.invariant'` voice (Mike #103 §6 #1 —
   // pinned trap; the Voice union does not grow).
   //
-  // Floor: `FOCUS_RING_PAINTED_FLOOR` (1.65, lock-LOW by current palette
-  // — see the constant's JSDoc for the gap to WCAG_NONTEXT and the
-  // palette-lift TODO). The contract target is WCAG_NONTEXT (3:1, SC
-  // 1.4.11) — the ring is a UI affordance the reader looks *at* but
-  // does not read; do NOT use WCAG_AA_TEXT (Mike #103 §6 #3). The
-  // current painted reality below 3:1 is documented in `contrast.test.
-  // ts` (PALETTE_FLOOR = 1.65) with the same lift TODO; this row
-  // mirrors that floor verbatim until the palette PR lands.
+  // Floor: `FOCUS_RING_PAINTED_FLOOR` (3.0, === WCAG_NONTEXT post-lift).
+  // The ring is a UI affordance the reader looks *at* but does not read;
+  // WCAG SC 1.4.11 (3:1 non-text) is the right contract — do NOT use
+  // WCAG_AA_TEXT (Mike #103 §6 #3). Painted ratios measured at both
+  // canvas-safe surface anchors: cold `4.29:1`, warm `3.94:1`. Both
+  // clear with headroom ≥ 0.94.
   //
   // Cardinality-1 row. NOT a new Surface union member — the focus ring is
   // chrome, not a paint-bearing journey surface (Mike #103 §6 #6). The

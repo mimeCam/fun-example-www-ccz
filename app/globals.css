@@ -342,13 +342,16 @@
   /* ─── Focus Ink — the reader-invariant accent ──────────────
      // reader-invariant — never warms, never personalizes, never archetype-forks.
      The `:focus-visible` ring reads from THIS token, not from `--token-accent`
-     (which the thermal engine interpolates violet → gold). Equal to the
-     dormant-accent literal today by design review, NOT by reference — keeping
-     them forked lets a future palette lift move the ring's ink independently
-     of the thermal anchor. TS mirror: `lib/design/focus.ts#FOCUS_INK`.
+     (which the thermal engine interpolates violet → gold). INTENTIONALLY
+     DIVERGED from the dormant-accent literal post-WCAG-lift (Mike #62
+     reserved the textual independence for exactly this case): lifted from
+     #7b2cbf to #c77dff so the painted ring clears WCAG SC 1.4.11 (3:1
+     non-text) at both thermal anchors — `1.71:1`/`1.86:1` → `3.94:1`/`4.29:1`.
+     The thread killer-feature spread (`2.24 → 8.95`) stays untouched.
+     TS mirror: `lib/design/focus.ts#FOCUS_INK`.
      Sync guard: `lib/design/__tests__/focus-sync.test.ts`.
      Physics gate: `lib/design/__tests__/focus-ink-byte-identity.test.ts`. */
-  --sys-focus-ink: #7b2cbf;
+  --sys-focus-ink: #c77dff;
 
   /* ─── Room Constitution — OS↔CSS seam, dark from byte zero ────────────
      These three declarations paint BEFORE script runs, BEFORE thermal

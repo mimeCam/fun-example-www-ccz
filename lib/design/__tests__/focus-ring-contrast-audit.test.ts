@@ -196,21 +196,21 @@ describe('focus-ring-contrast-audit · §1 LOCK / SHAPE (invariant brand, one ce
     expect(cell.invariant).toBe(true);
   });
 
-  it('the cell uses FOCUS_RING_PAINTED_FLOOR (current palette, lock-LOW)', () => {
+  it('the cell uses FOCUS_RING_PAINTED_FLOOR (the WCAG 1.4.11 contract)', () => {
     const [cell] = focusRingRow();
-    // Lock-LOW pattern — same shape as `THREAD_AMBIENT_FLOOR`. The
-    // current painted reality (1.65:1) sits below the contract target
-    // (WCAG_NONTEXT 3:1) by current palette; the gap is documented in
-    // `FOCUS_RING_PAINTED_FLOOR`'s JSDoc with the lift TODO. Mike #103
-    // §6 #3 named WCAG_NONTEXT as the *target* — type-pinned below.
+    // Post-palette-lift: `FOCUS_RING_PAINTED_FLOOR` IS `WCAG_NONTEXT` (3:1).
+    // The constant survives the lift to keep the "painted floor" name as a
+    // grep-anchor and a deletion barrier (a future "soften the ring for
+    // taste" PR has to delete the named constant, not just a number).
     expect(cell.floor).toBe(FOCUS_RING_PAINTED_FLOOR);
   });
 
-  it('FOCUS_RING_PAINTED_FLOOR sits BELOW WCAG_NONTEXT (palette lift pending)', () => {
-    // Number-vs-number gap. When a palette PR raises this constant to
-    // WCAG_NONTEXT, this assertion *flips* — its inverse becomes the
-    // post-lift invariant. The flip is the receipt of the lift.
-    expect(FOCUS_RING_PAINTED_FLOOR).toBeLessThan(WCAG_NONTEXT);
+  it('FOCUS_RING_PAINTED_FLOOR === WCAG_NONTEXT (the post-lift identity)', () => {
+    // Post-palette-lift identity (Sid 2026-04-26 — Mike napkin / Tanya UX
+    // #12). The previous LOCK assertion was `< WCAG_NONTEXT` (lock-LOW by
+    // palette, lift pending); the FLIP to identity is the receipt that the
+    // lift shipped — reviewers grep for this assertion to confirm it.
+    expect(FOCUS_RING_PAINTED_FLOOR).toBe(WCAG_NONTEXT);
     expect(WCAG_NONTEXT).toBeLessThan(WCAG_AA_TEXT);
   });
 
@@ -296,9 +296,8 @@ describe('focus-ring-contrast-audit · §3 RECEIPT (one number — worst-case at
     console.log(
       `[focus-ring-contrast-audit] ${ratio.toFixed(2)}:1 at both anchors `
       + `(focus-ink × 80% over surface, floor ${FOCUS_RING_PAINTED_FLOOR}:1, `
-      + `lock-LOW by current palette; contract target ${WCAG_NONTEXT}:1 `
-      + `WCAG 1.4.11 non-text — palette lift pending; type forbids divergence; `
-      + `mechanism mirrors SkipLink)`,
+      + `WCAG 1.4.11 non-text; reader-invariant chrome — type forbids `
+      + `divergence; mechanism mirrors SkipLink)`,
     );
     expect(ratio).toBeGreaterThanOrEqual(FOCUS_RING_PAINTED_FLOOR);
   });

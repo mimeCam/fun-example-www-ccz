@@ -45,7 +45,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 > ring carries (Mike #103 §7 risk note; rule of three).
 
 ### Reader Anchor (invariant chrome) (1)
-- Focus ring: `1.71:1` at both anchors, floor 1.65:1 (lock-LOW by current palette; contract target 3.0:1 WCAG 1.4.11 non-text — palette lift pending, see `FOCUS_RING_PAINTED_FLOOR` JSDoc; reader-invariant chrome — type forbids divergence)
+- Focus ring: worst-case `3.94:1` at both anchors, floor 3.0:1 (WCAG 1.4.11 non-text; reader-invariant chrome — type forbids divergence)
 
 ### Thermal Voices (7)
 - Worldview chip: worst-case `4.98:1` @ warm, floor 4.5:1

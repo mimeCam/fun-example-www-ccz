@@ -28,17 +28,14 @@ import { FOCUS, FOCUS_INK } from '@/lib/design/focus';
 const RING_ALPHA = FOCUS.alpha; // matches globals.css :focus-visible 80%
 
 /**
- * Palette floor — the composited ring (80% dormant violet + 20% bg) vs. the
- * bg itself reads at ~1.7–2.0 across every thermal stop with today's palette.
- * This is a pre-existing palette constraint the ink inherits from the
- * dormant-accent literal. Raising alpha to 100% tops out at ~2.4:1, so only
- * palette lift can close the WCAG 3:1 gap. Documented, not aspirational.
- *
- * TODO(palette-tuning, follow-up sprint): lift the dormant accent to a
- * brighter violet that clears 3:1 against both --token-bg and --token-surface.
- * When that lands, raise PALETTE_FLOOR to 3.0 and rename it WCAG_NON_TEXT_FLOOR.
+ * WCAG SC 1.4.11 non-text contrast floor (3.0:1) — the contract floor for
+ * the painted focus ring. Post-palette-lift (Sid 2026-04-26): `FOCUS_INK`
+ * lifted to `#c77dff` so the composited ring (80% over surface) reads
+ * `4.29:1` cold / `3.94:1` warm — both anchors clear 3:1 with ≥0.94
+ * headroom. The killer-feature thread spread (`2.24 → 8.95`) is preserved
+ * by leaving `THERMAL.accent` (the thread's dormant cell) untouched.
  */
-const PALETTE_FLOOR = 1.65;
+const WCAG_NON_TEXT_FLOOR = 3.0;
 
 const SCORES = [0, 25, 50, 75, 100] as const;
 
@@ -49,8 +46,8 @@ describe('focus-ring contrast — WCAG SC 1.4.11 gate (ink is reader-invariant)'
     const surface = tokens['--token-surface'];
     const ringOnBg = compositeOver(FOCUS_INK, bg, RING_ALPHA);
     const ringOnSurface = compositeOver(FOCUS_INK, surface, RING_ALPHA);
-    expect(contrast(ringOnBg, bg)).toBeGreaterThanOrEqual(PALETTE_FLOOR);
-    expect(contrast(ringOnSurface, surface)).toBeGreaterThanOrEqual(PALETTE_FLOOR);
+    expect(contrast(ringOnBg, bg)).toBeGreaterThanOrEqual(WCAG_NON_TEXT_FLOOR);
+    expect(contrast(ringOnSurface, surface)).toBeGreaterThanOrEqual(WCAG_NON_TEXT_FLOOR);
   });
 
   // Tanya §10.2 — the deliverable. The ring colour itself is byte-identical
@@ -142,18 +139,18 @@ describe('field focus border — WCAG SC 1.4.11 informational UI gate', () => {
 // future PR forks the ring for contrast mode, this test fails fast and
 // names the site (Mike #7.4, Tanya §3.3).
 //
-// AAA floor (7:1) is NOT enforced here — the dormant palette reads at
-// ~1.7-2.0 for the composited ring (palette constraint, see PALETTE_FLOOR
-// above). The follow-up sprint lifts the dormant accent; that's tracked
-// as TODO(palette-tuning). This block asserts byte-identity and the
-// today's palette floor instead — the honest gate.
+// AAA floor (7:1) is NOT enforced here — the painted ring composites to
+// ~3.94–4.29:1 with the lifted ink, well clear of WCAG SC 1.4.11 (3:1
+// non-text), but below the AAA 7:1 ceiling. AAA is NOT a contract for the
+// focus ring — it is a UI affordance, not body text. This block asserts
+// byte-identity and the contract floor — the honest gate.
 
 describe('focus-ring under prefers-contrast: more (reader-invariant)', () => {
   it('ring ink is byte-identical to its default render (no clamp fork)', () => {
     // Under the OS flag, the composited ring is still 80% FOCUS_INK over
     // the thermal backdrop. The ink itself does not move. If a future
     // commit forks FOCUS_INK on contrast-mode, this suite catches it.
-    expect(FOCUS_INK).toBe('#7b2cbf');
+    expect(FOCUS_INK).toBe('#c77dff');
   });
 
   it.each(SCORES)('score %i: ring clears documented floor on clamped bg', (score) => {
@@ -166,13 +163,10 @@ describe('focus-ring under prefers-contrast: more (reader-invariant)', () => {
     const surface = tokens['--token-surface'];
     const ringOnBg = compositeOver(FOCUS_INK, bg, RING_ALPHA);
     const ringOnSurface = compositeOver(FOCUS_INK, surface, RING_ALPHA);
-    expect(contrast(ringOnBg, bg)).toBeGreaterThanOrEqual(PALETTE_FLOOR);
-    expect(contrast(ringOnSurface, surface)).toBeGreaterThanOrEqual(PALETTE_FLOOR);
+    expect(contrast(ringOnBg, bg)).toBeGreaterThanOrEqual(WCAG_NON_TEXT_FLOOR);
+    expect(contrast(ringOnSurface, surface)).toBeGreaterThanOrEqual(WCAG_NON_TEXT_FLOOR);
   });
 
-  // TODO(palette-tuning, follow-up sprint): once the dormant accent is
-  // lifted to a brighter violet that clears ≥ 7:1 composited at 80%, raise
-  // this expectation to the AAA floor. Today we document the floor honestly.
   it('ring INK is byte-identical at every thermal stop (no contrast fork)', () => {
     const inks = SCORES.map(() => FOCUS_INK);
     expect(new Set(inks).size).toBe(1);

@@ -107,16 +107,21 @@ export const FOCUS_CSS_PREFIX = '--sys-focus';
  * byte-identical at score 0 and score 100 (physics enforced by
  * `lib/design/__tests__/focus-ink-byte-identity.test.ts`).
  *
- * Equal to `THERMAL.accent = '#7b2cbf'` today by design review, NOT by import.
- * Keeping them textually independent means a future palette lift can move the
- * thermal anchor without silently dragging the ring with it — and vice versa.
- * See Mike #62 §"Points of interest" #2.
+ * **Intentionally diverged from `THERMAL.accent = '#7b2cbf'`** post-WCAG-lift
+ * — the two literals were textually independent by Mike #62 doctrine *exactly*
+ * so this divergence could happen without silent drag. The lift to `#c77dff`
+ * (= `BRAND.accentViolet`'s value, by design review NOT by import) raises the
+ * painted ring from `1.71:1` (warm) / `1.86:1` (cold) to `3.94:1` / `4.29:1`,
+ * clearing WCAG SC 1.4.11 (3.0:1 non-text) at both thermal anchors. The
+ * killer-feature thread spread (`2.24 → 8.95`) is preserved by leaving
+ * `THERMAL.accent` (the thread's dormant cell) untouched. See "WCAG 1.4.11
+ * ship" — Mike napkin / Tanya UX #12.
  *
  * No fourth axis on `FocusRing`: ink is a COLOUR, not a ring geometry dimension.
  * `FOCUS` stays `{ width, alpha, offset }` — the cardinality-3 guard in
  * `focus-sync.test.ts` is load-bearing. Sibling constants > field sprawl.
  */
-export const FOCUS_INK = '#7b2cbf' as const;
+export const FOCUS_INK = '#c77dff' as const;
 
 /** CSS custom-property name of the ink token — the one authoring site. */
 export const FOCUS_INK_CSS = '--sys-focus-ink' as const;
