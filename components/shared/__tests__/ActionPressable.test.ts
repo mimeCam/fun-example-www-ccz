@@ -274,3 +274,71 @@ describe('ActionPressable — module surface', () => {
     expect(html).toMatch(/title="Copy image"/);
   });
 });
+
+// ─── 7 · Variant pass-through — primary CTAs opt in (Mike #26 / Tanya #81) ─
+
+/** Build with explicit variant/size — for primary-CTA tests. */
+function buildWithVariant(
+  variant: 'ghost' | 'solid',
+  phase: ActionPhase,
+  size: 'sm' | 'md' = 'sm',
+): ReactElement {
+  return createElement(ActionPressable, {
+    onClick: () => undefined,
+    phase,
+    reduced: false,
+    icon: buildIcon(),
+    idleLabel: 'Share this thread',
+    settledLabel: 'Shared',
+    hint: 'Share this thread',
+    variant,
+    size,
+    className: 'min-w-[14rem]',
+  });
+}
+
+describe('ActionPressable — variant pass-through (Mike #26 §3 / Tanya #81 §5)', () => {
+  it('default variant ("ghost") preserves the secondary-row chrome (no solid bg)', () => {
+    const html = render({ phase: 'idle' });
+    // Ghost is bg-transparent — solid's color-mix surface fragment must NOT
+    // appear when the caller leaves variant unset. Drift would mean the
+    // secondary row inherited a primary-CTA skin overnight.
+    expect(html).not.toMatch(/var\(--token-accent\)_14%/);
+  });
+
+  it('variant="solid" routes the gold-mix surface fragment onto the rendered button', () => {
+    const html = renderToStaticMarkup(buildWithVariant('solid', 'idle', 'md'));
+    // The VARIANT_SOLID recipe in press-phase.ts mixes 14% accent into
+    // surface for rest. If pass-through ever drops, this fragment is gone.
+    expect(html).toMatch(/var\(--token-accent\)_14%/);
+    // Solid uses the larger min-height (44px) at size="md" — width
+    // discipline rides the same recipe (logic principle #4 — 48pt target).
+    expect(html).toMatch(/min-h-\[44px\]/);
+  });
+
+  it('variant="solid" forwards the caller className (min-w-[14rem] survives)', () => {
+    const html = renderToStaticMarkup(buildWithVariant('solid', 'idle', 'md'));
+    expect(html).toMatch(/min-w-\[14rem\]/);
+  });
+
+  it('variant="solid" still mounts the SR-only PhaseAnnouncement on settled', () => {
+    // The witness covenant is variant-agnostic — primary CTAs get the same
+    // sr-only live region as the secondary row. (Tanya #81 §11 — the only
+    // regression test that matters.)
+    const html = renderToStaticMarkup(buildWithVariant('solid', 'settled', 'md'));
+    expect(liveText(html)).toBe('Shared');
+    expect(labelText(html)).toBe('Shared');
+  });
+
+  it('variant="solid" still hides the live region in idle and busy', () => {
+    expect(liveText(renderToStaticMarkup(buildWithVariant('solid', 'idle', 'md')))).toBeNull();
+    expect(liveText(renderToStaticMarkup(buildWithVariant('solid', 'busy', 'md')))).toBeNull();
+  });
+
+  it('variant="solid" + phase="settled" still surfaces the static aria-label hint', () => {
+    const html = renderToStaticMarkup(buildWithVariant('solid', 'settled', 'md'));
+    // aria-label is the gesture name (the hint), NOT the witness verb —
+    // mirrors the secondary-row contract under the new variant axis.
+    expect(html).toMatch(/aria-label="Share this thread"/);
+  });
+});

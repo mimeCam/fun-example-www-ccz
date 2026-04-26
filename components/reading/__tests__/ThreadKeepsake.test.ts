@@ -38,6 +38,22 @@ import { join } from 'node:path';
 const SRC_PATH = join(__dirname, '..', 'ThreadKeepsake.tsx');
 const SRC = readFileSync(SRC_PATH, 'utf8');
 
+// ─── Tiny helpers — surgical regex carve-outs over the source text ──────
+
+/**
+ * Slice the source body of `function PrimaryShare(...) { ... }`. Splitting
+ * on the bare token "PrimaryShare" hits the JSX call site too — this
+ * version anchors on the `function PrimaryShare\b` declaration so we always
+ * land inside the component body, never on the call site that wraps it.
+ */
+function primaryShareBody(): string {
+  const start = SRC.search(/function\s+PrimaryShare\b/);
+  if (start < 0) return '';
+  const tail = SRC.slice(start);
+  const next = tail.slice(1).search(/\bfunction\s+\w+\b/);
+  return next < 0 ? tail : tail.slice(0, next + 1);
+}
+
 // ─── 1 · Single primary + 3 secondaries ──────────────────────────────────
 
 describe('ThreadKeepsake · single-primary action layout (Tanya UX §4.1)', () => {
@@ -56,12 +72,23 @@ describe('ThreadKeepsake · single-primary action layout (Tanya UX §4.1)', () =
     expect(calls.length).toBe(3);
   });
 
-  it('primary Share is NOT wrapped in ActionPressable (scope guard)', () => {
-    // Primary CTA already has its own ceremony via navigator.share. The
-    // settled-state pulse is a *secondary* affordance — primary stays plain
-    // (Krystle's primary-button exclusion; Tanya UX §4.1 single-primary).
-    const primaryBlock = SRC.split('PrimaryShare')[1] ?? '';
-    expect(primaryBlock.split('SecondaryRow')[0]).not.toMatch(/ActionPressable/);
+  it('primary Share IS wrapped in ActionPressable variant="solid" (Mike #26 / Tanya #81)', () => {
+    // Pillar Two — primary buttons are not exempt. The gold CTA wears the
+    // same fingertip witness as the secondary row: glyph swap, verb tense
+    // flip, sr-only PhaseAnnouncement peer. The room stops talking over
+    // the gesture (Tanya #81 §2 — z-stack collapses to one receipt layer).
+    const body = primaryShareBody();
+    expect(body).toMatch(/<ActionPressable\b/);
+    expect(body).toMatch(/variant="solid"/);
+    expect(body).toMatch(/size="md"/);
+  });
+
+  it('primary Share pins its bounding box via min-w-[14rem] (Tanya #81 §4)', () => {
+    // The 12-character shrink "Share this thread" → "Shared" must be a
+    // content swap, not a box reshape. min-w-[14rem] is the load-bearing
+    // width discipline — locked here so a future contributor cannot
+    // shrink the floor without flipping this test red on first run.
+    expect(primaryShareBody()).toMatch(/min-w-\[14rem\]/);
   });
 
   it('one icon Pressable exists for the close affordance', () => {
@@ -165,9 +192,9 @@ describe('ThreadKeepsake · quiet-on-success contract (Mike #21 / Tanya #10)', (
   });
 
   it("runShareFailover is the lone legitimate announce: 'room' site", () => {
-    // navigator.share-unsupported failover has NO ActionPressable
-    // wrapping the primary CTA (Krystle's primary-button exclusion),
-    // so the room voice is the only available witness — explicit opt-in.
+    // The `navigator.share`-missing branch has NO fingertip witness to
+    // speak from (the primary never enters busy/settled in that branch),
+    // so the room voice is the only available organ — explicit opt-in.
     const failover = bodyOf('runShareFailover');
     expect(failover).toMatch(/announce\s*:\s*['"]room['"]/);
     // No OTHER function body in the file opts into the room voice.
@@ -175,6 +202,22 @@ describe('ThreadKeepsake · quiet-on-success contract (Mike #21 / Tanya #10)', (
     expect(bodyOf('runDownload')).not.toMatch(/announce\s*:\s*['"]room['"]/);
     expect(bodyOf('runCopyLink')).not.toMatch(/announce\s*:\s*['"]room['"]/);
     expect(bodyOf('runNativeShare')).not.toMatch(/announce\s*:\s*['"]room['"]/);
+    expect(bodyOf('runShare')).not.toMatch(/announce\s*:\s*['"]room['"]/);
+  });
+
+  it("runShare pulses on native success and stays silent on cancel (Tanya #81 §3)", () => {
+    // Success branch must call pulse(true) — the fingertip glow + sr-only
+    // peer is the entire receipt (no toast). The catch branch must NOT
+    // pulse — a cancelled share is neither success nor failure; silence
+    // is the correct witness (Mike #26 §7.1).
+    const share = bodyOf('runShare');
+    expect(share).toMatch(/pulse\s*\(\s*true\s*\)/);
+    // Cancel branch is silent — comment marks it, and no pulse(false) is
+    // emitted from the catch arm (the secondary verbs use pulse(false) as
+    // their failure decay; share's catch is a user-cancel, not a failure).
+    expect(share).toMatch(/cancelled/);
+    const catchArm = share.match(/catch\s*\{[^}]*\}/);
+    expect(catchArm?.[0] ?? '').not.toMatch(/pulse\s*\(/);
   });
 
   it("clipboard-utils import is shrunk to copyWithFeedback only", () => {

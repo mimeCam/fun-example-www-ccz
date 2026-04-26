@@ -22,12 +22,14 @@
  * (Tier 1, "the reader sends a thread to a friend without being asked
  * to"). Share leads, the rest cluster.
  *
- * Async-action settled-state pulse (Mike #18 / Tanya #11):
- * Copy / Save / Link each route through `<ActionPressable>` so the witness
- * lands at the fingertip — glyph swaps to a checkmark, verb shifts to past
- * tense ("Copied" / "Saved"), holds ~1200 ms, then quietly idles. The
- * primary "Share this thread" CTA is **not** wrapped — the navigator.share
- * sheet is its own ceremony (Krystle's primary-button exclusion).
+ * Async-action settled-state pulse (Mike #18 / Tanya #11; primary lift —
+ * Mike #26 / Tanya #81): Share / Copy / Save / Link all route through
+ * `<ActionPressable>` so the witness lands at the fingertip — glyph swaps
+ * to a checkmark, verb shifts to past tense ("Shared" / "Copied" / "Saved"),
+ * holds ~1000 ms, then quietly idles. **No success toast** on any of the
+ * four; the room voice survives only on the primary's `runShareFailover`
+ * (no `navigator.share` API → clipboard fallback) where the fingertip has
+ * no organ left to speak from. Failure still escalates one level by design.
  *
  * Implementation notes:
  *  - Preview SVG is the SAME `buildThreadSVG` used by the inline plate AND
@@ -41,13 +43,16 @@
  *
  * Credits: Paul K. ("must be beautiful in isolation"; Tier-1 share
  * outcome), Mike K. ("mirror the Thread can walk through"; preview ===
- * unfurl; #18 — `ActionPressable` napkin), Tanya D. (UX §4 — single-
+ * unfurl; #18 — `ActionPressable` napkin; #26 — primary-CTA lift via
+ * variant pass-through, no new primitive), Tanya D. (UX §4 — single-
  * primary action layout, icon + verb balance, modal motion discipline;
  * UX §0 — the "loop's last syllable" brief; #11 — the settled-state
- * spec), Krystle C. (original keepsake-feedback covenant — primary
- * excluded, ~1200 ms, fail-quiet recovery), Sid (this refactor — action
+ * spec; #81 — the gold button speaks its own resolution, the room
+ * stops talking over the gesture), Krystle C. (original keepsake-feedback
+ * covenant — primary excluded, ~1200 ms, fail-quiet recovery), Elon M.
+ * (engineering call — extend, don't sibling), Sid (this refactor — action
  * collapse, SHARED checkpoint emission, icon-set extraction, ActionPressable
- * adoption).
+ * adoption; this round — primary CTA wears the fingertip witness).
  */
 'use client';
 
@@ -185,7 +190,7 @@ function KeepsakeActions({ svg, snapshot, deepLink, unfurlUrl }: ActionsProps) {
   const a = useKeepsakeActions({ svg, snapshot, deepLink });
   return (
     <div className="px-sys-6 pb-sys-6">
-      <PrimaryShare onClick={a.onShare} busy={a.busy === 'share'} />
+      <PrimaryShare onClick={a.onShare} slot={a.shareSlot} />
       <SecondaryRow
         onCopy={a.onCopyImage} copySlot={a.copySlot}
         onSave={a.onDownload}  saveSlot={a.saveSlot}
@@ -200,21 +205,31 @@ function KeepsakeActions({ svg, snapshot, deepLink, unfurlUrl }: ActionsProps) {
   );
 }
 
-/** Primary "Share this thread" — gold solid, ↗ glyph, single verb. */
-function PrimaryShare({ onClick, busy }: { onClick: () => void; busy: boolean }) {
+/**
+ * Primary "Share this thread" — gold solid, ↗ glyph, single verb.
+ *
+ * Wears the same `<ActionPressable>` covenant as the secondary row
+ * (Mike #26 §3 / Tanya #81 §5–§6): on a successful native share the glyph
+ * crossfades to a checkmark and the label flips to "Shared", held ~1000 ms.
+ * The bounding box is pinned by `min-w-[14rem]` so the 12-character
+ * shrink (Share this thread → Shared) is a content swap, not a reshape
+ * (Tanya #81 §4). No toast on success; the failover keeps the room voice.
+ */
+function PrimaryShare({ onClick, slot }: { onClick: () => void; slot: UseActionPhaseResult }) {
   return (
     <div className="mb-sys-4 flex justify-center">
-      <Pressable
+      <ActionPressable
         variant="solid"
         size="md"
         onClick={onClick}
-        disabled={busy}
-        aria-label="Share this thread"
-        className="min-w-[14rem] gap-sys-2"
-      >
-        <ShareIcon size={16} />
-        <span>{busy ? 'Sharing…' : 'Share this thread'}</span>
-      </Pressable>
+        phase={slot.phase}
+        reduced={slot.reduced}
+        icon={<ShareIcon size={16} />}
+        idleLabel="Share this thread"
+        settledLabel="Shared"
+        hint="Share this thread"
+        className="min-w-[14rem]"
+      />
     </div>
   );
 }
@@ -292,6 +307,7 @@ function useKeepsakeActions(inputs: ActionHandlerInputs) {
   const copySlot = useActionPhase(busy === 'copy');
   const saveSlot = useActionPhase(busy === 'download');
   const linkSlot = useActionPhase(busy === 'link');
+  const shareSlot = useActionPhase(busy === 'share');
   const onCopyImage = useCallback(
     () => runCopyImage(svg, setBusy, copySlot.pulse), [svg, copySlot.pulse]);
   const onDownload  = useCallback(
@@ -301,8 +317,9 @@ function useKeepsakeActions(inputs: ActionHandlerInputs) {
     () => runCopyLink(deepLink, setBusy, linkSlot.pulse),
     [deepLink, linkSlot.pulse]);
   const onShare = useCallback(
-    () => runShare(snapshot, deepLink, setBusy), [snapshot, deepLink]);
-  return { busy, copySlot, saveSlot, linkSlot,
+    () => runShare(snapshot, deepLink, setBusy, shareSlot.pulse),
+    [snapshot, deepLink, shareSlot.pulse]);
+  return { busy, copySlot, saveSlot, linkSlot, shareSlot,
     onCopyImage, onDownload, onCopyLink, onShare };
 }
 
@@ -351,18 +368,20 @@ async function runCopyLink(
 }
 
 async function runShare(
-  snapshot: ThreadSnapshot, deepLink: string, setBusy: (b: Busy) => void,
+  snapshot: ThreadSnapshot, deepLink: string,
+  setBusy: (b: Busy) => void, pulse: Pulse,
 ): Promise<void> {
-  // No-fingertip case: the primary CTA is NOT wrapped in ActionPressable
-  // (Krystle's primary-button exclusion). The room voice is the only
-  // available witness on the failover, so we explicitly opt in to it.
+  // No-fingertip case: `navigator.share` is missing entirely, so the
+  // primary CTA never enters `busy`/`settled` — the room voice is the
+  // only available witness, opted into explicitly via `runShareFailover`
+  // (Mike #26 §5; Tanya #81 §6 — failure/no-API still escalates).
   if (typeof navigator === 'undefined' || !navigator.share) {
     await runShareFailover(deepLink);
     return;
   }
   setBusy('share');
-  try { await runNativeShare(snapshot, deepLink); }
-  catch { /* user cancelled — silent */ }
+  try { await runNativeShare(snapshot, deepLink); pulse(true); }
+  catch { /* user cancelled — silent (no pulse, no toast) */ }
   finally { setBusy(null); }
 }
 

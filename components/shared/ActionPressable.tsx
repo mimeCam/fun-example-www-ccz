@@ -1,10 +1,13 @@
 /**
  * ActionPressable — fingertip-local "I heard you" for async actions.
  *
- * Wraps `<Pressable variant="ghost">` and adds the success affordance:
- * during `settled` the action glyph swaps to `<CheckIcon>` and the verb
- * shifts to past tense (Copy → Copied, Save → Saved, Link → Copied) for
- * ~1200 ms, then the button quietly returns to `idle`.
+ * Wraps `<Pressable>` (default `variant="ghost" size="sm"`) and adds the
+ * success affordance: during `settled` the action glyph swaps to
+ * `<CheckIcon>` and the verb shifts to past tense (Copy → Copied, Save →
+ * Saved, Link → Copied, Share → Shared) for ~1000 ms, then the button
+ * quietly returns to `idle`. Primary CTAs opt into the same witness via
+ * `variant="solid" size="md"` — same phase machine, same SR peer, same
+ * width-disciplined bounding box (Mike #26 §3 / Tanya #81 §5).
  *
  * Compose-only primitive (Mike §6.2):
  *   • mechanical (down/release) → `<Pressable>` (untouched)
@@ -31,18 +34,21 @@
  * zero new layers — the receipt lands in two organs from one source.
  *
  * Credits: Mike K. (napkin §4 — compose-only primitive, two-layer split,
- * `phase` prop; #71 — `PhaseAnnouncement` peer, same-source rule),
+ * `phase` prop; #71 — `PhaseAnnouncement` peer, same-source rule; #26 §3 —
+ * `variant` pass-through is presentational, semantic layer untouched),
  * Tanya D. (UX §5 — icon swap, verb tense, color = text-foreground only,
  * no shadow/scale/chromatic aberration; #89 — fingertip receipt covenant
- * with no new visible stage), Krystle C. (original spec — primary
- * excluded, fail-quiet covenant, byte-identity wiring), Elon M.
- * (mechanical-vs-semantic split, what-we-actually-own physics), Sid
- * (this lift — single home; this round — settled-state receipt).
+ * with no new visible stage; #81 §5 — primary CTA is not exempt from the
+ * fingertip witness), Krystle C. (original spec — primary excluded,
+ * fail-quiet covenant, byte-identity wiring), Elon M. (mechanical-vs-
+ * semantic split, what-we-actually-own physics; #26 §4 — extend, do not
+ * sibling), Sid (this lift — single home; this round — primary CTA opt-in
+ * via variant pass-through, no new primitive).
  */
 
 'use client';
 
-import { Pressable } from '@/components/shared/Pressable';
+import { Pressable, type PressVariant, type PressSize } from '@/components/shared/Pressable';
 import { CheckIcon } from '@/components/shared/Icons';
 import {
   type ActionPhase,
@@ -68,16 +74,30 @@ export interface ActionPressableProps {
   hint: string;
   /** Extra className appended to the Pressable. */
   className?: string;
+  /**
+   * Visual variant pass-through to `<Pressable>`. Default `'ghost'`
+   * preserves the secondary-row look. `'solid'` is for primary CTAs that
+   * need the same fingertip witness — same gold skin, same check swap,
+   * same hold (Mike #26 §3 / Tanya #81 §5). `'icon'` intentionally stays
+   * gated: icon-only buttons rarely have a verb to past-tense flip.
+   */
+  variant?: PressVariant;
+  /**
+   * Density pass-through. Default `'sm'` matches the secondary-row siblings;
+   * `'md'` is the primary-CTA tap target (Tanya #81 §6 — 48pt earned by the
+   * inner `<Pressable>` size resolver, no per-call-site math).
+   */
+  size?: PressSize;
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function ActionPressable(props: ActionPressableProps): JSX.Element {
-  const { phase, reduced } = props;
+  const { phase, reduced, variant = 'ghost', size = 'sm' } = props;
   return (
     <Pressable
-      variant="ghost"
-      size="sm"
+      variant={variant}
+      size={size}
       onClick={props.onClick}
       disabled={phase === 'busy'}
       aria-label={props.hint}
