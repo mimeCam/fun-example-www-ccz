@@ -18,6 +18,10 @@
  *   Whisper      — text-sys-body / mist/60, typo-body (two-line target).
  *       ↓
  *   Primary      — <Pressable variant="ghost"> — link OR reset-button.
+ *                  `kind: 'link'` carries a trailing `<LeanArrow />` glyph
+ *                  that leans 2px right on `:focus-within` (Mike #48 §3,
+ *                  Tanya #87 §3 — semantic gate; reset is not forward
+ *                  motion, so `kind: 'button'` renders no glyph).
  *       ↓
  *   Secondary    — <TextLink variant="quiet"> — two lines below.
  *       ↓
@@ -37,12 +41,18 @@
  *   no new ledger entry, no new shadow token, no new animation.
  *
  * Credits: Mike K. (napkin §3 item #3 — 7th shared primitive, pair-rule
- * triggered: adoption test ships in the same PR), Tanya D. (UX §2 — the
+ * triggered: adoption test ships in the same PR; #48 — the LeanArrow span
+ * lifts the `→` glyph out of the four label literals into the primitive,
+ * locked behind `empty-arrow-fence.test.ts`), Tanya D. (UX §2 — the
  * ThresholdSurface anatomy, per-surface tint table §2.5, single-focal halo
- * §2.4, screenshot test §4), Elon M. (§3.2 — pure CSS variable read for the
- * breath token, no `lib/thermal/` import), Paul K. (§3 — the reset button
- * is the real feature on error; primary is a discriminated union to honor it),
- * Krystle C. (primitive scaffolding pattern & pair-rule discipline).
+ * §2.4, screenshot test §4; #87 §3 — semantic gate: reset earns no arrow,
+ * §5.1 — the leading space lives inside the span), Elon M. (§3.2 — pure
+ * CSS variable read for the breath token, no `lib/thermal/` import; #87
+ * — silent-failure modes of string-parsing motivated the primitive-author
+ * authority), Paul K. (§3 — the reset button is the real feature on error;
+ * primary is a discriminated union to honor it; #48 — fence ships in the
+ * same PR, no scope creep), Krystle C. (primitive scaffolding pattern &
+ * pair-rule discipline).
  */
 
 import type { ReactNode } from 'react';
@@ -158,13 +168,32 @@ function Actions({ primary, secondary }: {
 
 function PrimaryAction({ action }: { action: EmptySurfaceAction }) {
   if (action.kind === 'button') return (
+    // Reset is a re-attempt, not a destination — no arrow, no lean. The
+    // verb stands alone (Tanya §3 / Elon — semantic gate).
     <Pressable variant="ghost" size="md" onClick={action.onClick}>{action.label}</Pressable>
   );
   return (
     <Pressable asChild variant="ghost" size="md">
-      <Link href={action.href}>{action.label}</Link>
+      <Link href={action.href}>{action.label}<LeanArrow /></Link>
     </Pressable>
   );
+}
+
+/**
+ * The forward-motion glyph for `kind: 'link'` actions only.
+ *
+ * Decorative (`aria-hidden`) — screen readers continue to announce the
+ * verb alone. The leading space lives INSIDE the span so the kernel's
+ * 2px `translateX` on `:focus-within` (`globals.css:1004–1011`) moves
+ * text + glyph as one rigid unit — without the space-inside trick the
+ * pair would drift apart by 2px at large display sizes (Tanya §5.1).
+ *
+ * The lean is silenced under `prefers-reduced-motion: reduce` by the
+ * universal override at `globals.css:1224–1226`; the span is still
+ * rendered so the visual rhythm stays identical (Tanya §4).
+ */
+function LeanArrow() {
+  return <span aria-hidden="true" className="plate-caption-arrow">{' →'}</span>;
 }
 
 function SecondaryLink({ href, label }: { href: string; label: string }) {

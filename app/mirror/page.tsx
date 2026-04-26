@@ -107,7 +107,7 @@ function EmptyMirror() {
       kind="empty-mirror"
       headline={headline}
       whisper={whisper}
-      primary={{ kind: 'link', href: '/articles', label: 'Browse Articles →' }}
+      primary={{ kind: 'link', href: '/articles', label: 'Browse Articles' }}
       secondary={{ href: '/', label: 'Take the Quick Mirror' }}
       tint="gold"
     />

@@ -22,7 +22,7 @@ export default function NotFound() {
       kind="threshold-404"
       headline={headline}
       whisper={whisper}
-      primary={{ kind: 'link', href: '/', label: 'Return to the Threshold →' }}
+      primary={{ kind: 'link', href: '/', label: 'Return to the Threshold' }}
       secondary={{ href: '/articles', label: 'Or browse articles' }}
       tint="cyan"
     />

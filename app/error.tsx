@@ -30,7 +30,7 @@ export default function ErrorPage({
       kind="threshold-error"
       headline={headline}
       whisper={whisper}
-      primary={{ kind: 'button', onClick: reset, label: 'Try again →' }}
+      primary={{ kind: 'button', onClick: reset, label: 'Try again' }}
       secondary={{ href: '/', label: 'Return to the Threshold' }}
       tint="none"
     />

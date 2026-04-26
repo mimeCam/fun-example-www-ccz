@@ -311,7 +311,7 @@ function EmptyResonances() {
       kind="empty-resonances"
       headline={headline}
       whisper={whisper}
-      primary={{ kind: 'link', href: '/articles', label: 'Browse Articles →' }}
+      primary={{ kind: 'link', href: '/articles', label: 'Browse Articles' }}
       secondary={{ href: '/mirror', label: 'Read the Mirror' }}
       tint="rose"
     />
