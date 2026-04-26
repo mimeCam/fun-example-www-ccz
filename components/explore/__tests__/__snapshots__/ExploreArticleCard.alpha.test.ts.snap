@@ -3,7 +3,7 @@
 exports[`Worldview chip strip — all four siblings sit at the \`muted\` rung snapshot pin: the full WORLDVIEW_COLORS map (any change is a deliberate review) 1`] = `
 {
   "contrarian": "bg-rose/30 text-rose",
-  "philosophical": "bg-primary/30 text-primary",
+  "philosophical": "bg-primary/30 text-accent",
   "practical": "bg-cyan/30 text-cyan",
   "technical": "bg-primary/30 text-accent",
 }

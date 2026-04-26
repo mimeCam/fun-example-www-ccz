@@ -9,14 +9,33 @@
  * Design: reuses `lib/design/color-constants` (single source of truth)
  * and the same violet→gold accent interpolation used by GoldenThread.tsx.
  * No new colors, no new gradients, no new fonts. Mike's spec §3/§4.
+ *
+ * Voice license (Mike napkin #54 — Voice Ledger):
+ *   `keepsake` is licensed for `thermal.accent` (violet→gold gradient),
+ *   `archetype.gold` (title + warm gradient terminal), `archetype.halo`
+ *   (per-reader orb tint), and `recognition.mist` (fog track + caption).
+ *   See `lib/design/voice-ledger.ts` row `keepsake`. The `ACCENT` endpoints
+ *   below ARE the keepsake's `thermal.accent` voice — same dormant→warm
+ *   pair the live token interpolates between, sourced from the canvas-safe
+ *   constants so this module stays DOM-free.
  */
 import { BRAND, THERMAL, THERMAL_WARM, ARCHETYPE } from '@/lib/design/color-constants';
+import { licenseFor as voiceLicenseFor } from '@/lib/design/voice-ledger';
 import type { ArchetypeKey } from '@/types/content';
 
-/** Thread accent endpoints — dormant violet → warm gold. Parallel to
- *  `ACCENT` in `lib/thermal/thermal-tokens.ts`, but sourced from the
- *  canvas-safe `color-constants` module so this file stays DOM-free. */
+/** Thread accent endpoints — dormant violet → warm gold. The keepsake's
+ *  `thermal.accent` voice in static-canvas form (server SVG cannot read
+ *  the live `--token-accent` variable). Parallel to `ACCENT` in
+ *  `lib/thermal/thermal-tokens.ts` and authorised by `voice-ledger`'s
+ *  `keepsake` row — see `KEEPSAKE_VOICES` below for the runtime check. */
 const ACCENT = { dormant: THERMAL.accent, warm: THERMAL_WARM.accent };
+
+/**
+ * The Voice Ledger entry this module is bound to. Imported (rather than
+ * inlined) so a future ledger edit ripples here without a code change —
+ * the audit test reads the same source. Pure module-scope read.
+ */
+export const KEEPSAKE_VOICES = voiceLicenseFor('keepsake');
 
 export const ARCHETYPE_KEYS: ArchetypeKey[] =
   ['deep-diver', 'explorer', 'faithful', 'resonator', 'collector'];

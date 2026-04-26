@@ -12,7 +12,7 @@ exports[`worldview manifest — snapshot pin (any change is a deliberate review)
 exports[`worldview manifest — snapshot pin (any change is a deliberate review) WORLDVIEW_COLORS shape is byte-pinned 1`] = `
 {
   "contrarian": "bg-rose/30 text-rose",
-  "philosophical": "bg-primary/30 text-primary",
+  "philosophical": "bg-primary/30 text-accent",
   "practical": "bg-cyan/30 text-cyan",
   "technical": "bg-primary/30 text-accent",
 }

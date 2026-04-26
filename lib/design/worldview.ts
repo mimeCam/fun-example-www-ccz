@@ -2,39 +2,45 @@
  * Worldview chip-class manifest — single typed home for the four worldview
  * voices the Explore card paints.
  *
+ * **Adopted policy (Tanya UX #10 §4.2 — replaces the prior manifesto).**
+ * Worldview color is rendered exclusively by the Explore chip. No other
+ * surface in the journey adopts worldview hue. `accent` continues to serve
+ * as a recognition-surface color in `ReturnLetter` and `NextRead` per their
+ * existing usage; it is not promoted to "the philosophical register of the
+ * system." See `lib/design/voice-ledger.ts` — `chip` is the only Surface
+ * row that lists `worldview.*` voices.
+ *
  * Lifted from `components/explore/ExploreArticleCard.tsx` per Mike napkin #51
  * and Tanya UX #58 §6. The `Record<FilterType, string>` shape is the
  * compile-time guard: a fifth worldview added to `types/filter.ts` flips
  * this file red on the same PR — the type system is the centrality fence.
  *
- * Three exports (Tanya §7):
+ * Four exports:
  *   • WORLDVIEW_COLORS       — chip background+text Tailwind classes per worldview
  *   • WORLDVIEW_CHIP_LABELS  — capitalized human-readable labels (no raw keys)
+ *   • WORLDVIEW_GLYPHS       — abstract leadin glyph per worldview (Tanya UX #10 §2)
  *   • WORLDVIEW_FALLBACK_BG  — chip background when worldview is undefined
  *
- * One helper:
+ * Helpers:
  *   • worldviewChipClass(w?) — full class string with fallback baked in
+ *   • worldviewChipLabel(w?) — human-readable label
+ *   • worldviewChipGlyph(w?) — semiotic discriminator (principle #7)
  *
  * JIT-safety: every class string is emitted by `alphaClassOf` (a fixed-table
  * literal factory) or written verbatim — Tailwind's JIT cannot see template
  * interpolations like `bg-${family}/${pct}`. See `lib/design/alpha.ts:252`.
  *
- * Layout policy (Tanya UX §4): the worldview chip is the ONLY surface that
- * paints worldview color. Resonance, Mirror, Threshold, Thread, Keepsake,
- * Letter, Whisper — none of them adopt worldview hue. Ever. By spec.
- *
  * Credits:
- *   • Mike K. — architect napkin #51 (the shape, the pair rule, the
- *     `Record<FilterType, string>` typing call, the helper-owns-fallback
- *     polish, "polymorphism is a killer" — keep it a `Record`).
- *   • Tanya D. — UX spec #58 §3.3 (the `WORLDVIEW_CHIP_LABELS` upgrade —
- *     stops the chip from rendering raw lowercase identifiers; AAA polish),
- *     §4 (layout invariant — chip is not a theme), §6 (one register, four
- *     voices — all four chips share the `muted` rung).
- *   • Elon M. — first-principles teardown that named `Record<string,string>`
- *     as the typo trap; this module fixes it via `FilterType`.
- *   • Krystle C. (VP-Product) — original sprint pick: lift the manifest out
- *     of the component, type by `FilterType`, byte-identical render.
+ *   • Mike K. — architect napkin #51 + #54 (the `Record<…>` shape, the
+ *     "polymorphism is a killer" call, the Voice Ledger fence the
+ *     `philosophical → accent` realignment lands inside).
+ *   • Tanya D. — UX spec #58 §3.3 + #10 §2 (the `WORLDVIEW_CHIP_LABELS`
+ *     upgrade, the glyph layer per principle #7 "don't rely on color
+ *     alone", the honest layout-policy paragraph above).
+ *   • Krystle C. / Jason F. — #66 / #71 (the philosophical → accent
+ *     mechanical realignment that ships as one row of this map).
+ *   • Elon M. — first-principles teardown that named "two violets at chip
+ *     size = two violets" — the perceptual driver behind the glyph layer.
  */
 
 import { alphaClassOf } from '@/lib/design/alpha';
@@ -50,23 +56,61 @@ import type { FilterType } from '@/types/filter';
  * voice. Routes through `alphaClassOf` so the JIT-visible literal is owned
  * by the alpha ledger, not by handwritten strings.
  *
- * Family map (Tanya UX §2):
+ * Family map (Tanya UX #10 §2.2 — Krystle/Jason realignment lands here):
  *   technical     → primary bg / accent text  (violet on muted-violet)
- *   philosophical → primary bg / primary text (violet on muted-violet, monochrome)
+ *   philosophical → primary bg / accent text  (was `text-primary`; flipped
+ *                   to share `accent` with technical so the chip stops
+ *                   asserting two perceptually-identical violets)
  *   practical     → cyan bg    / cyan text
  *   contrarian    → rose bg    / rose text
  *
- * The known overlap (technical+philosophical share the `primary` family) is
- * the four-vs-three-voices contradiction; Tanya UX §6 keeps them at the same
- * rung so the register reads as "one voice, two intents." A future taxonomy
- * collapse would touch this map and `types/filter.ts` together.
+ * The known overlap (technical+philosophical share the `primary` family AND
+ * now `text-accent`) is the four-vs-three-voices contradiction. The glyph
+ * layer (`WORLDVIEW_GLYPHS` below) is the non-color discriminator that lets
+ * the four chips read as four voices regardless of monitor / color-vision
+ * (principle #7 — don't rely on color alone). A future taxonomy collapse to
+ * three worldviews would touch this map, `WORLDVIEW_GLYPHS`, and
+ * `types/filter.ts` together — see AGENTS.md follow-ons.
  */
 export const WORLDVIEW_COLORS: Record<FilterType, string> = {
   technical:     `${alphaClassOf('primary', 'muted', 'bg')} text-accent`,
-  philosophical: `${alphaClassOf('primary', 'muted', 'bg')} text-primary`,
+  philosophical: `${alphaClassOf('primary', 'muted', 'bg')} text-accent`,
   practical:     `${alphaClassOf('cyan',    'muted', 'bg')} text-cyan`,
   contrarian:    `${alphaClassOf('rose',    'muted', 'bg')} text-rose`,
 };
+
+// ─── Chip glyphs — semiotic discriminator (Tanya UX #10 §2.3) ─────────────
+
+/**
+ * Single-character abstract glyph leading the chip label. The glyph is the
+ * non-color discriminator that survives:
+ *   • color-blindness — two violets become identical to a deuteranope; `▣`
+ *     vs `◇` does not.
+ *   • chip size — at 11px text, color differences below ~8 ΔE blur. Shape
+ *     contrast is binary, never blurry.
+ *   • screenshots — keepsake-like share moments where the chip ends up on
+ *     a phone in sunlight: shape carries.
+ *
+ * Picked from the existing geometric repertoire (no new icon font, no SVG
+ * asset) — one Unicode character in the chip's existing text node. Per
+ * `prefer-icons-over-text.md` (Picture Superiority): the reader registers
+ * the worldview in one glance.
+ *
+ * Glyphs are deliberately ABSTRACT (not literal icons). Worldview is a
+ * register, not a topic — abstract shapes don't lie about meaning.
+ *
+ * Accessibility: the glyph is `aria-hidden` at the call site — a screen
+ * reader hears `Technical`, not "Technical, square inside square."
+ */
+export const WORLDVIEW_GLYPHS: Record<FilterType, string> = {
+  technical:     '▣',
+  philosophical: '◇',
+  practical:     '▲',
+  contrarian:    '◯',
+};
+
+/** Fallback glyph — a centered dot, lowest visual weight, no register. */
+const WORLDVIEW_FALLBACK_GLYPH = '·';
 
 // ─── Chip labels — capitalized, present-tense (Tanya UX §3.3) ──────────────
 
@@ -121,4 +165,17 @@ export function worldviewChipClass(w?: FilterType): string {
 export function worldviewChipLabel(w?: FilterType): string {
   if (w === undefined) return '—';
   return WORLDVIEW_CHIP_LABELS[w] ?? '—';
+}
+
+/**
+ * Chip glyph for a worldview — non-color discriminator (principle #7).
+ * Falls back to a centered dot when undefined. Pure, ≤ 10 LOC.
+ *
+ * The glyph element MUST be marked `aria-hidden` at the call site
+ * (Tanya UX #10 §7.2). Screen readers hear the label; sighted readers
+ * register the shape.
+ */
+export function worldviewChipGlyph(w?: FilterType): string {
+  if (w === undefined) return WORLDVIEW_FALLBACK_GLYPH;
+  return WORLDVIEW_GLYPHS[w] ?? WORLDVIEW_FALLBACK_GLYPH;
 }

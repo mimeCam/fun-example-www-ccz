@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`voice-ledger — snapshot pin (any change is a deliberate review) VOICE_LEDGER shape is byte-pinned 1`] = `
+{
+  "ceremony": [
+    "thermal.accent",
+    "archetype.gold",
+  ],
+  "chip": [
+    "worldview.primary",
+    "worldview.cyan",
+    "worldview.rose",
+    "worldview.fog",
+    "voice.accent",
+    "voice.cyan",
+    "voice.rose",
+    "voice.mist",
+  ],
+  "keepPlate": [
+    "archetype.gold",
+  ],
+  "keepsake": [
+    "thermal.accent",
+    "archetype.gold",
+    "archetype.halo",
+    "recognition.mist",
+  ],
+  "letter": [
+    "recognition.accent",
+    "recognition.mist",
+  ],
+  "thread": [
+    "thermal.accent",
+  ],
+  "whisper": [
+    "recognition.mist",
+    "archetype.gold",
+  ],
+}
+`;

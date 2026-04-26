@@ -6,6 +6,16 @@
  *
  * Returns a flat Record<string, string> of CSS custom property key→value pairs.
  * V2: continuous color + typography + spacing + shadow + radius interpolation.
+ *
+ * Voice Ledger note (Mike napkin #54): the `--token-accent` produced here is
+ * the `thermal.accent` voice in `lib/design/voice-ledger.ts`. Three surfaces
+ * are licensed to paint it: `thread` (Golden Thread fill), `ceremony` (warming
+ * burst), and `keepsake` (SVG gradient stop — via static `THERMAL.accent` /
+ * `THERMAL_WARM.accent` in `lib/design/color-constants.ts`, since SVG cannot
+ * read the live token). No other surface paints `--token-accent`; recognition
+ * surfaces (Letter / NextRead) speak their own `recognition.accent` voice
+ * which routes through `--accent`, not the thermal token. Different voice,
+ * same hue family. Drift caught by `chip-to-keepsake-audit.test.ts`.
  */
 
 import type { ThermalState } from './thermal-score';

@@ -15,6 +15,7 @@ import {
   WORLDVIEW_FALLBACK_BG,
   worldviewChipClass,
   worldviewChipLabel,
+  worldviewChipGlyph,
 } from '@/lib/design/worldview';
 
 interface ExploreArticleCardProps {
@@ -145,8 +146,15 @@ export default function ExploreArticleCard({
                   so we render `Technical` / `Philosophical` / `Practical` /
                   `Contrarian` — the chip stops looking like a debug tag. The
                   chip chrome routes through `worldviewChipClass` so the
-                  fallback can never be forgotten (Mike #51 §5 #4). */}
+                  fallback can never be forgotten (Mike #51 §5 #4).
+
+                  Glyph leadin (Tanya UX #10 §2 + principle #7): a
+                  one-character abstract shape carries the worldview at
+                  chip size when color alone collapses (color-blindness,
+                  small text, sunlight). `aria-hidden` so the screen
+                  reader hears the label, not the shape name. */}
               <span className={`px-sys-2 py-sys-1 rounded-sys-soft text-sys-micro font-sys-accent ${worldviewChipClass(article.worldview)}`}>
+                <span aria-hidden="true" className="mr-sys-1">{worldviewChipGlyph(article.worldview)}</span>
                 {worldviewChipLabel(article.worldview)}
               </span>
             </>
