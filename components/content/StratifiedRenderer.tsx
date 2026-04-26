@@ -20,6 +20,7 @@ import {
   getExtensionLabel,
   getExtensionBorderColor,
 } from '@/lib/content/content-layers';
+import { passageThermalClass } from '@/lib/design/typography';
 import { NewContentBadge } from './NewContentBadge';
 
 interface StratifiedRendererProps {
@@ -38,7 +39,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
   resolved?: ResolvedParagraph[];
 }) {
   return (
-    <div className="space-y-sys-7 leading-[var(--token-line-height)]">
+    <div className={`space-y-sys-7 ${passageThermalClass()}`}>
       {paragraphs.map((p, i) => {
         const variant = resolved?.find(r => r.slotIndex === offset + i && r.source !== null);
         return (
@@ -99,7 +100,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
       </div>
       <div className="space-y-sys-5">
         {block.paragraphs.map((p, i) => (
-          <p key={i} className="text-foreground max-w-prose-ch leading-[var(--token-line-height)]">
+          <p key={i} className={`text-foreground max-w-prose-ch ${passageThermalClass()}`}>
             {p.trim()}
           </p>
         ))}
@@ -224,11 +225,11 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
       <p className="text-sys-micro uppercase tracking-sys-caption text-rose/70 mb-sys-4">
         Your resonance
       </p>
-      <p className="text-sys-body text-foreground/70 italic leading-[var(--token-line-height)]">
+      <p className={`text-sys-body text-foreground/70 italic ${passageThermalClass()}`}>
         &ldquo;{data.quote}&rdquo;
       </p>
       <div className="h-px bg-gold/20 max-w-divider my-sys-4" />
-      <p className="text-sys-body text-rose italic leading-[var(--token-line-height)]">
+      <p className={`text-sys-body text-rose italic ${passageThermalClass()}`}>
         {data.note}
       </p>
       <p className="text-sys-micro text-mist/50 mt-sys-4">

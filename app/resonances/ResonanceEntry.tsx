@@ -18,6 +18,7 @@ import type React from 'react';
 import { TextLink } from '@/components/shared/TextLink';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { passageThermalClass } from '@/lib/design/typography';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import type { ResonanceWithArticle } from '@/types/resonance-display';
 
@@ -88,7 +89,7 @@ export default function ResonanceEntry({ resonance, timeAgo, faded, closingLine,
       <div className="h-px max-w-divider bg-gold/20 mb-sys-4" />
 
       {/* Reader's note */}
-      <p className="text-rose italic text-sys-body leading-[var(--token-line-height)] mb-sys-5">
+      <p className={`text-rose italic text-sys-body ${passageThermalClass()} mb-sys-5`}>
         {resonance.resonanceNote}
       </p>
 

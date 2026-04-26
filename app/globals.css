@@ -559,6 +559,18 @@ body {
   text-wrap: pretty;
   letter-spacing: var(--sys-track-passage);
 }
+/* Thermal carve-out — same family as .typo-passage (wrap: pretty), but binds
+   to the thermal scalars instead of the static --sys-lead-passage / --sys-track-passage.
+   Goes AFTER .typo-passage so the thermal binding wins on accidental composition.
+   Mnemonic: "passage is the rhythm; thermal is the breath." Reviewer-checkable
+   invariant: line-height + letter-spacing here pick up --token-* from the
+   thermal engine (lib/thermal/thermal-tokens.ts), so body prose breathes
+   between dormant (1.75 / -0.01em) and warm (1.95 / +0.02em) with engagement. */
+.typo-passage-thermal {
+  line-height: var(--token-line-height);
+  text-wrap: pretty;
+  letter-spacing: var(--token-letter-spacing);
+}
 .typo-heading {
   line-height: var(--sys-lead-heading);
   text-wrap: balance;

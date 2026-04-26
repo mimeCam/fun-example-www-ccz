@@ -7,7 +7,10 @@
  *   - a Tailwind preset `leading-(none|tight|snug|normal|relaxed|loose|<n>)`
  *     class slips into component or app code outside `lib/design/`
  *   - a Tailwind arbitrary `leading-[…]` class uses anything other than
- *     `var(--sys-lead-*)` or the thermal `var(--token-line-height)`
+ *     `var(--sys-lead-*)` (a static beat). The legacy thermal escape
+ *     hatch `leading-[var(--token-line-height)]` is no longer allow-listed
+ *     — consumers route through `passageThermalClass()` instead, which
+ *     resolves to the canonical `.typo-passage-thermal` rule.
  *   - an inline `style={{ lineHeight: <literal> }}` carries a numeric or
  *     unit literal (the ledger's job)
  *
@@ -24,7 +27,9 @@
  * token rule, lifted from elevation-adoption), Paul K. (KPI / guard-first
  * ordering — Tanya quotes him on this in the §11 spec), Krystle C. (the
  * sprint shape lifted from motion-adoption), Tanya D. (the per-beat polish
- * — `text-wrap` + kerning — that this guard keeps from being undone),
+ * — `text-wrap` + kerning — that this guard keeps from being undone; also
+ * the §5 tightening that retired the `leading-[var(--token-line-height)]`
+ * literal in favor of `.typo-passage-thermal`),
  * Elon M. (the `--sys-tick * N` integer-multiple lock the *sync* test
  * enforces and this *adoption* test backstops by killing arbitrary leading).
  */
@@ -34,8 +39,6 @@ import { join, relative, sep } from 'node:path';
 import {
   TYPOGRAPHY_LEDGER_EXEMPT_TOKEN,
   TYPOGRAPHY_ORDER,
-  THERMAL_LEADING_VAR,
-  THERMAL_TRACK_VAR,
 } from '../typography';
 
 const ROOT = join(__dirname, '..', '..', '..');
@@ -109,10 +112,14 @@ function hasTailwindArbitraryLeading(src: string): boolean {
   return false;
 }
 
-/** True iff the arbitrary leading payload is one of our two allow-listed vars. */
+/**
+ * True iff the arbitrary leading payload is a static beat var.
+ * The thermal carve-out (`var(--token-line-height)`) is no longer
+ * permitted as a literal — consumers use `passageThermalClass()` →
+ * `.typo-passage-thermal` instead. (Tanya UIX §5 — vocabulary lock.)
+ */
 function isAllowedArbitraryLeading(payload: string): boolean {
   const p = payload.trim();
-  if (p === `var(${THERMAL_LEADING_VAR})`) return true;
   return TYPOGRAPHY_ORDER.some((b) => p === `var(--sys-lead-${b})`);
 }
 
@@ -154,10 +161,15 @@ function hasTailwindArbitraryTracking(src: string): boolean {
   return false;
 }
 
-/** True iff the arbitrary tracking payload is one of our allow-listed vars. */
+/**
+ * True iff the arbitrary tracking payload is a static beat var.
+ * The thermal carve-out (`var(--token-letter-spacing)`) is no longer
+ * permitted as a literal — `.typo-passage-thermal` binds it canonically
+ * for the body column. (Tanya UIX §5 — vocabulary lock, by symmetry
+ * with the leading retirement.)
+ */
 function isAllowedArbitraryTracking(payload: string): boolean {
   const p = payload.trim();
-  if (p === `var(${THERMAL_TRACK_VAR})`) return true;
   return TYPOGRAPHY_ORDER.some((b) => p === `var(--sys-track-${b})`);
 }
 
@@ -221,7 +233,7 @@ describe('typography adoption — every leading goes through the ledger', () => 
     expect(hits.map((v) => v.file)).toEqual([]);
   });
 
-  it('no Tailwind arbitrary leading except var(--sys-lead-*) / var(--token-line-height)', () => {
+  it('no Tailwind arbitrary leading outside var(--sys-lead-*) — thermal goes through .typo-passage-thermal', () => {
     const hits = violations.filter((v) => v.kind === 'tw-arbitrary');
     expect(hits.map((v) => v.file)).toEqual([]);
   });
@@ -236,7 +248,7 @@ describe('typography adoption — every leading goes through the ledger', () => 
     expect(hits.map((v) => v.file)).toEqual([]);
   });
 
-  it('no Tailwind arbitrary tracking except var(--sys-track-*) / var(--token-letter-spacing)', () => {
+  it('no Tailwind arbitrary tracking outside var(--sys-track-*) — thermal goes through .typo-passage-thermal', () => {
     const hits = violations.filter((v) => v.kind === 'tw-arbitrary-track');
     expect(hits.map((v) => v.file)).toEqual([]);
   });
@@ -262,6 +274,35 @@ describe('typography adoption — typography.ts is the one legitimate home', () 
   });
 });
 
+// ─── Positive test — the migration target replaces the retired literals ─────
+
+describe('typography adoption — passageThermalClass is the canonical body-prose handle', () => {
+  const CSS = readFileSync(join(ROOT, 'app/globals.css'), 'utf8');
+
+  it('the canonical class .typo-passage-thermal is defined in globals.css', () => {
+    expect(CSS).toMatch(/\.typo-passage-thermal\s*\{[^}]*line-height:\s*var\(--token-line-height\)/);
+  });
+
+  it('passageThermalClass() is exported and returns the canonical class name', () => {
+    const src = readFileSync(join(ROOT, 'lib/design/typography.ts'), 'utf8');
+    expect(src).toMatch(/export\s+const\s+passageThermalClass\b/);
+    expect(src).toContain("'typo-passage-thermal'");
+  });
+
+  it('no consumer file outside the ledger imports the retired literals', () => {
+    // The migration is complete: every prior body-prose call site that
+    // used `leading-[var(--token-line-height)]` now imports
+    // `passageThermalClass` from the ledger. Sanity: at least one
+    // non-test consumer references the helper by name.
+    const consumers = collectFiles().filter((p) => {
+      const rel = relativePath(p);
+      if (ALLOW.has(rel)) return false;
+      return readFileSync(p, 'utf8').includes('passageThermalClass');
+    });
+    expect(consumers.length).toBeGreaterThan(0);
+  });
+});
+
 // ─── Allow-list internals — defensive coverage on the matchers ─────────────
 
 describe('typography adoption — allow-list internals are correct', () => {
@@ -271,8 +312,8 @@ describe('typography adoption — allow-list internals are correct', () => {
     });
   });
 
-  it('isAllowedArbitraryLeading accepts the thermal --token-line-height var', () => {
-    expect(isAllowedArbitraryLeading(`var(${THERMAL_LEADING_VAR})`)).toBe(true);
+  it('isAllowedArbitraryLeading rejects the retired thermal --token-line-height literal', () => {
+    expect(isAllowedArbitraryLeading('var(--token-line-height)')).toBe(false);
   });
 
   it('isAllowedArbitraryLeading rejects unrelated vars and bare numbers', () => {
@@ -287,8 +328,8 @@ describe('typography adoption — allow-list internals are correct', () => {
     });
   });
 
-  it('isAllowedArbitraryTracking accepts the thermal --token-letter-spacing var', () => {
-    expect(isAllowedArbitraryTracking(`var(${THERMAL_TRACK_VAR})`)).toBe(true);
+  it('isAllowedArbitraryTracking rejects the retired thermal --token-letter-spacing literal', () => {
+    expect(isAllowedArbitraryTracking('var(--token-letter-spacing)')).toBe(false);
   });
 
   it('isAllowedArbitraryTracking rejects unrelated vars and bare em literals', () => {

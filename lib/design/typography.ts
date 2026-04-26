@@ -189,18 +189,40 @@ export const TYPOGRAPHY_LEDGER_EXEMPT_TOKEN = 'typography-ledger:exempt';
 
 /**
  * The thermal engine's `--token-line-height` is a *continuous* scalar that
- * warms with engagement (1.5 → 1.85). It is **not** a beat. The ledger
- * documents the carve-out and exposes a read-only Tailwind class shorthand
- * so the migration can replace `leading-[var(--token-line-height)]` with
- * a named class without losing the thermal binding.
+ * warms with engagement (1.75 → 1.95 on body prose). It is **not** a beat
+ * — beats are static; this is the carve-out. `--token-letter-spacing`
+ * (-0.01em → +0.02em) is its tracking sibling. Both bind together in one
+ * named class — `typo-passage-thermal` — so body prose has *one* ledger
+ * handle, not two arbitrary literals.
  *
- * The adoption guard allow-lists this exact arbitrary class (and only it)
- * alongside `leading-[var(--sys-lead-*)]`. Everything else — `leading-tight`,
- * `leading-relaxed`, `leading-[1.6]`, etc. — fails the guard.
+ * The PRIMARY thermal signal is line-height (Tanya D., spec at
+ * `lib/thermal/thermal-tokens.ts:25–27`). Tracking is the body-prose
+ * carve-out (same family-vs-register shape as `passage` vs `passage-thermal`).
+ *
+ * The adoption guard tolerates the legacy arbitrary `leading-[var(--token-line-height)]`
+ * inside this module only (the helper below) for back-compat documentation;
+ * components migrate to `passageThermalClass()`.
  */
 export const THERMAL_LEADING_VAR = '--token-line-height';
 export const thermalLeadingClass = (): string =>
   `leading-[var(${THERMAL_LEADING_VAR})]`;
+
+/**
+ * The named ledger handle for the thermal reading-rhythm carve-out.
+ * Same family as `passage` (wrap: pretty); binds to `--token-line-height`
+ * and `--token-letter-spacing` instead of the static `--sys-lead-passage`
+ * / `--sys-track-passage`. Resolves to the canonical CSS class
+ * `.typo-passage-thermal` defined in `app/globals.css`.
+ *
+ * Components write `className={passageThermalClass()}` on body prose
+ * surfaces (article body paragraphs, archetype extensions, resonance
+ * marginalia, resonance archive notes). The static `passage` register
+ * is reserved for non-thermal surfaces (archive previews, thread cards,
+ * metadata blocks where engagement is not measured).
+ *
+ * Reviewer mnemonic: *passage is the rhythm; thermal is the breath.*
+ */
+export const passageThermalClass = (): string => 'typo-passage-thermal';
 
 // ─── Thermal carve-out — `--token-letter-spacing` is the BODY prose scalar ──
 
@@ -208,14 +230,11 @@ export const thermalLeadingClass = (): string =>
  * The thermal engine's `--token-letter-spacing` warms body prose only
  * (-0.01em → +0.02em with engagement). It is **not** a beat. `track` is
  * the anchor register; `--token-letter-spacing` is the thermal carve-out
- * on body text (analogous to `--token-line-height`). The adoption guard
- * allow-lists the exact arbitrary class `tracking-[var(--token-letter-spacing)]`
- * alongside `tracking-[var(--sys-track-*)]`. Everything else — `tracking-tight`,
- * `tracking-widest`, `tracking-[0.05em]`, etc. — fails the guard.
+ * on body text (analogous to `--token-line-height`).
  *
  * Declaration per property (AGENTS.md): `track` does not warm; body-prose
  * `--token-letter-spacing` is the single thermal carve-out, same shape
- * as `--token-line-height` vs. `leadN`.
+ * as `--token-line-height` vs. `leadN`. Bound by `passageThermalClass()`.
  */
 export const THERMAL_TRACK_VAR = '--token-letter-spacing';
 export const thermalTrackClass = (): string =>

@@ -29,6 +29,8 @@ import {
   TYPOGRAPHY_ORDER,
   SYS_TICK_PX,
   TypographyBeatName,
+  THERMAL_LEADING_VAR,
+  THERMAL_TRACK_VAR,
   leadingOf,
   cssVarOf,
   classesOf,
@@ -38,6 +40,7 @@ import {
   trackingClassOf,
   isKerned,
   isBalanced,
+  passageThermalClass,
   typographyInvariantHolds,
 } from '../typography';
 
@@ -211,6 +214,53 @@ describe('typography helpers', () => {
     expect(isBalanced('body')).toBe(false);
     expect(isBalanced('passage')).toBe(false);
     expect(isBalanced('caption')).toBe(false);
+  });
+});
+
+describe('thermal carve-out — .typo-passage-thermal CSS ↔ TS sync', () => {
+  /** Reuse readTypoBlock by feeding the suffix `passage-thermal`. */
+  function readThermalBlock(): string | undefined {
+    const rx = /\.typo-passage-thermal\s*\{([^}]*)\}/;
+    const match = CSS.match(rx);
+    return match ? match[1] : undefined;
+  }
+
+  it('passageThermalClass() returns "typo-passage-thermal"', () => {
+    expect(passageThermalClass()).toBe('typo-passage-thermal');
+  });
+
+  it('.typo-passage-thermal exists in globals.css', () => {
+    expect(readThermalBlock()).toBeDefined();
+  });
+
+  it('.typo-passage-thermal binds line-height to --token-line-height (PRIMARY thermal signal)', () => {
+    const block = readThermalBlock();
+    const decl = new RegExp(`line-height:\\s*var\\(${THERMAL_LEADING_VAR}\\)`);
+    expect(blockHas(block, decl)).toBe(true);
+  });
+
+  it('.typo-passage-thermal binds letter-spacing to --token-letter-spacing (body track carve-out)', () => {
+    const block = readThermalBlock();
+    const decl = new RegExp(`letter-spacing:\\s*var\\(${THERMAL_TRACK_VAR}\\)`);
+    expect(blockHas(block, decl)).toBe(true);
+  });
+
+  it('.typo-passage-thermal inherits passage wrap discipline (text-wrap: pretty)', () => {
+    const block = readThermalBlock();
+    expect(blockHas(block, /text-wrap:\s*pretty/)).toBe(true);
+  });
+
+  it('.typo-passage-thermal carries no static --sys-lead-* / --sys-track-* (thermal-only binding)', () => {
+    const block = readThermalBlock();
+    expect(blockHas(block, /var\(--sys-lead-/)).toBe(false);
+    expect(blockHas(block, /var\(--sys-track-/)).toBe(false);
+  });
+
+  it('.typo-passage-thermal appears AFTER .typo-passage in source order (cascade tip)', () => {
+    const idxStatic = CSS.indexOf('.typo-passage {');
+    const idxThermal = CSS.indexOf('.typo-passage-thermal');
+    expect(idxStatic).toBeGreaterThan(0);
+    expect(idxThermal).toBeGreaterThan(idxStatic);
   });
 });
 
