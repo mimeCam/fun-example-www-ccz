@@ -850,8 +850,9 @@ body {
    fires on the article automatically — one selector chain crosses every
    reader (cursor / touch / keyboard / screen-reader / voice). Same
    vocabulary as hover; the room notices the keyboard reader the same
-   way it notices the cursor. Precedent: `.plate-destination:focus-within`
-   at L886 (Mike #43 — KeepsakePlate). */
+   way it notices the cursor. Precedent: the site-wide `:focus-within`
+   caption-arrow nudge below (Mike #43 napkin §6 — KeepsakePlate +
+   QuoteCardLauncher both speak the lean as the third gesture tense). */
 .card-alive:hover,
 .card-alive:focus-within {
   transform: translateY(-4px) scale(1.015);
@@ -955,13 +956,6 @@ body {
 .plate-destination {
   position: relative;
 }
-.plate-destination .plate-caption-arrow {
-  display: inline-block;
-  transition: transform var(--sys-time-crossfade) var(--sys-ease-out);
-}
-.plate-destination:focus-within .plate-caption-arrow {
-  transform: translateX(2px);
-}
 @media (hover: hover) {
   .plate-destination::after {
     content: '';
@@ -979,6 +973,41 @@ body {
   35%  { box-shadow: var(--sys-elev-whisper); }
   65%  { box-shadow: var(--sys-elev-whisper); }
   100% { box-shadow: var(--sys-elev-rest); }
+}
+
+/* ─── Caption-Arrow Nudge — site-wide direct-gesture verb ─────────────────
+   The third tense of the gesture grammar (thread → paint → nudge). When a
+   reader's keyboard focus, finger, or cursor enters a focusable surface
+   that contains a `.plate-caption-arrow` span, the glyph leans 2px toward
+   where the gesture is going to land. Sub-perceptual; the reader will only
+   notice if we take it away.
+
+   Originally lived under `.plate-destination` (KeepsakePlate-only). Caller
+   #2 (QuoteCardLauncher in app/resonances/ResonanceEntry.tsx) revealed the
+   selector was tighter than the *intent*: the lean is a property of any
+   focusable destination wearing a forward glyph, not a property of plates.
+   Detached, not extracted — the kernel already existed; we freed it from
+   an accidental parent selector. Halo / dwell / entrance ceremony stay
+   plate-only above; only the gesture verb is universal. (Mike #43 napkin,
+   Tanya UX §5 "kernel correction, not extraction".)
+
+   Zero new tokens: same Motion ledger atoms (crossfade, ease-out). Reduced-
+   motion override is co-located in the universal block below — selector
+   matched to this new scope so the arrow's transform zeros under
+   `prefers-reduced-motion: reduce`. Source order: declared after the
+   .plate-destination family so the cascade stays defensive.
+
+   Credits: Mike K. (#43 napkin §6 — selector pair, source-order discipline,
+   no class rename), Tanya D. (UX spec — "the lean is the only thing they
+   share", focus-not-hover discipline), Elon M. (caught the no-op trap that
+   would have shipped a placebo), Paul K. (DoD: invisible until missing). */
+.plate-caption-arrow {
+  display: inline-block;
+  transition: transform var(--sys-time-crossfade) var(--sys-ease-out);
+}
+:focus-within > .plate-caption-arrow,
+:focus-within .plate-caption-arrow {
+  transform: translateX(2px);
 }
 /* The arrow-nudge reduced-motion override is appended at the foot of the
    universal `@media (prefers-reduced-motion: reduce)` block (the universal
@@ -1179,17 +1208,21 @@ body {
     animation: none !important;
     opacity: var(--sys-alpha-muted) !important;
   }
-  /* Plate destination — neither the halo dwell nor the focus arrow
-     nudge fire under reduced motion. The universal `*` rule above
-     already collapses animation-duration to the floor; this hard-kills
-     the halo regardless of fill-mode and zeros the arrow's transform
-     so no end-state translation lands on focus. The focus ring (driven
-     by --token-accent on :focus-visible) still lands — accessibility
-     never fails silently. (Mike #43 §5.3, Tanya UX #100 §2.4 table.) */
+  /* Plate destination + site-wide caption-arrow nudge — neither the halo
+     dwell nor the focus-within arrow lean fires under reduced motion. The
+     universal `*` rule above already collapses animation-duration to the
+     floor; this hard-kills the halo regardless of fill-mode and zeros the
+     arrow's transform so no end-state translation lands on focus. The
+     focus ring (driven by --token-accent on :focus-visible) still lands —
+     accessibility never fails silently. The arrow override matches the
+     site-wide selector now (any focusable ancestor), so both the Coda
+     plate AND the resonance launcher silence on the same beat. (Mike #43
+     §5.3 + §6, Tanya UX §3 reduced-motion row.) */
   .plate-destination::after {
     animation: none !important;
   }
-  .plate-destination:focus-within .plate-caption-arrow {
+  :focus-within > .plate-caption-arrow,
+  :focus-within .plate-caption-arrow {
     transform: none !important;
   }
   .thermal-typography {

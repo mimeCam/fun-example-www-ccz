@@ -219,6 +219,13 @@ function buildCardData(r: ResonanceWithArticle): QuoteCardData {
  * no fork to a `VisitedQuoteCardLauncher` variant (Mike #31 §11). The
  * `aria-label` is unchanged: the paint is the sentence, not a copy
  * change (Tanya #98 §4).
+ *
+ * The `→` glyph wears `.plate-caption-arrow` so the site-wide nudge rule
+ * (`globals.css`, detached from `.plate-destination` per Mike #43 §6 +
+ * Tanya UX §5) translates the arrow 2px right on `:focus-within`. The
+ * launcher itself stays a ghost — no halo, no dwell, no elevation. Only
+ * the glyph leans. `aria-hidden` keeps screen readers on the verb
+ * ("Save as card"), not the ornament.
  */
 function QuoteCardLauncher(
   { onOpen, visited }: { onOpen: () => void; visited?: boolean },
@@ -233,7 +240,7 @@ function QuoteCardLauncher(
         aria-label="Save this quote as a card"
         className={`${paint} text-sys-micro`}
       >
-        Save as card →
+        Save as card <span aria-hidden="true" className="plate-caption-arrow">→</span>
       </Pressable>
     </div>
   );

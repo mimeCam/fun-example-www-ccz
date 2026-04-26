@@ -244,9 +244,9 @@ describe('plate-destination — no new --sys-ease-* declaration is introduced', 
   });
 });
 
-// ─── 6 · Reduced-motion — both gestures silence; focus ring still lands ────
+// ─── 6 · Reduced-motion — halo silences; arrow nudge zeros at site-wide scope
 
-describe('plate-destination — reduced motion silences halo and arrow nudge', () => {
+describe('plate-destination — reduced motion silences halo (the plate-only ceremony)', () => {
   const css = readFile(CSS_PATH);
 
   it('a reduced-motion override hard-kills the ::after halo animation', () => {
@@ -258,22 +258,14 @@ describe('plate-destination — reduced motion silences halo and arrow nudge', (
     );
   });
 
-  it('a reduced-motion override zeros the focus-within arrow nudge transform', () => {
-    expect(css).toMatch(
-      /\.plate-destination:focus-within\s+\.plate-caption-arrow\s*\{[^}]*transform:\s*none\s*!important/,
-    );
-  });
-
-  it('both overrides live inside a @media (prefers-reduced-motion: reduce) block', () => {
-    // Find the position of each override; both must be after the OPEN of
-    // some prefers-reduced-motion block and before its CLOSE (handled
-    // implicitly: if either lived at top-level, they would already paint
-    // and the universal block would not be needed at all).
+  it('the halo override lives inside a @media (prefers-reduced-motion: reduce) block', () => {
+    // The arrow-nudge reduced-motion override moved to a site-wide selector
+    // when caller #2 (QuoteCardLauncher) adopted the rule — see
+    // plate-caption-arrow.test.ts for the new scope. The plate-only halo
+    // ceremony stays pinned here because halo IS plate-only doctrine.
     const mediaOpen = css.indexOf('@media (prefers-reduced-motion: reduce)');
     const haloOverride = css.indexOf('.plate-destination::after', mediaOpen);
-    const arrowOverride = css.indexOf('.plate-destination:focus-within .plate-caption-arrow', mediaOpen);
     expect(haloOverride).toBeGreaterThan(mediaOpen);
-    expect(arrowOverride).toBeGreaterThan(mediaOpen);
   });
 });
 
