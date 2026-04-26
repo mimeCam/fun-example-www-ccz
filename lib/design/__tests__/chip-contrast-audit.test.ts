@@ -100,12 +100,23 @@ const SURFACE_ANCHORS = [
 // ─── Pair → composited bg + measured ratio ────────────────────────────────
 
 /**
- * Composite the pair's bg hex over the surface anchor at `ALPHA.muted`
- * (the rung the chip paints today; `lib/design/worldview.ts`). Pure.
+ * Composite the pair's bg hex over the surface anchor at `ALPHA.hairline`
+ * — the rung the chip paints today (`lib/design/worldview.ts:86-91`, all
+ * four families route through `alphaClassOf(<family>, 'hairline', 'bg')`).
+ *
+ * **Bug-fix receipt (2026-04-26).** This audit previously composited at
+ * `ALPHA.muted` (0.30) — the prior rung. Commit f0e4799 stepped the
+ * worldview-chip family from `muted` → `hairline` (the atomic-fail-path
+ * doctrine: when `voice.rose / worldview.rose @ warm` slipped below 4.5:1
+ * at /30, the family stepped as one register), but the audit's compositing
+ * alpha was not stepped with it — so the audit kept testing a rung the
+ * chip had vacated, and `npx jest chip-contrast-audit` reported 5 stale
+ * failures while the chip itself shipped clean. Lifting the audit to
+ * `ALPHA.hairline` re-aligns the test with the painted reality. Pure.
  */
 function compositedBgHex(pair: ContrastPair, surfaceHex: string): string {
   const fgHex = chipVoiceToHex(pair.bg);
-  return compositeOver(fgHex, surfaceHex, ALPHA.muted);
+  return compositeOver(fgHex, surfaceHex, ALPHA.hairline);
 }
 
 /**
