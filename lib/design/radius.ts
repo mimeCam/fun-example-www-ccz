@@ -260,15 +260,19 @@ export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
  *
  * Pre-MirrorReveal migration this list carried 7 entries; the killer-
  * feature surface's graduation drops it to 6. Counter (occurrences across
- * `.ts/.tsx/.css` source — Mike napkin §4): 13 → 12 with this PR.
+ * `.ts/.tsx/.css` source — Mike napkin §4): 13 → 12 with that PR; this
+ * PR drops the counter further (12 → 11) and the list (6 → 5).
  * (Mike #63 §1, Tanya UX #53 §3 — the corner is the carrier; the
  * killer feature speaks one posture word, in one voice.)
+ *
+ * With this entry removed, both halves of the mirror surface
+ * (`MirrorRevealCard`, `QuickMirrorCard`) speak posture through the
+ * helper — the pair is closed. The remaining 5 are solo corners.
  */
 export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [
   'app/mirror/page.tsx',
   'components/explore/ExploreArticleCard.tsx',
   'components/mirror/MirrorLoadingSurface.tsx',
-  'components/mirror/QuickMirrorCard.tsx',
   'components/return/ReturnLetter.tsx',
   'lib/utils/press-phase.ts',
 ] as const;

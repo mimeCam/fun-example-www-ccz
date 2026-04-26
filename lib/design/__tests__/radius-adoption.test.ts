@@ -362,7 +362,7 @@ describe('thermal-radius grandfather list — auditable drift, shrinking', () =>
       .not.toContain('components/shared/Threshold.tsx');
   });
 
-  it('counter shrinks one per PR — current size is 6 (was 7 pre-MirrorReveal)', () => {
-    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(6);
+  it('counter shrinks one per PR — current size is 5 (was 6 pre-MirrorPair)', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(5);
   });
 });

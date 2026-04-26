@@ -17,6 +17,7 @@ import ShareOverlay from './ShareOverlay';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 
 /* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
    Module-scope bindings so the JSX + `phaseClass` map below stay plain
@@ -34,6 +35,18 @@ const DIVIDER_HAIRLINE = alphaClassOf('gold',       'hairline', 'bg');     // bg
 const WHISPER_TEXT     = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
 const BORDER_HAIRLINE  = alphaClassOf('gold',       'hairline', 'border'); // border-gold/10
 const BORDER_MUTED     = alphaClassOf('gold',       'muted',    'border'); // border-gold/30
+
+/* ─── Radius-ledger handle — typed posture, JIT-safe ────────────────────
+   Mike napkin #63 §5.1 + #19 §4.2 (mirror-pair closure): hoist the resolved
+   class string to module scope with UPPER_SNAKE provenance, mirroring
+   `MirrorRevealCard.tsx:36`. Posture vocabulary (`ceremony`) is the
+   reviewer-facing word; the helper resolves to the thermal-lifted wide
+   rung at runtime. The class literal lives once in `lib/design/radius.ts`
+   (line 144) so Tailwind JIT scans it there. Output bytes: identical.
+   With this binding, both faces of the killer feature speak `ceremony`
+   in one voice — the pair is closed. (Tanya UX #53 §3 — pixel parity
+   is the contract; the room is *being* its posture, not having it.) */
+const THERM_CEREMONY = thermalRadiusClassByPosture('ceremony');
 
 interface Props {
   result: QuickMirrorResult;
@@ -128,7 +141,7 @@ function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
 
 function cardBase(): string {
   return 'relative my-sys-10 mx-auto max-w-card p-sys-7 text-center'
-    + ' thermal-radius-wide border bg-gradient-to-b from-surface to-background'
+    + ` ${THERM_CEREMONY} border bg-gradient-to-b from-surface to-background`
     + ' transition-all duration-reveal ease-out';
 }
 
