@@ -4,6 +4,10 @@
  * Whisper, not billboard — gentle suggestion at the article's end.
  * Ceremony-aware: defers visibility to the CeremonySequencer.
  * Shows ONE recommendation with context about WHY.
+ *
+ * Per-archetype border + text + glyph live in
+ * `lib/design/archetype-accents.ts` — single typed home keyed by
+ * `ArchetypeKey`. Mike napkin #96 / Tanya UX #22.
  */
 
 'use client';
@@ -13,24 +17,12 @@ import { Article } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import { useCeremony } from './CeremonySequencer';
 import { TextLink } from '@/components/shared/TextLink';
-
-/** Archetype accent colors — matches content-layers extension borders. */
-const ARCHETYPE_ACCENT: Record<ArchetypeKey, string> = {
-  'deep-diver': 'border-cyan/30 text-cyan',
-  'explorer': 'border-accent/30 text-accent',
-  'faithful': 'border-secondary/30 text-secondary',
-  'resonator': 'border-rose/30 text-rose',
-  'collector': 'border-amber/30 text-amber',
-};
-
-/** Human-readable archetype labels for the "For the ..." badge. */
-const ARCHETYPE_LABEL: Record<ArchetypeKey, string> = {
-  'deep-diver': 'Deep Diver',
-  'explorer': 'Explorer',
-  'faithful': 'Faithful Reader',
-  'resonator': 'Resonator',
-  'collector': 'Collector',
-};
+import {
+  archetypeAccentClass,
+  archetypeLabel,
+  archetypeAccentGlyph,
+  archetypeAccentGlyphClass,
+} from '@/lib/design/archetype-accents';
 
 interface NextReadProps {
   article: Article;
@@ -52,7 +44,10 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
 
   if (!visible) return null;
 
-  const label = archetype ? ARCHETYPE_LABEL[archetype] : '';
+  // Tanya UX #22 §5 #5 — fallback is silent: the chip suppresses entirely
+  // when no archetype has been resolved yet. The empty-string from
+  // `archetypeLabel(undefined|null)` flips this gate to false.
+  const label = archetypeLabel(archetype);
 
   return (
     <div data-next-read className="py-sys-7 animate-fade-in">
@@ -62,7 +57,17 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
           Up Next
         </span>
         {label && (
-          <span className={`text-sys-micro tracking-sys-caption font-sys-accent border rounded-sys-full px-sys-3 py-sys-1 ${ARCHETYPE_ACCENT[archetype!]}`}>
+          /* Tanya UX #22 §3.4: glyph leadin (principle #7 — don't rely on
+             color alone). `aria-hidden` so a screen reader hears the
+             label, not the shape name. Per-glyph optical lift via
+             `archetypeAccentGlyphClass` — `◉` and `❒` are filled and
+             visibly sink vs the line glyphs at `text-sys-micro`. */
+          <span
+            className={`text-sys-micro tracking-sys-caption font-sys-accent border rounded-sys-full px-sys-3 py-sys-1 ${archetypeAccentClass(archetype)}`}
+          >
+            <span aria-hidden="true" className={archetypeAccentGlyphClass(archetype)}>
+              {archetypeAccentGlyph(archetype)}
+            </span>
             For the {label}
           </span>
         )}
@@ -73,8 +78,13 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
         {article.title}
       </h3>
 
-      {/* Context — WHY this article was recommended */}
-      <p className="text-sys-caption text-mist/60 mb-sys-4 typo-caption">
+      {/* Context — WHY this article was recommended.
+          Tanya UX #80 + Mike napkin #96 §7 #4: snapped the legacy /60 alpha
+          on this line to `/50` (the `recede` rung — "frame around the
+          subject"). The context line IS the frame around the next-read
+          subject; the rung now matches its UX role. One drift retired
+          with the lift. */}
+      <p className="text-sys-caption text-mist/50 mb-sys-4 typo-caption">
         {context}
       </p>
 

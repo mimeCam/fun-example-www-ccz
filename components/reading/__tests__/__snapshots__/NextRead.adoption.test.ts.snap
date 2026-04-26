@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`archetypeAccentClass — the helper carries the load NextRead used to snapshot pin: five archetype outputs (any change is a deliberate review) 1`] = `
+{
+  "collector": "border-amber/30 text-amber",
+  "deep-diver": "border-cyan/30 text-cyan",
+  "explorer": "border-accent/30 text-accent",
+  "faithful": "border-secondary/30 text-secondary",
+  "resonator": "border-rose/30 text-rose",
+}
+`;

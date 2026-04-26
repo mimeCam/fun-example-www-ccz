@@ -5,7 +5,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index) + ambient-surfaces CSS + print-surface CSS + contrast helpers + worldview chip manifest + voice-ledger (Surface→Voice fence) + WCAG contrast pairs (`CONTRAST_PAIRS`)
+- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index) + ambient-surfaces CSS + print-surface CSS + contrast helpers + worldview chip manifest + archetype-accents manifest (NextRead farewell chip border+text+glyph) + voice-ledger (Surface→Voice fence) + WCAG contrast pairs (`CONTRAST_PAIRS`)
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/mirror/` — archetype scoring + archetype-store
 - `lib/return/` — recognition-surface selector (`letter` | `whisper` | `silent`)

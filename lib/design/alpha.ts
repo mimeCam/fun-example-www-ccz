@@ -166,11 +166,18 @@ export const ALPHA_MOTION_ENDPOINT_PATHS: readonly string[] = [
  *  to close the worldview-chip drift: the four worldview voices now route
  *  through `alphaClassOf` uniformly, no raw `bg-primary/30` / `bg-cyan/30`
  *  literals scattered across components. Pinned in
- *  `lib/design/__tests__/worldview.test.ts`. */
+ *  `lib/design/__tests__/worldview.test.ts`.
+ *
+ *  `secondary` and `amber` promoted in Mike napkin #96 §3 (Tanya UX #22 §3.3)
+ *  to close the NextRead farewell-chip drift: the five archetype voices
+ *  (`deep-diver`/`explorer`/`faithful`/`resonator`/`collector`) now route
+ *  through `alphaClassOf` uniformly. Pinned in
+ *  `lib/design/__tests__/archetype-accents.test.ts`. */
 export const ALPHA_COLOR_FAMILIES = [
   'fog', 'mist', 'rose', 'gold',
   'accent', 'surface', 'foreground', 'background',
   'primary', 'cyan',
+  'secondary', 'amber',
 ] as const;
 
 export type ColorFamily = (typeof ALPHA_COLOR_FAMILIES)[number];
@@ -243,6 +250,15 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   uniformly. The chip-class manifest moved to
   //   `lib/design/worldview.ts` — single typed home keyed by `FilterType`.
   //   Pinned in `lib/design/__tests__/worldview.test.ts`.
+  // Follow-on redeemed (Mike napkin #96, Tanya UX #22 §3.3):
+  //   `secondary` and `amber` promoted into `ALPHA_COLOR_FAMILIES`; the
+  //   five archetype farewell-chip styles now route through `alphaClassOf`
+  //   uniformly. The accent-class manifest moved to
+  //   `lib/design/archetype-accents.ts` — single typed home keyed by
+  //   `ArchetypeKey`. `components/reading/NextRead.tsx` retired off this
+  //   list (rule-of-three twin to napkin #51). Pinned in
+  //   `lib/design/__tests__/archetype-accents.test.ts` +
+  //   `components/reading/__tests__/NextRead.adoption.test.ts`.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
@@ -251,7 +267,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/home/ViaWhisper.tsx',
   'components/navigation/AmbientNav.tsx',
   'components/navigation/GemHome.tsx',
-  'components/reading/NextRead.tsx',
   'components/reading/ThreadKeepsake.tsx',
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
@@ -293,6 +308,8 @@ const BG_ALPHA: Record<ColorFamily, Record<AlphaRung, string>> = {
   background: { hairline: 'bg-background/10', muted: 'bg-background/30', recede: 'bg-background/50', quiet: 'bg-background/70' },
   primary:    { hairline: 'bg-primary/10',    muted: 'bg-primary/30',    recede: 'bg-primary/50',    quiet: 'bg-primary/70' },
   cyan:       { hairline: 'bg-cyan/10',       muted: 'bg-cyan/30',       recede: 'bg-cyan/50',       quiet: 'bg-cyan/70' },
+  secondary:  { hairline: 'bg-secondary/10',  muted: 'bg-secondary/30',  recede: 'bg-secondary/50',  quiet: 'bg-secondary/70' },
+  amber:      { hairline: 'bg-amber/10',      muted: 'bg-amber/30',      recede: 'bg-amber/50',      quiet: 'bg-amber/70' },
 };
 
 /** Text-color-kind lookup. */
@@ -307,6 +324,8 @@ const TEXT_ALPHA: Record<ColorFamily, Record<AlphaRung, string>> = {
   background: { hairline: 'text-background/10', muted: 'text-background/30', recede: 'text-background/50', quiet: 'text-background/70' },
   primary:    { hairline: 'text-primary/10',    muted: 'text-primary/30',    recede: 'text-primary/50',    quiet: 'text-primary/70' },
   cyan:       { hairline: 'text-cyan/10',       muted: 'text-cyan/30',       recede: 'text-cyan/50',       quiet: 'text-cyan/70' },
+  secondary:  { hairline: 'text-secondary/10',  muted: 'text-secondary/30',  recede: 'text-secondary/50',  quiet: 'text-secondary/70' },
+  amber:      { hairline: 'text-amber/10',      muted: 'text-amber/30',      recede: 'text-amber/50',      quiet: 'text-amber/70' },
 };
 
 /** Border-color-kind lookup. */
@@ -321,6 +340,8 @@ const BORDER_ALPHA: Record<ColorFamily, Record<AlphaRung, string>> = {
   background: { hairline: 'border-background/10', muted: 'border-background/30', recede: 'border-background/50', quiet: 'border-background/70' },
   primary:    { hairline: 'border-primary/10',    muted: 'border-primary/30',    recede: 'border-primary/50',    quiet: 'border-primary/70' },
   cyan:       { hairline: 'border-cyan/10',       muted: 'border-cyan/30',       recede: 'border-cyan/50',       quiet: 'border-cyan/70' },
+  secondary:  { hairline: 'border-secondary/10',  muted: 'border-secondary/30',  recede: 'border-secondary/50',  quiet: 'border-secondary/70' },
+  amber:      { hairline: 'border-amber/10',      muted: 'border-amber/30',      recede: 'border-amber/50',      quiet: 'border-amber/70' },
 };
 
 /** Shadow-color-kind lookup. */
@@ -335,6 +356,8 @@ const SHADOW_ALPHA: Record<ColorFamily, Record<AlphaRung, string>> = {
   background: { hairline: 'shadow-background/10', muted: 'shadow-background/30', recede: 'shadow-background/50', quiet: 'shadow-background/70' },
   primary:    { hairline: 'shadow-primary/10',    muted: 'shadow-primary/30',    recede: 'shadow-primary/50',    quiet: 'shadow-primary/70' },
   cyan:       { hairline: 'shadow-cyan/10',       muted: 'shadow-cyan/30',       recede: 'shadow-cyan/50',       quiet: 'shadow-cyan/70' },
+  secondary:  { hairline: 'shadow-secondary/10',  muted: 'shadow-secondary/30',  recede: 'shadow-secondary/50',  quiet: 'shadow-secondary/70' },
+  amber:      { hairline: 'shadow-amber/10',      muted: 'shadow-amber/30',      recede: 'shadow-amber/50',      quiet: 'shadow-amber/70' },
 };
 
 /** Map `ColorAlphaKind` → its lookup table. Pure, ≤ 10 LOC. */

@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`archetype manifest — snapshot pin (any change is a deliberate review) ARCHETYPE_ACCENT_BORDER shape is byte-pinned 1`] = `
+{
+  "collector": "border-amber/30",
+  "deep-diver": "border-cyan/30",
+  "explorer": "border-accent/30",
+  "faithful": "border-secondary/30",
+  "resonator": "border-rose/30",
+}
+`;
+
+exports[`archetype manifest — snapshot pin (any change is a deliberate review) ARCHETYPE_ACCENT_TEXT shape is byte-pinned 1`] = `
+{
+  "collector": "text-amber",
+  "deep-diver": "text-cyan",
+  "explorer": "text-accent",
+  "faithful": "text-secondary",
+  "resonator": "text-rose",
+}
+`;
+
+exports[`archetype manifest — snapshot pin (any change is a deliberate review) ARCHETYPE_GLYPHS shape is byte-pinned 1`] = `
+{
+  "collector": "❒",
+  "deep-diver": "◉",
+  "explorer": "→",
+  "faithful": "✦",
+  "resonator": "≈",
+}
+`;
+
+exports[`archetype manifest — snapshot pin (any change is a deliberate review) ARCHETYPE_LABELS shape is byte-pinned 1`] = `
+{
+  "collector": "Collector",
+  "deep-diver": "Deep Diver",
+  "explorer": "Explorer",
+  "faithful": "Faithful Reader",
+  "resonator": "Resonator",
+}
+`;
