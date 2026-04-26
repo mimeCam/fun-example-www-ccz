@@ -139,6 +139,7 @@ import {
 } from '../voice-ledger';
 import { contrast } from '../contrast';
 import { BRAND, THERMAL, THERMAL_WARM } from '../color-constants';
+import { resolveLinkColor } from '@/lib/utils/link-phase';
 
 // ─── The three painted foreshadow voices — voice → hex mirror ─────────────
 //
@@ -416,5 +417,26 @@ describe('textlink-passage-contrast-audit · §3 RECEIPT (worst-case per voice, 
     const hoverRose = worstCellFor(PAINTED[2]);
     expect(hoverGold).toBeGreaterThanOrEqual(WCAG_NONTEXT);
     expect(hoverRose).toBeGreaterThanOrEqual(WCAG_NONTEXT);
+  });
+});
+
+// ─── 2.5 · IDENTITY — focus paints byte-identical to hover, per accent ────
+// Mirror of `skiplink-contrast-audit · §2 IDENTITY` shape (Krystle C. #1,
+// via Mike napkin #128). `link-phase.ts:119` collapses both phases onto
+// the same `destAccent` today by coincidence; this pins the coincidence
+// as a contract. N=2 of the IDENTITY shape — genus extraction deferred
+// per rule-of-three (Mike #102 §3 / #128).
+
+describe('textlink-passage-contrast-audit · §2.5 IDENTITY (focus===hover per accent)', () => {
+  it('focus-gold paints byte-identical to hover-gold', () => {
+    const hover = resolveLinkColor('hover', 'passage', 'var(--gold)');
+    const focus = resolveLinkColor('focus', 'passage', 'var(--gold)');
+    expect(focus).toBe(hover);
+  });
+
+  it('focus-rose paints byte-identical to hover-rose', () => {
+    const hover = resolveLinkColor('hover', 'passage', 'var(--rose)');
+    const focus = resolveLinkColor('focus', 'passage', 'var(--rose)');
+    expect(focus).toBe(hover);
   });
 });
