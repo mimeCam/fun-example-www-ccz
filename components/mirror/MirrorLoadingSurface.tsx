@@ -9,7 +9,7 @@
  *
  * Geometry mirrors `MirrorRevealCard` exactly (Tanya UX #47 §3.1):
  *   - same width  (`max-w-md`)
- *   - same radius (`thermal-radius-wide`)
+ *   - same radius (`ceremony` posture, resolved through `thermalRadiusClassByPosture`)
  *   - same padding (`p-sys-8`)
  *   - same vertical center (parent's `min-h-[85vh]` flex column)
  *
@@ -28,10 +28,21 @@
  */
 
 import { Skeleton } from '@/components/shared/Skeleton';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
+
+/* Radius-ledger handle — typed posture, JIT-safe. The class literal
+   lives once in `lib/design/radius.ts`; this file speaks the posture
+   word that resolves to it. Output bytes: identical to the prior
+   `thermal-radius-wide` string. Sibling-handle parity with
+   `MirrorRevealCard.tsx:36` — both /mirror surfaces answer the same
+   posture word for the same reason they share `max-w-md`. The corner
+   is the same corner before and after the swap.
+   (Mike napkin #63 §5.1 / Tanya UX #52 §2.1, §5) */
+const THERM_CEREMONY = thermalRadiusClassByPosture('ceremony');
 
 /** The skeleton's outer geometry — pinned to MirrorRevealCard's outer card. */
 const CARD_GEOMETRY =
-  'max-w-md w-full thermal-radius-wide p-sys-8 min-h-[18rem]';
+  `max-w-md w-full ${THERM_CEREMONY} p-sys-8 min-h-[18rem]`;
 
 /**
  * Vertical rhythm: four child placeholders matching the reveal's voice

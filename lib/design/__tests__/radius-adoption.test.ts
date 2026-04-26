@@ -362,8 +362,8 @@ describe('thermal-radius grandfather list — auditable drift, shrinking', () =>
       .not.toContain('components/shared/Threshold.tsx');
   });
 
-  it('counter shrinks one per PR — current size is 3 (was 4 pre-ExploreArticleCard)', () => {
-    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(3);
+  it('counter shrinks one per PR — current size is 2 (was 3 pre-MirrorLoadingSurface)', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(2);
   });
 
   it('the migrated recognition-letter (ReturnLetter.tsx) is OFF the grandfather list', () => {
@@ -374,5 +374,10 @@ describe('thermal-radius grandfather list — auditable drift, shrinking', () =>
   it('the migrated cold-start card (ExploreArticleCard.tsx) is OFF the grandfather list', () => {
     expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
       .not.toContain('components/explore/ExploreArticleCard.tsx');
+  });
+
+  it('the migrated loading surface (MirrorLoadingSurface.tsx) is OFF the grandfather list', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
+      .not.toContain('components/mirror/MirrorLoadingSurface.tsx');
   });
 });
