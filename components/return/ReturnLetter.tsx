@@ -21,6 +21,7 @@ import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 
 // ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
@@ -223,11 +224,15 @@ function LetterCard({
   const visible = phase === 'rest';
   const dividerScale = phase === 'approach' ? 'scaleX(0)' : 'scaleX(1)';
 
+  // Posture-first corner: the helper resolves to the canonical thermal-radius
+  // class. The literal lives in `lib/design/radius.ts` only — this surface
+  // speaks one posture word (`held`) in one voice (Mike #40 §6.1, Tanya UX
+  // #73 §2.1). Off the grandfather list with this PR.
   return (
     <div className={`relative max-w-[32rem] mx-auto my-sys-10 p-sys-8 md:p-sys-9
       max-h-[40vh] overflow-y-auto
       bg-gradient-to-b from-surface to-background
-      rounded-sys-medium thermal-radius border transition-all duration-reveal
+      rounded-sys-medium ${thermalRadiusClassByPosture('held')} border transition-all duration-reveal
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss — typography-ledger:exempt — icon glyph (&times;), no reading
           rhythm; leading-none collapses the line-box around a single char. */}

@@ -362,7 +362,12 @@ describe('thermal-radius grandfather list — auditable drift, shrinking', () =>
       .not.toContain('components/shared/Threshold.tsx');
   });
 
-  it('counter shrinks one per PR — current size is 5 (was 6 pre-MirrorPair)', () => {
-    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(5);
+  it('counter shrinks one per PR — current size is 4 (was 5 pre-ReturnLetter)', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(4);
+  });
+
+  it('the migrated recognition-letter (ReturnLetter.tsx) is OFF the grandfather list', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
+      .not.toContain('components/return/ReturnLetter.tsx');
   });
 });

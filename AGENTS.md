@@ -23,6 +23,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Design System
 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index). 8 shared primitives. Pair rule: adding a 9th ledger or primitive means shipping sync + adoption tests in the same PR. Radius rungs carry a typed `posture` field (`label · held · ceremony · closure`) — reviewer asks "what is this corner saying?" before reaching for a pixel. Accessibility queries flow through `// reader-invariant` surfaces — they clarify, they do not warm.
 
+**Reviewer literacy — posture suggests, posture does not dictate.** When a corner answers `ceremony`, the entrance is *usually* `reveal` or longer. When it answers `label`, the entrance is *usually* `crossfade` or `instant`. Posture **suggests** a beat family; the surface's task picks the exact beat. This is reviewer guidance, not a typed accessor — the radius and motion ledgers stay orthogonal in code. Geometry is timeless; motion has tense. Do not add `motionByPosture()` or sibling cross-ledger accessors — the correlation lives in the reviewer's head, not in the type system. (Mike #40 §6.3, Tanya UX #73 §2.2; Elon's teardown of the bridge proposal supplies the falsifying evidence — a single `held` surface consumes five distinct motion beats by design.)
+
 ## WIP
 - *(none)*
 

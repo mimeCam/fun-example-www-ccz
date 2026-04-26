@@ -54,6 +54,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import type { Letter } from '@/types/book-narration';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { __testing__ } from '../ReturnLetter';
 import { RecognitionWhisper } from '../RecognitionWhisper';
 
@@ -273,7 +274,29 @@ describe('phaseStyles — border at `hairline` across non-approach phases', () =
   });
 });
 
-// ─── 6 · Drift absence — the grandfather entry can come off the list ──────
+// ─── 6 · Posture-helper migration — corner speaks `held`, byte-identical ──
+//
+// Mike #40 §6.1 / Tanya UX #73 §2.1 — the literal `thermal-radius` class
+// graduated to `thermalRadiusClassByPosture('held')`. The helper output is
+// byte-identical to the literal it replaces (zero pixel delta), and the SSR
+// markup carries the canonical thermal-radius token. This pin is what lets
+// the grandfather entry shrink (5 → 4) without losing review evidence.
+
+describe('ReturnLetter — posture-helper resolves to canonical thermal-radius', () => {
+  it('thermalRadiusClassByPosture("held") returns the literal thermal-radius', () => {
+    expect(thermalRadiusClassByPosture('held')).toBe('thermal-radius');
+  });
+
+  it('the rest-phase SSR markup carries the resolved thermal-radius class', () => {
+    expect(renderRest()).toContain(' thermal-radius ');
+  });
+
+  it('the rest-phase markup does NOT carry the wide variant (held ≠ ceremony)', () => {
+    expect(renderRest()).not.toContain('thermal-radius-wide');
+  });
+});
+
+// ─── 7 · Drift absence — the grandfather entry can come off the list ──────
 
 describe('LetterCard — full SSR shows zero off-ledger color-alpha drift', () => {
   it('no /60, /80, /90, /20 in any (bg|text|border|shadow) shorthand', () => {
