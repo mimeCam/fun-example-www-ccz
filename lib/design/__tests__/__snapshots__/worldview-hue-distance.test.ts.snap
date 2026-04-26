@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`worldview-hue-distance · snapshot pin (Δh receipt) per-surface Δh table is byte-pinned (numbers, not adjectives) 1`] = `
+exports[`worldview-hue-distance · snapshot pin (dual-axis receipt) per-surface Δh · ΔE table is byte-pinned (numbers, not adjectives) 1`] = `
 {
   "chip": {
-    "accent↔cyan": "109.97°",
-    "accent↔rose": "58.11°",
-    "cyan↔rose": "168.07°",
+    "accent↔cyan": "109.97° · ΔE 31.39",
+    "accent↔rose": "58.11° · ΔE 17.01",
+    "cyan↔rose": "168.07° · ΔE 22.41",
   },
 }
 `;

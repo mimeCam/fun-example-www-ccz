@@ -97,14 +97,22 @@ export function circularHueDelta(a: number, b: number): number {
 
 // ─── OKLab perceptual distance — the eyeball, sibling to the wheel ───────
 //
-// HSL Δh is the audit kernel; OKLab ΔE is the eyeball (Mike napkin POI #5,
-// Elon §6, Tanya UX §3.2). HSL 15° is a hue floor — at low chroma or extreme
-// lightness two colours 15° apart can still look near-identical. OKLab is
-// perceptually uniform; Euclidean distance in its space tracks "how different
-// these read on a real screen." Pure, no DOM, no deps. NOT a test gate this
-// sprint — sibling helper for palette-PR REPL sanity checks (Mike POI #5,
-// not a fence). Promote to an audit when a third surface needs it (rule of
-// three). Spec: Björn Ottosson, https://bottosson.github.io/posts/oklab/.
+// HSL Δh is one ruler; OKLab ΔE is its perceptual sibling (Mike napkin POI
+// #5 / #131 POI #1, Elon §6, Tanya UX §3.2). HSL 15° is a hue floor — at
+// low chroma or extreme lightness two colours 15° apart can still look
+// near-identical. OKLab is perceptually uniform; Euclidean distance in its
+// space tracks "how different these read on a real screen." Pure, no DOM,
+// no deps. Spec: Björn Ottosson, https://bottosson.github.io/posts/oklab/.
+//
+// **Live gate (Sid 2026-04-26, Mike napkin #131).** Promoted from a REPL
+// helper to a binding dual-axis gate alongside `circularHueDelta`. The
+// three caller docblocks defend their per-audit ΔE floors on first
+// principles (`archetype-hue-distance.test.ts:OKLAB_FLOOR_DE = 6`,
+// `worldview-hue-distance.test.ts:OKLAB_FLOOR_DE = 10`, `textlink-passage-
+// hue-distance.test.ts:OKLAB_FLOOR_DE = 10`); the mutation receipt
+// (`sibling-voice-perceptual-mutation.test.ts`) proves the second witness
+// catches a chroma collapse the wheel cannot see. Floors per audit, not
+// global — the floor is the architecture, not a paint value (Mike POI #6).
 
 /** sRGB channel [0,1] → linear-light [0,1]. Pure, ≤ 10 LOC. */
 function srgbToLinear(c: number): number {

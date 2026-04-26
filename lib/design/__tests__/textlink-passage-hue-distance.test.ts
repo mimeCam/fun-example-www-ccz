@@ -107,11 +107,14 @@
 
 import { BRAND } from '../color-constants';
 import {
+  deltaEPair,
   deltaHue,
   deltaTable,
+  dualReceipt,
   familyPairs,
   surfaceReceipt,
   worstPair,
+  worstPerceptualPair,
 } from '../hue-distance';
 
 // ─── Floors — calibrated, not eyeballed ──────────────────────────────────
@@ -134,6 +137,25 @@ import {
  * global — the floor is the architecture.
  */
 const HUE_FLOOR_DEG = 45;
+
+/**
+ * Minimum acceptable OKLab ΔE between any two distinct foreshadow
+ * text-color families that share the passage TextLink surface (Mike
+ * napkin #131 POI #1, Sid 2026-04-26). Today's tightest pair on the
+ * ΔE axis is `accent` ↔ `rose` ≈ 17.01 (the same cross-family pair the
+ * worldview chip already audits); the binding pair on Δh — `gold` ↔
+ * `rose` (55.86°) — sits at ΔE ≈ 17.36, comfortably clear of 10. The
+ * 10 floor is the architectural fence: cross-family pairs start at
+ * much larger ΔE than sibling-violet ones, so the floor sits
+ * architecturally higher (mirrors the 45° Δh floor's +30° headroom
+ * shape; same architectural floor and rationale as the worldview chip's
+ * cross-family pairs — both cross hue family boundaries).
+ *
+ * Defended on first principles, not eyeballed (Elon §3 / Mike POI #1).
+ * Floors per audit, not global — the floor is the architecture, not a
+ * paint value.
+ */
+const OKLAB_FLOOR_DE = 10;
 
 // ─── Family → painted hex resolver ───────────────────────────────────────
 
@@ -192,7 +214,7 @@ const TEXTLINK_PASSAGE_SURFACES: Record<string, readonly string[]> = {
 // genus per Mike napkin #131 POI #7). Floors stay per-audit (the floor
 // is the architecture, not a paint value — Mike POI #6).
 
-// ─── 1 · Floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────────
+// ─── 1a · Δh floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────
 
 describe(`textlink-passage-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, () => {
   for (const [surface, families] of Object.entries(TEXTLINK_PASSAGE_SURFACES)) {
@@ -204,17 +226,32 @@ describe(`textlink-passage-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° fl
   }
 });
 
-// ─── 2 · Worst-case sweep — per-surface receipt + global stdout line ─────
+// ─── 1b · ΔE floor — every (surface, pair) holds ≥ OKLAB_FLOOR_DE ────────
+
+describe(`textlink-passage-hue-distance · per-surface ≥ ${OKLAB_FLOOR_DE} ΔE floor`, () => {
+  for (const [surface, families] of Object.entries(TEXTLINK_PASSAGE_SURFACES)) {
+    for (const [a, b] of familyPairs(families)) {
+      it(`${surface} · ΔE(${a}, ${b}) ≥ ${OKLAB_FLOOR_DE}`, () => {
+        expect(deltaEPair(a, b, FAMILY_HEX)).toBeGreaterThanOrEqual(OKLAB_FLOOR_DE);
+      });
+    }
+  }
+});
+
+// ─── 2 · Worst-case sweep — dual-axis per-surface receipt ────────────────
 
 describe('textlink-passage-hue-distance · worst-case receipt (per surface)', () => {
   for (const [surface, families] of Object.entries(TEXTLINK_PASSAGE_SURFACES)) {
-    it(`${surface} · worst Δh clears the floor (mirrors §1 by design)`, () => {
-      const { pair, dh } = worstPair(families, FAMILY_HEX);
+    it(`${surface} · worst Δh and ΔE both clear their floors (mirrors §1 by design)`, () => {
+      const { pair: dhPair, dh } = worstPair(families, FAMILY_HEX);
+      const { pair: dePair, dE } = worstPerceptualPair(families, FAMILY_HEX);
       // eslint-disable-next-line no-console
       console.log(
-        `[textlink-passage-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${pair} (floor ${HUE_FLOOR_DEG}°)`,
+        `[textlink-passage-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${dhPair} (floor ${HUE_FLOOR_DEG}°)`
+          + ` · worst ΔE ${dE.toFixed(2)} at ${dePair} (floor ${OKLAB_FLOOR_DE})`,
       );
       expect(dh).toBeGreaterThanOrEqual(HUE_FLOOR_DEG);
+      expect(dE).toBeGreaterThanOrEqual(OKLAB_FLOOR_DE);
     });
   }
 });
@@ -258,14 +295,14 @@ describe('textlink-passage-hue-distance · resolver invariants', () => {
 
 // ─── 4 · Snapshot — the full Δh table per surface (the receipt) ──────────
 
-describe('textlink-passage-hue-distance · snapshot pin (Δh receipt)', () => {
-  it('per-surface Δh table is byte-pinned (numbers, not adjectives)', () => {
-    expect(surfaceReceipt(TEXTLINK_PASSAGE_SURFACES, FAMILY_HEX)).toMatchSnapshot();
+describe('textlink-passage-hue-distance · snapshot pin (dual-axis receipt)', () => {
+  it('per-surface Δh · ΔE table is byte-pinned (numbers, not adjectives)', () => {
+    expect(dualReceipt(TEXTLINK_PASSAGE_SURFACES, FAMILY_HEX)).toMatchSnapshot();
   });
 
   // Direct-table sanity — pins the kernel import surface so a future
   // rename of `deltaTable` / `surfaceReceipt` is loud (compile-time + test).
-  it('deltaTable matches the snapshot row for the passage surface', () => {
+  it('deltaTable matches the (Δh-only) row for the passage surface', () => {
     const direct = deltaTable(TEXTLINK_PASSAGE_SURFACES.passage, FAMILY_HEX);
     expect(direct).toEqual(surfaceReceipt(TEXTLINK_PASSAGE_SURFACES, FAMILY_HEX).passage);
   });

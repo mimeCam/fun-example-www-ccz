@@ -6,8 +6,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
 - `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs, eight sibling contrast audits
-- `lib/design/hue.ts` — canonical hex↔RGB↔HSL kernel + `circularHueDelta` + `oklchDeltaE` (perceptual sibling, not a test gate; palette-PR REPL helper). Contrast, thermal-tokens, and focus-ink physics route through it. Drift = `npx jest` red.
-- `lib/design/hue-distance.ts` — per-surface Δh audit kernel (`familyPairs`, `deltaTable`, `worstPair`, `surfaceReceipt`); three callers (archetype + worldview + textlink-passage sibling-voice audits), one stateless kernel, no class hierarchy.
+- `lib/design/hue.ts` — canonical hex↔RGB↔HSL kernel + `circularHueDelta` + `oklchDeltaE` (live binding gate alongside `circularHueDelta`; the eyeball, sibling to the wheel). Contrast, thermal-tokens, and focus-ink physics route through it. Drift = `npx jest` red.
+- `lib/design/hue-distance.ts` — per-surface dual-axis audit kernel (`familyPairs`, `deltaTable`, `worstPair`, `surfaceReceipt` for Δh; `deltaEPair`, `worstPerceptualPair`, `dualReceipt` for ΔE); three callers (archetype + worldview + textlink-passage sibling-voice audits), one stateless kernel, no class hierarchy.
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
 - `lib/ceremony/` — quiet-store (gifting-phase pub/sub for host-level suppression)
 - `lib/mirror/` — archetype scoring + archetype-store
@@ -71,13 +71,17 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ### Sibling Voice Hue Distance (3)
 
-> Hue-Δ (degrees), not contrast ratio. Shape decides group (Tanya UX #60 §3).
-> One stateless kernel (`lib/design/hue-distance.ts`), three callers — drift = red.
-> Floors per audit (the floor is the architecture, not a paint value — Mike POI #6).
+> Two named axes per receipt — hue angle (Δh, degrees) and perceptual distance
+> (OKLab ΔE). Sibling voices on a shared surface must clear both floors;
+> either alone misses low-chroma collapse. Floors per audit (the floor is the
+> architecture, not a paint value — Mike POI #6). Mirrors the Contrast Audit
+> Receipts shape (two named anchors). One stateless kernel
+> (`lib/design/hue-distance.ts`), three callers, plus one mutation receipt
+> (`sibling-voice-perceptual-mutation.test.ts`) — drift = red.
 
-- Archetype chip (NextRead): worst-case `16.91°` @ accent↔secondary, floor 15° (sibling violets distinguishable on shared surface; verified in OKLab ΔE ≈ 8.74 across both thermal anchors — Mike napkin #100, Tanya UX #12, Sid 2026-04-26)
-- Worldview chip (ExploreArticleCard): worst-case `58.11°` @ accent↔rose, floor 45° (three distinct text-color families — `{accent, cyan, rose}`; technical/philosophical share `text-accent` by design — `WORLDVIEW_GLYPHS` `▣`/`◇` is the non-color discriminator, not hue — Mike napkin §"Sibling Voice Hue Distance (2)", Tanya UX #10 §2.3, Sid 2026-04-26)
-- TextLink (passage): worst-case `55.86°` @ gold↔rose, floor 45° (three foreshadow voices — `{accent, gold, rose}`; gold↔rose is the binding pair, the other two pairs are decoy receipts at 113.96°/58.11° — cross-family warm yellow ↔ warm pink; hover destinations must read as different rooms — Mike napkin #131, Elon #27, Tanya UX #39, Sid 2026-04-26)
+- Archetype chip (NextRead): Δh `16.91°` @ accent↔secondary (floor 15°) · ΔE `8.74` @ accent↔secondary (floor 6) — sibling violets distinguishable on a real screen; the same pair pins both axes (Mike napkin #100/#131, Tanya UX #12/#37, Sid 2026-04-26)
+- Worldview chip (ExploreArticleCard): Δh `58.11°` @ accent↔rose (floor 45°) · ΔE `17.01` @ accent↔rose (floor 10) — three distinct text-color families `{accent, cyan, rose}`; technical/philosophical share `text-accent` by design — `WORLDVIEW_GLYPHS` `▣`/`◇` is the non-color discriminator (Mike napkin §"Sibling Voice Hue Distance (2)"/#131, Tanya UX #10 §2.3 / #37, Sid 2026-04-26)
+- TextLink (passage): Δh `55.86°` @ gold↔rose (floor 45°) · ΔE `17.01` @ accent↔rose (floor 10) — three foreshadow voices `{accent, gold, rose}`; gold↔rose binds Δh, accent↔rose binds ΔE; the cross-family pairs cross warm-yellow ↔ warm-pink and violet ↔ warm-pink boundaries (Mike napkin #131, Elon #27, Tanya UX #39, Sid 2026-04-26)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

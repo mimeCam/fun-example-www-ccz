@@ -79,11 +79,14 @@
 
 import { BRAND } from '../color-constants';
 import {
+  deltaEPair,
   deltaHue,
   deltaTable,
+  dualReceipt,
   familyPairs,
   surfaceReceipt,
   worstPair,
+  worstPerceptualPair,
 } from '../hue-distance';
 
 // ─── Floors — calibrated, not eyeballed ──────────────────────────────────
@@ -101,6 +104,25 @@ import {
  * higher. Floors per audit, not global — the floor is the architecture.
  */
 const HUE_FLOOR_DEG = 45;
+
+/**
+ * Minimum acceptable OKLab ΔE between any two distinct worldview text-color
+ * families that share a surface (Mike napkin #131 POI #1, Sid 2026-04-26).
+ * Today's tightest pair on the ΔE axis is `accent` ↔ `rose` ≈ 17.01 —
+ * the same cross-family pair that pins Δh at 58.11°. The 10 floor is the
+ * architectural fence: cross-family pairs start at much larger ΔE than
+ * sibling-violet ones (the archetype audit's floor is 6 because its
+ * tightest pair is *itself* a sibling-violet); the cross-family fence
+ * sits architecturally higher to mirror the +30° headroom shape of the
+ * 45° Δh floor — *catches a severe chroma collapse without pinning to
+ * today's number* (Mike napkin §6).
+ *
+ * Defended on first principles, not eyeballed (Elon §3 / Mike POI #1).
+ * Floors per audit, not global — the floor is the architecture, not a
+ * paint value. (Same ΔE floor and rationale as the textlink-passage
+ * audit's cross-family pairs — both cross hue family boundaries.)
+ */
+const OKLAB_FLOOR_DE = 10;
 
 // ─── Family → painted hex resolver ───────────────────────────────────────
 
@@ -146,7 +168,7 @@ const WORLDVIEW_SURFACES: Record<string, readonly string[]> = {
   chip: ['accent', 'cyan', 'rose'],
 };
 
-// ─── 1 · Floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────────
+// ─── 1a · Δh floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────
 
 describe(`worldview-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, () => {
   for (const [surface, families] of Object.entries(WORLDVIEW_SURFACES)) {
@@ -158,17 +180,32 @@ describe(`worldview-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, (
   }
 });
 
-// ─── 2 · Worst-case sweep — per-surface receipt + global stdout line ─────
+// ─── 1b · ΔE floor — every (surface, pair) holds ≥ OKLAB_FLOOR_DE ────────
+
+describe(`worldview-hue-distance · per-surface ≥ ${OKLAB_FLOOR_DE} ΔE floor`, () => {
+  for (const [surface, families] of Object.entries(WORLDVIEW_SURFACES)) {
+    for (const [a, b] of familyPairs(families)) {
+      it(`${surface} · ΔE(${a}, ${b}) ≥ ${OKLAB_FLOOR_DE}`, () => {
+        expect(deltaEPair(a, b, FAMILY_HEX)).toBeGreaterThanOrEqual(OKLAB_FLOOR_DE);
+      });
+    }
+  }
+});
+
+// ─── 2 · Worst-case sweep — dual-axis per-surface receipt ────────────────
 
 describe('worldview-hue-distance · worst-case receipt (per surface)', () => {
   for (const [surface, families] of Object.entries(WORLDVIEW_SURFACES)) {
-    it(`${surface} · worst Δh clears the floor (mirrors §1 by design)`, () => {
-      const { pair, dh } = worstPair(families, FAMILY_HEX);
+    it(`${surface} · worst Δh and ΔE both clear their floors (mirrors §1 by design)`, () => {
+      const { pair: dhPair, dh } = worstPair(families, FAMILY_HEX);
+      const { pair: dePair, dE } = worstPerceptualPair(families, FAMILY_HEX);
       // eslint-disable-next-line no-console
       console.log(
-        `[worldview-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${pair} (floor ${HUE_FLOOR_DEG}°)`,
+        `[worldview-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${dhPair} (floor ${HUE_FLOOR_DEG}°)`
+          + ` · worst ΔE ${dE.toFixed(2)} at ${dePair} (floor ${OKLAB_FLOOR_DE})`,
       );
       expect(dh).toBeGreaterThanOrEqual(HUE_FLOOR_DEG);
+      expect(dE).toBeGreaterThanOrEqual(OKLAB_FLOOR_DE);
     });
   }
 });
@@ -209,14 +246,14 @@ describe('worldview-hue-distance · resolver invariants', () => {
 
 // ─── 4 · Snapshot — the full Δh table per surface (the receipt) ──────────
 
-describe('worldview-hue-distance · snapshot pin (Δh receipt)', () => {
-  it('per-surface Δh table is byte-pinned (numbers, not adjectives)', () => {
-    expect(surfaceReceipt(WORLDVIEW_SURFACES, FAMILY_HEX)).toMatchSnapshot();
+describe('worldview-hue-distance · snapshot pin (dual-axis receipt)', () => {
+  it('per-surface Δh · ΔE table is byte-pinned (numbers, not adjectives)', () => {
+    expect(dualReceipt(WORLDVIEW_SURFACES, FAMILY_HEX)).toMatchSnapshot();
   });
 
   // Direct-table sanity — pins the kernel import surface so a future
   // rename of `deltaTable` / `surfaceReceipt` is loud (compile-time + test).
-  it('deltaTable matches the snapshot row for the chip surface', () => {
+  it('deltaTable matches the (Δh-only) row for the chip surface', () => {
     const direct = deltaTable(WORLDVIEW_SURFACES.chip, FAMILY_HEX);
     expect(direct).toEqual(surfaceReceipt(WORLDVIEW_SURFACES, FAMILY_HEX).chip);
   });

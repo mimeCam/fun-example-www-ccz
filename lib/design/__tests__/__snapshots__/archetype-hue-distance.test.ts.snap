@@ -1,18 +1,18 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`archetype-hue-distance · snapshot pin (Δh receipt) per-surface Δh table is byte-pinned (numbers, not adjectives) 1`] = `
+exports[`archetype-hue-distance · snapshot pin (dual-axis receipt) per-surface Δh · ΔE table is byte-pinned (numbers, not adjectives) 1`] = `
 {
   "chip": {
-    "accent↔amber": "110.99°",
-    "accent↔rose": "58.11°",
-    "accent↔secondary": "16.91°",
-    "cyan↔accent": "109.97°",
-    "cyan↔amber": "139.04°",
-    "cyan↔rose": "168.07°",
-    "cyan↔secondary": "93.05°",
-    "rose↔amber": "52.89°",
-    "secondary↔amber": "127.91°",
-    "secondary↔rose": "75.02°",
+    "accent↔amber": "110.99° · ΔE 31.18",
+    "accent↔rose": "58.11° · ΔE 17.01",
+    "accent↔secondary": "16.91° · ΔE 8.74",
+    "cyan↔accent": "109.97° · ΔE 31.39",
+    "cyan↔amber": "139.04° · ΔE 22.10",
+    "cyan↔rose": "168.07° · ΔE 22.41",
+    "cyan↔secondary": "93.05° · ΔE 22.79",
+    "rose↔amber": "52.89° · ΔE 15.04",
+    "secondary↔amber": "127.91° · ΔE 25.74",
+    "secondary↔rose": "75.02° · ΔE 13.13",
   },
 }
 `;

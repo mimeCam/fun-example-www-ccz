@@ -168,10 +168,12 @@ describe('hue · the project palette parses cleanly', () => {
 
 // ─── 6 · oklchDeltaE — perceptual sibling to circularHueDelta ────────────
 //
-// The eyeball, not the wheel (Mike napkin POI #5 / Tanya UX §3.2 / Elon §6).
-// Property tests, not a fence — `oklchDeltaE` is a REPL helper for the next
-// palette PR, not a test gate this sprint. The properties below pin its
-// shape so a future caller leaning on it inherits a kernel that behaves.
+// The eyeball, sibling to the wheel (Mike napkin POI #5 / Tanya UX §3.2 /
+// Elon §6). Promoted to a binding dual-axis gate alongside `circularHueDelta`
+// — the three sibling-voice audits (`archetype-`/`worldview-`/`textlink-
+// passage-hue-distance`) call it through `lib/design/hue-distance.ts`. The
+// properties below pin its kernel-level invariants — identity, symmetry,
+// non-negativity — so the gate above stands on first principles, not vibes.
 
 describe('hue · oklchDeltaE — perceptual property tests', () => {
   it('identity → 0 (any hex is zero distance from itself)', () => {

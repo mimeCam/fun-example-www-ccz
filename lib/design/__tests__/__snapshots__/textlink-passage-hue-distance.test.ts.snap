@@ -1,11 +1,11 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`textlink-passage-hue-distance · snapshot pin (Δh receipt) per-surface Δh table is byte-pinned (numbers, not adjectives) 1`] = `
+exports[`textlink-passage-hue-distance · snapshot pin (dual-axis receipt) per-surface Δh · ΔE table is byte-pinned (numbers, not adjectives) 1`] = `
 {
   "passage": {
-    "accent↔gold": "113.96°",
-    "accent↔rose": "58.11°",
-    "gold↔rose": "55.86°",
+    "accent↔gold": "113.96° · ΔE 32.99",
+    "accent↔rose": "58.11° · ΔE 17.01",
+    "gold↔rose": "55.86° · ΔE 17.36",
   },
 }
 `;

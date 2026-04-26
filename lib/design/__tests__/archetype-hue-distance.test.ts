@@ -81,11 +81,14 @@
 
 import { BRAND } from '../color-constants';
 import {
+  deltaEPair,
   deltaHue,
   deltaTable,
+  dualReceipt,
   familyPairs,
   surfaceReceipt,
   worstPair,
+  worstPerceptualPair,
 } from '../hue-distance';
 
 // ─── Floors — calibrated, not eyeballed ──────────────────────────────────
@@ -101,6 +104,26 @@ import {
  * Architectural, not calibrated — *the floor is the architecture*.
  */
 const HUE_FLOOR_DEG = 15;
+
+/**
+ * Minimum acceptable OKLab ΔE between any two archetype families that
+ * share a surface (Mike napkin #131 POI #1, Sid 2026-04-26). Today's
+ * tightest pair on the ΔE axis is the same sibling-violet that pins
+ * Δh — `accent` ↔ `secondary` reads ≈ 8.74. The 6 floor is the
+ * architectural fence: Ottosson's published "moderately different on
+ * a real screen" threshold is 5; +1 margin carries today's reality
+ * minus a real headroom margin (~30 % chroma knock on `accentViolet`
+ * collapses this pair to ≈ 3.77, well below 6 — see the
+ * `sibling-voice-perceptual-mutation.test.ts` mutation receipt).
+ *
+ * Cross-family pairs on this surface read in the 13–32 range; 6 leaves
+ * normal palette breathing room while catching low-chroma collapse the
+ * wheel cannot see (HSL Δh stays ≥ 16° under the same knock — the
+ * second witness earns its keep). Defended on first principles, not
+ * eyeballed (Elon §3 / Mike POI #1). Floors per audit, not global —
+ * the floor is the architecture, not a paint value.
+ */
+const OKLAB_FLOOR_DE = 6;
 
 // ─── Family → painted hex resolver ───────────────────────────────────────
 
@@ -145,7 +168,7 @@ const ARCHETYPE_SURFACES: Record<string, readonly string[]> = {
 // the kernel is the fence. Floors stay per-audit (the floor is the
 // architecture, not a paint value — Mike POI #6).
 
-// ─── 1 · Floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────────
+// ─── 1a · Δh floor — every (surface, pair) holds ≥ HUE_FLOOR_DEG ─────────
 
 describe(`archetype-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, () => {
   for (const [surface, families] of Object.entries(ARCHETYPE_SURFACES)) {
@@ -157,17 +180,32 @@ describe(`archetype-hue-distance · per-surface ≥ ${HUE_FLOOR_DEG}° floor`, (
   }
 });
 
-// ─── 2 · Worst-case sweep — per-surface receipt + global stdout line ─────
+// ─── 1b · ΔE floor — every (surface, pair) holds ≥ OKLAB_FLOOR_DE ────────
+
+describe(`archetype-hue-distance · per-surface ≥ ${OKLAB_FLOOR_DE} ΔE floor`, () => {
+  for (const [surface, families] of Object.entries(ARCHETYPE_SURFACES)) {
+    for (const [a, b] of familyPairs(families)) {
+      it(`${surface} · ΔE(${a}, ${b}) ≥ ${OKLAB_FLOOR_DE}`, () => {
+        expect(deltaEPair(a, b, FAMILY_HEX)).toBeGreaterThanOrEqual(OKLAB_FLOOR_DE);
+      });
+    }
+  }
+});
+
+// ─── 2 · Worst-case sweep — dual-axis per-surface receipt ────────────────
 
 describe('archetype-hue-distance · worst-case receipt (per surface)', () => {
   for (const [surface, families] of Object.entries(ARCHETYPE_SURFACES)) {
-    it(`${surface} · worst Δh clears the floor (mirrors §1 by design)`, () => {
-      const { pair, dh } = worstPair(families, FAMILY_HEX);
+    it(`${surface} · worst Δh and ΔE both clear their floors (mirrors §1 by design)`, () => {
+      const { pair: dhPair, dh } = worstPair(families, FAMILY_HEX);
+      const { pair: dePair, dE } = worstPerceptualPair(families, FAMILY_HEX);
       // eslint-disable-next-line no-console
       console.log(
-        `[archetype-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${pair} (floor ${HUE_FLOOR_DEG}°)`,
+        `[archetype-hue-distance] ${surface} · worst Δh ${dh.toFixed(2)}° at ${dhPair} (floor ${HUE_FLOOR_DEG}°)`
+          + ` · worst ΔE ${dE.toFixed(2)} at ${dePair} (floor ${OKLAB_FLOOR_DE})`,
       );
       expect(dh).toBeGreaterThanOrEqual(HUE_FLOOR_DEG);
+      expect(dE).toBeGreaterThanOrEqual(OKLAB_FLOOR_DE);
     });
   }
 });
@@ -199,14 +237,14 @@ describe('archetype-hue-distance · resolver invariants', () => {
 
 // ─── 4 · Snapshot — the full Δh table per surface (the receipt) ──────────
 
-describe('archetype-hue-distance · snapshot pin (Δh receipt)', () => {
-  it('per-surface Δh table is byte-pinned (numbers, not adjectives)', () => {
-    expect(surfaceReceipt(ARCHETYPE_SURFACES, FAMILY_HEX)).toMatchSnapshot();
+describe('archetype-hue-distance · snapshot pin (dual-axis receipt)', () => {
+  it('per-surface Δh · ΔE table is byte-pinned (numbers, not adjectives)', () => {
+    expect(dualReceipt(ARCHETYPE_SURFACES, FAMILY_HEX)).toMatchSnapshot();
   });
 
   // Direct-table sanity — a deltaTable call shaped like the kernel's per-row
   // projection; pins the import surface so a future kernel rename is loud.
-  it('deltaTable matches the snapshot row for the chip surface', () => {
+  it('deltaTable matches the (Δh-only) row for the chip surface', () => {
     const direct = deltaTable(ARCHETYPE_SURFACES.chip, FAMILY_HEX);
     expect(direct).toEqual(surfaceReceipt(ARCHETYPE_SURFACES, FAMILY_HEX).chip);
   });
