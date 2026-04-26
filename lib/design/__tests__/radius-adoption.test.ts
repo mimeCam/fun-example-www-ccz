@@ -234,7 +234,7 @@ describe('radius adoption — every corner goes through the ledger', () => {
     expect(hits.map((v) => v.file)).toEqual([]);
   });
 
-  it('no unspoken `thermal-radius` literals outside the grandfather list', () => {
+  it('no unspoken `thermal-radius` literals anywhere outside `radius.ts`', () => {
     const hits = violations.filter((v) => v.kind === 'tw-thermal-radius');
     expect(hits.map((v) => v.file)).toEqual([]);
   });
@@ -362,8 +362,8 @@ describe('thermal-radius foundation queue — auditable residual, single-file', 
       .not.toContain('components/shared/Threshold.tsx');
   });
 
-  it('counter shrinks one per PR — current size is 1 (was 2 pre-mirror/page graduation)', () => {
-    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(1);
+  it('counter shrinks one per PR — queue closed 2026-04-26 (size 0)', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(0);
   });
 
   it('the migrated recognition-letter (ReturnLetter.tsx) is OFF the grandfather list', () => {
@@ -384,5 +384,10 @@ describe('thermal-radius foundation queue — auditable residual, single-file', 
   it('the graduated mirror page (app/mirror/page.tsx) is OFF the grandfather list', () => {
     expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
       .not.toContain('app/mirror/page.tsx');
+  });
+
+  it('the graduated press-phase foundation (lib/utils/press-phase.ts) is OFF the grandfather list', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
+      .not.toContain('lib/utils/press-phase.ts');
   });
 });

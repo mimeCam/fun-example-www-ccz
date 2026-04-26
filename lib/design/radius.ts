@@ -141,7 +141,10 @@ export const radiusClassByPosture = (p: RadiusPosture): string =>
  */
 export const thermalRadiusClassByPosture = (
   p: Extract<RadiusPosture, 'held' | 'ceremony'>,
-): string => (p === 'held' ? 'thermal-radius' : 'thermal-radius-wide');
+): string =>
+  // The only legal occurrence of `thermal-radius` outside CSS — every
+  // reader-facing corner resolves through this helper.
+  (p === 'held' ? 'thermal-radius' : 'thermal-radius-wide');
 
 /**
  * Thermal-lift CSS var reference — exposes `--token-radius-soft` to TS
@@ -245,39 +248,12 @@ export const THERMAL_RADIUS_VAR = '--token-radius-soft';
  */
 export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
 
-// ─── Thermal-radius foundation queue — one residual, isolation-first ──────
+// ─── Thermal-radius foundation queue — sealed ─────────────────────────────
 
 /**
- * Foundation-layer queue of one — `lib/utils/press-phase.ts`. The list
- * has graduated from a multi-entry punch-list to a single-entry queue:
- * every user-facing surface of the killer feature (`/mirror`) now
- * resolves its corner through `thermalRadiusClassByPosture(...)`, and
- * the only literal that remains lives in a foundation utility consumed
- * by every `<Pressable>` on the site. Its blast radius is intrinsic;
- * it gets its own dedicated PR, its own test cycle, its own sprint.
- * (Mike napkin §4.4 / Paul §6.)
- *
- * Reviewer mantra: **decrement, do not add.** An entry leaves when the
- * file flips to `thermalRadiusClassByPosture(...)`. A PR that adds an
- * entry is failing the literacy contract — the fence exists to fail
- * loudly the moment a new corner becomes unspoken.
- *
- * Pre-MirrorReveal migration this list carried 7 entries; the killer-
- * feature surface's graduation drops it to 6. Counter (occurrences across
- * `.ts/.tsx/.css` source — Mike napkin §4): 13 → 12, then 12 → 11 with
- * the MirrorPair PR; ReturnLetter dropped 11 → 10 (5 → 4); ExploreArticleCard
- * dropped 10 → 9 (4 → 3); MirrorLoadingSurface dropped 9 → 8 (3 → 2).
- * This PR (Mike napkin #38 §1 / Tanya UX #19 §2) drops the counter
- * further (8 → 7) and the list (2 → 1) by graduating
- * `app/mirror/page.tsx` — the JSX-comment dialect on the lobby page now
- * names the helper instead of the raw class literal. Reviewer-language
- * matches user-language end-to-end; the killer feature speaks
- * `ceremony` through one helper, in source and on the page alike.
- *
- * The remaining 1 is a foundation-layer corner: `press-phase.ts`
- * exposes `PRESSABLE_BASE`, consumed site-wide. Next sprint, isolation-
- * first.
+ * Intentionally empty. Any raw `thermal-radius` literal outside
+ * `radius.ts` is a hard fail. Symbol kept (not deleted) because the
+ * adoption test imports it — empty array minimizes blast radius.
+ * Closed 2026-04-26.
  */
-export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [
-  'lib/utils/press-phase.ts',
-] as const;
+export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [] as const;

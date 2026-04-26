@@ -15,6 +15,7 @@
 
 import type { CSSProperties } from 'react';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 
 // ─── Phase vocabulary ──────────────────────────────────────────────────────
 
@@ -121,7 +122,7 @@ export function resolveSizeClass(variant: PressVariant, size: PressSize): string
 /** Every variant starts here: radius, transition, focus, typography. */
 export const PRESSABLE_BASE =
   'relative inline-flex items-center justify-center gap-sys-2 ' +
-  'thermal-radius font-sys-accent text-sys-caption ' +
+  `${thermalRadiusClassByPosture('held')} font-sys-accent text-sys-caption ` +
   'transition-[background-color,border-color,color,transform,box-shadow,opacity] ' +
   'duration-[var(--sys-time-hover)] ease-out ' +
   'select-none touch-manipulation will-change-transform';
