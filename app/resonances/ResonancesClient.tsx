@@ -36,6 +36,7 @@ import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import { ResonanceSectionHeader } from '@/components/resonances/ResonanceSectionHeader';
 import ResonanceExport from './ResonanceExport';
+import { LeanArrow } from '@/components/shared/LeanArrow';
 import { TextLink } from '@/components/shared/TextLink';
 import { Skeleton } from '@/components/shared/Skeleton';
 import WhisperFooter from '@/components/shared/WhisperFooter';
@@ -198,11 +199,14 @@ export default function ResonancesClient() {
   return (
     <div className="max-w-2xl mx-auto pt-sys-8">
       <GemHome />
-      {/* Header */}
+      {/* Header — the "Your Mirror" forward door. The `<LeanArrow />` kernel
+          replaces the raw glyph so this surface joins the other three
+          forward-motion CTAs that lean 2px on `:focus-within` (Krystle #61
+          orphan-adoption; Tanya §3 — every forward door, same lean). */}
       <div className="flex justify-between items-center mb-sys-9">
         <div />
         <TextLink variant="passage" href="/mirror" className="text-sys-caption">
-          Your Mirror →
+          Your Mirror<LeanArrow />
         </TextLink>
       </div>
 

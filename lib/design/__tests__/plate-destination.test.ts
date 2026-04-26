@@ -108,8 +108,18 @@ function shadowCarriesLiteral(body: string): boolean {
   return shadows.some((s) => /rgba\(|color-mix\(/.test(s));
 }
 
-// ─── 1 · Adoption — KeepsakePlate.tsx wires the rule + arrow span ──────────
+// ─── 1 · Adoption — KeepsakePlate.tsx wires the rule + LeanArrow kernel ───
 
+/**
+ * After Mike #80, the `.plate-caption-arrow` span no longer lives in
+ * `KeepsakePlate.tsx` — it was hoisted into the `<LeanArrow />` kernel at
+ * `components/shared/LeanArrow.tsx`. The plate's two adoption signals are
+ * now (1) the `.plate-destination` class on the surface and (2) the
+ * `<LeanArrow />` kernel import + JSX render in PlateCaption. The arrow
+ * span itself is owned by the kernel; the kernel-side aria-hidden +
+ * single-source-of-truth contract is pinned by
+ * `components/shared/__tests__/lean-arrow-fence.test.ts` (Axis B + C).
+ */
 describe('plate-destination — KeepsakePlate.tsx adopts the rule', () => {
   const tsx = readFile(PLATE_PATH);
 
@@ -117,14 +127,21 @@ describe('plate-destination — KeepsakePlate.tsx adopts the rule', () => {
     expect(tsx).toMatch(/['"]plate-destination['"]/);
   });
 
-  it('PlateCaption renders a .plate-caption-arrow span around the glyph', () => {
-    expect(tsx).toMatch(/className=['"]plate-caption-arrow['"]/);
+  it('PlateCaption imports the LeanArrow kernel from @/components/shared/LeanArrow', () => {
+    expect(tsx).toMatch(
+      /import\s*\{\s*LeanArrow\s*\}\s*from\s*['"]@\/components\/shared\/LeanArrow['"]/,
+    );
   });
 
-  it('the arrow span is aria-hidden so screen readers ignore the glyph', () => {
-    const span = tsx.match(/<span[^>]*plate-caption-arrow[^>]*>/);
-    expect(span).not.toBeNull();
-    expect(span![0]).toMatch(/aria-hidden/);
+  it('PlateCaption renders <LeanArrow /> in JSX (the kernel adoption signal)', () => {
+    expect(tsx).toMatch(/<LeanArrow\s*\/>/);
+  });
+
+  it('KeepsakePlate.tsx does NOT hand-roll a `.plate-caption-arrow` span', () => {
+    // The kernel is the only inlining site (Axis C of lean-arrow-fence).
+    // If a future contributor restores the inline span here, the kernel's
+    // aria-hidden + leading-space-inside contract starts drifting.
+    expect(tsx).not.toMatch(/className=['"]plate-caption-arrow['"]/);
   });
 });
 

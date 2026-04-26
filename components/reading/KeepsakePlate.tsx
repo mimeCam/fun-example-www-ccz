@@ -34,6 +34,7 @@
 'use client';
 
 import { ThreadKeepsake } from '@/components/reading/ThreadKeepsake';
+import { LeanArrow } from '@/components/shared/LeanArrow';
 import { Pressable } from '@/components/shared/Pressable';
 import {
   buildThreadSVG, KEEPSAKE_DIMENSIONS, type ThreadSnapshot,
@@ -176,16 +177,19 @@ function PlateThumbnail({ snapshot }: { snapshot: ThreadSnapshot }) {
 /**
  * The "Keep this thread →" eyebrow caption. One verb, one direction.
  *
- * The `→` glyph lives inside a `.plate-caption-arrow` span (decorative,
- * `aria-hidden`) so the destination CSS rule can nudge a single character
+ * The `→` glyph is rendered by the `<LeanArrow />` kernel
+ * (`components/shared/LeanArrow.tsx`) — one stateless kernel, N callers
+ * (Mike #78). The kernel owns the `.plate-caption-arrow` span (decorative,
+ * `aria-hidden`) so the site-wide nudge rule translates a single character
  * 2px right on `:focus-within` without animating the whole `<p>`. Screen
  * readers continue to announce "Keep this thread" cleanly; the arrow is
- * the universal handshake. (Mike #43 §5.5, Tanya UX #100 §2.5.)
+ * the universal handshake. The leading space lives INSIDE the kernel's
+ * span (Tanya §5.1) — this caller appends `<LeanArrow />` with no padding.
  */
 function PlateCaption() {
   return (
     <p className="mt-sys-3 mb-sys-1 text-center text-gold text-sys-caption font-sys-accent">
-      Keep this thread <span aria-hidden="true" className="plate-caption-arrow">→</span>
+      Keep this thread<LeanArrow />
     </p>
   );
 }

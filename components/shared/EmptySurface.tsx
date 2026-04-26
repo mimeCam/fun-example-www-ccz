@@ -41,9 +41,11 @@
  *   no new ledger entry, no new shadow token, no new animation.
  *
  * Credits: Mike K. (napkin §3 item #3 — 7th shared primitive, pair-rule
- * triggered: adoption test ships in the same PR; #48 — the LeanArrow span
- * lifts the `→` glyph out of the four label literals into the primitive,
- * locked behind `empty-arrow-fence.test.ts`), Tanya D. (UX §2 — the
+ * triggered: adoption test ships in the same PR; #48 — the `<LeanArrow />`
+ * span lifts the `→` glyph out of the four label literals; #80 — kernel
+ * lives in `components/shared/LeanArrow.tsx`, fence at
+ * `lean-arrow-fence.test.ts` is now site-wide, not surface-scoped),
+ * Tanya D. (UX §2 — the
  * ThresholdSurface anatomy, per-surface tint table §2.5, single-focal halo
  * §2.4, screenshot test §4; #87 §3 — semantic gate: reset earns no arrow,
  * §5.1 — the leading space lives inside the span), Elon M. (§3.2 — pure
@@ -59,6 +61,7 @@ import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { GemHome } from '@/components/navigation/GemHome';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { LeanArrow } from '@/components/shared/LeanArrow';
 import { Pressable } from '@/components/shared/Pressable';
 import { TextLink } from '@/components/shared/TextLink';
 import WhisperFooter from '@/components/shared/WhisperFooter';
@@ -179,23 +182,6 @@ function PrimaryAction({ action }: { action: EmptySurfaceAction }) {
   );
 }
 
-/**
- * The forward-motion glyph for `kind: 'link'` actions only.
- *
- * Decorative (`aria-hidden`) — screen readers continue to announce the
- * verb alone. The leading space lives INSIDE the span so the kernel's
- * 2px `translateX` on `:focus-within` (`globals.css:1004–1011`) moves
- * text + glyph as one rigid unit — without the space-inside trick the
- * pair would drift apart by 2px at large display sizes (Tanya §5.1).
- *
- * The lean is silenced under `prefers-reduced-motion: reduce` by the
- * universal override at `globals.css:1224–1226`; the span is still
- * rendered so the visual rhythm stays identical (Tanya §4).
- */
-function LeanArrow() {
-  return <span aria-hidden="true" className="plate-caption-arrow">{' →'}</span>;
-}
-
 function SecondaryLink({ href, label }: { href: string; label: string }) {
   return (
     <TextLink variant="quiet" href={href} className="text-sys-caption">
@@ -203,6 +189,12 @@ function SecondaryLink({ href, label }: { href: string; label: string }) {
     </TextLink>
   );
 }
+
+// LeanArrow lives in `components/shared/LeanArrow.tsx` — one kernel, N
+// callers (Mike #78). The verb-primitive JSDoc moved to that file along
+// with the leading-space-inside-the-span contract (Tanya §5.1) and the
+// reduced-motion still-renders contract (Tanya §4). Do not re-inline
+// the span here — `lean-arrow-fence.test.ts` Axis C will fail the build.
 
 // ─── Halo — the sole ornament ──────────────────────────────────────────────
 

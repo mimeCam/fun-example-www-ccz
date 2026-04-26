@@ -124,30 +124,49 @@ describe('plate-caption-arrow — declared at top level (no .plate-destination a
   });
 });
 
-// ─── 2 · Adoption — both callers wrap the glyph in the span ────────────────
+// ─── 2 · Adoption — both callers consume the <LeanArrow /> kernel ─────────
 
-describe('plate-caption-arrow — both callers carry the span', () => {
+/**
+ * Mike #80 promoted the inline span to a kernel at
+ * `components/shared/LeanArrow.tsx`. The class + aria-hidden + leading-
+ * space-inside contract now live in ONE place; callers import the kernel
+ * and never re-declare the span. The site-wide fence
+ * `components/shared/__tests__/lean-arrow-fence.test.ts` (Axis B + C)
+ * pins that single-source-of-truth invariant from the kernel side; this
+ * block pins it from the caller side so the two callers that use the
+ * `:focus-within` lean (KeepsakePlate's Coda surface, ResonanceEntry's
+ * QuoteCardLauncher) stay wired to the kernel after the promotion.
+ */
+describe('plate-caption-arrow — both callers consume the LeanArrow kernel', () => {
   const plateTsx = readFile(PLATE_PATH);
   const launcherTsx = readFile(LAUNCHER_PATH);
 
-  it('caller #1 (KeepsakePlate.tsx) renders the .plate-caption-arrow span', () => {
-    expect(plateTsx).toMatch(/className=['"]plate-caption-arrow['"]/);
+  it('caller #1 (KeepsakePlate.tsx) imports LeanArrow from the kernel module', () => {
+    expect(plateTsx).toMatch(
+      /import\s*\{\s*LeanArrow\s*\}\s*from\s*['"]@\/components\/shared\/LeanArrow['"]/,
+    );
   });
 
-  it('caller #1 marks the glyph aria-hidden (decorative, not announced)', () => {
-    const span = plateTsx.match(/<span[^>]*plate-caption-arrow[^>]*>/);
-    expect(span).not.toBeNull();
-    expect(span![0]).toMatch(/aria-hidden/);
+  it('caller #1 (KeepsakePlate.tsx) renders <LeanArrow /> in JSX', () => {
+    expect(plateTsx).toMatch(/<LeanArrow\s*\/>/);
   });
 
-  it('caller #2 (ResonanceEntry.tsx) renders the .plate-caption-arrow span', () => {
-    expect(launcherTsx).toMatch(/className=['"]plate-caption-arrow['"]/);
+  it('caller #2 (ResonanceEntry.tsx) imports LeanArrow from the kernel module', () => {
+    expect(launcherTsx).toMatch(
+      /import\s*\{\s*LeanArrow\s*\}\s*from\s*['"]@\/components\/shared\/LeanArrow['"]/,
+    );
   });
 
-  it('caller #2 marks the glyph aria-hidden (decorative, not announced)', () => {
-    const span = launcherTsx.match(/<span[^>]*plate-caption-arrow[^>]*>/);
-    expect(span).not.toBeNull();
-    expect(span![0]).toMatch(/aria-hidden/);
+  it('caller #2 (ResonanceEntry.tsx) renders <LeanArrow /> in JSX', () => {
+    expect(launcherTsx).toMatch(/<LeanArrow\s*\/>/);
+  });
+
+  it('neither caller hand-rolls a `.plate-caption-arrow` span (kernel is the only site)', () => {
+    // The site-wide invariant: the literal class lives in exactly one
+    // .tsx (LeanArrow.tsx). Caller-side regression — re-inlining the
+    // span — is caught here AND by lean-arrow-fence Axis C.
+    expect(plateTsx).not.toMatch(/className=['"]plate-caption-arrow['"]/);
+    expect(launcherTsx).not.toMatch(/className=['"]plate-caption-arrow['"]/);
   });
 
   it('caller #2 does NOT carry the .plate-destination class (no ceremony import)', () => {

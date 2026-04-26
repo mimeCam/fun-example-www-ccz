@@ -16,6 +16,7 @@ import { useState, useEffect } from 'react';
 import { Article } from '@/lib/content/ContentTagger';
 import type { ArchetypeKey } from '@/types/content';
 import { useCeremony } from './CeremonySequencer';
+import { LeanArrow } from '@/components/shared/LeanArrow';
 import { TextLink } from '@/components/shared/TextLink';
 import {
   archetypeAccentClass,
@@ -95,13 +96,17 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
       </p>
 
       {/* CTA — the showcase `passage` moment: reader hovers → feels
-          the destination room's temperature before the click. */}
+          the destination room's temperature before the click. The
+          `<LeanArrow />` kernel makes this surface join the other forward
+          doors that lean 2px on `:focus-within` (Krystle #61, Tanya §3 —
+          every forward door, same lean). Leading space lives INSIDE the
+          kernel's span (Tanya §5.1) — caller drops the trailing space. */}
       <TextLink
         variant="passage"
         href={`/article/${article.id}`}
         className="text-sys-caption font-sys-accent"
       >
-        Read this next →
+        Read this next<LeanArrow />
       </TextLink>
     </div>
   );

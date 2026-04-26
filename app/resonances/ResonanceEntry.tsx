@@ -25,6 +25,7 @@ import { useCallback, useState, type RefObject } from 'react';
 import { TextLink } from '@/components/shared/TextLink';
 import { Pressable } from '@/components/shared/Pressable';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { LeanArrow } from '@/components/shared/LeanArrow';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { passageThermalClass } from '@/lib/design/typography';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
@@ -220,12 +221,14 @@ function buildCardData(r: ResonanceWithArticle): QuoteCardData {
  * `aria-label` is unchanged: the paint is the sentence, not a copy
  * change (Tanya #98 §4).
  *
- * The `→` glyph wears `.plate-caption-arrow` so the site-wide nudge rule
- * (`globals.css`, detached from `.plate-destination` per Mike #43 §6 +
- * Tanya UX §5) translates the arrow 2px right on `:focus-within`. The
- * launcher itself stays a ghost — no halo, no dwell, no elevation. Only
- * the glyph leans. `aria-hidden` keeps screen readers on the verb
- * ("Save as card"), not the ornament.
+ * The `<LeanArrow />` kernel (`components/shared/LeanArrow.tsx`) wears
+ * `.plate-caption-arrow` so the site-wide nudge rule (`globals.css`,
+ * detached from `.plate-destination` per Mike #43 §6 + Tanya UX §5)
+ * translates the arrow 2px right on `:focus-within`. The launcher itself
+ * stays a ghost — no halo, no dwell, no elevation. Only the glyph leans.
+ * `aria-hidden` (owned by the kernel) keeps screen readers on the verb
+ * ("Save as card"), not the ornament. The leading space lives INSIDE the
+ * kernel's span (Tanya §5.1) — caller drops the manual trailing space.
  */
 function QuoteCardLauncher(
   { onOpen, visited }: { onOpen: () => void; visited?: boolean },
@@ -240,7 +243,7 @@ function QuoteCardLauncher(
         aria-label="Save this quote as a card"
         className={`${paint} text-sys-micro`}
       >
-        Save as card <span aria-hidden="true" className="plate-caption-arrow">→</span>
+        Save as card<LeanArrow />
       </Pressable>
     </div>
   );
