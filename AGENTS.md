@@ -37,6 +37,17 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 ## WIP
 - *(none)*
 
+## Adoption Fences
+
+> One literal, one canonical home (or two when JIT/SVG forces the second).
+> Each fence is a grep-shaped CI guard naming the legal exits in its
+> failure message. New entries land in this list in the same shape
+> (Tanya UX #60 §3 — *shape decides group*).
+
+- Caption-metric face — `<CaptionMetric>` is the only legal speller of the `tracking-sys-caption + tabular-nums` tuple (`lib/design/__tests__/caption-metric-adoption.test.ts`).
+- Numeric-features literals — `font-feature-settings: 'tnum' 1, 'lnum' 1` lives in `lib/design/typography.ts`; the SVG keepsake consumer is the only other home (`lib/design/__tests__/numeric-features-adoption.test.ts`).
+- Filled-glyph optical lift — `relative -top-[0.5px]` lives ONLY in `lib/design/typography.ts` as `FILLED_GLYPH_OPTICAL_LIFT_CLASS`; the worldview + archetype chip manifests reach for the constant by name (Tailwind JIT scans `lib/`, so one literal is sufficient). Symmetric `align-baseline` is wired on both chip rests (NextRead + ExploreArticleCard). `▲` aesthetic carve-out preserved; sub-pixel paint receipt deferred per JSDoc caveat. (`lib/design/__tests__/filled-glyph-lift-adoption.test.ts` — Mike napkin #100, Tanya UX #100, Sid 2026-04-26.)
+
 ## Contrast Audit Receipts
 
 > Two named groups; cardinality lives in the heading. Within each group every

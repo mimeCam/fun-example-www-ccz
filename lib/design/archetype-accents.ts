@@ -55,6 +55,7 @@
  */
 
 import { alphaClassOf } from '@/lib/design/alpha';
+import { FILLED_GLYPH_OPTICAL_LIFT_CLASS } from '@/lib/design/typography';
 import type { ArchetypeKey } from '@/types/content';
 
 // ─── Chip borders — five voices at the muted rung (/30) ────────────────────
@@ -221,16 +222,24 @@ export function archetypeAccentGlyph(k?: ArchetypeKey | null): string {
  * because their ink density centres below the optical line. A 0.5px lift
  * brings them onto the same baseline rhythm as the others.
  *
+ * The shared default — `FILLED_GLYPH_OPTICAL_LIFT_CLASS` — lives in
+ * `lib/design/typography.ts` (one literal, three legal homes, one
+ * grep-fence). This map is the per-glyph aesthetic veto layer: every
+ * filled glyph that wants the default opts in by referencing the
+ * constant; every line glyph (or filled glyph with an aesthetic
+ * carve-out) is simply absent from the map.
+ *
  * `→`, `≈`, `✦` deliberately get no nudge — their ink sits on the
  * optical centre line at micro-text, no compensation needed.
  *
  * One Tailwind utility, no per-glyph component, no ceremony. The
- * `relative -top-[0.5px]` literal must appear verbatim in source for the
- * JIT scanner to emit it (no template interpolation).
+ * verbatim `relative -top-[0.5px]` literal lives in `typography.ts`;
+ * Tailwind's JIT scans `lib/**\/*.ts`, so the utility is emitted once
+ * regardless of how many ledgers reference the constant by name.
  */
 const ARCHETYPE_GLYPH_NUDGE: Partial<Record<ArchetypeKey, string>> = {
-  'deep-diver': 'relative -top-[0.5px]',
-  'collector':  'relative -top-[0.5px]',
+  'deep-diver': FILLED_GLYPH_OPTICAL_LIFT_CLASS,
+  'collector':  FILLED_GLYPH_OPTICAL_LIFT_CLASS,
 };
 
 /**

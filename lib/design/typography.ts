@@ -282,3 +282,60 @@ export const NUMERIC_FEATURE_SETTINGS =
  *   `<text style="${numericFeatureStyle()}">…</text>`
  */
 export const numericFeatureStyle = (): string => NUMERIC_FEATURE_SETTINGS;
+
+// ─── Filled-glyph optical lift — chip-baseline polish ──────────────────────
+
+/**
+ * Tailwind utility pair that lifts filled-ink glyphs by 0.5px so they
+ * rest on the same x-height as line glyphs at `text-sys-micro`.
+ *
+ * The mechanism is **filled-glyph centroid drift at micro text**: filled
+ * glyphs (`▣`, `◉`, `❒`) carry their ink-density centre BELOW the
+ * optical line, so they read as visibly sunk vs line-only siblings
+ * (`◇`, `◯`, `→`, `≈`, `✦`). A single −0.5px lift brings the filled
+ * three onto the same baseline rhythm. This constant is the **default**
+ * for that compensation.
+ *
+ * Per-glyph aesthetic veto is preserved at the surface manifest. `▲`
+ * (worldview/practical) is the documented exception: its downward point
+ * already reads as forward motion (Tanya UX #10 §4.1), so the worldview
+ * surface omits it from `WORLDVIEW_GLYPH_NUDGE`. Lift policy is per-glyph
+ * optical centroid, **not** "every filled glyph." A future filled glyph
+ * whose drift is not visually compensated by its outline opts in via the
+ * `*_GLYPH_NUDGE` map at its surface's manifest.
+ *
+ * **Sub-pixel rendering caveat:** `-top-[0.5px]` may quantize to 0 on a
+ * 1× display with subpixel anti-aliasing disabled. This is acceptable —
+ * the lift is *at most* a 0.5px improvement; when it quantizes away the
+ * chip is no worse than today. This is the source-level token, not a
+ * paint receipt; a paint-byte audit is a sibling concern on a different
+ * branch of the test taxonomy (Mike napkin §4.5, Tanya §4.3).
+ *
+ * **JIT contract:** the literal `relative -top-[0.5px]` must appear
+ * verbatim in source for Tailwind's JIT scanner to emit the utility.
+ * Tailwind scans `lib/**\/*.ts`, so the literal in this export is
+ * sufficient — both consumer ledgers may import the constant by name
+ * without re-spelling the string. No template interpolation in the
+ * literal itself.
+ *
+ * Adoption guard: `lib/design/__tests__/filled-glyph-lift-adoption.test.ts`
+ * fails CI if any module other than this ledger spells the literal
+ * `relative -top-[0.5px]`. The two consumer manifests
+ * (`lib/design/worldview.ts`, `lib/design/archetype-accents.ts`) reach
+ * for the constant by name; a third home flips the fence red and names
+ * the legal exits.
+ *
+ * Mike napkin: *one literal, three legal homes (one export + two
+ * consumers), one grep-fence — named after the physics, shaped exactly
+ * like `NUMERIC_FEATURE_SETTINGS`.* No "handshake" cosmology — N=1 is
+ * not a category (Elon §2.1).
+ *
+ * Credits: Krystle C. (the original DRY scope: one literal, two homes,
+ * one adoption guard), Mike K. (napkin §4.1 — name the physics not the
+ * cosmology, §4.4 — JIT-emission is load-bearing, §4.6 — refuse the
+ * handshake category at N=1), Elon M. (#76 §3.1/§3.2 — sub-pixel
+ * caveat, the `▲` carve-out honesty), Tanya D. (#62 §4.1 — the per-
+ * glyph optical-baseline nudge, #62 §4.2 — the symmetric `align-
+ * baseline` chip-rest fix, §4.1 — the `▲`-as-aesthetic-veto admission).
+ */
+export const FILLED_GLYPH_OPTICAL_LIFT_CLASS = 'relative -top-[0.5px]';

@@ -61,9 +61,15 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
              color alone). `aria-hidden` so a screen reader hears the
              label, not the shape name. Per-glyph optical lift via
              `archetypeAccentGlyphClass` — `◉` and `❒` are filled and
-             visibly sink vs the line glyphs at `text-sys-micro`. */
+             visibly sink vs the line glyphs at `text-sys-micro`.
+
+             Tanya UX #62 §4.2 (extension #100 §2.3): `align-baseline`
+             keeps the rounded `py-sys-1` chip on the same x-height as
+             the `font-sys-accent` "Up Next" kicker — the symmetric fix
+             to the worldview chip's metadata-row landing. Without it
+             the pill leaves a 1px optical drop against the kicker. */
           <span
-            className={`text-sys-micro tracking-sys-caption font-sys-accent border rounded-sys-full px-sys-3 py-sys-1 ${archetypeAccentClass(archetype)}`}
+            className={`text-sys-micro tracking-sys-caption font-sys-accent border rounded-sys-full px-sys-3 py-sys-1 align-baseline ${archetypeAccentClass(archetype)}`}
           >
             <span aria-hidden="true" className={archetypeAccentGlyphClass(archetype)}>
               {archetypeAccentGlyph(archetype)}

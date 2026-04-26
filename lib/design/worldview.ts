@@ -44,6 +44,7 @@
  */
 
 import { alphaClassOf } from '@/lib/design/alpha';
+import { FILLED_GLYPH_OPTICAL_LIFT_CLASS } from '@/lib/design/typography';
 import type { FilterType } from '@/types/filter';
 
 // ─── Chip backgrounds — one register, four voices (hairline rung, /10) ───
@@ -199,15 +200,24 @@ export function worldviewChipGlyph(w?: FilterType): string {
  * their ink density centres below the optical line. A 0.5px lift
  * brings `▣` onto the same baseline rhythm as the others.
  *
+ * The shared default — `FILLED_GLYPH_OPTICAL_LIFT_CLASS` — lives in
+ * `lib/design/typography.ts` (one literal, three legal homes, one
+ * grep-fence). This map is the per-glyph aesthetic veto layer: every
+ * filled glyph that wants the default opts in by referencing the
+ * constant; every filled glyph with an aesthetic carve-out is simply
+ * absent from the map.
+ *
  * `▲` (Practical) deliberately gets no nudge — its downward point reads
  * as "forward," and that suits the worldview voice (Tanya §4.1 table).
+ * The omission *is* the carve-out; do not add a value to silence it.
  *
  * One Tailwind utility, no per-glyph component, no ceremony. The
- * `relative -top-[0.5px]` literal must appear verbatim in source for
- * the JIT scanner to emit it (no template interpolation).
+ * verbatim `relative -top-[0.5px]` literal lives in `typography.ts`;
+ * Tailwind's JIT scans `lib/**\/*.ts`, so the utility is emitted once
+ * regardless of how many ledgers reference the constant by name.
  */
 const WORLDVIEW_GLYPH_NUDGE: Partial<Record<FilterType, string>> = {
-  technical: 'relative -top-[0.5px]',
+  technical: FILLED_GLYPH_OPTICAL_LIFT_CLASS,
 };
 
 /**
