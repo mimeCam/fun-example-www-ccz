@@ -1,21 +1,27 @@
 /**
  * Quote Card Export Utilities
- * Handles downloading and clipboard operations for quote cards.
  *
- * Features:
- * - Download as PNG
- * - Copy to clipboard
- * - File naming with timestamps
- * - Error handling via the shared toast primitive
+ * Pure-TS export helpers for the quote-card surface. These do the work
+ * (download / copy-to-clipboard / batch) and return a boolean. They DO
+ * NOT speak success — the witness lives at the fingertip on the host
+ * (`<QuoteKeepsake>`'s `<ActionPressable>` row), not in the room.
  *
- * Toast feedback: routed through `@/lib/sharing/toast-store` (the 6th
- * primitive's pub/sub singleton). Three `:exempt` comments removed —
- * the surface paints inside React's tree now (Mike §1, Tanya §0).
+ * Direct-gesture asymmetry (Mike #81 / Tanya #75 — quote-card host #2):
+ *   • Success → silent. The caller's `pulse(ok)` glyph swap + sr-only
+ *     `<PhaseAnnouncement>` is the receipt.
+ *   • Failure → `showExportError(method)` toasts with `intent: 'warn'`.
+ *     The asymmetry holds in both directions — failure escalates.
  *
- * Voice parity: phrases flow through `replyPhrase(kind)` — the pure-TS
- * tone resolver. Reflective readers saving a card see "Saved."; kinetic
- * readers see "Downloaded." The under-tinting discipline (Tanya §7.2)
- * lives in the lexicon, not here.
+ * The previous `showExportFeedback(method)` helper has been retired:
+ * the success surface is no longer a toast. The failure helper stays.
+ *
+ * Voice parity: failure phrases flow through `replyPhrase('copy-failed')`
+ * / `replyPhrase('download-failed')` — same lexicon every other surface
+ * uses. No archetype threading; SSR-safe via `readStoredArchetype()`.
+ *
+ * Credits: Mike K. (#81 napkin — strip the success toast, return a
+ * boolean, keep the failure path), Tanya D. (#75 §4.1 — the migration
+ * diff: lines retired, lines kept, why), Sid (this lift).
  */
 
 import { toastShow } from '@/lib/sharing/toast-store';
@@ -106,26 +112,13 @@ export function generateFilename(
 }
 
 /**
- * Surface a success confirmation through the shared toast primitive.
- * Phrase is resolved via the lexicon using the reader's stored archetype
- * (null → `DEFAULT_TONE`). Reflective readers get "Saved." / "Card copied.";
- * kinetic & analytical readers get the neutral defaults.
- */
-export function showExportFeedback(
-  method: 'download' | 'clipboard',
-  onSuccess?: () => void
-): void {
-  toastShow({
-    message: replyPhrase(method === 'download' ? 'download' : 'copy-image'),
-    intent: 'confirm',
-  });
-  if (onSuccess) onSuccess();
-}
-
-/**
  * Surface a failure through the shared toast (warn intent, same surface).
  * Phrase is resolved via the lexicon — the reflective "Didn't land — try
  * again." only reaches reflective readers; others see the neutral failure.
+ *
+ * This is the SOLE legitimate `toastShow` call site in this file: the
+ * asymmetry rule is "failure escalates one level" because the reader
+ * needs to know when the contract breaks (Mike #81 §8.3, Tanya #75 §4.1).
  */
 export function showExportError(method: 'download' | 'clipboard'): void {
   toastShow({
@@ -135,37 +128,40 @@ export function showExportError(method: 'download' | 'clipboard'): void {
 }
 
 /**
- * Export quote card with automatic retry
+ * Attempt one export pass — pure orchestration over the two atoms.
+ * Pulled out so `exportQuoteCard` stays under 10 lines (Sid lab rule).
+ */
+async function attemptExport(
+  dataUrl: string,
+  method: 'download' | 'clipboard',
+  options: ExportOptions,
+): Promise<boolean> {
+  return method === 'download'
+    ? downloadQuoteCard(dataUrl, options)
+    : copyQuoteCardToClipboard(dataUrl);
+}
+
+/**
+ * Export quote card with automatic retry. **Quiet on success** — the
+ * caller owns the witness (an `<ActionPressable>.pulse(ok)` at the
+ * fingertip). Failure (after all retries exhausted) escalates to the
+ * room via `showExportError`. Returns the boolean outcome so the host
+ * can pulse(ok) and emit checkpoints (Mike #81 §4.1).
  */
 export async function exportQuoteCard(
   dataUrl: string,
   method: 'download' | 'clipboard' = 'download',
   options: ExportOptions = {},
-  maxRetries: number = 2
+  maxRetries: number = 2,
 ): Promise<boolean> {
-  let attempts = 0;
-
-  while (attempts <= maxRetries) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const success = method === 'download'
-        ? await downloadQuoteCard(dataUrl, options)
-        : await copyQuoteCardToClipboard(dataUrl);
-
-      if (success) {
-        showExportFeedback(method);
-        return true;
-      }
+      if (await attemptExport(dataUrl, method, options)) return true;
     } catch (error) {
-      console.error(`Export attempt ${attempts + 1} failed:`, error);
+      console.error(`Export attempt ${attempt + 1} failed:`, error);
     }
-
-    attempts++;
-    if (attempts <= maxRetries) {
-      // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, 500));
-    }
+    if (attempt < maxRetries) await new Promise(r => setTimeout(r, 500));
   }
-
   showExportError(method);
   return false;
 }
