@@ -245,13 +245,17 @@ export const THERMAL_RADIUS_VAR = '--token-radius-soft';
  */
 export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
 
-// ─── Thermal-radius drift grandfather — shrinks one entry per PR ───────────
+// ─── Thermal-radius foundation queue — one residual, isolation-first ──────
 
 /**
- * Files that still ship a raw `.thermal-radius` / `.thermal-radius-wide`
- * class literal while the helper migration walks file-by-file. The
- * adoption guard fences NEW drift hard; this list grandfathers the
- * pre-migration callsites so the test stays green between graduations.
+ * Foundation-layer queue of one — `lib/utils/press-phase.ts`. The list
+ * has graduated from a multi-entry punch-list to a single-entry queue:
+ * every user-facing surface of the killer feature (`/mirror`) now
+ * resolves its corner through `thermalRadiusClassByPosture(...)`, and
+ * the only literal that remains lives in a foundation utility consumed
+ * by every `<Pressable>` on the site. Its blast radius is intrinsic;
+ * it gets its own dedicated PR, its own test cycle, its own sprint.
+ * (Mike napkin §4.4 / Paul §6.)
  *
  * Reviewer mantra: **decrement, do not add.** An entry leaves when the
  * file flips to `thermalRadiusClassByPosture(...)`. A PR that adds an
@@ -262,17 +266,18 @@ export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
  * feature surface's graduation drops it to 6. Counter (occurrences across
  * `.ts/.tsx/.css` source — Mike napkin §4): 13 → 12, then 12 → 11 with
  * the MirrorPair PR; ReturnLetter dropped 11 → 10 (5 → 4); ExploreArticleCard
- * dropped 10 → 9 (4 → 3). This PR (Mike napkin #37 §3 / Tanya UX #52 §5)
- * drops the counter further (9 → 8) and the list (3 → 2) by graduating
- * `components/mirror/MirrorLoadingSurface.tsx` — the killer-feature's
- * held-breath surface now answers `ceremony` through the same posture
- * helper its sibling `MirrorRevealCard` already uses. Sibling-handle parity:
- * the load → reveal handoff resolves through one word in source.
+ * dropped 10 → 9 (4 → 3); MirrorLoadingSurface dropped 9 → 8 (3 → 2).
+ * This PR (Mike napkin #38 §1 / Tanya UX #19 §2) drops the counter
+ * further (8 → 7) and the list (2 → 1) by graduating
+ * `app/mirror/page.tsx` — the JSX-comment dialect on the lobby page now
+ * names the helper instead of the raw class literal. Reviewer-language
+ * matches user-language end-to-end; the killer feature speaks
+ * `ceremony` through one helper, in source and on the page alike.
  *
- * The remaining 2 are solo corners. Mike's next-cadence order
- * (one per sprint, isolation-first): `mirror/page.tsx` → `press-phase.ts`.
+ * The remaining 1 is a foundation-layer corner: `press-phase.ts`
+ * exposes `PRESSABLE_BASE`, consumed site-wide. Next sprint, isolation-
+ * first.
  */
 export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [
-  'app/mirror/page.tsx',
   'lib/utils/press-phase.ts',
 ] as const;

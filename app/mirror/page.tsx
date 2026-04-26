@@ -84,11 +84,12 @@ export default function MirrorPage() {
     <div className="min-h-screen p-sys-8">
       <GemHome />
       {/* Loading surface — routed through <Skeleton variant="card"> with
-          geometry pinned to MirrorRevealCard (max-w-md, thermal-radius-wide,
-          p-sys-8). Cadence flows through `.sys-skeleton` (MOTION.linger);
-          reduced-motion floor lands at ALPHA.muted (Tanya UX #47 §3.1). No
-          archetype pre-promise: surface is `bg-surface`, no border, no
-          shadow, no gradient — the reveal earns those when it arrives. */}
+          geometry pinned to MirrorRevealCard (max-w-md, ceremony posture
+          via thermalRadiusClassByPosture, p-sys-8). Cadence flows through
+          `.sys-skeleton` (MOTION.linger); reduced-motion floor lands at
+          ALPHA.muted (Tanya UX #47 §3.1). No archetype pre-promise:
+          surface is `bg-surface`, no border, no shadow, no gradient —
+          the reveal earns those when it arrives. */}
       <div className="flex flex-col items-center justify-center min-h-[85vh]">
         <MirrorLoadingSurface />
       </div>

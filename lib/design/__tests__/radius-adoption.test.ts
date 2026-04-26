@@ -337,7 +337,7 @@ describe('radius adoption — scanner internals are correct', () => {
 
 // ─── Grandfather list — drift receipts, decrementing per migration ────────
 
-describe('thermal-radius grandfather list — auditable drift, shrinking', () => {
+describe('thermal-radius foundation queue — auditable residual, single-file', () => {
   it('every entry is a real, readable source path (no dead receipts)', () => {
     THERMAL_RADIUS_GRANDFATHERED_PATHS.forEach((p) => {
       expect(() => readFileSync(join(ROOT, p), 'utf8')).not.toThrow();
@@ -362,8 +362,8 @@ describe('thermal-radius grandfather list — auditable drift, shrinking', () =>
       .not.toContain('components/shared/Threshold.tsx');
   });
 
-  it('counter shrinks one per PR — current size is 2 (was 3 pre-MirrorLoadingSurface)', () => {
-    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(2);
+  it('counter shrinks one per PR — current size is 1 (was 2 pre-mirror/page graduation)', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS.length).toBe(1);
   });
 
   it('the migrated recognition-letter (ReturnLetter.tsx) is OFF the grandfather list', () => {
@@ -379,5 +379,10 @@ describe('thermal-radius grandfather list — auditable drift, shrinking', () =>
   it('the migrated loading surface (MirrorLoadingSurface.tsx) is OFF the grandfather list', () => {
     expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
       .not.toContain('components/mirror/MirrorLoadingSurface.tsx');
+  });
+
+  it('the graduated mirror page (app/mirror/page.tsx) is OFF the grandfather list', () => {
+    expect(THERMAL_RADIUS_GRANDFATHERED_PATHS)
+      .not.toContain('app/mirror/page.tsx');
   });
 });
