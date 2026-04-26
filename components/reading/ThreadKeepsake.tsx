@@ -58,7 +58,7 @@ import {
   type ThreadSnapshot,
 } from '@/lib/sharing/thread-render';
 import { buildKeepsakeHref, buildUnfurlUrl } from '@/lib/sharing/thread-snapshot';
-import { copyWithFeedback, showCopyFeedback } from '@/lib/sharing/clipboard-utils';
+import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
@@ -315,7 +315,9 @@ async function runCopyImage(
   try {
     const ok = await copyPngToClipboard(svg);
     if (ok) emitCheckpoint(CHECKPOINTS.SHARED);
-    showCopyFeedback(ok ? 'Keepsake copied.' : 'Copy unsupported — try Save.');
+    // Quiet-on-success: the ActionPressable.pulse(ok) glow + sr-only
+    // <PhaseAnnouncement> is the receipt. Failure escalates via
+    // copyWithFeedback's failure path on the link/share verbs (Mike #21).
     pulse(ok);
   } finally { setBusy(null); }
 }
@@ -337,9 +339,13 @@ async function runCopyLink(
 ): Promise<void> {
   setBusy('link');
   try {
-    // copyWithFeedback already emits SHARED on the clipboard-utils path.
-    const ok = await copyWithFeedback(
-      deepLink, 'Link copied — the thread travels with it.');
+    // Quiet-on-success: the Link button's pulse(ok) is the receipt.
+    // Failure still toasts (warn) — see copyWithFeedback's contract.
+    // copyWithFeedback emits SHARED on the clipboard-utils path.
+    const ok = await copyWithFeedback(deepLink, {
+      successMessage: 'Link copied — the thread travels with it.',
+      failureMessage: "Couldn't copy — try Save instead.",
+    });
     pulse(ok);
   } finally { setBusy(null); }
 }
@@ -347,18 +353,31 @@ async function runCopyLink(
 async function runShare(
   snapshot: ThreadSnapshot, deepLink: string, setBusy: (b: Busy) => void,
 ): Promise<void> {
+  // No-fingertip case: the primary CTA is NOT wrapped in ActionPressable
+  // (Krystle's primary-button exclusion). The room voice is the only
+  // available witness on the failover, so we explicitly opt in to it.
   if (typeof navigator === 'undefined' || !navigator.share) {
-    await copyWithFeedback(deepLink, 'Share unsupported — link copied instead.');
+    await runShareFailover(deepLink);
     return;
   }
   setBusy('share');
-  try {
-    await navigator.share({
-      title: snapshot.title || 'A thread I kept',
-      text: 'This is what reading felt like.',
-      url: deepLink,
-    });
-    emitCheckpoint(CHECKPOINTS.SHARED);
-  } catch { /* user cancelled — silent */ }
+  try { await runNativeShare(snapshot, deepLink); }
+  catch { /* user cancelled — silent */ }
   finally { setBusy(null); }
+}
+
+async function runShareFailover(deepLink: string): Promise<void> {
+  await copyWithFeedback(deepLink, {
+    successMessage: 'Share unsupported — link copied instead.',
+    announce: 'room',
+  });
+}
+
+async function runNativeShare(snapshot: ThreadSnapshot, deepLink: string): Promise<void> {
+  await navigator.share({
+    title: snapshot.title || 'A thread I kept',
+    text: 'This is what reading felt like.',
+    url: deepLink,
+  });
+  emitCheckpoint(CHECKPOINTS.SHARED);
 }

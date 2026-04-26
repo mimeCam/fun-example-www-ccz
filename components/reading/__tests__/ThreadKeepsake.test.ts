@@ -127,7 +127,64 @@ describe('ThreadKeepsake · SHARED checkpoint (Paul §Tier-1)', () => {
   });
 });
 
-// ─── 5 · Source-pin invariants — adoption fences mirrored locally ────────
+// ─── 5 · Quiet-on-success contract (Mike #21 / Tanya #10 — Quiet Keepsake) ─
+
+/**
+ * Carve out the body of an `async function <name>(...)` declaration up to
+ * the next `async function` (or end-of-file). Keeps the regex per-test
+ * focused on the *function body* and not stray identifier references that
+ * appear in `useCallback(...)` parameter lists.
+ */
+function bodyOf(name: string): string {
+  const start = SRC.search(new RegExp(`async\\s+function\\s+${name}\\b`));
+  if (start < 0) return '';
+  const tail = SRC.slice(start);
+  const next = tail.slice(1).search(/\basync\s+function\b/);
+  return next < 0 ? tail : tail.slice(0, next + 1);
+}
+
+describe('ThreadKeepsake · quiet-on-success contract (Mike #21 / Tanya #10)', () => {
+  it("runCopyImage no longer emits a redundant toast on success — pulse alone is the receipt", () => {
+    // Source-pin: the showCopyFeedback literal in runCopyImage (the
+    // "Keepsake copied." / "Copy unsupported — try Save." line) is gone.
+    // Same fingertip witness now governs success AND failure: the
+    // ActionPressable.pulse(ok) glow + sr-only <PhaseAnnouncement>.
+    expect(SRC).not.toMatch(/showCopyFeedback\s*\(/);
+    expect(SRC).not.toMatch(/import\s*\{[^}]*showCopyFeedback[^}]*\}/);
+  });
+
+  it("runCopyLink uses the options-bag shape (default-quiet on success)", () => {
+    // copyWithFeedback({ successMessage: ... }) — no positional args,
+    // no announce: 'room'. Quiet-on-success is the default; failure
+    // still escalates via the helper's failure path (warn intent toast).
+    const linkBody = bodyOf('runCopyLink');
+    expect(linkBody).toMatch(/copyWithFeedback\s*\(\s*deepLink\s*,\s*\{/);
+    expect(linkBody).toMatch(/successMessage\s*:\s*['"]Link copied/);
+    // The Link verb has a fingertip — must NOT opt into the room voice.
+    expect(linkBody).not.toMatch(/announce\s*:\s*['"]room['"]/);
+  });
+
+  it("runShareFailover is the lone legitimate announce: 'room' site", () => {
+    // navigator.share-unsupported failover has NO ActionPressable
+    // wrapping the primary CTA (Krystle's primary-button exclusion),
+    // so the room voice is the only available witness — explicit opt-in.
+    const failover = bodyOf('runShareFailover');
+    expect(failover).toMatch(/announce\s*:\s*['"]room['"]/);
+    // No OTHER function body in the file opts into the room voice.
+    expect(bodyOf('runCopyImage')).not.toMatch(/announce\s*:\s*['"]room['"]/);
+    expect(bodyOf('runDownload')).not.toMatch(/announce\s*:\s*['"]room['"]/);
+    expect(bodyOf('runCopyLink')).not.toMatch(/announce\s*:\s*['"]room['"]/);
+    expect(bodyOf('runNativeShare')).not.toMatch(/announce\s*:\s*['"]room['"]/);
+  });
+
+  it("clipboard-utils import is shrunk to copyWithFeedback only", () => {
+    // After the default-flip the keepsake no longer imports
+    // showCopyFeedback — the symbol is dead from this surface.
+    expect(SRC).toMatch(/import\s*\{\s*copyWithFeedback\s*\}\s*from\s*['"]@\/lib\/sharing\/clipboard-utils['"]/);
+  });
+});
+
+// ─── 6 · Source-pin invariants — adoption fences mirrored locally ────────
 
 describe('ThreadKeepsake · adoption fences mirrored locally', () => {
   it('does NOT import `framer-motion` (motion ledger sealed)', () => {

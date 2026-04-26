@@ -35,13 +35,21 @@
  * Reviewed literal messages that may appear inside `toastShow({ message: ... })`
  * without routing through `replyPhrase` / `phraseFor`. Any new entry must be
  * added here (line-by-line review) before the adoption guard will accept it.
+ *
+ * Note (Mike #21 / Tanya #10 — the Quiet Keepsake): after the default-flip,
+ * the keepsake's success literals never reach `toastShow` directly — they
+ * flow through `copyWithFeedback({ successMessage })` and only escalate
+ * to a toast when the caller explicitly opts into the room voice. The
+ * entries below stay listed because they ARE the reviewed phrases the
+ * keepsake hands to the helper; if a future grep accidentally re-introduces
+ * one as a bare `toastShow` argument, we want the audit to recognise it
+ * rather than fail-closed on a phrase the team already approved.
  */
 export const POETIC_OVERRIDES: ReadonlySet<string> = new Set<string>([
   // ThreadKeepsake — the keepsake ceremony's poetic one-offs.
-  'Keepsake copied.',
-  'Copy unsupported — try Download.',
   'Link copied — the thread travels with it.',
   'Share unsupported — link copied instead.',
+  "Couldn't copy — try Save instead.",
 ]);
 
 /**

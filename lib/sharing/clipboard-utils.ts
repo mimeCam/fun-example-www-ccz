@@ -13,10 +13,25 @@
  * Explicit `successMessage` / `failureMessage` overrides still win (callers
  * like `ThreadKeepsake` pass poetic one-offs). Only the *default* path
  * consults the lexicon.
+ *
+ * Direct-gesture asymmetry (Mike #21 / Tanya #10 — the Quiet Keepsake):
+ *   `copyWithFeedback` and `showCopyFeedback` are **quiet-on-success** by
+ *   default. The witness lives at the fingertip (the caller's
+ *   `ActionPressable.pulse(ok)` glow + sr-only `<PhaseAnnouncement>`). The
+ *   room (toast) only speaks when the caller has no fingertip witness OR
+ *   when the operation fails — failure escalates one level because the
+ *   reader needs to know.
+ *
+ *   Opt in to the room voice via `announce: 'room'`. Today the only
+ *   legitimate site is `runShare`'s `navigator.share`-unsupported failover
+ *   (no `ActionPressable` wraps the primary CTA — Krystle's primary-button
+ *   exclusion). The third independent site that needs this asymmetry will
+ *   earn the 9th ledger; until then it lives as a default + a paragraph in
+ *   AGENTS.md (rule of three; doctrine: Mike #70 §A — "no ninth ledger").
  */
 
 import {
-  toastShow, type ToastIntent, type ToastHandle,
+  toastShow, type ToastHandle,
 } from '@/lib/sharing/toast-store';
 import { replyPhrase } from '@/lib/sharing/reply-resolve';
 import {
@@ -122,15 +137,55 @@ export function isClipboardSupported(): boolean {
 }
 
 /**
+ * Where the copy outcome should announce itself.
+ *   `'fingertip'` — default. The caller owns the witness (an
+ *                   `<ActionPressable>` pulse, a button label flip, etc.).
+ *                   Nothing toasts on success; failure still escalates.
+ *   `'room'`      — explicit opt-in for surfaces with no fingertip
+ *                   witness. Both success AND failure toast.
+ *
+ * Failure ALWAYS toasts regardless of `announce` — the contract is
+ * "failure escalates one level" (Tanya §2.1). A failed copy with no
+ * witness anywhere is a silent contract break the reader cannot recover
+ * from. (Mike #21, Tanya #10 §6 — Fingertip-Receipt Covenant.)
+ */
+export type CopyAnnounce = 'fingertip' | 'room';
+
+/** Options bag for `copyWithFeedback` — keyword form, default-quiet. */
+export interface CopyFeedbackOptions {
+  /** Override the success phrase (skips the lexicon for this call). */
+  successMessage?: string;
+  /** Override the failure phrase (skips the lexicon for this call). */
+  failureMessage?: string;
+  /** Optional citation envelope — see `clipboard-envelope.ts`. */
+  envelope?: EnvelopeInput;
+  /** Where the success voice lives. Default: `'fingertip'` (no toast). */
+  announce?: CopyAnnounce;
+}
+
+/**
  * Show a brief toast confirmation. Pure-TS callers route through the
  * single store; the `<ToastHost>` portal mounted in `<ThermalLayout>`
  * paints the surface with full ledger-token resolution.
  *
+ * Quiet-by-default (Mike #21 / Tanya #10): pass `announce: 'room'` to
+ * actually emit a confirm toast. Without it, this helper is a no-op on
+ * success — the assumption is the caller's fingertip already painted the
+ * receipt. The export stays alive for explicit room-voice surfaces.
+ *
+ * Returns a non-null `ToastHandle` only when a toast was actually shown.
+ *
  * @param message - Final, already-tinted phrase to show; defaults to the
  *                  reader-tinted `'copy-text'` phrase via `replyPhrase`.
+ * @param announce - Where the voice lives. Default `'fingertip'` (silent).
  * @param duration - Optional dwell override (defaults to `confirm` budget)
  */
-export function showCopyFeedback(message?: string, duration?: number): ToastHandle {
+export function showCopyFeedback(
+  message?: string,
+  announce: CopyAnnounce = 'fingertip',
+  duration?: number,
+): ToastHandle | null {
+  if (announce !== 'room') return null;
   return toastShow({
     message: message ?? replyPhrase('copy-text'),
     intent: 'confirm',
@@ -139,26 +194,42 @@ export function showCopyFeedback(message?: string, duration?: number): ToastHand
 }
 
 /**
- * Copy text and surface the result through the shared toast. Defaults
- * flow through the lexicon (reader's tone tints the phrase); callers may
- * pass explicit `successMessage` / `failureMessage` to override.
+ * Copy text. Defaults are quiet-on-success: the caller's fingertip
+ * witness owns the receipt; only failures escalate to the room (toast
+ * with `warn` intent). Pass `announce: 'room'` to emit a confirm toast on
+ * success too — used by surfaces with no fingertip available
+ * (`navigator.share` failover, `useToast.confirm(kind)`-style callers).
  *
- * Returns the boolean copy outcome so callers can chain follow-ups.
+ * Returns the boolean copy outcome so callers can chain follow-ups
+ * (`pulse(ok)`, checkpoint emits, etc.).
  */
 export async function copyWithFeedback(
   text: string,
-  successMessage?: string,
-  failureMessage?: string,
-  envelope?: EnvelopeInput,
+  options: CopyFeedbackOptions = {},
 ): Promise<boolean> {
-  const ok = await copyToClipboard(text, envelope);
-  toastShow({
-    message: ok
-      ? (successMessage ?? replyPhrase('copy-link'))
-      : (failureMessage ?? replyPhrase('copy-failed')),
-    intent:  ok ? 'confirm' : 'warn',
-  });
+  const ok = await copyToClipboard(text, options.envelope);
+  if (shouldAnnounce(ok, options.announce)) {
+    toastShow({
+      message: phraseFor(ok, options),
+      intent:  ok ? 'confirm' : 'warn',
+    });
+  }
   return ok;
+}
+
+/**
+ * Toast iff the operation failed (always loud) OR the caller explicitly
+ * opted into the room voice (e.g. `runShare` failover). Success without
+ * an explicit room request stays at the fingertip.
+ */
+function shouldAnnounce(ok: boolean, announce?: CopyAnnounce): boolean {
+  return !ok || announce === 'room';
+}
+
+/** Pick the toast phrase: caller override → lexicon default. */
+function phraseFor(ok: boolean, options: CopyFeedbackOptions): string {
+  if (ok) return options.successMessage ?? replyPhrase('copy-link');
+  return options.failureMessage ?? replyPhrase('copy-failed');
 }
 
 /**
