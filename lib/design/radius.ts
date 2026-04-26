@@ -261,18 +261,19 @@ export const MIRROR_BREATHE_KEYFRAME = 'mirrorRadiusBreathe';
  * Pre-MirrorReveal migration this list carried 7 entries; the killer-
  * feature surface's graduation drops it to 6. Counter (occurrences across
  * `.ts/.tsx/.css` source — Mike napkin §4): 13 → 12, then 12 → 11 with
- * the MirrorPair PR. This PR (Mike #40 §5 / Tanya UX #73 §2.1) drops
- * the counter further (11 → 10) and the list (5 → 4) by graduating
- * `components/return/ReturnLetter.tsx` — the recognition-letter surface
- * now speaks one posture word, in one voice.
+ * the MirrorPair PR; ReturnLetter dropped 11 → 10 (5 → 4). This PR
+ * (Mike napkin #92 / Tanya UX #100 §8) drops the counter further (10 → 9)
+ * and the list (4 → 3) by graduating
+ * `components/explore/ExploreArticleCard.tsx` — the cold-start surface's
+ * two corners (Link focus-ring and inner article) now collapse into one
+ * `THERM_HELD` posture binding, in one voice.
  *
- * The remaining 4 are solo corners. Mike's suggested next-cadence order
- * (one per sprint, isolation-first): `ExploreArticleCard.tsx` →
- * `MirrorLoadingSurface.tsx` → `mirror/page.tsx` → `press-phase.ts`.
+ * The remaining 3 are solo corners. Mike's next-cadence order
+ * (one per sprint, isolation-first): `MirrorLoadingSurface.tsx` →
+ * `mirror/page.tsx` → `press-phase.ts`.
  */
 export const THERMAL_RADIUS_GRANDFATHERED_PATHS: readonly string[] = [
   'app/mirror/page.tsx',
-  'components/explore/ExploreArticleCard.tsx',
   'components/mirror/MirrorLoadingSurface.tsx',
   'lib/utils/press-phase.ts',
 ] as const;

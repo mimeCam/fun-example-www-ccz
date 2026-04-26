@@ -9,6 +9,7 @@ import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import {
   WORLDVIEW_COLORS,
   WORLDVIEW_FALLBACK_BG,
@@ -47,6 +48,18 @@ const CURATED_HOVER   = alphaClassOf('gold', 'recede',   'border'); // border-go
 const ORGANIC_REST    = alphaClassOf('fog',  'hairline', 'border'); // border-fog/10
 const ORGANIC_HOVER   = alphaClassOf('fog',  'recede',   'border'); // border-fog/50
 
+/* ─── Radius-ledger handle (posture-routed thermal corner) ──────────────────
+   `thermal-radius` graduates from raw literal to a posture-vocabulary handle.
+   The reviewer asks "what is this corner saying?" — the answer is `held`:
+   "I am a contained thing you can act on." (RadiusPosture lock, radius.ts §9.)
+
+   Module-scope so the binding evaluates once; Tailwind JIT still sees the
+   verbatim `'thermal-radius'` literal through `radius.ts` source. Output is
+   byte-identical — the card paints the same corner. (Mike napkin §92, Tanya
+   UX §4.1, posture-card cadence: ExploreArticleCard → MirrorLoadingSurface
+   → mirror/page.tsx → press-phase.ts.) */
+const THERM_HELD = thermalRadiusClassByPosture('held');
+
 /**
  * Card edge class — one decision, two voices. Hover variants are written
  * as literals (Tailwind JIT cannot see `hover:${X}` interpolation; the full
@@ -77,9 +90,9 @@ export default function ExploreArticleCard({
     <Link
       ref={ref as React.RefObject<HTMLAnchorElement>}
       href={`/article/${article.id}`}
-      className="block group thermal-radius"
+      className={`block group ${THERM_HELD}`}
     >
-      {/* `thermal-radius` on the anchor itself — so the global :focus-visible
+      {/* `${THERM_HELD}` on the anchor itself — so the global :focus-visible
           ring inherits the same curve the inner article surface declares.
           Without it, keyboard-focus would paint a 0-radius box around a
           rounded card. (Honoring-ring audit — Tanya #93 §4, Mike napkin §4.3.)
@@ -88,7 +101,7 @@ export default function ExploreArticleCard({
           mount (card invisible) then `data-sys-enter="rise"` on intersection
           (card animates in with stagger). One observer for the whole list. */}
       <article
-        className={`bg-surface thermal-radius shadow-sys-rest p-sys-6 h-full flex flex-col
+        className={`bg-surface ${THERM_HELD} shadow-sys-rest p-sys-6 h-full flex flex-col
           card-alive ${edgeClass(isCurated)}`}
       >
         {/* Tanya §2.4: cards are surfaces, not buttons. Rest → sys-rest
@@ -164,4 +177,5 @@ export const __testing__ = {
   ORGANIC_REST,
   ORGANIC_HOVER,
   WORLDVIEW_FALLBACK_BG,
+  THERM_HELD,
 } as const;

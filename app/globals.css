@@ -752,21 +752,40 @@ body {
 /* Perceptible hover: the card feels like picking up a book.
    4px lift crosses spatial perception on any display density.
    1.5% scale reinforces "picking up" metaphor compositively.
-   Shadow width (not opacity) creates visible halo on dark surfaces. */
+   Shadow comes from the elevation ledger — `--sys-elev-float` for organic
+   cards, `--sys-elev-whisper` for curated. Both already authored at the
+   "calm reading surface" weight; no inline literals. (Tanya UX #100 §2 —
+   "fog catching late light", not a Bootstrap modal drop shadow.) */
 .card-alive {
+  /* Hover sequence offset — local rule property, not a system beat
+     (the motion ledger stays 8 named beats; this is choreography
+     between two of them). The title color (group-hover crossfade,
+     t=0) leads the card lift (t=80ms). 80ms is below the conscious-
+     perception window (~100ms) and above the simultaneity threshold
+     (~30ms) — the reader feels the room notice them, not a count of
+     ticks. (Tanya UX #100 §3.) */
+  --card-alive-notice: 80ms;
   transition: transform var(--sys-time-hover) var(--sys-ease-out),
               box-shadow var(--sys-time-hover) var(--sys-ease-out),
               border-color var(--sys-time-hover) var(--sys-ease-out);
 }
+/* Hover sequence (Tanya UX #100 §3): the title color warms first via
+   `group-hover:text-thermal-accent` on the inner <h3> at t=0. The card
+   surface follows after `--card-alive-notice` — below conscious
+   perception (~100ms), above simultaneity (~30ms). The reader cannot
+   count the gap; they only feel the room notice them, then lean in.
+   Title-warmth-leads, surface-follows. */
 .card-alive:hover {
   transform: translateY(-4px) scale(1.015);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--sys-elev-float);
   transition-timing-function: var(--sys-ease-out);
   transition-duration: var(--sys-time-hover);
+  transition-delay: var(--card-alive-notice);
 }
 .card-alive:not(:hover) {
   transition-timing-function: var(--sys-ease-settle);
   transition-duration: var(--sys-time-enter); /* 300ms leave: gentle settle-down = enter beat */
+  transition-delay: 0ms;                      /* one breath out, not two */
 }
 
 /* ─── Resonance Alive Card Glow ──────────────────────────────────────────
@@ -780,9 +799,29 @@ body {
     var(--token-resonance-glow-alive);
 }
 
-/* Curated card alive-state — gold-tinted shadow on hover */
+/* Curated card alive-state — glow family, not depth. The curated row's
+   entire identity is *warmth*; the depth family belongs to the organic
+   grid. Two channels, two jobs, no overload. (Tanya UX #100 §5.) */
 .card-alive-curated:hover {
-  box-shadow: 0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent);
+  box-shadow: var(--sys-elev-whisper);
+}
+
+/* Active confirmation pulse — touch + mouse-down (Tanya UX #100 §4).
+   Half the lift of the hover state, one ledger rung lower (`rise`, not
+   `float`). The pulse confirms the tap landed *before* the page
+   transition begins. Reader-felt impact: the link feels like a button
+   being pressed, not a URL being requested. Mobile parity for the
+   desktop hover polish.
+
+   Source-order matters: this rule must follow `.card-alive:hover` and
+   `.card-alive-curated:hover` so the press depth wins over the curated
+   glow during a press. Same specificity, later cascade. */
+.card-alive:active {
+  transform: translateY(-2px) scale(1.005);
+  box-shadow: var(--sys-elev-rise);
+  transition-duration: var(--sys-time-instant); /* 150ms — receipt of touch */
+  transition-timing-function: var(--sys-ease-out);
+  transition-delay: 0ms;                        /* press confirmation must be immediate */
 }
 
 /* ─── CTA Physical Press ────────────────────────────── */
