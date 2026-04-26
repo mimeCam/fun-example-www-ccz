@@ -110,9 +110,16 @@ export const FOCUS_CSS_PREFIX = '--sys-focus';
  * **Intentionally diverged from `THERMAL.accent = '#7b2cbf'`** post-WCAG-lift
  * — the two literals were textually independent by Mike #62 doctrine *exactly*
  * so this divergence could happen without silent drag. The lift to `#c77dff`
- * (= `BRAND.accentViolet`'s value, by design review NOT by import) raises the
- * painted ring from `1.71:1` (warm) / `1.86:1` (cold) to `3.94:1` / `4.29:1`,
- * clearing WCAG SC 1.4.11 (3.0:1 non-text) at both thermal anchors. The
+ * (= `BRAND.accentViolet`'s value, by design review NOT by import) keeps the
+ * ink in the violet family — Δh `1.91°` vs `THERMAL.accent`, floor `10°`
+ * (gated by `focus-ink-byte-identity.test.ts`) — and clears WCAG SC 1.4.11:
+ * painted ring `3.94:1` worst-case at both anchors, floor `3.0:1` (gated by
+ * `focus-ring-contrast-audit.test.ts`). Two existing witnesses (Δh on the
+ * wheel; painted contrast on the eye), one filename each — adjective→number
+ * by Mike napkin #22 / Tanya UX #41, 2026-04-26. Cardinality 1, single-axis
+ * receipt is honest (Tanya UX #60 §3 *shape decides group*, applied
+ * symmetrically); do NOT import `hue-distance.ts` here (sibling-voice kernel,
+ * wrong failure mode for this surface — rule of three preserved). The
  * killer-feature thread spread (`2.24 → 8.95`) is preserved by leaving
  * `THERMAL.accent` (the thread's dormant cell) untouched. See "WCAG 1.4.11
  * ship" — Mike napkin / Tanya UX #12.
