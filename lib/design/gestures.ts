@@ -297,7 +297,6 @@ export const GESTURE_LEDGER_EXEMPT_TOKEN = 'gesture-ledger:exempt';
  *       `gestureClassesOf` once and is referenced everywhere downstream.
  */
 export const GESTURE_GRANDFATHERED_PATHS: readonly string[] = [
-  'app/resonances/ResonanceEntry.tsx',
   // Mike napkin #88 — `MirrorRevealCard.tsx` redeemed: now reads
   // `gestureClassesForMotion('reveal-keepsake' | 'fade-neutral', reduce)`
   // and honors `prefers-reduced-motion` via `useReducedMotion()`. The list
@@ -310,6 +309,17 @@ export const GESTURE_GRANDFATHERED_PATHS: readonly string[] = [
   // Retiring the file is the cleanest possible noun-shaped answer to
   // "what word did I retire today?" — one fewer surface, one fewer
   // dialect, one shorter ledger. The list ONLY shrinks.
+  // Sid napkin (Mike #42 / Tanya UIX #53) — `app/resonances/ResonanceEntry.tsx`
+  // redeemed two transitions in one breath, both onto verbs already in the
+  // Atlas. The wrapper's settle is `card-settle` (*"the card is drifting
+  // back down to sleep"*); the vitality fill's % crossfade is `fade-neutral`
+  // (*"one thing dissolves while another arrives — neither rushing"*). The
+  // file now reads `gestureClassesForMotion(verb, reduce)` once per call
+  // site and honors `prefers-reduced-motion` via `useReducedMotion()` —
+  // the same shape `MirrorRevealCard` set down. No new helper, no new
+  // ledger crossing; the rose vitality pill stayed inside the gesture
+  // ledger because `vitality: number` is a TTL countdown, not a thermal
+  // score (Elon §1 atom audit, Tanya UIX §6). The list ONLY shrinks.
   'components/mirror/ShareOverlay.tsx',
   // Mike napkin #91 — `whisper-linger` (verb #13) redeemed three sites in
   // one breath: `ViaWhisper`, `RecognitionWhisper`, `GemHome`. They all

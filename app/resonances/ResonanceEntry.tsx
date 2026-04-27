@@ -18,6 +18,15 @@
  * matches `<ThreadKeepsake>` byte-for-byte (no success toast on Copy / Save
  * / Link / Share). One verb per quote per card, never a peer to the
  * resonance card itself (Tanya §2.4 — single primary on the surface).
+ *
+ * Gesture redemption (Sid napkin — Mike #42 / Tanya UIX #53): the card's
+ * two transitions now read on the Gesture Atlas. The wrapper's settle is
+ * `card-settle` ("the card is drifting back down to sleep"); the vitality
+ * fill's % crossfade is `fade-neutral` ("one thing dissolves while another
+ * arrives — neither rushing"). Both branch on `useReducedMotion()` via
+ * `gestureClassesForMotion`, the same shape `MirrorRevealCard` already
+ * uses (Mike napkin #88). A reader who turned motion off no longer feels
+ * the card breathing at them.
  */
 'use client';
 
@@ -27,7 +36,9 @@ import { Pressable } from '@/components/shared/Pressable';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { LeanArrow } from '@/components/shared/LeanArrow';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { passageThermalClass } from '@/lib/design/typography';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { QuoteKeepsake } from '@/components/articles/QuoteKeepsake';
 import { resolveLauncherPaint } from '@/lib/resonances/visited-launcher';
@@ -65,7 +76,9 @@ function CardGem({ faded }: { faded?: boolean }) {
 }
 
 /** Vitality bar — rose gradient for alive, empty for faded. */
-function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean }) {
+function VitalityBar(
+  { vitality, faded, reduce }: { vitality: number; faded?: boolean; reduce: boolean },
+) {
   // Track is ambient chrome — Alpha rung `muted` via the ledger helper,
   // same string emitted as before ("bg-fog/30"), now ledger-sourced.
   const trackClass = `h-1.5 rounded-sys-full ${alphaClassOf('fog', 'muted')} w-full`;
@@ -74,8 +87,10 @@ function VitalityBar({ vitality, faded }: { vitality: number; faded?: boolean })
   const pct = Math.min(100, Math.round((vitality / 30) * 100));
   return (
     <div className={`${trackClass} overflow-hidden`}>
-      <div className="h-full rounded-sys-full bg-gradient-to-r from-rose to-rose/60 transition-all duration-fade"
-        style={{ width: `${pct}%` }} />
+      <div
+        className={`h-full rounded-sys-full bg-gradient-to-r from-rose to-rose/60 transition-all ${gestureClassesForMotion('fade-neutral', reduce)}`}
+        style={{ width: `${pct}%` }}
+      />
     </div>
   );
 }
@@ -88,9 +103,15 @@ export default function ResonanceEntry({
   // it with a 12px lift + opacity fade once 15% of the card enters the viewport.
   const { ref } = useScrollRise({ index: index ?? 0, disabled: index === undefined });
   const keepsake = useQuoteKeepsakeState();
+  // Reduced-motion: read once at the surface and thread the boolean to the
+  // two transitions on this card. `card-settle` is a `skip` policy under
+  // reduce (the return-phase exhale lands instantly); `fade-neutral` is
+  // `shorten` (the % crossfade compresses to the 120ms floor). Same shape
+  // as `MirrorRevealCard` (Mike napkin #88).
+  const reduce = useReducedMotion();
 
   return (
-    <div ref={ref as RefObject<HTMLDivElement>} className={cardClass(faded)}>
+    <div ref={ref as RefObject<HTMLDivElement>} className={cardClass(faded, reduce)}>
       <CardLabel faded={faded} />
       {resonance.quote && <QuotedLine text={resonance.quote} />}
       <div className="h-px max-w-divider bg-gold/20 mb-sys-4" />
@@ -98,7 +119,7 @@ export default function ResonanceEntry({
       <div className="h-px bg-fog mb-sys-4" />
       <ArticleMeta resonance={resonance} timeAgo={timeAgo} />
       <div className="mt-sys-4">
-        <VitalityBar vitality={resonance.vitality} faded={faded} />
+        <VitalityBar vitality={resonance.vitality} faded={faded} reduce={reduce} />
       </div>
       {!faded && resonance.quote && (
         <QuoteCardLauncher onOpen={keepsake.open} visited={visited} />
@@ -122,9 +143,14 @@ export default function ResonanceEntry({
  * (outer belt + inner thermal pulse via `--token-resonance-glow-alive`).
  * `opacity-recede` removed from `dimmed` — the faded state is carried by
  * four internal color tokens (Tanya UIX #64 §3).
+ *
+ * The `alive ↔ shaped` swap rides the `card-settle` verb — *"the card is
+ * drifting back down to sleep"* — branched on `prefers-reduced-motion` so
+ * the return phase lands instantly when the reader has motion off.
  */
-function cardClass(faded?: boolean): string {
-  const base = 'rounded-sys-medium p-sys-7 my-sys-8 transition-all duration-enter';
+function cardClass(faded: boolean | undefined, reduce: boolean): string {
+  const settle = gestureClassesForMotion('card-settle', reduce);
+  const base = `rounded-sys-medium p-sys-7 my-sys-8 transition-all ${settle}`;
   const alive = 'bg-surface/60 border-l-4 border-rose resonance-card-alive';
   const dimmed = 'bg-surface/30 border-l-4 border-rose/30';
   return `${base} ${faded ? dimmed : alive}`;

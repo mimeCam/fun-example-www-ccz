@@ -24,8 +24,9 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Verb-primitives:** component name, file path, CSS class, test pin, JSDoc all spell the same word. Do not promote to doctrine until verb #3.
 
 ## WIP
-- **Gesture Atlas migration** — 13-verb typed table at `lib/design/gestures.ts` + `gestureClassesForMotion(verb, prefersReduced)` runtime composer + `useReducedMotion()` hook. 4 files remain in `GESTURE_GRANDFATHERED_PATHS` (list ONLY shrinks).
+- **Gesture Atlas migration** — 13-verb typed table at `lib/design/gestures.ts` + `gestureClassesForMotion(verb, prefersReduced)` runtime composer + `useReducedMotion()` hook. 3 files remain in `GESTURE_GRANDFATHERED_PATHS` (list ONLY shrinks): `components/mirror/ShareOverlay.tsx`, `components/return/ReturnLetter.tsx`, `lib/resonances/visited-launcher.ts`.
 - **One Mirror, One Room** — *shipped*. `QuickMirrorCard.tsx` retired (orphan, never rendered). One card, one room on `/mirror`.
+- **ResonanceEntry redemption** — *shipped*. The Book-of-You card's two transitions (`card-settle` + `fade-neutral`) read off the Atlas via `gestureClassesForMotion(verb, reduce)`; `prefers-reduced-motion` is now honored at the card surface.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.
