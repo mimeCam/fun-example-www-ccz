@@ -19,10 +19,10 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible.
 
 ## Design System Conventions
-All design rules are enforced by fence tests (`*.fence.test.ts`, `*-fence.test.ts`). Key primitives: `ActionPressable`, `alphaClassOf()`, `swapWidthClassOf()`, `DismissButton`, `OverlayHeader`, `Divider`, `chromeMutedBorder()`. Voice ledger in `lib/design/`. Gesture atlas at `lib/design/gestures.ts`.
+All design rules are enforced by fence tests (`*.fence.test.ts`, `*-fence.test.ts`). Key primitives: `ActionPressable`, `alphaClassOf()`, `swapWidthClassOf()`, `DismissButton`, `OverlayHeader`, `Divider`, `chromeMutedBorder()`. Voice ledger in `lib/design/`. Gesture atlas at `lib/design/gestures.ts`. Fence walker kernel at `lib/design/__tests__/_fence.ts` (two API surfaces: `runLinePatterns`, `runJsxBlocks`); old `_adoption-fence` / `_jsx-fence-walker` are now re-export shims.
 
 ## WIP
-(none)
+- Mechanical sweep: re-point ~13 remaining fence callers (caption-metric, numeric-features, filled-glyph-lift, swap-width on the line-pattern side; voice-call-site, alpha-call-site, divider, dismiss-verb, overlay-header, gesture-call-site, label-swap-width, action-receipt + allowlist on the jsx-call-site side) at the canonical `_fence.ts` and delete the two shims. Independent, mechanical, low-risk — out of scope for the consolidation commit.
 
 ## Deployment
 Docker on port 7200. Volumes: `persona-blog-db`, `persona-blog-logs`.

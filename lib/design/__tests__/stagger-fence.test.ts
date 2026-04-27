@@ -26,7 +26,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runFence, formatViolations, type FenceDecl } from './_adoption-fence';
+import { runLinePatterns, formatViolations, type FenceDecl } from './_fence';
 import {
   STAGGER_ALLOWED_PATHS,
   STAGGER_LEDGER_EXEMPT_TOKEN,
@@ -51,7 +51,7 @@ const FENCE: FenceDecl = {
 // ─── Tests — the bare-class fence ─────────────────────────────────────────
 
 describe('stagger adoption — every *-stagger-N literal routes through staggerClassOf', () => {
-  const violations = runFence(FENCE);
+  const violations = runLinePatterns(FENCE);
 
   const fixHint =
     `    → use staggerClassOf({ family, rung }) from lib/design/stagger\n` +
