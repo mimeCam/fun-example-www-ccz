@@ -66,6 +66,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { chromeMutedBorder } from '@/lib/design/chrome-paint';
 import { Toast, __testing__ } from '../Toast';
 import type { ToastMsg } from '@/lib/sharing/toast-store';
 
@@ -98,13 +99,19 @@ describe('Toast — alpha-ledger handle points at the canonical rung', () => {
     expect(SURFACE_BORDER).toContain('border-fog/30');
   });
 
+  it('SURFACE_BORDER routes through the chrome-paint kernel', () => {
+    // Mike napkin §1 — Toast joins five sister chrome edges at one
+    // paint can; the kernel is the SSOT, this assertion is its echo.
+    expect(SURFACE_BORDER).toBe(`border ${chromeMutedBorder()}`);
+  });
+
   it('SURFACE_BORDER is NOT the pre-snap drift value (border-fog/15)', () => {
     expect(SURFACE_BORDER).not.toContain('border-fog/15');
     expect(SURFACE_BORDER).not.toContain(alphaClassOf('fog', 'hairline', 'border'));
   });
 
   it('SURFACE_BASE composes the resolver call, not a hand-typed literal', () => {
-    expect(SURFACE_BASE).toContain(alphaClassOf('fog', 'muted', 'border'));
+    expect(SURFACE_BASE).toContain(chromeMutedBorder());
     expect(SURFACE_BASE).not.toContain('border-fog/15');
   });
 });

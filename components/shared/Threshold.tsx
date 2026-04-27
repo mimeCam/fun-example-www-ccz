@@ -27,6 +27,7 @@ import {
   resolveBackdropStyle, resolveChamberExitStyle,
 } from '@/lib/utils/animation-phase';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
+import { chromeMutedBorder } from '@/lib/design/chrome-paint';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 
@@ -71,10 +72,13 @@ const CENTER_LAYOUT =
 const DRAWER_LAYOUT =
   'fixed top-0 right-0 bottom-0 z-sys-drawer flex pointer-events-none';
 
-// // reader-invariant:forced-colors — border-fog/30 evaporates; replace with
-// a `CanvasText` edge so the modal keeps a visible rectangle.
+// // reader-invariant:forced-colors — `border-fog/30` evaporates; replace
+// with a `CanvasText` edge so the modal keeps a visible rectangle. The
+// hairline routes through the chrome-paint kernel (Mike napkin §1, Tanya
+// UIX §2) — same paint can as Toast / AmbientNav / both Keepsakes /
+// KeepsakePlate. Five-edges-one-hand: this is the doorway edge.
 const CENTER_SHAPE =
-  'w-full max-w-2xl border border-fog/30 ' +
+  `w-full max-w-2xl border ${chromeMutedBorder()} ` +
   'forced-colors:border-[CanvasText]';
 
 // // reader-invariant:forced-colors — drawer's left-accent re-expresses as

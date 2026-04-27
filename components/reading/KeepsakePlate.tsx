@@ -45,6 +45,7 @@ import {
 } from '@/lib/hooks/useKeepsakePreview';
 import { MOTION } from '@/lib/design/motion';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
+import { chromeMutedBorder } from '@/lib/design/chrome-paint';
 
 interface KeepsakePlateProps {
   articleId: string;
@@ -167,11 +168,25 @@ function PlateThumbnail({ snapshot }: { snapshot: ThreadSnapshot }) {
     <div
       role="img"
       aria-label={`Your thread keepsake for ${snapshot.title || 'this read'}`}
-      className="rounded-sys-medium overflow-hidden border border-fog/30 bg-void w-full"
+      className={thumbnailFrameClass()}
       style={{ aspectRatio: `${KEEPSAKE_DIMENSIONS.width} / ${KEEPSAKE_DIMENSIONS.height}` }}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );
+}
+
+/**
+ * Frame composer — geometry + chrome-paint hairline. The border routes
+ * through `chromeMutedBorder()` so this inline thumbnail shares the
+ * exact paint can with the modal Keepsake frames it previews. Mike
+ * napkin §1; Tanya UIX §2 — five edges, one hand. ≤ 10 LOC.
+ */
+function thumbnailFrameClass(): string {
+  return [
+    'rounded-sys-medium overflow-hidden border',
+    chromeMutedBorder(),
+    'bg-void w-full',
+  ].join(' ');
 }
 
 /**

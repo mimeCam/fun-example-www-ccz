@@ -53,6 +53,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { createElement } from 'react';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { chromeMutedBorder } from '@/lib/design/chrome-paint';
 import { __testing__ } from '../ThreadKeepsake';
 
 const { KeepsakePreview, PREVIEW_FRAME } = __testing__;
@@ -91,6 +92,12 @@ describe('ThreadKeepsake — alpha-ledger handle points at the canonical rung', 
   it('PREVIEW_FRAME is border-fog/30 (the `muted` rung wire format)', () => {
     expect(PREVIEW_FRAME).toBe(alphaClassOf('fog', 'muted', 'border'));
     expect(PREVIEW_FRAME).toBe('border-fog/30');
+  });
+
+  it('PREVIEW_FRAME routes through the chrome-paint kernel', () => {
+    // Mike napkin §1 — five chrome edges, one paint can; the keepsake
+    // frame's call site is byte-identical to its sister surfaces.
+    expect(PREVIEW_FRAME).toBe(chromeMutedBorder());
   });
 
   it('PREVIEW_FRAME is NOT the pre-snap drift value (border-fog/20)', () => {

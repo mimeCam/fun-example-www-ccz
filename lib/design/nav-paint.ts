@@ -41,6 +41,7 @@
  */
 
 import { alphaClassOf, type AlphaRung } from './alpha';
+import { chromeMutedBorder } from './chrome-paint';
 import type { ThermalState } from '@/lib/thermal/thermal-score';
 
 // ─── Gem — quiet/dormant + three thermal rungs ────────────────────────────
@@ -195,6 +196,8 @@ export function navBarChassis(): string {
   // below IS voice (fog/muted) and routes through alphaClassOf.
   const geom = 'fixed bottom-0 inset-x-0 z-sys-nav';
   const scrim = 'bg-void/80 backdrop-blur-sm animate-fade-in';
-  const hairline = `border-t ${alphaClassOf('fog', 'muted', 'border')}`;
+  // chrome-paint kernel — the chassis hairline shares one register with
+  // Toast / Threshold / KeepsakePlate / both Keepsakes (Mike napkin §1).
+  const hairline = `border-t ${chromeMutedBorder()}`;
   return `${geom} ${scrim} ${hairline}`;
 }

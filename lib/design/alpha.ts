@@ -277,40 +277,22 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   presence at its tide-mark crest; the gem at every state sits at
   //   least one rung lower. The list ONLY shrinks. Pinned in
   //   `lib/design/__tests__/nav-voice-adoption.test.ts`.
-  // Live drifter retired (Mike napkin #110, Tanya UIX #43, Krystle drift-
-  //   density pick): `ThreadKeepsake.tsx` — TWO drift sites snapped to
-  //   the ledger. (1) keepsake preview frame: `border-fog/20` →
-  //   `alphaClassOf('fog','muted','border')` (= `border-fog/30`) — sister
-  //   surfaces at the share boundary now frame at the same rung as the
-  //   sibling `QuoteKeepsake.tsx:166` (Mike napkin #92). (2) dev-only
-  //   unfurl printout: `text-mist/60` (off-ledger) →
-  //   `alphaClassOf('mist','recede','text')` (= `text-mist/50`) — meta
-  //   line under the actions cluster, ledger calibration: recede = "the
-  //   frame around the subject; bylines, captions, attribution."
-  //   Pair-snap heuristic only; no `preview-frame.ts` kernel-lift (rule
-  //   of three; N=2 is two callers, not a kernel — Elon §2). Pinned in
-  //   `components/reading/__tests__/ThreadKeepsake.alpha.test.ts`.
-  // Live drifter retired (Mike napkin #110 §4 + Tanya UIX #43, Sid
-  //   2026-04-27): `AmbientNav.tsx` — chassis graduated to the Voice
-  //   Ledger via the new `navBarChassis()` resolver in
-  //   `lib/design/nav-paint.ts`. Two literals were on the bar's frame:
-  //     hairline — `border-fog/20` → `alphaClassOf('fog','muted','border')`
-  //                (= `border-fog/30`). Third occurrence of the pair-snap
-  //                after `ThreadKeepsake bdb7608` and `QuoteKeepsake
-  //                3f25b18`; rule-of-three threshold (Mike #110 §6) —
-  //                licenses the snap, NOT a kernel-lift. Sister chrome
-  //                surfaces now share the `muted` rung (Tanya UIX #43 §2.1).
-  //     scrim    — `bg-void/80 backdrop-blur-sm` → exempt token. `void`
-  //                ∉ ALPHA_COLOR_FAMILIES, `/80` ∉ legal rungs; routing
-  //                through `alphaClassOf` would either lie about the
-  //                scrim or dilute the four-rung discipline. The
-  //                `// alpha-ledger:exempt — structural scrim` token
-  //                inside `navBarChassis()` is the audit trail (Elon #80
-  //                option (a), adopted verbatim).
-  //   The AmbientNav source now contains zero `bg-void/<N>` and zero
-  //   `border-fog/<N>` matches; the chassis fence (§1 of
-  //   `nav-voice-adoption.test.ts`, widened) catches re-introduction.
-  //   The list ONLY shrinks.
+  // Live drifters retired — `border-fog/20|15 → /30` chrome-muted register
+  //   (Mike napkins #92 / #110 / #112 / chrome-paint-kernel, Tanya UIX
+  //   #43 / #87 / "five edges, one hand", Sid). The four prior `border-
+  //   fog/<N>` snaps (`QuoteKeepsake`, `ThreadKeepsake`, `AmbientNav`
+  //   chassis hairline, `Toast`) plus the two raw-literal migrations
+  //   (`Threshold` center-shape, `KeepsakePlate` thumbnail) all route
+  //   through `chromeMutedBorder()` in `lib/design/chrome-paint.ts` —
+  //   one paint can, six chrome edges, byte-identical grep parity.
+  //   Active SSOT lives at the kernel; the per-file `*.alpha.test.ts`
+  //   pins the wire format and the `chrome-paint-fence.test.ts` pins
+  //   the call-site rhythm. The chassis scrim's `bg-void/80` exempt
+  //   token still lives inside `navBarChassis()` (Elon #80 option (a)
+  //   — `void` ∉ ALPHA_COLOR_FAMILIES; `/80` ∉ legal rungs).
+  //   ThreadKeepsake's secondary `text-mist/60 → /50` snap is unrelated
+  //   to chrome-paint; the `mist`-recede route through `alphaClassOf`
+  //   stays its own one-line audit trail.
   // Live drifter retired (Mike napkin #111, Tanya UIX #80, Krystle drift-
   //   density pick, Sid 2026-04-27): `app/resonances/ResonanceEntry.tsx`
   //   — the `alive ↔ dimmed` pair-rule graduates to the role-based 4-rung
@@ -345,24 +327,9 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   text-tier floor over both anchors. Pinned in
   //   `app/resonances/__tests__/ResonanceEntry.alpha.test.ts`.
   //   The list ONLY shrinks.
-  // Live drifter retired (Mike napkin #112, Tanya UIX #87, Sid 2026-04-27):
-  //   `components/shared/Toast.tsx` — the 6th primitive's surface graduates
-  //   to the chrome-muted register. ONE drift site snapped to the ledger:
-  //     hairline — `border border-fog/15` → `border ${alphaClassOf(
-  //                'fog','muted','border')}` (= `border-fog/30`). Toast
-  //                joins `AmbientNav`, `ThreadKeepsake`, `QuoteKeepsake` at
-  //                the `muted` rung; the four-surface chrome register now
-  //                shares one resolver call as its name (Tanya UIX #87 §2).
-  //   Sister-surface symmetry (Tanya §2 + §6): top-edge AmbientNav hairline
-  //   ↔ bottom-edge Toast hairline both at `/30` — the viewport's chrome
-  //   bookends now speak the same dialect; the prior `/15` ↔ `/30` half-step
-  //   contrast mismatch is resolved. No `chromeBorder()` kernel-lift
-  //   (rule-of-three: N=4 callers ≠ a kernel — Mike §6 / Elon §2.2; we
-  //   lift when a fifth surface arrives and the resolver call starts
-  //   feeling ceremonial). No "chrome-muted hairline" docstring planted
-  //   (the function call IS the vocabulary — Tanya §5). Pinned in
-  //   `components/shared/__tests__/Toast.alpha.test.ts`.
-  //   The list ONLY shrinks.
+  //   (Toast's `/15 → /30` snap is part of the consolidated chrome-paint
+  //   note above — sister-surface symmetry with the AmbientNav top-edge
+  //   hairline. Pinned in `components/shared/__tests__/Toast.alpha.test.ts`.)
   // Live drifter retired (Mike napkin #30 — Quote-Frame Const, Grandfather
   //   Shrink — + Tanya UIX #12 §1 — The Echo Frame, Sid 2026-04-27):
   //   `components/resonances/ResonanceDrawer.tsx` — the duplicated quoted-

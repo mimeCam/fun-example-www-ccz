@@ -32,7 +32,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { MOTION, MOTION_REDUCED_MS, EASE } from '@/lib/design/motion';
-import { alphaClassOf } from '@/lib/design/alpha';
+import { chromeMutedBorder } from '@/lib/design/chrome-paint';
 import { useReducedMotionFlag } from '@/lib/utils/reduced-motion';
 import { type ToastMsg, type ToastIntent } from '@/lib/sharing/toast-store';
 
@@ -64,18 +64,17 @@ interface ToastProps {
  * `aria-live="polite"`; this surface is silent at the ARIA layer.
  */
 /**
- * Hairline graduation (Mike napkin #112, Tanya UIX #87): Toast joins the
- * chrome-muted register already shared by `AmbientNav`, `ThreadKeepsake`,
- * and `QuoteKeepsake`. The border routes through the alpha ledger via
- * `alphaClassOf('fog','muted','border')` (= `border-fog/30`) — the JIT-safe
- * literal-table factory — so a future swap of the rung vocabulary cannot
- * silently drift the register without flipping `Toast.alpha.test.ts`.
+ * Hairline graduation — Toast routes through the chrome-paint kernel
+ * (`lib/design/chrome-paint.ts`). The kernel resolves to the on-ledger
+ * literal `alphaClassOf('fog','muted','border')` (= `border-fog/30`) so
+ * a future swap of the rung vocabulary cannot silently drift the register
+ * without flipping both `Toast.alpha.test.ts` and the kernel-fence.
  *
- * The function call IS the vocabulary. No docstring "chrome-muted hairline"
- * token is planted — three sister surfaces already grep to this exact call;
- * make the fourth match (Tanya §5).
+ * The function call IS the vocabulary; the call-site grep is the SSOT.
+ * Mike napkin §1; Tanya UIX §2 (five edges, one hand). Five sister
+ * surfaces share this exact call.
  */
-const SURFACE_BORDER = `border ${alphaClassOf('fog', 'muted', 'border')}`;
+const SURFACE_BORDER = `border ${chromeMutedBorder()}`;
 
 // // reader-invariant:forced-colors — `bg-foreground` / `text-background` /
 // `shadow-sys-float` / `border-fog/30` all strip by spec. Replace with a

@@ -60,7 +60,7 @@ import {
   showExportError,
 } from '@/lib/quote-cards/export-utils';
 import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
-import { alphaClassOf } from '@/lib/design/alpha';
+import { chromeMutedBorder } from '@/lib/design/chrome-paint';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
 import { OverlayHeader } from '@/components/shared/OverlayHeader';
@@ -157,13 +157,16 @@ function useGeneratedCard(
 interface PreviewProps { dataUrl: string; title: string }
 
 /**
- * Frame rung — `muted` (0.30) on `fog`. The border is felt-but-not-seen:
- * traces the rounded corner so it reads as a deliberate shape, then
- * disappears behind the subject (Tanya UIX #92 §2 — the photographable
- * frame). One rung lighter than the modal panel so the two frames
- * concentric-nest instead of competing.
+ * Frame rung — chrome-paint kernel (Mike napkin §1). Routes through
+ * `chromeMutedBorder()` to land on `border-fog/30` (= `muted` on `fog`).
+ * The border is felt-but-not-seen: traces the rounded corner so it reads
+ * as a deliberate shape, then disappears behind the subject (Tanya UIX
+ * #92 §2 — the photographable frame). One rung lighter than the modal
+ * panel so the two frames concentric-nest instead of competing. Sibling
+ * surface to `ThreadKeepsake.tsx` and the four other chrome edges that
+ * route through the same kernel call.
  */
-const PREVIEW_FRAME = alphaClassOf('fog', 'muted', 'border');
+const PREVIEW_FRAME = chromeMutedBorder();
 
 /**
  * Opaque preview frame — `bg-void` is deliberate (Tanya #75 §3.5: the card
