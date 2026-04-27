@@ -11,13 +11,16 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark
 - `components/articles/` — QuoteKeepsake
-- `components/shared/__tests__/_jsx-fence-walker.ts` — shared transport kernel for call-site fences
+- `components/shared/__tests__/_jsx-fence-walker.ts` — shared transport kernel for call-site fences (4 tenants: lean-arrow, alpha, voice, action-receipt)
+- `lib/design/__tests__/action-receipt-allowlist.ts` — single source of truth for receipt-bearing JSX hosts
 - `scripts/` — build-time codegen
 
 ## Core Feature
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible.
 
 ## Design Rules
+- **Action Receipt:** discrete events (click/copy/share/save/dismiss/submit) end with a settled-state acknowledgement — visible delta + SR peer, same source. Canonical host: `ActionPressable` (`components/shared/ActionPressable.tsx`). Fence: `components/shared/__tests__/action-receipt-fence.test.ts`. Escape hatch: `// receipt-opt-out: <reason>` on the handler line.
+- **Gesture Release:** continuous attachments (hover, focus-within, scroll) return to rest. The release IS the third state — no fourth ceremony. Canonical: `LeanArrow` (`components/shared/LeanArrow.tsx`).
 - **Direct-gesture asymmetry:** fingertip witness → no toast; no witness → room voice via `announce: 'room'`
 - **Voice peer:** `copyWithFeedback()` must spell `announce:` literally at every call site (fence: `lib/sharing/__tests__/voice-call-site-fence.test.ts`)
 - **Alpha call-site:** `alphaClassOf()` must pass quoted literals — no variables, no templates (fence: `components/shared/__tests__/alpha-call-site-fence.test.ts`)
