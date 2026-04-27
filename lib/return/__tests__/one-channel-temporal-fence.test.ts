@@ -76,11 +76,20 @@ describe('one-channel temporal fence · §1 lift moments are unique', () => {
     expect(letterTimeline().liftMs).not.toBe(whisperTimeline().liftMs);
   });
 
-  it('letter lifts AFTER whisper (the room exhales before it speaks)', () => {
-    // Tanya UX §4.2: the SSR paint settles, THEN the letter card
-    // approaches. Whisper has no rest delay (its CSS animation-delay
-    // owns the visible lift gate); the letter waits one frame seed.
-    expect(letterTimeline().liftMs).toBeGreaterThan(whisperTimeline().liftMs);
+  it('letter and whisper lift at distinct offsets (kernel-owned anticipation)', () => {
+    // Mike napkin §"Kernel-Owned Anticipation": whisper now claims the
+    // 1500ms anticipation breath that previously lived inline as a CSS
+    // animationDelay on RecognitionWhisper. The letter still waits one
+    // frame seed (~50ms). The single-channel promise is uniqueness of
+    // lift moments — the spatial selector enforces the mutual-exclusion
+    // (letter and whisper never paint together by route gate); the
+    // *ordering* between them is incidental and is now flipped by the
+    // very property we want (the whisper's anticipation lives on the
+    // timeline, not in the surface). Pin uniqueness; drop the order.
+    const a = letterTimeline().liftMs;
+    const b = whisperTimeline().liftMs;
+    expect(a).not.toBe(b);
+    expect(Math.min(a, b)).toBeGreaterThanOrEqual(0);
   });
 });
 

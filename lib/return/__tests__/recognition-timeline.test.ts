@@ -157,8 +157,19 @@ describe('recognition-timeline · §4 phaseAt walks the milestones', () => {
     expect(phaseAt(letterTimeline(), Number.MAX_SAFE_INTEGER)).toBe('fold');
   });
 
-  it('whisper t=0 falls into settle immediately (lift+rest are zero-width)', () => {
-    expect(phaseAt(whisperTimeline(), 0)).toBe('settle');
+  it('whisper t=0 sits at rest (the kernel-owned anticipation breath)', () => {
+    // Mike napkin §"Kernel-Owned Anticipation" — `liftMs = MOTION.settle`
+    // promotes the previously-inline CSS animationDelay into the kernel.
+    // For the first 1500ms the whisper sits at rest; the lift gate is
+    // owned by the timeline, not by the surface.
+    expect(phaseAt(whisperTimeline(), 0)).toBe('rest');
+  });
+
+  it('whisper t=liftMs falls into settle immediately (settleMs is zero-width)', () => {
+    const t = whisperTimeline();
+    // settleMs = 0; phaseAt is half-open, so t = liftMs lands directly
+    // in 'settle' (lift is a zero-ms blip the chain walker steps through).
+    expect(phaseAt(t, t.liftMs)).toBe('settle');
   });
 
   it('phaseAt is monotonic — once past a phase, never returns to it', () => {

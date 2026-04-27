@@ -147,13 +147,13 @@ export function letterTimeline(): RecognitionTimeline {
  *   • ViaWhisper.T_LINGER (was 6000ms — re-canonicalised to 8s here so
  *     every recognition voice across the site speaks the same dwell).
  *
- * The CSS animation-delay on RecognitionWhisper still owns the *visible*
- * lift gate (1500ms inside the surface itself); this timeline owns the
- * post-lift silence and the retirement to muted.
+ * `liftMs` is the time the room takes before greeting the reader. The
+ * kernel owns it; both whisper surfaces (`RecognitionWhisper`, `ViaWhisper`)
+ * inherit it. All five phase durations are owned by `whisperTimeline()`.
  */
 export function whisperTimeline(): RecognitionTimeline {
   return {
-    liftMs:   0,
+    liftMs:   MOTION.settle,            // 1500 — the breath before greeting
     settleMs: 0,
     holdMs:   MOTION.linger * 8,        // 8000 — the canonical recognition dwell
     foldMs:   MOTION.settle,            // 1500 — gentle retirement

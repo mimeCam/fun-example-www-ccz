@@ -227,13 +227,24 @@ describe('Recognition pair — closing-of-letter rung === whisper-quote rung', (
     expect(CLOSING_QUIET).toBe('text-foreground/70');
   });
 
-  it('the whisper paints its quote at the `opacity-quiet` rung', () => {
-    // The Whisper's body line speaks at `opacity-quiet` in its initial,
-    // pre-settle state — the moment the reader's eye lands on it. After
-    // 8 linger breaths it dissolves to `opacity-muted` (ambient room
-    // presence), but the speaking register is `quiet`. (Tanya UX #63 §4.)
-    const whisper = renderWhisperQuote();
-    expect(whisper).toContain('opacity-quiet');
+  it('the whisper paints its quote at the `opacity-quiet` rung (speaking phase)', () => {
+    // After Mike's "Kernel-Owned Anticipation" refactor, `liftMs` is owned
+    // by the timeline kernel — the surface paints `opacity-0` during the
+    // 1500ms breath (`rest` phase, the SSR initial state) and crosses to
+    // `opacity-quiet` once the kernel says `lift`/`settle`. SSR markup
+    // therefore carries `opacity-0`; the source carries the speaking-rung
+    // class for the kernel to walk into. After 8 linger breaths the cue
+    // dissolves to `opacity-muted` (ambient room presence) — the speaking
+    // register is `quiet`. (Tanya UX #63 §4; Mike napkin §"Kernel-Owned
+    // Anticipation".)
+    const fs = require('node:fs') as typeof import('node:fs');
+    const path = require('node:path') as typeof import('node:path');
+    const src = fs.readFileSync(
+      path.join(__dirname, '..', 'RecognitionWhisper.tsx'), 'utf8',
+    );
+    expect(src).toContain('opacity-quiet');
+    // SSR pin — the breath frame is opacity-0 (the kernel-owned anticipation).
+    expect(renderWhisperQuote()).toContain('opacity-0');
   });
 
   it('the closing register and the whisper-quote register are the SAME rung name', () => {
