@@ -70,7 +70,7 @@ export default function MirrorPage() {
       <div className="flex flex-col items-center justify-center min-h-[85vh]">
         {mirror
           ? <MirrorRevealCard mirror={mirror} />
-          : <QuickMirrorAsReveal result={quickMirror!} />}
+          : <QuickMirrorReveal result={quickMirror!} />}
         <MetaLine
           articlesRead={articlesRead}
           firstDetected={firstDetected}
@@ -116,8 +116,11 @@ function EmptyMirror() {
 
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
-/** Quick-mirror result rendered in the same card style as MirrorRevealCard. */
-function QuickMirrorAsReveal({ result }: { result: QuickMirrorResult }) {
+/** Quick-mirror result, rendered through `MirrorRevealCard` — the singular
+ *  reveal surface on `/mirror` (Tanya UX "One Mirror, One Room" §3).
+ *  The cold and warm branches share one card, one room — only the data
+ *  source differs. */
+function QuickMirrorReveal({ result }: { result: QuickMirrorResult }) {
   const fakeMirror: ReaderMirror = {
     archetype: result.archetype,
     archetypeLabel: result.archetypeLabel,

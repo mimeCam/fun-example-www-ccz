@@ -10,6 +10,7 @@
 import { useState, useEffect } from 'react';
 import type { ArchetypeKey } from '@/types/content';
 import { friendWhisperText } from '@/lib/sharing/deep-link';
+import { gestureClassesOf } from '@/lib/design/gestures';
 
 /** Time before the whisper dims (2 × linger — this is a greeting, not ambient). */
 const T_LINGER = 6000;
@@ -29,7 +30,7 @@ export default function ViaWhisper({ via }: Props) {
 
   return (
     // alpha-ledger:exempt — motion fade endpoint (opacity-100 is the visible transition target)
-    <p className={`text-center text-sys-caption transition-opacity duration-linger mb-sys-4
+    <p className={`text-center text-sys-caption transition-opacity ${gestureClassesOf('whisper-linger')} mb-sys-4
       ${dimmed ? 'opacity-muted' : 'opacity-100'}`}>
       <span className="text-gold/80 italic">{text}</span>
     </p>

@@ -13,6 +13,7 @@
 import { useEffect, useState } from 'react';
 import type { ReturnRecognitionState } from '@/lib/hooks/useReturnRecognition';
 import { MOTION } from '@/lib/design/motion';
+import { gestureClassesOf } from '@/lib/design/gestures';
 
 /** Whisper-settle dwell: eight `linger` breaths. A long, ambient quiet. */
 const WHISPER_SETTLE_MS = MOTION.linger * 8; // 8000ms
@@ -41,7 +42,7 @@ export function RecognitionWhisper({ recognition }: Props) {
       style={{ animationDelay: `${MOTION.settle}ms`, animationFillMode: 'forwards' }}
     >
       <p
-        className={`text-sys-caption italic font-display transition-opacity duration-linger thermal-drift
+        className={`text-sys-caption italic font-display transition-opacity ${gestureClassesOf('whisper-linger')} thermal-drift
           ${settled ? 'opacity-muted' : 'opacity-quiet'}`}
         style={{ color: 'var(--mist)' }}
       >

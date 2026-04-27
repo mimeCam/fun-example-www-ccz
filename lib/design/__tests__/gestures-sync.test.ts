@@ -35,6 +35,7 @@ import {
   GESTURE_MOTION_ENDPOINT_PATHS,
   gestureClassesOf,
   reducedClassOf,
+  gestureClassesForMotion,
   gestureInvariantHolds,
   type GestureVerb,
   type ReducedPolicy,
@@ -103,6 +104,38 @@ describe('reducedClassOf — three policies, three shapes', () => {
   });
 });
 
+// ─── Tests — runtime-branched composer (Mike napkin #88 §4.1) ─────────────
+
+/**
+ * `gestureClassesForMotion(verb, prefersReduced)` is a runtime ternary
+ * over two table reads — never a template. The two branches must equal
+ * the canonical helpers exactly so a future refactor cannot slip a
+ * dynamic string past either the JIT or the type system.
+ */
+describe('gestureClassesForMotion — branches over the policy column', () => {
+  it('prefersReduced=false → identical to gestureClassesOf(verb)', () => {
+    GESTURE_VERBS.forEach((v) => {
+      expect(gestureClassesForMotion(v, false)).toBe(gestureClassesOf(v));
+    });
+  });
+
+  it('prefersReduced=true → identical to reducedClassOf(verb)', () => {
+    GESTURE_VERBS.forEach((v) => {
+      expect(gestureClassesForMotion(v, true)).toBe(reducedClassOf(v));
+    });
+  });
+
+  it("the killer-feature pair: 'reveal-keepsake' + 'fade-neutral' both shorten under reduce", () => {
+    expect(gestureClassesForMotion('reveal-keepsake', true)).toBe('duration-crossfade ease-out');
+    expect(gestureClassesForMotion('fade-neutral',    true)).toBe('duration-crossfade ease-out');
+  });
+
+  it('the perform branch preserves the authored timing for the killer-feature pair', () => {
+    expect(gestureClassesForMotion('reveal-keepsake', false)).toBe('duration-reveal ease-out');
+    expect(gestureClassesForMotion('fade-neutral',    false)).toBe('duration-fade ease-sustain');
+  });
+});
+
 // ─── Tests — structural invariants of the table ───────────────────────────
 
 describe('gestures — structural invariants', () => {
@@ -122,8 +155,8 @@ describe('gestures — structural invariants', () => {
     expect(new Set<GestureVerb>(GESTURE_VERBS).size).toBe(GESTURE_VERBS.length);
   });
 
-  it('at least twelve verbs — the four-domain vocabulary is seated', () => {
-    expect(GESTURE_VERBS.length).toBeGreaterThanOrEqual(12);
+  it('at least thirteen verbs — the four-domain vocabulary is seated', () => {
+    expect(GESTURE_VERBS.length).toBeGreaterThanOrEqual(13);
   });
 });
 

@@ -228,13 +228,15 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   letter and the whisper-quote register both resolve to `quiet`. Pinned
   //   in `components/return/__tests__/ReturnLetter.alpha.test.ts`.
   // Live drifter retired (Mike napkin #47 §3, mirroring napkin #19 §4.2):
-  //   `QuickMirrorCard.tsx` — five drift sites snapped to the ledger
+  //   `QuickMirrorCard.tsx` — five drift sites were snapped to the ledger
   //   (dismissed-divider /20 → hairline; whisper-quote /80 → quiet;
   //   shimmer + reveal + rest border /20 → muted, the pair-rule rung the
-  //   sibling MirrorRevealCard already paints with). Emergence stays at
-  //   hairline so the choreography reads as progressive presence
-  //   (emergence whispers itself in → shimmer/reveal/rest earn the muted
-  //   border). Pinned in `components/mirror/__tests__/QuickMirrorCard.alpha.test.ts`.
+  //   sibling MirrorRevealCard already paints with). The file itself was
+  //   later RETIRED (Sid, Tanya UX "One Mirror, One Room") — `app/mirror/
+  //   page.tsx` adapts the quick-mirror result onto `MirrorRevealCard`
+  //   for both branches, so the orphan ceased to ship; the receipt now
+  //   lives only on the surviving sibling
+  //   (`components/mirror/MirrorRevealCard.tsx`). The list ONLY shrinks.
   // Live drifter retired (Mike napkin #50, Tanya UX #58):
   //   `ExploreArticleCard.tsx` — nine drift sites snapped to the ledger
   //   (curated rest /20 → muted; organic rest /15 → hairline; organic

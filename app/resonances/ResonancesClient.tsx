@@ -250,9 +250,12 @@ export default function ResonancesClient() {
                   visited={isVisited(r.id)}
                   onSaved={() => markVisited(r.id)}
                 />
-                {/* Data-driven whisper between entries */}
+                {/* Data-driven whisper between entries — joins the scroll-rise wave
+                    via shared `index` so the whisper exhales on the same beat as the
+                    card it follows (Tanya UX §3.2 — one observer, one rhythm).
+                    Renders null when the synthesizer has nothing to say. */}
                 {i < carrying.length - 1 && (
-                  <EvolutionThread context={contexts[i]} />
+                  <EvolutionThread context={contexts[i]} index={i} />
                 )}
               </div>
             );

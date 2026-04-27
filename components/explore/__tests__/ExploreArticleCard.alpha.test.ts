@@ -34,9 +34,11 @@
  *      are JIT-visible (template interpolation cannot reach hover: prefix —
  *      Mike #50 §7 #1).
  *
- * Mirrors the `ReturnLetter.alpha.test.ts` and `QuickMirrorCard.alpha.test.ts`
+ * Mirrors the `ReturnLetter.alpha.test.ts` and `MirrorRevealCard.alpha.test.ts`
  * shape: `testEnvironment: 'node'`, `react-dom/server` `renderToStaticMarkup`,
  * `React.createElement`. No jsdom dependency added. Per-file pin only.
+ * (The sibling `QuickMirrorCard.alpha.test.ts` was retired alongside its
+ * orphan component file in Sid's "One Mirror, One Room" pass.)
  *
  * Credits: Mike K. (architect napkin #50 — drift inventory, pair-invariant
  * receipt-test pattern, the JIT-safe-literal table convention, the

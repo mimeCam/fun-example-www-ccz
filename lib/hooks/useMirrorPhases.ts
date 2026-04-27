@@ -1,12 +1,21 @@
 /**
- * useMirrorPhases — 5-phase animation state machine for mirror reveal cards.
+ * useMirrorPhases — 5-phase animation state machine for the mirror reveal card.
  *
- * Phases: hidden → emergence → shimmer → reveal → rest
- * Both QuickMirrorCard and MirrorRevealCard share this logic.
- * Reduced-motion: instant jump to 'rest' (no ceremony).
+ * Phases: hidden → emergence → shimmer → reveal → rest.
+ *
+ * Singular consumer today: `MirrorRevealCard` on `/mirror` (it reads
+ * `MIRROR_PAGE_TIMINGS`). The cold and warm branches of the page both
+ * route through the same component with the same cadence — the reader
+ * sees one card, one breath. (Pre-cycle `QuickMirrorCard` and its
+ * companion `QUICK_TIMINGS` row were retired in Sid's "One Mirror, One
+ * Room" pass; the inline reveal had already been removed from the
+ * article flow.)
+ *
+ * Reduced-motion: instant jump to 'rest' AND `showShares = true` in the
+ * same effect tick — no perceived stagger when the reader has asked the
+ * room to be still (Tanya UX §4 "share-row stagger floor").
  *
  * @param timings — phase transition timestamps (ms from mount).
- * @param shareDelay — ms after rest phase to show share actions.
  */
 
 'use client';
@@ -22,15 +31,6 @@ export interface MirrorPhaseTimings {
   rest: number;
   shareDelay: number;
 }
-
-/** Default timings for the inline QuickMirrorCard (reflective, generous). */
-export const QUICK_TIMINGS: MirrorPhaseTimings = {
-  emerge: 0,
-  shimmer: 800,
-  reveal: 2000,
-  rest: 4000,
-  shareDelay: 1200,
-};
 
 /** Default timings for the mirror-page MirrorRevealCard (faster, reader chose this). */
 export const MIRROR_PAGE_TIMINGS: MirrorPhaseTimings = {

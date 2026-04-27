@@ -204,8 +204,10 @@ const config: Config = {
         // shared <Skeleton variant="card"> primitive, so the breath cadence
         // matches every other loading surface on the site (`MOTION.linger`).
         'mirror-shimmer': 'mirrorGlow 0.8s ease-in-out infinite',
-        // QuickMirrorCard — 2-cycle gold glow during emergence
-        'quick-mirror-glow': 'quickMirrorPulse 600ms ease-in-out 2',
+        // `quick-mirror-glow` retired with `QuickMirrorCard.tsx` (Sid,
+        // Tanya UX "One Mirror, One Room") — the inline reveal stopped
+        // shipping; the warm-data card on `/mirror` rides `mirror-shimmer`
+        // (gold-to-violet) and the archetype-tinted shimmerStyle inline.
         // Discovery — one-shot gold-to-cyan border transition
         'discovery-shimmer': 'discoveryShimmer 1.2s ease-out forwards',
         // Toast transitions
@@ -260,10 +262,8 @@ const config: Config = {
           '0%, 100%': { boxShadow: '0 0 20px color-mix(in srgb, var(--primary) 30%, transparent)' },
           '50%': { boxShadow: '0 0 50px color-mix(in srgb, var(--accent-violet) 50%, transparent)' },
         },
-        quickMirrorPulse: {
-          '0%, 100%': { boxShadow: '0 8px 40px color-mix(in srgb, var(--gold) 25%, transparent)' },
-          '50%': { boxShadow: '0 12px 60px color-mix(in srgb, var(--gold) 40%, transparent)' },
-        },
+        // `quickMirrorPulse` keyframe retired alongside `QuickMirrorCard.tsx`
+        // (Sid, Tanya UX "One Mirror, One Room"). No remaining consumer.
         discoveryShimmer: {
           '0%': { borderLeftColor: 'var(--gold)', boxShadow: `-4px 0 16px color-mix(in srgb, var(--gold) 20%, transparent)` },
           '60%': { borderLeftColor: 'var(--gold)', boxShadow: `-4px 0 8px color-mix(in srgb, var(--gold) 8%, transparent)` },

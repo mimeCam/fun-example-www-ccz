@@ -1,9 +1,13 @@
 /**
- * MirrorRevealCard — full archetype reveal on /mirror page.
+ * MirrorRevealCard — the singular archetype reveal surface, on `/mirror`.
  *
- * Same phase system as QuickMirrorCard but faster ceremony (~3.5s vs ~5.2s).
- * The reader chose to come here — less preamble, faster reward.
- * Share actions appear 600ms after rest (vs 1200ms inline).
+ * One card, one room (Tanya UX "One Mirror, One Room"). Both the warm
+ * branch (`mirror`) and the cold branch (`quickMirror` adapted by
+ * `app/mirror/page.tsx`) render this component; the inline-end-of-article
+ * sibling (`QuickMirrorCard.tsx`) was retired in Sid's pass — its file
+ * had been an orphan the reader never met. Share actions appear 600ms
+ * after rest; reduced-motion collapses that stagger to 0 in the same
+ * effect tick (`useMirrorPhases`).
  */
 
 'use client';
@@ -13,9 +17,11 @@ import type { ArchetypeKey } from '@/types/content';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
 import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import { useMirrorPhases, MIRROR_PAGE_TIMINGS, type Phase } from '@/lib/hooks/useMirrorPhases';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import ShareOverlay from './ShareOverlay';
 import { MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 
 /* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
@@ -42,6 +48,7 @@ interface Props {
 
 export default function MirrorRevealCard({ mirror, articleId }: Props) {
   const { phase, showContent, showShares } = useMirrorPhases(MIRROR_PAGE_TIMINGS);
+  const reduce = useReducedMotion();
   const colors = ARCHETYPE_COLORS[(mirror.archetype as ArchetypeKey) ?? 'collector'];
   const shareResult = buildShareResult(mirror);
 
@@ -50,27 +57,43 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
       <div className={`
         relative max-w-md w-full ${THERM_CEREMONY} p-sys-8 text-center
         bg-gradient-to-b from-surface to-background overflow-hidden
-        transition-all duration-reveal ease-out
+        transition-all ${REVEAL_GESTURE(reduce)}
         ${phaseClass(phase)}
       `}
-        style={shimmerStyle(phase, colors)}>
-        <RevealLabel visible={showContent} color={colors.hex} />
+        style={shimmerStyle(phase, colors, reduce)}>
+        <RevealLabel visible={showContent} color={colors.hex} reduce={reduce} />
         <ArchetypeName label={mirror.archetypeLabel} visible={showContent} color={colors.hex} />
-        <WhisperQuote text={mirror.whisper} visible={showContent} />
-        <GoldDivider visible={showContent} color={colors.hex} />
+        <WhisperQuote text={mirror.whisper} visible={showContent} reduce={reduce} />
+        <GoldDivider visible={showContent} color={colors.hex} reduce={reduce} />
         {showShares && <ShareOverlay result={shareResult} articleId={articleId} />}
       </div>
     </div>
   );
 }
 
+/* ─── Verb-resolved class fragments ───────────────────────────────────────
+   Mike napkin #88 §1: every transition's (duration, ease) pair routes
+   through the verb registry, branched on `prefers-reduced-motion`. The two
+   verbs the card consumes:
+
+     • `reveal-keepsake` — the card itself (the killer-feature carrier).
+     • `fade-neutral`    — the inner content cascade (label, whisper,
+                            divider) — *one dissolves while another arrives*.
+
+   Both pre-resolve to JIT-visible literal strings via the (perform / shorten)
+   table in `lib/design/gestures.ts`. */
+const REVEAL_GESTURE = (r: boolean): string => gestureClassesForMotion('reveal-keepsake', r);
+const FADE_GESTURE   = (r: boolean): string => gestureClassesForMotion('fade-neutral',    r);
+
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
-function RevealLabel({ visible, color }: { visible: boolean; color: string }) {
+function RevealLabel({ visible, color, reduce }: {
+  visible: boolean; color: string; reduce: boolean;
+}) {
   return (
     <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-2
-      transition-all duration-fade ${fadeClass(visible)}`}
-      style={{ ...fadeStyle(visible, 0), color, opacity: visible ? 0.7 : 0 }}>
+      transition-all ${FADE_GESTURE(reduce)} ${fadeClass(visible)}`}
+      style={{ ...fadeStyle(visible, 0, reduce), color, opacity: visible ? 0.7 : 0 }}>
       Because you stayed…
     </p>
   );
@@ -79,32 +102,46 @@ function RevealLabel({ visible, color }: { visible: boolean; color: string }) {
 function ArchetypeName({ label, visible, color }: {
   label: string; visible: boolean; color: string;
 }) {
+  // The visible state rides the bespoke `mirror-archetype-label` keyframe
+  // (a CSS animation, not a transition) — out of the verb registry's scope
+  // by Tanya UX §5.3 (paint, not gesture). Reduced-motion is owned by the
+  // keyframe's own `@media (prefers-reduced-motion: reduce)` pair (CSS).
   return (
     <h2 className={`text-sys-h3 font-display font-sys-display tracking-sys-heading
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
-      style={{ ...fadeStyle(visible, MOTION.instant), color }}>
+      style={{ ...fadeStyle(visible, MOTION.instant, false), color }}>
       {label}
     </h2>
   );
 }
 
-function WhisperQuote({ text, visible }: { text: string; visible: boolean }) {
+function WhisperQuote({ text, visible, reduce }: {
+  text: string; visible: boolean; reduce: boolean;
+}) {
   // Alpha ledger: `quiet` (0.70) — "content, but not THE content."
   // The whisper is a quote; archetype name above is THE content. /80 was drift.
   return (
     <p className={`mt-sys-3 text-sys-caption ${WHISPER_TEXT} italic max-w-card-body
-      mx-auto typo-caption transition-all duration-fade ${fadeClass(visible)}`}
-      style={fadeStyle(visible, MOTION.enter)}>
+      mx-auto typo-caption transition-all ${FADE_GESTURE(reduce)} ${fadeClass(visible)}`}
+      style={fadeStyle(visible, MOTION.enter, reduce)}>
       &ldquo;{text}&rdquo;
     </p>
   );
 }
 
-function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
+function GoldDivider({ visible, color, reduce }: {
+  visible: boolean; color: string; reduce: boolean;
+}) {
   // Alpha ledger: `muted` (0.30) — "ambient chrome; skip past it."
-  // Same rung as the QuickMirrorCard divider and the GoldenThread fading posture.
+  // Same rung as the GoldenThread fading posture. Reduced-motion:
+  // `fade-neutral` policy = `shorten` → 120ms crossfade-floor; the divider
+  // lands at scale-x-1 nearly instantly. Tanya UX §4.1.
+  // gesture-ledger:exempt — `transition-transform` continuous gesture; no
+  // verb minted (rule of three not met — the only consumer of this rhythm
+  // is this card; the orphan sibling was retired). Tanya UX "One Mirror,
+  // One Room" §3 + Mike napkin #88 §4.
   return (
-    <div className={`my-sys-6 h-px max-w-divider mx-auto transition-transform duration-fade opacity-muted
+    <div className={`my-sys-6 h-px max-w-divider mx-auto transition-transform ${FADE_GESTURE(reduce)} opacity-muted
       ${visible ? 'scale-x-100' : 'scale-x-0'}`}
       style={{ backgroundColor: color }} />
   );
@@ -113,8 +150,8 @@ function GoldDivider({ visible, color }: { visible: boolean; color: string }) {
 /* ─── Helpers ───────────────────────────────────────────── */
 
 function phaseClass(p: Phase): string {
-  // Tanya §2.3: same as QuickMirrorCard — the room is warming (bloom),
-  // not lifting. The reveal gesture lives in the prior shimmer phase.
+  // Tanya §2.3: the room is warming (bloom), not lifting. The reveal
+  // gesture lives in the prior shimmer phase.
   // alpha-ledger:exempt — motion fade endpoints (hidden → shimmer/reveal/rest).
   // `emergence` uses `opacity-quiet` (0.70) — the "content-but-not-the-content"
   // rung — so the card is legible at that tier before shimmer brings full presence.
@@ -133,9 +170,14 @@ function phaseClass(p: Phase): string {
 }
 
 /* elevation-ledger:exempt — Tanya §5 mirror-card archetype-tint carve-out.
-   Shape mirrors `bloom`; color is archetype-driven instead of gold. */
-function shimmerStyle(p: Phase, colors: { shimmerTo: string }): React.CSSProperties {
-  if (p !== 'shimmer') return {};
+   Shape mirrors `bloom`; color is archetype-driven instead of gold.
+   Reduced-motion (Tanya UX §4.1): skip the archetype-tinted shimmer beat
+   entirely — render at rest-state shadow only. The card's CSS `box-shadow`
+   transition still rides `gestureClassesForMotion` so the swap is gentle. */
+function shimmerStyle(
+  p: Phase, colors: { shimmerTo: string }, reduce: boolean,
+): React.CSSProperties {
+  if (reduce || p !== 'shimmer') return {};
   return { boxShadow: `0 12px 60px ${colors.shimmerTo}` };
 }
 
@@ -144,18 +186,29 @@ function fadeClass(visible: boolean): string {
   return visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md';
 }
 
-function fadeStyle(visible: boolean, delayMs: number): React.CSSProperties {
-  return visible ? { transitionDelay: `${delayMs}ms` } : {};
+/** Stagger the inner cascade — except under reduced motion, where every
+ *  child lands at delay 0 (Tanya UX §4.1 — "All three at delay 0"). */
+function fadeStyle(visible: boolean, delayMs: number, reduce: boolean): React.CSSProperties {
+  if (!visible) return {};
+  return { transitionDelay: `${reduce ? 0 : delayMs}ms` };
 }
 
 /**
- * Test seam — pure helpers + alpha-ledger handles, exposed so the
- * adoption test can pin the phase→className map deterministically
- * without spinning up a phase machine. Mirrors the CaptionMetric
- * `__testing__` idiom (Mike #38 §5).
+ * Test seam — pure helpers + alpha-ledger handles + verb-resolved class
+ * fragments, exposed so adoption tests can pin the phase→className map and
+ * the gesture-resolution branches deterministically without spinning up a
+ * phase machine. Mirrors the CaptionMetric `__testing__` idiom (Mike #38 §5).
+ *
+ * Verb resolvers: `REVEAL_GESTURE(reduce)` and `FADE_GESTURE(reduce)` —
+ * the two consumer branches the killer-feature carrier exercises. Pinned
+ * by `MirrorRevealCard.gestures.test.ts` per Mike napkin #88 §4.2.
  */
 export const __testing__ = {
   phaseClass,
+  fadeStyle,
+  shimmerStyle,
+  REVEAL_GESTURE,
+  FADE_GESTURE,
   WHISPER_TEXT,
   BORDER_HAIRLINE,
   BORDER_MUTED,

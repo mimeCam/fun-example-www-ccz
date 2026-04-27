@@ -23,10 +23,11 @@
  *     fragments; the surface loses its transition at runtime.
  *
  *   • `reduced: 'perform' | 'shorten' | 'skip'` is a **typed column** on
- *     each row. Today, the column has values; the resolver wiring (which
- *     reads `prefers-reduced-motion` and applies the policy) is a follow-
- *     up sprint per Mike #9 Point 3. The column locks the policy at the
- *     type level so a future reduced-motion pass is a one-table edit.
+ *     each row. The column locks the policy at the type level so a reduced-
+ *     motion pass is a one-table edit. The runtime carrier is
+ *     `gestureClassesForMotion(verb, prefersReduced)`; the first consumer
+ *     is `MirrorRevealCard` via `useReducedMotion()` (Mike napkin #88).
+ *     Future call sites read the same composer.
  *
  *   • Twelve verbs, four domains (Tanya UX §2): **input** (fingertip),
  *     **surface** (room leans), **content-swap** (one dissolves, another
@@ -129,6 +130,15 @@ export const GESTURES = {
   'card-settle':      { beat: 'enter',     ease: 'settle',  reduced: 'skip'    },
   /** *"The room is closing its door — chamber first, the air dims a beat later."* */
   'threshold-slide':  { beat: 'instant',   ease: 'out',     reduced: 'shorten' },
+  /** *"The room is exhaling a thought it doesn't quite say — present, then dim."*
+   *  Whisper-class ambient fade: arrival/return greetings and the home gem's
+   *  thermal color drift. 1000ms = `linger`, the passage-breathing beat. The
+   *  three call sites (`ViaWhisper`, `RecognitionWhisper`, `GemHome`) shared
+   *  this rhythm by accident before; the verb names the breath.
+   *  `reduced: 'shorten'` (not `'skip'`) — a whisper at the floor crossfade
+   *  is still a whisper; silence would invert the felt sentence.
+   *  Krystle C. (verb #13), Tanya UX §1, Mike napkin #91. */
+  'whisper-linger':   { beat: 'linger',    ease: 'out',     reduced: 'shorten' },
 
   // ─── Content swap — one thing dissolves while another arrives ────────────
   /** *"Something precious is emerging — slow, delicate, earned."*
@@ -177,6 +187,7 @@ const VERB_CLASSES: Readonly<Record<GestureVerb, string>> = {
   'card-lift':          'duration-hover ease-out',
   'card-settle':        'duration-enter ease-settle',
   'threshold-slide':    'duration-instant ease-out',
+  'whisper-linger':     'duration-linger ease-out',
   'reveal-keepsake':    'duration-reveal ease-out',
   'title-warm':         'duration-crossfade ease-out',
   'fade-neutral':       'duration-fade ease-sustain',
@@ -201,15 +212,38 @@ export function gestureClassesOf(verb: GestureVerb): string {
  * `'skip'` returns the empty string (the endpoint state lands instantly,
  * no transition class is emitted). Pure, ≤ 10 LoC.
  *
- * Today the resolver is not wired (Mike #9 Point 3); the helper exists so
- * the follow-up sprint that DOES honor `prefers-reduced-motion` is a one-
- * file edit, not a registry rebuild. Pinned by the sync test.
+ * The runtime carrier is `gestureClassesForMotion(verb, prefersReduced)`
+ * (see below); the first consumer is `components/mirror/MirrorRevealCard.tsx`
+ * via `useReducedMotion()` (Mike napkin #88). The `reduced:` column is no
+ * longer "locked-but-unwired" — the killer feature reads it.
  */
 export function reducedClassOf(verb: GestureVerb): string {
   const policy = GESTURES[verb].reduced;
   if (policy === 'skip') return '';
   if (policy === 'perform') return VERB_CLASSES[verb];
   return 'duration-crossfade ease-out';
+}
+
+/**
+ * The verb's class fragment **branched on the runtime motion preference**:
+ *
+ *   `prefersReduced === false` → `gestureClassesOf(verb)` (the authored row)
+ *   `prefersReduced === true`  → `reducedClassOf(verb)`   (the policy row)
+ *
+ * Both arms resolve to STRING LITERALS Tailwind's JIT can already see in
+ * source — this composer is a runtime ternary over two table reads, never
+ * a template. Same JIT-literal lesson as `alphaClassOf` and `gestureClassesOf`.
+ *
+ * Wire this at any `'use client'` call site that reads `useReducedMotion()`.
+ * Per Mike napkin #88, `MirrorRevealCard` is the first consumer that turns
+ * the locked `reduced:` column into behaviour the visitor can feel. Pure,
+ * ≤ 10 LoC. Pinned by `gestures-sync.test.ts`.
+ */
+export function gestureClassesForMotion(
+  verb: GestureVerb,
+  prefersReduced: boolean,
+): string {
+  return prefersReduced ? reducedClassOf(verb) : gestureClassesOf(verb);
 }
 
 // ─── Invariant — locked by the sync test ──────────────────────────────────
@@ -263,15 +297,30 @@ export const GESTURE_LEDGER_EXEMPT_TOKEN = 'gesture-ledger:exempt';
  *       `gestureClassesOf` once and is referenced everywhere downstream.
  */
 export const GESTURE_GRANDFATHERED_PATHS: readonly string[] = [
-  'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
-  'components/mirror/MirrorRevealCard.tsx',
-  'components/mirror/QuickMirrorCard.tsx',
+  // Mike napkin #88 — `MirrorRevealCard.tsx` redeemed: now reads
+  // `gestureClassesForMotion('reveal-keepsake' | 'fade-neutral', reduce)`
+  // and honors `prefers-reduced-motion` via `useReducedMotion()`. The list
+  // ONLY shrinks; do not re-add without a new migration receipt.
+  // Sid napkin #N (Tanya UX spec, "One Mirror, One Room") — the
+  // `components/mirror/QuickMirrorCard.tsx` entry is gone because the
+  // file is gone. The orphan was never rendered: `app/mirror/page.tsx`
+  // adapts a quick-mirror result into `MirrorRevealCard` for both
+  // branches; the article page removed the inline reveal long ago.
+  // Retiring the file is the cleanest possible noun-shaped answer to
+  // "what word did I retire today?" — one fewer surface, one fewer
+  // dialect, one shorter ledger. The list ONLY shrinks.
   'components/mirror/ShareOverlay.tsx',
-  'components/navigation/GemHome.tsx',
-  'components/return/RecognitionWhisper.tsx',
+  // Mike napkin #91 — `whisper-linger` (verb #13) redeemed three sites in
+  // one breath: `ViaWhisper`, `RecognitionWhisper`, `GemHome`. They all
+  // shared the (linger, out) rhythm longhand; the verb names it. The
+  // call-site rhythm fence pins them to the same string forever.
+  // Mike napkin #N (Tanya UX §3) — `app/resonances/EvolutionThread.tsx`
+  // redeemed onto `whisper-linger`; the fourth site joins ViaWhisper /
+  // RecognitionWhisper / GemHome on the (linger, out) breath. The page's
+  // gold thread of memory now runs through chapter break + carrying divider
+  // + this whisper as one chord. The list ONLY shrinks.
   'components/return/ReturnLetter.tsx',
-  'components/home/ViaWhisper.tsx',
   'lib/resonances/visited-launcher.ts',
 ] as const;
 

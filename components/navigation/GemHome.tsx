@@ -17,6 +17,7 @@
 import Link from 'next/link';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 import { GemIcon } from '@/components/shared/GemIcon';
+import { gestureClassesOf } from '@/lib/design/gestures';
 
 function gemColor(state: string, quiet: boolean): string {
   if (quiet) return 'text-mist/20';
@@ -52,7 +53,7 @@ export function GemHome({ quiet = false }: GemHomeProps) {
       // round silhouette — a pill ring around the gem instead of a 0-radius
       // box (honoring-ring, Tanya #93 §4 / Mike napkin §4.3).
       className={`rounded-sys-full fixed top-sys-4 left-sys-6 z-sys-gem hover:text-gold
-        transition-colors duration-linger ease-out
+        transition-colors ${gestureClassesOf('whisper-linger')}
         ${gemColor(state, quiet)} ${gemShadow(state, quiet)}`}
       aria-label="Home"
     >

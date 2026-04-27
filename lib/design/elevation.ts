@@ -12,8 +12,9 @@
  *
  * The site had 44+ raw `box-shadow` declarations in `globals.css` plus
  * inline drift in `press-phase.ts`, `clipboard-utils.ts`, `GemHome.tsx`,
- * `QuickMirrorCard.tsx`, and `SelectionPopoverTrigger.tsx`. This module
- * is the one home for shadow values; the adoption guard keeps it that way.
+ * `QuickMirrorCard.tsx` (file later retired — Sid, Tanya UX "One Mirror,
+ * One Room"), and `SelectionPopoverTrigger.tsx`. This module is the one
+ * home for shadow values; the adoption guard keeps it that way.
  *
  * IMPORTANT: if you change a value in globals.css, change it here too.
  * The test in __tests__/elevation-sync.test.ts catches drift.

@@ -209,8 +209,10 @@ export default function ExploreArticleCard({
 /**
  * Test seam — pure helpers + alpha-ledger handles, exposed so the per-file
  * adoption test can pin the card's edge classes deterministically without
- * spinning up the full SSR render. Mirrors the `QuickMirrorCard.__testing__`
- * idiom (Mike napkin #19 §5; #50 §4).
+ * spinning up the full SSR render. Mirrors the `MirrorRevealCard.__testing__`
+ * idiom (Mike napkin #19 §5; #50 §4); the prior sibling
+ * `QuickMirrorCard.__testing__` was retired alongside its orphan component
+ * (Sid, Tanya UX "One Mirror, One Room").
  */
 export const __testing__ = {
   edgeClass,
