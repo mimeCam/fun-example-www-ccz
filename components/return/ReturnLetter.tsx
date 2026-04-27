@@ -62,8 +62,8 @@ const COPY_TOAST_MS = MOTION.linger * 2; // 2000ms
 // scattered annotations (Mike POI-3, Tanya §4.3):
 //
 //   • Alpha ledger   — rung handles (LABEL_RECEDE, CLOSING_QUIET, …) above.
-//   • Motion ledger  — opacity-0/100 endpoints inside `phaseStyles`
-//                      (alpha-ledger:exempt — motion fade endpoint).
+//   • Motion ledger  — alpha-ledger:exempt — motion fade endpoint;
+//                      opacity-0/100 endpoints inside `phaseStyles`.
 //   • Gesture ledger — transition timing routes through
 //                      `gestureClassesForMotion(verb, reduce)` below.
 //                      Verbs: `reveal-keepsake` (card), `fade-neutral`

@@ -58,6 +58,7 @@ import {
   showExportError,
 } from '@/lib/quote-cards/export-utils';
 import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
+import { alphaClassOf } from '@/lib/design/alpha';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
 import { ActionPressable } from '@/components/shared/ActionPressable';
@@ -172,18 +173,26 @@ function KeepsakeHeader({ onClose }: { onClose: () => void }) {
 interface PreviewProps { dataUrl: string; title: string }
 
 /**
+ * Frame rung — `muted` (0.30) on `fog`. The border is felt-but-not-seen:
+ * traces the rounded corner so it reads as a deliberate shape, then
+ * disappears behind the subject (Tanya UIX #92 §2 — the photographable
+ * frame). One rung lighter than the modal panel so the two frames
+ * concentric-nest instead of competing.
+ */
+const PREVIEW_FRAME = alphaClassOf('fog', 'muted', 'border');
+
+/**
  * Opaque preview frame — `bg-void` is deliberate (Tanya #75 §3.5: the card
  * IS the subject; layering it over a translucent panel produces a busy
  * composite). Aspect ratio pinned to 1:1, matching the renderer's 1080×1080.
+ *
+ * alpha-ledger:adopted (Mike #92, Tanya UIX #92) — frame routes through
+ * the ledger like the rest of the system.
  */
 function KeepsakePreview({ dataUrl, title }: PreviewProps) {
-  // TODO: snap `border-fog/20` to the alpha ledger — pre-existing drift the
-  // alpha-adoption fence currently flags. Pick `hairline` (10) or `muted`
-  // (30) per Tanya UIX, route through `alphaClassOf('fog', rung, 'border')`.
-  // Out of scope this PR (Sid napkin — ShareOverlay graduation, Mike #92).
   return (
-    <div className="mx-sys-6 mb-sys-5 rounded-sys-medium overflow-hidden
-                    border border-fog/20 bg-void">
+    <div className={`mx-sys-6 mb-sys-5 rounded-sys-medium overflow-hidden
+                    border ${PREVIEW_FRAME} bg-void`}>
       <div
         role="img"
         aria-label={`Quote card: ${title}`}
@@ -460,3 +469,13 @@ async function runNativeShare(
   });
   emitCheckpoint(CHECKPOINTS.SHARED);
 }
+
+/* ─── Test-only exports — per-file SSR pins (Mike #92) ──────────────────── */
+
+/**
+ * Surface the private `KeepsakePreview` + the resolved `PREVIEW_FRAME`
+ * literal to `__tests__/QuoteKeepsake.alpha.test.ts`. Mirrors the
+ * `__testing__` shape used by `ReturnLetter.tsx` so the per-file alpha
+ * pin can render the leaf without portal-mounting the whole modal.
+ */
+export const __testing__ = { KeepsakePreview, PREVIEW_FRAME };

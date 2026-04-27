@@ -25,9 +25,9 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## WIP
 - **Gesture Atlas closed** (2026-04-27): 13 verbs, 0 grandfathered paths, fence flipped from tolerate→forbid. A typed 13-row table + a JIT-literal class factory + a shrink-only fence make a class of motion-drift bugs structurally impossible at zero added complexity. Source receipt: `lib/design/gestures.ts` § `GESTURE_GRANDFATHERED_PATHS`. Pinned by `gestures-sync.test.ts` (`toEqual([])`) and `gesture-call-site-fence.test.ts` Axis C (`toBe(0)`).
+- **Keepsake frame snapped to the alpha ledger** (2026-04-27): the killer-feature surface's preview border (`QuoteKeepsake.tsx`) routes through `alphaClassOf('fog', 'muted', 'border')` — JIT-safe literal-table factory — instead of a hand-typed `border-fog/20`. The file was never on the grandfather list; the fence was already armed and silently red in CI. Pinned by `components/articles/__tests__/QuoteKeepsake.alpha.test.ts`. (No `tolerate→forbid` lifecycle name yet — wait for verb #3.)
 
 ## Open TODOs (drift sightings, deferred)
-- `components/articles/QuoteKeepsake.tsx:182` — `border-fog/20` off-ledger; route through `alphaClassOf` next polish pass.
 - ShareOverlay's post-click "Copied!" handoff (`mirror-share-confirm`) is a *receipt*, not a label — earns `action-swap` on its own micro-PR once the rule-of-three fires (Tanya UIX #99 §7).
 
 ## Deployment
