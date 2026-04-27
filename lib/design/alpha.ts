@@ -455,9 +455,37 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //             pinned site-wide by `lib/design/__tests__/
   //             alpha-adoption.test.ts` (`/80` is no longer a legal rung).
   //   The grandfather list shrinks 5 → 4. The list ONLY shrinks.
+  // Live drifter retired (Mike napkin #115 — graduate ResonanceSectionHeader
+  //   to /50 (rung-mate pair: gold ≡ mist on `recede`) — + Tanya UIX #80
+  //   §2 / UIX #90 §3.1, Sid 2026-04-27): `components/resonances/
+  //   ResonanceSectionHeader.tsx` — the section-label primitive graduates
+  //   onto the role-based 4-rung vocabulary. Two literals snapped + module-
+  //   scope handles planted + same-rung pair-fence licensed:
+  //     gold — `text-gold/40` → `alphaClassOf('gold','recede','text')`
+  //             (= `text-gold/50`; the shaped chapter steps onto the same
+  //             rung as `ResonanceEntry`'s alive surface — header is a
+  //             sibling of the body, not a louder cousin).
+  //     mist — `text-mist/60` → `alphaClassOf('mist','recede','text')`
+  //             (= `text-mist/50`; the carrying chapter steps DOWN one
+  //             half-rung onto the same `recede` step — both tones differ
+  //             by hue, not by volume).
+  //   `mist` gains its first real call-site in this same sprint
+  //   (`ResonancesClient.tsx` — the carrying subtitle is promoted into the
+  //   primitive; Tanya UIX #90 §1 — "give the second tone a real surface
+  //   or delete it"); the dormant branch was Schrödinger's tone before, the
+  //   per-file §4 fence is now load-bearing. The `GOLD_RUNG` / `MIST_RUNG`
+  //   handles join the family of module-scope alpha tokens already surfaced
+  //   via `__testing__` on the sister sites — N=2 callers in one file is
+  //   a const, not a kernel (Mike §6 / Elon §2.2; no `sectionHeaderToneClass`
+  //   kernel-lift, the resolver IS the kernel). No `pair-rule` rename
+  //   ceremony in `AGENTS.md`: the per-file §4 same-rung pin is the doctrine
+  //   that earns ink. A third call-site licenses graduation. Pinned per-
+  //   file in `components/resonances/__tests__/ResonanceSectionHeader.alpha
+  //   .test.ts`; pinned site-wide by `lib/design/__tests__/alpha-adoption
+  //   .test.ts` (`/40` and `/60` are no longer legal rungs).
+  //   The grandfather list shrinks 4 → 3. The list ONLY shrinks.
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
-  'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',
 ] as const;
 

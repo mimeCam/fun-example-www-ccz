@@ -211,17 +211,23 @@ export default function ResonancesClient() {
         </TextLink>
       </div>
 
-      {/* Page title */}
+      {/* Page title — h1 alone in its block. The italic carrying-subtitle
+          retired (Tanya UIX #90 §0 / §2): two chapters in two grammars made
+          the chapter break read as a property of the labels, not a property
+          of the chapter. The carrying subtitle is now promoted into the
+          `ResonanceSectionHeader` primitive below — same micro register on
+          both chapters, two warmths at one volume (mist/recede ≡
+          gold/recede). The visitor reads the chapter, never the label. */}
       <div className="mb-sys-9">
         <h1 className="text-[var(--token-accent)] text-sys-h3 font-display font-sys-body lowercase">
           the book of you
         </h1>
-        <p className="text-mist text-sys-body italic mt-sys-1">What you&apos;re still carrying</p>
       </div>
 
       {/* Carrying section — alive resonances */}
       {carrying.length > 0 && (
         <section className="mb-sys-9">
+          <ResonanceSectionHeader label="what's carrying you" tone="mist" />
           {carrying.map((r, i) => {
             const ctx = contexts[i];
             // Detect chapter break before this entry
