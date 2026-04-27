@@ -9,6 +9,7 @@ import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceC
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
+import { DismissButton } from '@/components/shared/DismissButton';
 import { Field } from '@/components/shared/Field';
 import { TextLink } from '@/components/shared/TextLink';
 
@@ -178,25 +179,8 @@ function DrawerHeader({
           Why does <span className="sr-only">{articleTitle} </span>this matter to you?
         </p>
       </div>
-      <Pressable
-        variant="icon"
-        onClick={onClose}
-        className="-mr-sys-3"
-        aria-label="Close"
-      >
-        <CloseIcon />
-      </Pressable>
+      <DismissButton.Inline onClose={onClose} />
     </div>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-      viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6L6 18M6 6l12 12" />
-    </svg>
   );
 }
 

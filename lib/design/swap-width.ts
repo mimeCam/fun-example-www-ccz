@@ -24,6 +24,10 @@
  *   sync test                       fence test
  *   (drift = fail)                  (forbid `min-w-[Xrem]` on
  *                                    `<ActionPressable>` hosts)
+ *                                  +
+ *                                   adoption test
+ *                                   (forbid the three rung literals
+ *                                    outside the canonical home)
  *
  * Three rungs, derived from the longest-settled-label per host:
  *

@@ -160,7 +160,10 @@ describe('ReturnLetter — under reduce the dismiss + action row render immediat
   const html = renderReducedLanding();
 
   it('the dismiss button is in the SSR markup at first paint', () => {
-    expect(html).toContain('aria-label="Dismiss"');
+    // Universal Exit kernel: aria-label="Close" is frozen at the kernel,
+    // every site, every archetype. The "Dismiss" dialect retired with the
+    // <DismissButton.Absolute /> swap (Mike #90 / Tanya UIX #33 §5).
+    expect(html).toContain('aria-label="Close"');
   });
 
   it('the Copy button rides the canonical fingertip witness via aria-label', () => {

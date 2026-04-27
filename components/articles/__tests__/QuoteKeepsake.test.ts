@@ -108,8 +108,12 @@ describe('QuoteKeepsake · single-primary action layout (Tanya §75 §4.2)', () 
     expect(primaryShareBody()).toMatch(/swapWidthClassOf\s*\(\s*3\s*\)/);
   });
 
-  it('one icon Pressable exists for the close affordance', () => {
-    expect(SRC).toMatch(/variant="icon"/);
+  it('the close affordance is the universal-exit kernel (DismissButton.Inline)', () => {
+    // The hand-rolled `<Pressable variant="icon" />` close affordance
+    // retired with the DismissButton kernel landing (Mike #90 / Tanya
+    // UIX #33). The kernel owns the placement classes and the frozen
+    // verb; the call site stays a single declarative line.
+    expect(SRC).toMatch(/<DismissButton\.Inline\b/);
   });
 });
 
@@ -143,12 +147,20 @@ describe('QuoteKeepsake · icon-led actions (Tanya UX §4.1, principle #7)', () 
     expect(SRC).toMatch(/from\s+['"]@\/components\/shared\/Icons['"]/);
   });
 
-  it('mounts ShareIcon, CopyIcon, DownloadIcon, LinkIcon, CloseIcon', () => {
+  it('mounts ShareIcon, CopyIcon, DownloadIcon, LinkIcon (action set)', () => {
     expect(SRC).toMatch(/<ShareIcon\b/);
     expect(SRC).toMatch(/<CopyIcon\b/);
     expect(SRC).toMatch(/<DownloadIcon\b/);
     expect(SRC).toMatch(/<LinkIcon\b/);
-    expect(SRC).toMatch(/<CloseIcon\b/);
+  });
+
+  it('routes the close affordance through the DismissButton kernel', () => {
+    // Mike #90 / Tanya UIX #33 — the universal-exit kernel owns the close
+    // verb. The header trailing slot is `.Inline`. The hand-rolled
+    // `<Pressable variant="icon"><CloseIcon /></Pressable>` retired with
+    // the kernel landing; the dismiss-verb-fence enforces it site-wide.
+    expect(SRC).toMatch(/<DismissButton\.Inline\b/);
+    expect(SRC).toMatch(/from\s+['"]@\/components\/shared\/DismissButton['"]/);
   });
 });
 
@@ -226,8 +238,12 @@ describe('QuoteKeepsake · adoption fences mirrored locally', () => {
     expect(SRC).not.toMatch(/['"`]\d+ms['"`]/);
   });
 
-  it('routes touch through `<Pressable>` (no raw <button> in source)', () => {
-    expect(SRC).toMatch(/<Pressable\b/);
+  it('routes touch through Pressable substrates (no raw <button> in source)', () => {
+    // After the universal-exit kernel landing, every interactive surface
+    // here composes Pressable transitively: <ActionPressable> for the
+    // four action verbs, <DismissButton.Inline> for the close affordance.
+    // No file-local <Pressable> is needed; raw <button> remains forbidden.
+    expect(SRC).toMatch(/<(ActionPressable|DismissButton)\b/);
     expect(SRC).not.toMatch(/<button\b/);
   });
 

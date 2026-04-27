@@ -19,6 +19,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Gesture Atlas:** 13 verbs, 0 grandfathered. `lib/design/gestures.ts`. Fence: forbid-only.
 - **Alpha call-site:** `alphaClassOf()` — quoted literals only, no variables.
 - **Label-swap width:** `swapWidthClassOf(1|2|3)` on `<ActionPressable>` hosts. Fence: `label-swap-width-fence.test.ts`.
+- **Universal Exit:** overlay close → `<DismissButton.Inline />` / `<DismissButton.Absolute />`. Fence: `dismiss-verb-fence.test.ts`.
 
 ## WIP
 (none)

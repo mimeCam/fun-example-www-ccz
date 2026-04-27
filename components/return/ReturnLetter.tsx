@@ -20,6 +20,7 @@ import { getSeason } from '@/lib/mirror/season-engine';
 import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
+import { DismissButton } from '@/components/shared/DismissButton';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import { CopyIcon } from '@/components/shared/Icons';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
@@ -295,18 +296,15 @@ function LetterCard({
       bg-gradient-to-b from-surface to-background
       rounded-sys-medium ${thermalRadiusClassByPosture('held')} border transition-all ${REVEAL_GESTURE(reduce)}
       ${phaseStyles(phase, settled)}`}>
-      {/* Dismiss — typography-ledger:exempt — icon glyph (&times;), no reading
-          rhythm; leading-none collapses the line-box around a single char. */}
+      {/* Dismiss — Universal Exit kernel (Mike #90, Tanya UIX #33): the
+          same hand closes every overlay. The historical &times; carve-out
+          and its typography-ledger:exempt comment retire with this swap;
+          <DismissButton.Absolute /> owns the placement classes
+          (top-sys-4 right-sys-4 text-sys-lg leading-none) and the frozen
+          aria-label="Close" verb. `size="sm"` survives — density is
+          orthogonal to placement (Mike #90 §"… Decisions" #4). */}
       {visible && (
-        <Pressable
-          variant="icon"
-          size="sm"
-          onClick={onDismiss}
-          aria-label="Dismiss"
-          className="absolute top-sys-4 right-sys-4 text-sys-lg leading-none"
-        >
-          &times;
-        </Pressable>
+        <DismissButton.Absolute size="sm" onClose={onDismiss} />
       )}
       {/* Label — `recede` (0.50): the frame around the subject. */}
       <p className={`text-sys-micro uppercase tracking-sys-caption ${LABEL_RECEDE} text-center`}>

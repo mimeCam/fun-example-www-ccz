@@ -63,10 +63,10 @@ import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
-import { Pressable } from '@/components/shared/Pressable';
+import { DismissButton } from '@/components/shared/DismissButton';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import {
-  CloseIcon, ShareIcon, CopyIcon, DownloadIcon, LinkIcon,
+  ShareIcon, CopyIcon, DownloadIcon, LinkIcon,
 } from '@/components/shared/Icons';
 import { useActionPhase, type UseActionPhaseResult } from '@/lib/hooks/useActionPhase';
 import { CHECKPOINTS, emitCheckpoint } from '@/lib/hooks/useLoopFunnel';
@@ -160,13 +160,7 @@ function KeepsakeHeader({ onClose }: { onClose: () => void }) {
           A line worth carrying.
         </p>
       </div>
-      <Pressable
-        variant="icon"
-        onClick={onClose}
-        className="-mr-sys-3"
-        aria-label="Close keepsake">
-        <CloseIcon />
-      </Pressable>
+      <DismissButton.Inline onClose={onClose} />
     </div>
   );
 }
