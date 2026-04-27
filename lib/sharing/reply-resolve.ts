@@ -20,16 +20,18 @@
  * caller arrives).
  */
 
-import { readStoredArchetype } from '@/lib/mirror/archetype-store';
+import { readEffectiveArchetype } from '@/lib/mirror/archetype-store';
 import {
   archetypeToTone, phraseFor, type ReplyKind,
 } from '@/lib/sharing/reply-lexicon';
 
 /**
  * Resolve the curated phrase for a share-seam reply, tinted by the reader's
- * stored archetype. If no archetype is stored (or we're on the server),
- * folds to `DEFAULT_TONE` — a neutral phrase the room won't over-perform.
+ * effective archetype. Layered read: Mirror first (durable), provisional
+ * cookie second (first-paint hint), neutral last. The first-time sharer
+ * who arrived from a referrer the heuristic recognises now hears the
+ * tone-matched phrase too — Paul §S4: felt, not flagged.
  */
 export function replyPhrase(kind: ReplyKind): string {
-  return phraseFor(kind, archetypeToTone(readStoredArchetype()));
+  return phraseFor(kind, archetypeToTone(readEffectiveArchetype()));
 }

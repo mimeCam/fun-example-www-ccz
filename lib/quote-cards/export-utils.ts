@@ -17,7 +17,8 @@
  *
  * Voice parity: failure phrases flow through `replyPhrase('copy-failed')`
  * / `replyPhrase('download-failed')` — same lexicon every other surface
- * uses. No archetype threading; SSR-safe via `readStoredArchetype()`.
+ * uses. No archetype threading; SSR-safe via `readEffectiveArchetype()`
+ * (Mirror result wins; provisional cookie fills first-paint silence).
  *
  * Credits: Mike K. (#81 napkin — strip the success toast, return a
  * boolean, keep the failure path), Tanya D. (#75 §4.1 — the migration

@@ -18,7 +18,7 @@ import { type AnimationTokens } from '@/lib/thermal/thermal-animation';
 import { computeFull, applyToDOM, type AppliedThermal } from '@/lib/thermal/apply-tokens';
 import { ceremonyPlan, type TransitionPlan } from '@/lib/thermal/transition-choreography';
 import {
-  MIRROR_STORAGE_KEY, readStoredArchetype,
+  MIRROR_STORAGE_KEY, readEffectiveArchetype,
 } from '@/lib/mirror/archetype-store';
 import type { ArchetypeKey } from '@/types/content';
 
@@ -79,12 +79,15 @@ export function ThermalProvider({ children }: { children: ReactNode }) {
   // this call reconciles React state with the DOM and handles live updates.
   useEffect(() => { refresh(); }, [refresh]);
 
-  // Hydrate archetype from localStorage on mount (Mirror snapshot key).
-  // Listen to `storage` so a Mirror taken in another tab updates the voice.
+  // Hydrate archetype on mount via the layered read — Mirror first, then
+  // the first-paint provisional cookie (Mike `from-michael-koch-project-
+  // architect-76.md` §3 — "polymorphism is a killer; same single source
+  // of truth, just answers null less often"). Listen to `storage` so a
+  // Mirror taken in another tab still wins immediately.
   useEffect(() => {
-    setArchetype(readStoredArchetype());
+    setArchetype(readEffectiveArchetype());
     const onStorage = (e: StorageEvent) => {
-      if (e.key === MIRROR_STORAGE_KEY) setArchetype(readStoredArchetype());
+      if (e.key === MIRROR_STORAGE_KEY) setArchetype(readEffectiveArchetype());
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);

@@ -32,7 +32,7 @@
  * lexicon settles on).
  */
 
-import { readStoredArchetype } from '@/lib/mirror/archetype-store';
+import { readEffectiveArchetype } from '@/lib/mirror/archetype-store';
 import {
   archetypeToTone, phraseFor, whisperFor,
   type EmptySurfaceKind,
@@ -55,7 +55,10 @@ export interface EmptyPhrase {
  * the curious, non-over-performed first-visit voice.
  */
 export function emptyPhrase(kind: EmptySurfaceKind): EmptyPhrase {
-  const tone = archetypeToTone(readStoredArchetype());
+  // Layered read: Mirror first, provisional-cookie second, neutral last.
+  // First-time visitors with a confident provisional guess hear the
+  // archetype-tinted phrase; weak signals fall to `DEFAULT_TONE`.
+  const tone = archetypeToTone(readEffectiveArchetype());
   return {
     headline: phraseFor(kind, tone),
     whisper:  whisperFor(kind, tone),

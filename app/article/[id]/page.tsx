@@ -30,6 +30,7 @@ import type { ArchetypeKey } from '@/types/content';
 import type { ContentBlock } from '@/lib/content/content-layers';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { CollapsibleSlot } from '@/components/shared/CollapsibleSlot';
+import { Divider } from '@/components/shared/Divider';
 
 // Recognition-surface portal — gated by the shared selector so the
 // Whisper and the home-rail Letter can never paint at the same time
@@ -190,13 +191,14 @@ function ArticleContent({ params }: { params: { id: string } }) {
 
           {/* Coda hairline — geometric divider between the article body
               (and its quiet Whisper) and site chrome (the WhisperFooter).
-              Reuses the header hairline token. Tanya §4 — prevents the
-              mist-on-mist mumble where the Whisper bleeds into the
-              Footer's tagline. No new tokens; same `border-gold/10`.
-              The top margin is the hairline's own rung — the envelope
-              above provides the asymmetric breath; this sibling does
+              Migrated from a raw `<hr>` to the `<Divider.Static />`
+              kernel (Tanya UX §4.4 ratifies the divider sprint as a UX
+              requirement, not just a token-discipline ticket). The
+              kernel owns gold/10, max-w-divider, rounded-full, and the
+              symmetric breath rung. The envelope above (`CollapsibleSlot`)
+              still owns the asymmetric coda breath — this sibling does
               not compensate for the portal's render verdict. */}
-          <hr className="mt-sys-7 max-w-divider mx-auto border-gold/10" />
+          <Divider.Static spacing="sys-7" />
         </div>
         <WhisperFooter />
       </article>

@@ -48,7 +48,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
             key={i}
             data-paragraph-id={`${prefix}-p${offset + i}`}
             data-variant={variant?.source ?? undefined}
-            className={`text-foreground max-w-prose-ch ${variant ? 'pl-sys-4 border-l-2 border-gold/20' : ''}`}
+            className={`text-foreground max-w-prose-ch ${variant ? 'pl-sys-4 border-l-2 border-gold/10' : ''}`}
           >
             {p.trim()}
           </p>

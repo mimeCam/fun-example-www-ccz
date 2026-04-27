@@ -37,6 +37,7 @@ function makeStorage(initial: Record<string, string> = {}) {
 function withWindow(
   storage: ReturnType<typeof makeStorage>,
   fn: (mod: typeof import('@/lib/mirror/archetype-store')) => void,
+  cookieValue: string = '',
 ): void {
   const listeners = new Set<(e: StorageEvent) => void>();
   (globalThis as { window?: unknown }).window = {
@@ -51,8 +52,14 @@ function withWindow(
       for (const cb of listeners) cb({ key } as StorageEvent);
     },
   };
+  // Provisional layer reads `document.cookie`. Stub it so the layered
+  // reads can be exercised without jsdom (Mike §3 — pure tests, no DOM).
+  (globalThis as { document?: unknown }).document = { cookie: cookieValue };
   try { fn(loadModule()); }
-  finally { delete (globalThis as { window?: unknown }).window; }
+  finally {
+    delete (globalThis as { window?: unknown }).window;
+    delete (globalThis as { document?: unknown }).document;
+  }
 }
 
 describe('archetype-store — SSR safety', () => {
@@ -139,5 +146,68 @@ describe('archetype-store — cross-tab subscription', () => {
 
       expect(hits).toEqual(['faithful']);
     });
+  });
+});
+
+// ─── Layered read — Mirror ?? Provisional ?? null (Mike §1, §6) ────────────
+
+describe('archetype-store — layered read · readEffectiveArchetype', () => {
+  it('returns Mirror result when Mirror is present (provisional shadowed)', () => {
+    const storage = makeStorage({
+      'quick-mirror-result': JSON.stringify({ archetype: 'deep-diver' as ArchetypeKey }),
+    });
+    withWindow(storage, (mod) => {
+      expect(mod.readEffectiveArchetype()).toBe('deep-diver');
+    }, '__pt=explorer.0.50');
+  });
+
+  it('returns provisional cookie when Mirror is absent', () => {
+    withWindow(makeStorage(), (mod) => {
+      expect(mod.readEffectiveArchetype()).toBe('explorer');
+    }, '__pt=explorer.0.50');
+  });
+
+  it('returns null when neither Mirror nor cookie answers', () => {
+    withWindow(makeStorage(), (mod) => {
+      expect(mod.readEffectiveArchetype()).toBeNull();
+    });
+  });
+
+  it('Mirror always wins even if both layers disagree', () => {
+    const storage = makeStorage({
+      'quick-mirror-result': JSON.stringify({ archetype: 'collector' as ArchetypeKey }),
+    });
+    withWindow(storage, (mod) => {
+      // Cookie says explorer, Mirror says collector — Mirror wins.
+      expect(mod.readEffectiveArchetype()).toBe('collector');
+    }, '__pt=explorer.0.55');
+  });
+
+  it('readProvisionalArchetype isolates the cookie layer', () => {
+    withWindow(makeStorage(), (mod) => {
+      expect(mod.readProvisionalArchetype()).toBe('resonator');
+      expect(mod.readStoredArchetype()).toBeNull();
+    }, '__pt=resonator.0.55');
+  });
+
+  it('corrupt cookie folds to null without throwing', () => {
+    withWindow(makeStorage(), (mod) => {
+      expect(() => mod.readProvisionalArchetype()).not.toThrow();
+      expect(mod.readProvisionalArchetype()).toBeNull();
+    }, '__pt=garbled-payload');
+  });
+
+  it('cookie missing entirely returns null', () => {
+    withWindow(makeStorage(), (mod) => {
+      expect(mod.readProvisionalArchetype()).toBeNull();
+    }, '');
+  });
+
+  it('SSR (no document) returns null on the provisional layer', () => {
+    delete (globalThis as { window?: unknown }).window;
+    delete (globalThis as { document?: unknown }).document;
+    const mod = loadModule();
+    expect(mod.readProvisionalArchetype()).toBeNull();
+    expect(mod.readEffectiveArchetype()).toBeNull();
   });
 });
