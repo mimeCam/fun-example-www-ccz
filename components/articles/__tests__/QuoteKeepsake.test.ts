@@ -108,12 +108,15 @@ describe('QuoteKeepsake · single-primary action layout (Tanya §75 §4.2)', () 
     expect(primaryShareBody()).toMatch(/swapWidthClassOf\s*\(\s*3\s*\)/);
   });
 
-  it('the close affordance is the universal-exit kernel (DismissButton.Inline)', () => {
+  it('the close affordance reaches the universal-exit kernel via <OverlayHeader>', () => {
     // The hand-rolled `<Pressable variant="icon" />` close affordance
     // retired with the DismissButton kernel landing (Mike #90 / Tanya
-    // UIX #33). The kernel owns the placement classes and the frozen
-    // verb; the call site stays a single declarative line.
-    expect(SRC).toMatch(/<DismissButton\.Inline\b/);
+    // UIX #33). The hand-rolled header skeleton — `<div flex …
+    // justify-between …>` + `<DismissButton.Inline />` — retired with
+    // the OverlayHeader kernel landing (Mike #77 / Tanya UIX #21). The
+    // call site stays a single declarative line; the kernel owns the
+    // verb, the placement, and the layout.
+    expect(SRC).toMatch(/<OverlayHeader\b/);
   });
 });
 
@@ -154,13 +157,16 @@ describe('QuoteKeepsake · icon-led actions (Tanya UX §4.1, principle #7)', () 
     expect(SRC).toMatch(/<LinkIcon\b/);
   });
 
-  it('routes the close affordance through the DismissButton kernel', () => {
+  it('routes the close affordance through the OverlayHeader kernel', () => {
     // Mike #90 / Tanya UIX #33 — the universal-exit kernel owns the close
-    // verb. The header trailing slot is `.Inline`. The hand-rolled
-    // `<Pressable variant="icon"><CloseIcon /></Pressable>` retired with
-    // the kernel landing; the dismiss-verb-fence enforces it site-wide.
-    expect(SRC).toMatch(/<DismissButton\.Inline\b/);
-    expect(SRC).toMatch(/from\s+['"]@\/components\/shared\/DismissButton['"]/);
+    // verb. Mike #77 / Tanya UIX #21 — the overlay-nameplate kernel owns
+    // the header skeleton and slots `<DismissButton.Inline>` itself. The
+    // hand-rolled `<Pressable variant="icon"><CloseIcon /></Pressable>`
+    // retired with the dismiss-verb kernel; the hand-rolled header
+    // skeleton retired with the overlay-header kernel. Both fences
+    // enforce it site-wide.
+    expect(SRC).toMatch(/<OverlayHeader\b/);
+    expect(SRC).toMatch(/from\s+['"]@\/components\/shared\/OverlayHeader['"]/);
   });
 });
 
@@ -241,9 +247,10 @@ describe('QuoteKeepsake · adoption fences mirrored locally', () => {
   it('routes touch through Pressable substrates (no raw <button> in source)', () => {
     // After the universal-exit kernel landing, every interactive surface
     // here composes Pressable transitively: <ActionPressable> for the
-    // four action verbs, <DismissButton.Inline> for the close affordance.
-    // No file-local <Pressable> is needed; raw <button> remains forbidden.
-    expect(SRC).toMatch(/<(ActionPressable|DismissButton)\b/);
+    // four action verbs, <OverlayHeader> for the header (which slots
+    // <DismissButton.Inline> internally). No file-local <Pressable> is
+    // needed; raw <button> remains forbidden.
+    expect(SRC).toMatch(/<(ActionPressable|OverlayHeader)\b/);
     expect(SRC).not.toMatch(/<button\b/);
   });
 

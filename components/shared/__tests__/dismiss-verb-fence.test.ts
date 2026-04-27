@@ -266,11 +266,18 @@ describe('dismiss-verb-fence — Axis E · five utterances spell `dismiss-button
 // ─── Sanity guards — the fence is not a no-op ──────────────────────────────
 
 describe('dismiss-verb-fence — sanity · the kernel is reachable from the call sites', () => {
-  it('at least four .tsx files import DismissButton from the kernel', () => {
-    const rx = /import[^;]*\bDismissButton\b[^;]*from\s+['"]@\/components\/shared\/DismissButton['"]/;
+  it('at least four overlay surfaces reach the dismiss kernel (direct or via <OverlayHeader>)', () => {
+    // After Mike #77 lift: three of the original four direct callers
+    // (`ResonanceDrawer` / `QuoteKeepsake` / `ThreadKeepsake`) now reach
+    // the dismiss kernel transitively through `<OverlayHeader>`. Reachability
+    // is preserved: `OverlayHeader` itself imports DismissButton, and three
+    // surfaces import OverlayHeader. We count both rungs so the sanity
+    // floor still holds (Mike #77 §"Modules involved", §"How we know we won").
+    const dismissRx = /import[^;]*\bDismissButton\b[^;]*from\s+['"]@\/components\/shared\/DismissButton['"]/;
+    const overlayHeaderRx = /import[^;]*\bOverlayHeader\b[^;]*from\s+['"]@\/components\/shared\/OverlayHeader['"]/;
     const callers = preloadAll()
       .filter(({ rel }) => rel.endsWith('.tsx') && rel !== KERNEL_PATH)
-      .filter(({ src }) => rx.test(src))
+      .filter(({ src }) => dismissRx.test(src) || overlayHeaderRx.test(src))
       .map(({ rel }) => rel);
     expect(callers.length).toBeGreaterThanOrEqual(4);
   });

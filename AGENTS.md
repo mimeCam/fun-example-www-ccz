@@ -20,6 +20,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Alpha call-site:** `alphaClassOf()` — quoted literals only, no variables.
 - **Label-swap width:** `swapWidthClassOf(1|2|3)` on `<ActionPressable>` hosts. Fence: `label-swap-width-fence.test.ts`.
 - **Universal Exit:** overlay close → `<DismissButton.Inline />` / `<DismissButton.Absolute />`. Fence: `dismiss-verb-fence.test.ts`.
+- **Overlay nameplate:** every overlay opens with `<OverlayHeader title blurb onClose />` — `items-center`, no `className`. Fence: `overlay-header-fence.test.ts`.
 
 ## WIP
 (none)

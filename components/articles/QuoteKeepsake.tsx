@@ -63,7 +63,7 @@ import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
-import { DismissButton } from '@/components/shared/DismissButton';
+import { OverlayHeader } from '@/components/shared/OverlayHeader';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import {
   ShareIcon, CopyIcon, DownloadIcon, LinkIcon,
@@ -112,7 +112,13 @@ export function QuoteKeepsake(props: QuoteKeepsakeProps): JSX.Element | null {
     <Threshold isOpen={isOpen} onClose={onClose}
       labelledBy="quote-keepsake-title" describedBy="quote-keepsake-blurb"
       variant="center">
-      <KeepsakeHeader onClose={onClose} />
+      <OverlayHeader
+        title="Save this quote"
+        titleId="quote-keepsake-title"
+        blurb="A line worth carrying."
+        blurbId="quote-keepsake-blurb"
+        onClose={onClose}
+      />
       <KeepsakePreview dataUrl={dataUrl} title={data.articleTitle} />
       <KeepsakeActions data={data} dataUrl={dataUrl}
         deepLink={deepLink ?? ''} onSaved={onSaved} />
@@ -144,25 +150,6 @@ function useGeneratedCard(
     return () => { cancelled = true; };
   }, [key, isOpen, data]);
   return dataUrl;
-}
-
-/* ─── Header ─────────────────────────────────────────────────────────────── */
-
-function KeepsakeHeader({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="flex items-start justify-between p-sys-6 pb-sys-4">
-      <div>
-        <h3 id="quote-keepsake-title"
-            className="text-sys-lg font-display font-sys-display text-foreground">
-          Save this quote
-        </h3>
-        <p id="quote-keepsake-blurb" className="text-mist text-sys-caption mt-sys-1">
-          A line worth carrying.
-        </p>
-      </div>
-      <DismissButton.Inline onClose={onClose} />
-    </div>
-  );
 }
 
 /* ─── Preview ────────────────────────────────────────────────────────────── */

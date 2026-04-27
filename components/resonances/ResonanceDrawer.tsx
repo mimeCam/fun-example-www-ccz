@@ -9,7 +9,7 @@ import { useResonanceCeremony, CEREMONY_TIMING } from '@/lib/hooks/useResonanceC
 import { loadHistory, saveHistory, addResonance } from '@/lib/thermal/thermal-history';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
-import { DismissButton } from '@/components/shared/DismissButton';
+import { OverlayHeader } from '@/components/shared/OverlayHeader';
 import { Field } from '@/components/shared/Field';
 import { TextLink } from '@/components/shared/TextLink';
 
@@ -132,7 +132,13 @@ export function ResonanceDrawer({
       dismissOnBackdrop={!success}
       dismissOnEscape={!success}
     >
-      <DrawerHeader onClose={onClose} articleTitle={articleTitle} />
+      <OverlayHeader
+        title="Save Resonance"
+        titleId="resonance-drawer-title"
+        blurbId="resonance-drawer-blurb"
+        blurb={<>Why does <span className="sr-only">{articleTitle} </span>this matter to you?</>}
+        onClose={onClose}
+      />
       <div className="mx-sys-6 border-t border-fog/20" />
 
       <div className="flex-1 p-sys-6 pt-sys-5">
@@ -164,25 +170,6 @@ export function ResonanceDrawer({
 }
 
 /* ─── Sub-components ─────────────────────────────── */
-
-function DrawerHeader({
-  onClose, articleTitle,
-}: { onClose: () => void; articleTitle: string }) {
-  return (
-    <div className="flex items-center justify-between p-sys-6 pb-sys-4">
-      <div>
-        <h3 id="resonance-drawer-title"
-          className="text-sys-lg font-display font-sys-display text-foreground">
-          Save Resonance
-        </h3>
-        <p className="text-mist text-sys-caption mt-sys-1">
-          Why does <span className="sr-only">{articleTitle} </span>this matter to you?
-        </p>
-      </div>
-      <DismissButton.Inline onClose={onClose} />
-    </div>
-  );
-}
 
 function SlotIndicator({ used, total, pulsing }: {
   used: number; total: number; pulsing: boolean;

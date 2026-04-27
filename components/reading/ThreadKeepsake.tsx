@@ -67,7 +67,7 @@ import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
-import { DismissButton } from '@/components/shared/DismissButton';
+import { OverlayHeader } from '@/components/shared/OverlayHeader';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import {
   ShareIcon, CopyIcon, DownloadIcon, LinkIcon,
@@ -121,7 +121,13 @@ export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProp
     <Threshold isOpen={isOpen} onClose={onClose}
       labelledBy="keepsake-title" describedBy="keepsake-blurb"
       variant="center">
-      <KeepsakeHeader onClose={onClose} />
+      <OverlayHeader
+        title="Keep this thread"
+        titleId="keepsake-title"
+        blurb="A mirror of what you just read."
+        blurbId="keepsake-blurb"
+        onClose={onClose}
+      />
       <KeepsakePreview svg={svg} title={snapshot.title} />
       <KeepsakeActions
         svg={svg}
@@ -130,25 +136,6 @@ export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProp
         unfurlUrl={unfurlUrl}
       />
     </Threshold>
-  );
-}
-
-/* ─── Header ─────────────────────────────────────────────────────────────── */
-
-function KeepsakeHeader({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="flex items-start justify-between p-sys-6 pb-sys-4">
-      <div>
-        <h3 id="keepsake-title"
-            className="text-sys-lg font-display font-sys-display text-foreground">
-          Keep this thread
-        </h3>
-        <p id="keepsake-blurb" className="text-mist text-sys-caption mt-sys-1">
-          A mirror of what you just read.
-        </p>
-      </div>
-      <DismissButton.Inline onClose={onClose} />
-    </div>
   );
 }
 
