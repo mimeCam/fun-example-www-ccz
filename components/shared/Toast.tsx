@@ -32,6 +32,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { MOTION, MOTION_REDUCED_MS, EASE } from '@/lib/design/motion';
+import { alphaClassOf } from '@/lib/design/alpha';
 import { useReducedMotionFlag } from '@/lib/utils/reduced-motion';
 import { type ToastMsg, type ToastIntent } from '@/lib/sharing/toast-store';
 
@@ -62,8 +63,22 @@ interface ToastProps {
  * Z-stacking honors the existing `z-sys-toast` rung (60). The host carries
  * `aria-live="polite"`; this surface is silent at the ARIA layer.
  */
+/**
+ * Hairline graduation (Mike napkin #112, Tanya UIX #87): Toast joins the
+ * chrome-muted register already shared by `AmbientNav`, `ThreadKeepsake`,
+ * and `QuoteKeepsake`. The border routes through the alpha ledger via
+ * `alphaClassOf('fog','muted','border')` (= `border-fog/30`) — the JIT-safe
+ * literal-table factory — so a future swap of the rung vocabulary cannot
+ * silently drift the register without flipping `Toast.alpha.test.ts`.
+ *
+ * The function call IS the vocabulary. No docstring "chrome-muted hairline"
+ * token is planted — three sister surfaces already grep to this exact call;
+ * make the fourth match (Tanya §5).
+ */
+const SURFACE_BORDER = `border ${alphaClassOf('fog', 'muted', 'border')}`;
+
 // // reader-invariant:forced-colors — `bg-foreground` / `text-background` /
-// `shadow-sys-float` / `border-fog/15` all strip by spec. Replace with a
+// `shadow-sys-float` / `border-fog/30` all strip by spec. Replace with a
 // `1px solid CanvasText` edge on `Canvas` so the pill still reads as a
 // surface, not a floating string (Tanya UX #53 §3.6).
 const SURFACE_BASE =
@@ -71,7 +86,7 @@ const SURFACE_BASE =
   'text-sys-caption font-sys-accent ' +
   'bg-foreground text-background select-none ' +
   'max-w-[18rem] w-max ' +
-  'border border-fog/15 ' +
+  `${SURFACE_BORDER} ` +
   'forced-colors:border-[CanvasText] forced-colors:bg-[Canvas] ' +
   'forced-colors:text-[CanvasText] forced-colors:shadow-none';
 
@@ -190,3 +205,14 @@ function onPhaseAnimationEnd(
   if (phase === 'entering') setPhase('shown');
   else if (phase === 'leaving') onDismissed();
 }
+
+/* ─── Test-only exports — per-file alpha pin (Mike #112, Tanya UIX #87) ──── */
+
+/**
+ * Surface the resolved `SURFACE_BORDER` literal AND the assembled
+ * `SURFACE_BASE` to `__tests__/Toast.alpha.test.ts`. Mirrors the
+ * `__testing__` shape used by the sister keepsake surfaces so the
+ * per-file alpha pin can assert both the resolver call AND the wire
+ * format without portal-mounting the host.
+ */
+export const __testing__ = { SURFACE_BORDER, SURFACE_BASE };

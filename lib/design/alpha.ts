@@ -345,6 +345,24 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   text-tier floor over both anchors. Pinned in
   //   `app/resonances/__tests__/ResonanceEntry.alpha.test.ts`.
   //   The list ONLY shrinks.
+  // Live drifter retired (Mike napkin #112, Tanya UIX #87, Sid 2026-04-27):
+  //   `components/shared/Toast.tsx` — the 6th primitive's surface graduates
+  //   to the chrome-muted register. ONE drift site snapped to the ledger:
+  //     hairline — `border border-fog/15` → `border ${alphaClassOf(
+  //                'fog','muted','border')}` (= `border-fog/30`). Toast
+  //                joins `AmbientNav`, `ThreadKeepsake`, `QuoteKeepsake` at
+  //                the `muted` rung; the four-surface chrome register now
+  //                shares one resolver call as its name (Tanya UIX #87 §2).
+  //   Sister-surface symmetry (Tanya §2 + §6): top-edge AmbientNav hairline
+  //   ↔ bottom-edge Toast hairline both at `/30` — the viewport's chrome
+  //   bookends now speak the same dialect; the prior `/15` ↔ `/30` half-step
+  //   contrast mismatch is resolved. No `chromeBorder()` kernel-lift
+  //   (rule-of-three: N=4 callers ≠ a kernel — Mike §6 / Elon §2.2; we
+  //   lift when a fifth surface arrives and the resolver call starts
+  //   feeling ceremonial). No "chrome-muted hairline" docstring planted
+  //   (the function call IS the vocabulary — Tanya §5). Pinned in
+  //   `components/shared/__tests__/Toast.alpha.test.ts`.
+  //   The list ONLY shrinks.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonancesClient.tsx',
   'components/articles/ArticlesPageClient.tsx',
@@ -353,7 +371,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',
-  'components/shared/Toast.tsx',
 ] as const;
 
 // ─── Helpers — JIT-safe color-alpha class-string factories ────────────────
