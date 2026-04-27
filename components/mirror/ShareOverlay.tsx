@@ -5,6 +5,26 @@
  * Staggered reveal: delays sourced from `lib/design/motion.ts` so every
  * stagger on the site reads from the same motion ledger.
  * Icons > text for instant visual parsing (Picture Superiority effect).
+ *
+ * Verb graduation (Mike napkin #92, Tanya UIX #99) — the hover tooltip's
+ * opacity transition reads off the Gesture Atlas via
+ * `gestureClassesForMotion('crossfade-inline', reduce)`. Felt sentence:
+ * *"One label replacing another — instant enough I don't see the seam."*
+ * The verb's `reduced: 'perform'` row keeps the gesture as authored even
+ * under `prefers-reduced-motion: reduce` — labels stay fast and predictable.
+ *
+ * Layout polish (Tanya UIX #99 §2): the tooltip is pinned ABOVE the icon
+ * (`-top-9`), out of the gutter where the DeepLink paragraph lives. The
+ * outer column gap stepped one rung wider (`gap-sys-4`) and the DeepLink
+ * lifted from `muted` (30) to `recede` (50) — the alpha-ledger rung for
+ * "context around the subject" — so the URL reads as quietly informational
+ * rather than decorative noise. A 6×6 `rotate-45 bg-void` caret pins the
+ * tooltip to its anchor button.
+ *
+ * The post-click "Copied!" handoff is intentionally NOT graduated this
+ * cycle (Tanya UIX #99 §7) — that surface is a *receipt*, not a label,
+ * and earns `action-swap` on its own micro-PR once the rule-of-three has
+ * fired. The current `mirror-share-confirm` recipe stays in place.
  */
 
 'use client';
@@ -22,6 +42,8 @@ import { encodeDeepLink } from '@/lib/sharing/deep-link';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION } from '@/lib/design/motion';
+import { gestureClassesForMotion } from '@/lib/design/gestures';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 /**
  * Stagger step between icon reveals — half the `instant` beat (75ms… but
@@ -41,22 +63,25 @@ interface Props {
 
 export default function ShareOverlay({ result, articleId }: Props) {
   const [copied, setCopied] = useState(false);
+  const reduce = useReducedMotion();
   const deepUrl = encodeDeepLink(result.archetype, articleId);
 
+  // Outer column gap stepped from `sys-3` → `sys-4` (Tanya UIX #99 §2b) —
+  // gives the DeepLink paragraph below airspace clear of the icon row.
   return (
-    <div className="mt-sys-4 flex flex-col items-center gap-sys-3">
+    <div className="mt-sys-4 flex flex-col items-center gap-sys-4">
       <div className="flex justify-center gap-sys-4">
         <StaggeredIconBtn delay={0}
           onClick={useSaveImage(result)}
-          label="Save PNG" icon={<DownloadIcon />} />
+          label="Save PNG" icon={<DownloadIcon />} reduce={reduce} />
         <StaggeredIconBtn delay={SHARE_STAGGER_MS}
           onClick={useCopyText(result.archetype, articleId, setCopied)}
           label={copied ? 'Copied!' : 'Copy Link'}
           icon={copied ? <CheckIcon /> : <ClipboardIcon />}
-          confirm={copied} />
+          confirm={copied} reduce={reduce} />
         <StaggeredIconBtn delay={SHARE_STAGGER_MS * 2}
           onClick={useXShare(result.archetype, articleId)}
-          label="Share on X" icon={<XIcon />} />
+          label="Share on X" icon={<XIcon />} reduce={reduce} />
       </div>
       <DeepLink url={deepUrl} />
     </div>
@@ -64,22 +89,27 @@ export default function ShareOverlay({ result, articleId }: Props) {
 }
 
 /* ─── Staggered icon button with fade-in ─────────────────── */
+//
+// gesture-ledger:exempt — `animate-fade-in` is a CSS keyframe (paint, not
+// gesture) per Tanya UIX §5.3; out of the verb registry's scope, same
+// exemption pattern as `mirror-archetype-label` in MirrorRevealCard.
 
-function StaggeredIconBtn({ onClick, label, icon, delay, confirm }: {
+function StaggeredIconBtn({ onClick, label, icon, delay, confirm, reduce }: {
   onClick: () => void; label: string; icon: React.ReactNode;
-  delay: number; confirm?: boolean;
+  delay: number; confirm?: boolean; reduce: boolean;
 }) {
   return (
     <div className="animate-fade-in" style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}>
-      <IconBtn onClick={onClick} label={label} icon={icon} confirm={confirm} />
+      <IconBtn onClick={onClick} label={label} icon={icon} confirm={confirm} reduce={reduce} />
     </div>
   );
 }
 
 /* ─── Icon button with tooltip ──────────────────────────── */
 
-function IconBtn({ onClick, label, icon, confirm }: {
-  onClick: () => void; label: string; icon: React.ReactNode; confirm?: boolean;
+function IconBtn({ onClick, label, icon, confirm, reduce }: {
+  onClick: () => void; label: string; icon: React.ReactNode;
+  confirm?: boolean; reduce: boolean;
 }) {
   return (
     <Pressable
@@ -90,13 +120,50 @@ function IconBtn({ onClick, label, icon, confirm }: {
       className={`group ${confirm ? 'mirror-share-confirm' : ''}`}
     >
       {icon}
-      {/* alpha-ledger:exempt — motion fade endpoints (hover tooltip opacity transition) */}
-      <span className="pointer-events-none absolute -bottom-8 left-1/2
-        -translate-x-1/2 rounded-sys-medium bg-void text-mist text-sys-micro px-sys-2 py-sys-1
-        opacity-0 group-hover:opacity-100 transition-opacity duration-instant whitespace-nowrap">
-        {label}
-      </span>
+      <Tooltip label={label} reduce={reduce} />
     </Pressable>
+  );
+}
+
+/* ─── Tooltip — verb-graduated hover label ──────────────── */
+//
+// Mike napkin #92 / Tanya UIX #99 §1: the opacity transition rides
+// `gestureClassesForMotion('crossfade-inline', reduce)` — one verb names
+// the (duration, ease) pair at the call site. The verb's `reduced:
+// 'perform'` row keeps the gesture as authored under
+// `prefers-reduced-motion: reduce` — labels stay fast and predictable.
+// The composer is JIT-safe by table-of-literals construction (same lesson
+// `alphaClassOf` paid for); never template-interpolate the duration class.
+//
+// Layout (Tanya UIX #99 §2a): tooltip pinned ABOVE the icon (`-top-9`),
+// out of the DeepLink paragraph's gutter; caret rotated from the bottom
+// edge points down to its anchor button.
+
+function Tooltip({ label, reduce }: { label: string; reduce: boolean }) {
+  // alpha-ledger:exempt — motion fade endpoints (hover tooltip α=0/α=1 pair)
+  // The verb factory owns the (duration, ease) pair on this transition; the
+  // OPACITY endpoints (`opacity-0` / `group-hover:opacity-100`) remain
+  // Motion-owned per the alpha-ledger carve-out — same shape Tanya UIX #99
+  // §3 named "the carve-out comment can stay; it's still accurate."
+  return (
+    <span className={`pointer-events-none absolute -top-9 left-1/2
+      -translate-x-1/2 rounded-sys-medium bg-void text-mist text-sys-micro px-sys-2 py-sys-1
+      shadow-sys-rest whitespace-nowrap
+      opacity-0 group-hover:opacity-100 transition-opacity
+      ${gestureClassesForMotion('crossfade-inline', reduce)}`}>
+      {label}
+      <TooltipCaret />
+    </span>
+  );
+}
+
+/** 6×6 caret pinned to the tooltip's bottom edge — roots the chip to its
+ *  anchor button so the eye knows which icon owns the noun. (Tanya UIX
+ *  #99 §3 — "tooltip without a caret reads as a free-floating brand chip".) */
+function TooltipCaret() {
+  return (
+    <span className="pointer-events-none absolute left-1/2 -bottom-0.5
+      h-1.5 w-1.5 -translate-x-1/2 rotate-45 bg-void shadow-sys-rest" />
   );
 }
 
@@ -146,10 +213,20 @@ function XIcon() {
 }
 
 /* ─── Deep link display ──────────────────────────────────── */
+//
+// Alpha-ledger snap (Tanya UIX #99 §2c): `/30` (muted) → `/50` (recede).
+// Tanya's spec named `/40` for the felt sentence; the alpha ledger only
+// recognises 10/30/50/70 (`hairline | muted | recede | quiet`), so the
+// snap-up rung is `recede` — *"context around the subject"* per the
+// alpha-ledger JSDoc. The URL now reads as quietly informational rather
+// than decorative noise, which is the exact intent Tanya named.
+// TODO: when the next alpha-ledger pass earns a /40 rung (or a "soft
+// muted" name), revisit. For now the canonical rung lands the felt
+// sentence and stays inside the call-site fence.
 
 function DeepLink({ url }: { url: string }) {
   return (
-    <p className="text-mist/30 text-sys-micro mt-sys-2 max-w-card-body truncate text-center">
+    <p className="text-mist/50 text-sys-micro mt-sys-2 max-w-card-body truncate text-center">
       {url}
     </p>
   );

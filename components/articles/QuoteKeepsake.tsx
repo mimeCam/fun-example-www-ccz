@@ -177,6 +177,10 @@ interface PreviewProps { dataUrl: string; title: string }
  * composite). Aspect ratio pinned to 1:1, matching the renderer's 1080×1080.
  */
 function KeepsakePreview({ dataUrl, title }: PreviewProps) {
+  // TODO: snap `border-fog/20` to the alpha ledger — pre-existing drift the
+  // alpha-adoption fence currently flags. Pick `hairline` (10) or `muted`
+  // (30) per Tanya UIX, route through `alphaClassOf('fog', rung, 'border')`.
+  // Out of scope this PR (Sid napkin — ShareOverlay graduation, Mike #92).
   return (
     <div className="mx-sys-6 mb-sys-5 rounded-sys-medium overflow-hidden
                     border border-fog/20 bg-void">

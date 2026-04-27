@@ -320,7 +320,19 @@ export const GESTURE_GRANDFATHERED_PATHS: readonly string[] = [
   // ledger crossing; the rose vitality pill stayed inside the gesture
   // ledger because `vitality: number` is a TTL countdown, not a thermal
   // score (Elon §1 atom audit, Tanya UIX §6). The list ONLY shrinks.
-  'components/mirror/ShareOverlay.tsx',
+  // Sid napkin (Mike #92 / Tanya UIX #99) — `components/mirror/ShareOverlay.tsx`
+  // redeemed onto `crossfade-inline` (verb #12). The hover-tooltip opacity
+  // transition reads `gestureClassesForMotion('crossfade-inline', reduce)`
+  // and the file wires `useReducedMotion()` once at the component top.
+  // Felt sentence: *"One label replacing another — instant enough I don't
+  // see the seam."* The verb's `reduced: 'perform'` row keeps labels fast
+  // and predictable even under `prefers-reduced-motion: reduce` — Tanya's
+  // discipline that "reduced-motion users especially need fast,
+  // predictable labels" landed in source. The post-click "Copied!" handoff
+  // is intentionally NOT graduated this cycle (separate verb, separate
+  // PR); the existing `mirror-share-confirm` recipe stays in place. The
+  // list ONLY shrinks. Pinned by `components/mirror/__tests__/
+  // ShareOverlay.gestures.test.ts`.
   // Mike napkin #91 — `whisper-linger` (verb #13) redeemed three sites in
   // one breath: `ViaWhisper`, `RecognitionWhisper`, `GemHome`. They all
   // shared the (linger, out) rhythm longhand; the verb names it. The
