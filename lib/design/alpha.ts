@@ -311,8 +311,41 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   `border-fog/<N>` matches; the chassis fence (§1 of
   //   `nav-voice-adoption.test.ts`, widened) catches re-introduction.
   //   The list ONLY shrinks.
+  // Live drifter retired (Mike napkin #111, Tanya UIX #80, Krystle drift-
+  //   density pick, Sid 2026-04-27): `app/resonances/ResonanceEntry.tsx`
+  //   — the `alive ↔ dimmed` pair-rule graduates to the role-based 4-rung
+  //   vocabulary. Two literal snaps + eight ledger routings:
+  //     SURFACE pair (Tanya §4 + §10 row A — "two registers, one rung apart"):
+  //       alive   /60  → `alphaClassOf('surface','recede','bg')` (= /50;
+  //                       step DOWN — body in repose, the reader's
+  //                       rose-italic note gains free authority).
+  //       dimmed  /30  → `alphaClassOf('surface','muted','bg')`   (= /30,
+  //                       same wire string, now ledger-sourced).
+  //       (`ALPHA_ORDER.indexOf('recede') - ALPHA_ORDER.indexOf('muted') === 1`.)
+  //     RIBBON: dimmed `border-rose/30` → `alphaClassOf('rose','muted','border')`.
+  //     GEM family-anchor (Tanya §4, visited-launcher precedent): both gems
+  //       at the `quiet` rung; family carries the temperature, rung anchors.
+  //         alive   `text-rose/70` → `alphaClassOf('rose','quiet','text')`
+  //         dimmed  `text-mist/30` → `alphaClassOf('mist','quiet','text')`
+  //                                   (= /70 — rung jump, family swap;
+  //                                   recognition grammar already in use
+  //                                   by `resolveLauncherPaint`).
+  //     META + CLOSING + QUOTED routed through `alphaClassOf` for audit:
+  //       quoted line     `/70` → `alphaClassOf('foreground','quiet','text')`
+  //       article meta    `/50` → `alphaClassOf('mist','recede','text')`
+  //       closing line    `/50` → `alphaClassOf('gold','recede','text')`
+  //     DIVIDERS: two raw `<div h-px …>` retire to `<Divider.Static
+  //       spacing="sys-4" />` (Tanya §5; geometry-only kernel auto-resolves
+  //       to `bg-gold/10` via `alphaClassOf('gold','hairline','bg')`).
+  //       The `bg-gold/20` drift on line 117 and the raw `bg-fog` divider
+  //       on line 119 both die — one dialect, two utterances.
+  //   The visited-launcher contrast audit's `CARD_SURFACE_ALPHA` updated
+  //   0.6 → 0.5 in lockstep so the WCAG floor stays measured against the
+  //   *actual* alive surface composition. `gold/70` still clears the
+  //   text-tier floor over both anchors. Pinned in
+  //   `app/resonances/__tests__/ResonanceEntry.alpha.test.ts`.
+  //   The list ONLY shrinks.
   'app/resonances/EvolutionThread.tsx',
-  'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',

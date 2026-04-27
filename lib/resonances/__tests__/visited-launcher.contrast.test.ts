@@ -10,13 +10,15 @@
  * `gold/50` fails, step UP to `quiet` (0.70), not down. Defend the
  * alpha ledger; never paint louder than the contrast budget allows.**
  *
- * Empirical reading on this surface (with the `bg-surface/60` card
- * composition, see `cardClass()` in `app/resonances/ResonanceEntry.tsx`):
+ * Empirical reading on this surface (with the `bg-surface/recede` (=/50)
+ * card composition — Tanya UIX #80 §4: surface stepped DOWN one rung from
+ * /60 to /50 in the `ResonanceEntry` alpha graduation; the body in repose
+ * gives the rose-italic note free authority). Source: `cardClass()` in
+ * `app/resonances/ResonanceEntry.tsx`.
  *
- *   gold/50 over alive card surface (cold) ≈ 3.53:1   ← fails 4.5:1
- *   gold/50 over alive card surface (warm) ≈ 3.39:1   ← fails 4.5:1
- *   gold/70 over alive card surface (cold) ≈ 5.65:1   ← passes
- *   gold/70 over alive card surface (warm) ≈ 5.18:1   ← passes
+ * The recede→quiet step from the prior audit holds: gold/70 still clears
+ * the floor over the new (slightly more page-bg-tinted) composited
+ * surface; gold/50 still fails. Numbers re-measured by this file.
  *
  * This file pins the *gold/70* numbers. Two cells (visited × {cold,
  * warm}). One floor (4.5:1 — WCAG_AA_TEXT). If either cell drops below
@@ -24,10 +26,10 @@
  * a per-cell knob.
  *
  * Math note: the launcher text is alpha-composited gold OVER the card's
- * own composited surface (`bg-surface/60` over the page bg). Two
- * composite steps:
+ * own composited surface (`bg-surface/50` over the page bg, post Mike #111
+ * + Tanya #80 graduation). Two composite steps:
  *
- *   1. card_surface = compositeOver(THERMAL.surface, THERMAL.bg, 0.6)
+ *   1. card_surface = compositeOver(THERMAL.surface, THERMAL.bg, 0.5)
  *   2. visible_text = compositeOver(BRAND.gold, card_surface, ALPHA.quiet)
  *
  * Then `contrast(visible_text, card_surface)` is the AA test cell.
@@ -68,12 +70,14 @@ import { VISITED_RUNG } from '../visited-launcher';
 
 // ─── Card surface composition ────────────────────────────────────────────
 //
-// The alive resonance card paints `bg-surface/60` over the page bg.
-// Reproduce that composite here so the test sees what the eye sees.
-// Source: `cardClass()` in `app/resonances/ResonanceEntry.tsx` —
-// `bg-surface/60 border-l-4 border-rose resonance-card-alive`.
+// The alive resonance card paints `bg-surface/recede` (=/50) over the
+// page bg, post the Mike #111 + Tanya UIX #80 alpha graduation that
+// stepped the alive chassis DOWN one rung (Tanya §4: free authority for
+// the reader's note). Reproduce that composite here so the test sees
+// what the eye sees. Source: `ALIVE_CHASSIS` in
+// `app/resonances/ResonanceEntry.tsx` (named handle, `__testing__`-pinned).
 
-const CARD_SURFACE_ALPHA = 0.6;
+const CARD_SURFACE_ALPHA = 0.5;
 
 interface Anchor { readonly name: 'cold' | 'warm'; readonly surface: string }
 

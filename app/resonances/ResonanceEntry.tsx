@@ -7,8 +7,8 @@
  * When `index` is undefined, the hook is disabled — no observer, no ref, no timers.
  *
  * Opacity fix: the shaped card drops `opacity-recede` (Tanya UIX #64 §3). Its faded
- * identity is carried by four internal color tokens (bg-surface/30, border-rose/30,
- * mist/30 gem, no shadow). The wrapper blanket opacity conflicted with scroll-rise's
+ * identity is carried by internal color tokens (surface@muted, rose-border@muted,
+ * mist gem, no shadow). The wrapper blanket opacity conflicted with scroll-rise's
  * `animation-fill-mode: both` which ends at full presence (opacity 1, the
  * Motion-owned fade endpoint).
  *
@@ -27,6 +27,26 @@
  * `gestureClassesForMotion`, the same shape `MirrorRevealCard` already
  * uses (Mike napkin #88). A reader who turned motion off no longer feels
  * the card breathing at them.
+ *
+ * Alpha graduation (Mike napkin #111 + Tanya UIX #80, Sid 2026-04-27): this
+ * file is OFF `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS`. The `alive ↔
+ * dimmed` pair is now spoken in the role-based 4-rung vocabulary owned by
+ * `lib/design/alpha.ts` — every color-alpha literal routes through
+ * `alphaClassOf()`. Per Tanya §4 + §10 row A: the surfaces sit exactly
+ * one ledger step apart — `recede` (alive, the body in repose) →
+ * `muted` (dimmed, ambient chrome the eye skims past). The reader's
+ * rose-italic note gains authority because the card around it stepped
+ * back a half-rung, not because the note got louder. The two raw
+ * dividers retire to `<Divider.Static />` (Tanya §5; one dialect, two
+ * utterances, geometry-only). Pinned per-file by `ResonanceEntry.alpha.test.ts`.
+ *
+ * Credits — alpha graduation: Paul K. (the *"two registers, one rung
+ * apart"* sentence and the single polish test that gates the PR), Tanya D.
+ * (UIX #80 — the surface step-DOWN doctrine, the gem family-anchor at
+ * `quiet`, the divider unification), Mike K. (architect — the JIT-safe
+ * literal-table routing, the `__testing__` per-file SSR pin shape, the
+ * grandfather-list-only-shrinks discipline), Krystle C. (drift-density
+ * pick), Elon M. (insistence that every gate be measurable).
  */
 'use client';
 
@@ -35,6 +55,7 @@ import { TextLink } from '@/components/shared/TextLink';
 import { Pressable } from '@/components/shared/Pressable';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { LeanArrow } from '@/components/shared/LeanArrow';
+import { Divider } from '@/components/shared/Divider';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { passageThermalClass } from '@/lib/design/typography';
@@ -69,19 +90,63 @@ interface Props {
   onSaved?: () => void;
 }
 
-/** Small gem icon for the card label. */
+// ─── Module-level alpha-ledger handles (JIT-safe literals) ────────────────
+//
+// Per Mike napkin #111 §4 (mirror of `<MirrorRevealCard>` BORDER_HAIRLINE /
+// `<Divider>` HAIRLINE_BG handles): every ledger crossing on this surface
+// resolves once, here, against `alphaClassOf()`. The `__testing__` export
+// hands these to `ResonanceEntry.alpha.test.ts` so the per-file SSR pin
+// asserts against named tokens, not magic strings. Tiny grep-able homes.
+//
+// Pair-rule: ALIVE_CHASSIS sits at `recede` (0.50), DIMMED_CHASSIS at
+// `muted` (0.30) — exactly one ledger step apart (Tanya §10 row A). The
+// reader's rose-italic note (passageThermalClass, default presence) gains
+// authority because the chassis around it stepped DOWN a half-rung
+// (Tanya §4: "free authority"), not because the note got louder.
+
+/** Surface paint at `recede` — the body in repose. */
+const ALIVE_SURFACE = alphaClassOf('surface', 'recede', 'bg');
+
+/** Surface paint at `muted` — ambient chrome, the eye skims past. */
+const DIMMED_SURFACE = alphaClassOf('surface', 'muted', 'bg');
+
+/** Border ribbon at `muted` — the warmth has cooled, the print remains. */
+const DIMMED_BORDER = alphaClassOf('rose', 'muted', 'border');
+
+/** Alive chassis — recede surface, full-presence rose ribbon, two-layer glow. */
+const ALIVE_CHASSIS = `${ALIVE_SURFACE} border-l-4 border-rose resonance-card-alive`;
+
+/** Dimmed chassis — muted surface, muted ribbon, no glow. */
+const DIMMED_CHASSIS = `${DIMMED_SURFACE} border-l-4 ${DIMMED_BORDER}`;
+
+/** Vitality bar track — `muted` rung; ambient chrome the eye skims past. */
+const VITALITY_TRACK = alphaClassOf('fog', 'muted');
+
+/** Gem paint at `quiet` for alive — content, but not THE content. */
+const GEM_ALIVE = alphaClassOf('rose', 'quiet', 'text');
+
+/** Gem paint at `quiet` for dimmed — same rung, family swap (visited-launcher precedent). */
+const GEM_DIMMED = alphaClassOf('mist', 'quiet', 'text');
+
+/** Quoted-line text — `quiet` rung; the article speaking, not the reader. */
+const QUOTED_LINE_TEXT = alphaClassOf('foreground', 'quiet', 'text');
+
+/** Article-meta text — `recede` rung; the frame around the subject. */
+const ARTICLE_META_TEXT = alphaClassOf('mist', 'recede', 'text');
+
+/** Closing-line text — `recede` rung; the room's small farewell. */
+const CLOSING_LINE_TEXT = alphaClassOf('gold', 'recede', 'text');
+
+/** Small gem icon for the card label. Pure presentation, ≤ 5 LOC. */
 function CardGem({ faded }: { faded?: boolean }) {
-  const color = faded ? 'text-mist/30' : 'text-rose/70';
-  return <GemIcon size="xs" className={color} />;
+  return <GemIcon size="xs" className={faded ? GEM_DIMMED : GEM_ALIVE} />;
 }
 
-/** Vitality bar — rose gradient for alive, empty for faded. */
+/** Vitality bar — rose gradient for alive, empty track for faded. */
 function VitalityBar(
   { vitality, faded, reduce }: { vitality: number; faded?: boolean; reduce: boolean },
 ) {
-  // Track is ambient chrome — Alpha rung `muted` via the ledger helper,
-  // same string emitted as before ("bg-fog/30"), now ledger-sourced.
-  const trackClass = `h-1.5 rounded-sys-full ${alphaClassOf('fog', 'muted')} w-full`;
+  const trackClass = `h-1.5 rounded-sys-full ${VITALITY_TRACK} w-full`;
   if (faded) return <div className={trackClass} />;
 
   const pct = Math.min(100, Math.round((vitality / 30) * 100));
@@ -114,9 +179,9 @@ export default function ResonanceEntry({
     <div ref={ref as RefObject<HTMLDivElement>} className={cardClass(faded, reduce)}>
       <CardLabel faded={faded} />
       {resonance.quote && <QuotedLine text={resonance.quote} />}
-      <div className="h-px max-w-divider bg-gold/20 mb-sys-4" />
+      <Divider.Static spacing="sys-4" />
       <ReaderNote note={resonance.resonanceNote} />
-      <div className="h-px bg-fog mb-sys-4" />
+      <Divider.Static spacing="sys-4" />
       <ArticleMeta resonance={resonance} timeAgo={timeAgo} />
       <div className="mt-sys-4">
         <VitalityBar vitality={resonance.vitality} faded={faded} reduce={reduce} />
@@ -142,18 +207,21 @@ export default function ResonanceEntry({
  * `resonance-card-alive` replaces `shadow-rose-glow`: two-layer box-shadow
  * (outer belt + inner thermal pulse via `--token-resonance-glow-alive`).
  * `opacity-recede` removed from `dimmed` — the faded state is carried by
- * four internal color tokens (Tanya UIX #64 §3).
+ * the chassis tokens above (Tanya UIX #64 §3 + #80 §4).
  *
  * The `alive ↔ shaped` swap rides the `card-settle` verb — *"the card is
  * drifting back down to sleep"* — branched on `prefers-reduced-motion` so
  * the return phase lands instantly when the reader has motion off.
+ *
+ * Pair-rule (Tanya UIX #80 §4 + §10 row A): ALIVE_CHASSIS sits at `recede`,
+ * DIMMED_CHASSIS at `muted` — exactly one ledger step apart. The chassis
+ * literals live at module scope so the `__testing__` export can pin both
+ * registers to named tokens (no magic strings). Pure, ≤ 5 LOC.
  */
 function cardClass(faded: boolean | undefined, reduce: boolean): string {
   const settle = gestureClassesForMotion('card-settle', reduce);
   const base = `rounded-sys-medium p-sys-7 my-sys-8 transition-all ${settle}`;
-  const alive = 'bg-surface/60 border-l-4 border-rose resonance-card-alive';
-  const dimmed = 'bg-surface/30 border-l-4 border-rose/30';
-  return `${base} ${faded ? dimmed : alive}`;
+  return `${base} ${faded ? DIMMED_CHASSIS : ALIVE_CHASSIS}`;
 }
 
 function CardLabel({ faded }: { faded?: boolean }) {
@@ -169,7 +237,7 @@ function CardLabel({ faded }: { faded?: boolean }) {
 
 function QuotedLine({ text }: { text: string }) {
   return (
-    <p className="text-foreground/70 italic text-sys-body max-w-prose-sm mb-sys-4">
+    <p className={`${QUOTED_LINE_TEXT} italic text-sys-body max-w-prose-sm mb-sys-4`}>
       &ldquo;{text}&rdquo;
     </p>
   );
@@ -190,14 +258,14 @@ function ArticleMeta({ resonance, timeAgo }: { resonance: ResonanceWithArticle; 
         className="text-sys-caption font-sys-accent">
         {resonance.articleTitle}
       </TextLink>
-      <p className="text-mist/50 text-sys-micro mt-sys-1">{timeAgo}</p>
+      <p className={`${ARTICLE_META_TEXT} text-sys-micro mt-sys-1`}>{timeAgo}</p>
     </>
   );
 }
 
 function ClosingLine({ line }: { line: string }) {
   return (
-    <p className="mt-sys-5 text-gold/50 italic text-sys-micro typo-caption">
+    <p className={`mt-sys-5 ${CLOSING_LINE_TEXT} italic text-sys-micro typo-caption`}>
       {line}
     </p>
   );
@@ -274,3 +342,29 @@ function QuoteCardLauncher(
     </div>
   );
 }
+
+// ─── Test seam — pure handles for the per-file SSR alpha pin ─────────────
+//
+// Mirrors `ThreadKeepsake.__testing__` (Mike napkin #92 / #110 §4) — tiny
+// named handles let `ResonanceEntry.alpha.test.ts` assert against the
+// canonical `alphaClassOf(...)` literals AND the expected wire strings. A
+// future swap of the rung vocabulary cannot silently shift either register
+// without flipping the per-file pin.
+//
+// Pair-rule (Tanya UIX #80 §10 row A): `ALIVE_CHASSIS` carries
+// `alphaClassOf('surface','recede','bg')` and `DIMMED_CHASSIS` carries
+// `alphaClassOf('surface','muted','bg')`. The two rungs sit exactly one
+// ledger step apart in `ALPHA_ORDER`. Pinned by §4 of the test.
+export const __testing__ = {
+  ALIVE_CHASSIS,
+  DIMMED_CHASSIS,
+  ALIVE_SURFACE,
+  DIMMED_SURFACE,
+  DIMMED_BORDER,
+  VITALITY_TRACK,
+  GEM_ALIVE,
+  GEM_DIMMED,
+  QUOTED_LINE_TEXT,
+  ARTICLE_META_TEXT,
+  CLOSING_LINE_TEXT,
+} as const;
