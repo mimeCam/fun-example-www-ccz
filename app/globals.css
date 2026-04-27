@@ -1209,18 +1209,16 @@ body {
   .empty-stagger-headline {
     animation-delay: 0ms !important;
   }
-  /* ShareOverlay sibling cascade — same shape, same fix. The breath is
-     optional; the receipt (the icon row arriving) is not. Tanya UIX #19 §2.1. */
-  .share-stagger-1,
-  .share-stagger-2,
-  .share-stagger-3 {
+  /* Stagger-ledger silence hook — every staggered cascade that opts in
+     by setting `data-sys-stagger` lands instantly. The universal `*` rule
+     above zeros DURATION; this rule zeros both animation-DELAY (cluster
+     family — Share row) and transition-DELAY (reveal family — Mirror
+     inner cascade). One selector, one a11y promise; future cascades
+     join by adding the attribute, not by adding an override.
+     Address: `lib/design/stagger.ts`. (Krystle C. spec; Mike #napkin
+     three-commit-silence; Tanya UIX #19/§3.1; Sid 2026-04-27.) */
+  [data-sys-stagger] {
     animation-delay: 0ms !important;
-  }
-  /* MirrorRevealCard inner cascade — same shape, same fix. The `*` rule
-     above zeros transition-DURATION; this rule zeros transition-DELAY. */
-  .mirror-stagger-1,
-  .mirror-stagger-2,
-  .mirror-stagger-3 {
     transition-delay: 0ms !important;
   }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {

@@ -120,15 +120,29 @@ describe('MirrorRevealCard — reduced-motion suppresses the shimmer bloom', () 
 
 describe('MirrorRevealCard — inner cascade lives at the paint layer', () => {
   it('exposes the JIT-safe `MIRROR_STAGGER_CLASS` table on the seam', () => {
+    // Class strings now route through the canonical Stagger Ledger
+    // (`lib/design/stagger.ts`); the seam still holds the resolved
+    // (rung → literal) map for source-grep parity with the prior fence.
     expect(MIRROR_STAGGER_CLASS).toEqual({
       1: 'mirror-stagger-1', 2: 'mirror-stagger-2', 3: 'mirror-stagger-3',
     });
   });
 
-  it("'mirror-stagger-1' / -2 / -3 appear as literal class strings", () => {
-    expect(SOURCE).toMatch(/['"`\s]mirror-stagger-1['"`\s]/);
-    expect(SOURCE).toMatch(/['"`\s]mirror-stagger-2['"`\s]/);
-    expect(SOURCE).toMatch(/['"`\s]mirror-stagger-3['"`\s]/);
+  it('reads the three rungs through staggerClassOf({ family: "reveal", rung })', () => {
+    expect(SOURCE).toMatch(/staggerClassOf\(\s*\{\s*family:\s*['"]reveal['"],\s*rung:\s*1\s*\}/);
+    expect(SOURCE).toMatch(/staggerClassOf\(\s*\{\s*family:\s*['"]reveal['"],\s*rung:\s*2\s*\}/);
+    expect(SOURCE).toMatch(/staggerClassOf\(\s*\{\s*family:\s*['"]reveal['"],\s*rung:\s*3\s*\}/);
+  });
+
+  it('imports staggerClassOf from the canonical seam', () => {
+    expect(SOURCE).toMatch(
+      /import\s*\{[^}]*\bstaggerClassOf\b[^}]*\}\s*from\s*['"]@\/lib\/design\/stagger['"]/,
+    );
+  });
+
+  it('spreads STAGGER_DATA_PROPS on the cascade rungs (silence hook)', () => {
+    const matches = SOURCE.match(/STAGGER_DATA_PROPS/g) ?? [];
+    expect(matches.length).toBeGreaterThanOrEqual(3); // import + 3 spreads
   });
 
   it('no `transitionDelay` literal appears inside any style={…} block', () => {

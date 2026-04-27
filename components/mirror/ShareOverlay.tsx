@@ -64,27 +64,25 @@ import { ActionPressable } from '@/components/shared/ActionPressable';
 import { useActionPhase, type UseActionPhaseResult } from '@/lib/hooks/useActionPhase';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
+import {
+  staggerClassOf,
+  STAGGER_DATA_PROPS,
+  type StaggerRung,
+} from '@/lib/design/stagger';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 /**
- * Stagger step → paint class (closed table of literals).
- *
- * Discrete `step: 1 | 2 | 3` instead of `delay: number` — the JIT-safe
- * lookup pattern this codebase pays for elsewhere (`alphaClassOf`,
- * `swapWidthClassOf`). NEVER template-interpolate the class name; Tailwind
- * cannot see what it cannot grep.
+ * Stagger rung → paint class — looked up via the canonical Stagger
+ * Ledger (`lib/design/stagger.ts`). `family: 'cluster'` is the Share
+ * icon row's felt shape: a horizontal politely-yielding cluster.
  *
  * The actual delays live one layer over in `app/globals.css`:
  *   1 → 0ms · 2 → calc(var(--sys-time-hover) / 2) · 3 → var(--sys-time-hover)
- * If a future cycle wants to re-time the cadence, it changes
- * `--sys-time-hover` once and every stagger built on it follows.
+ * The `data-sys-stagger` attribute is the silence hook: under
+ * `prefers-reduced-motion: reduce`, one selector zeroes the delay so
+ * all three icons land instantly.
  */
-const STAGGER_CLASS = {
-  1: 'share-stagger-1',
-  2: 'share-stagger-2',
-  3: 'share-stagger-3',
-} as const;
-type StaggerStep = keyof typeof STAGGER_CLASS;
+type StaggerStep = StaggerRung;
 
 interface Props {
   result: QuickMirrorResult;
@@ -123,17 +121,20 @@ export default function ShareOverlay({ result, articleId }: Props) {
 // gesture) per Tanya UIX §5.3; out of the verb registry's scope, same
 // exemption pattern as `mirror-archetype-label` in MirrorRevealCard.
 //
-// The `share-stagger-N` class derives its `animation-delay` from
-// `--sys-time-hover` in `app/globals.css`. The reduced-motion @media block
-// in the same file zeroes the delay so all three icons land instantly under
-// `prefers-reduced-motion: reduce` (Tanya UIX #19 §2.1, Mike napkin #96).
-// The component owns no millisecond literal; the design-system file owns
-// the cadence. Two surfaces (`.empty-stagger-headline` is the cousin),
-// one shape — rule-of-two earns a paint pattern, not yet a TS factory.
+// The class string is read off the Stagger Ledger
+// (`lib/design/stagger.ts`) for the `cluster` family — the JIT-safe
+// table-of-literals lookup pattern this codebase pays for elsewhere.
+// `data-sys-stagger` is the silence hook: one CSS selector
+// (`[data-sys-stagger]` under `@media (prefers-reduced-motion: reduce)`)
+// zeroes both animation-delay and transition-delay for every cascade
+// that carries the attribute. The component owns no millisecond literal.
 
 function StaggerSlot({ step, children }: { step: StaggerStep; children: React.ReactNode }) {
   return (
-    <div className={`animate-fade-in ${STAGGER_CLASS[step]}`}>
+    <div
+      className={`animate-fade-in ${staggerClassOf({ family: 'cluster', rung: step })}`}
+      {...STAGGER_DATA_PROPS}
+    >
       {children}
     </div>
   );

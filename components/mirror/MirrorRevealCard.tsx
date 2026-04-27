@@ -23,6 +23,11 @@ import { Divider } from '@/components/shared/Divider';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
+import {
+  staggerClassOf,
+  STAGGER_DATA_PROPS,
+  type StaggerRung,
+} from '@/lib/design/stagger';
 
 /* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
    Pinned at module scope so the `phaseClass` map below stays a plain
@@ -94,16 +99,17 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
 const REVEAL_GESTURE = (r: boolean): string => gestureClassesForMotion('reveal-keepsake', r);
 const FADE_GESTURE   = (r: boolean): string => gestureClassesForMotion('fade-neutral',    r);
 
-/* ─── Inner-cascade stagger → paint class (closed table of literals) ──────
-   Sibling to `STAGGER_CLASS` in `ShareOverlay.tsx` (Mike #95 §1). Delays
-   live in `app/globals.css` (1→0ms · 2→`--sys-time-instant` · 3→`--sys-time-
-   enter`); reduced-motion floor is one @media block in the same file.
-   NEVER template-interpolate; Tailwind cannot grep a runtime concat. */
-const MIRROR_STAGGER_CLASS = {
-  1: 'mirror-stagger-1',
-  2: 'mirror-stagger-2',
-  3: 'mirror-stagger-3',
-} as const;
+/* ─── Inner-cascade stagger → paint class (Stagger Ledger lookup) ─────────
+   Class strings come from `lib/design/stagger.ts` for the `reveal` family.
+   Delays live in `app/globals.css` (1→0ms · 2→`--sys-time-instant` ·
+   3→`--sys-time-enter`); the reduced-motion floor is one
+   `[data-sys-stagger]` selector under one @media block. The
+   `data-sys-stagger` attribute on each rung is the silence hook. */
+const MIRROR_STAGGER_CLASS: Readonly<Record<StaggerRung, string>> = {
+  1: staggerClassOf({ family: 'reveal', rung: 1 }),
+  2: staggerClassOf({ family: 'reveal', rung: 2 }),
+  3: staggerClassOf({ family: 'reveal', rung: 3 }),
+};
 
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
@@ -115,7 +121,8 @@ function RevealLabel({ visible, color, motion }: {
   return (
     <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-2
       ${MIRROR_STAGGER_CLASS[1]} ${motion} ${fadeClass(visible)}`}
-      style={{ color, opacity: visible ? 0.7 : 0 }}>
+      style={{ color, opacity: visible ? 0.7 : 0 }}
+      {...STAGGER_DATA_PROPS}>
       Because you stayed…
     </p>
   );
@@ -131,7 +138,8 @@ function ArchetypeName({ label, visible, color }: {
     <h2 className={`text-sys-h3 font-display font-sys-display tracking-sys-heading
       ${MIRROR_STAGGER_CLASS[2]}
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
-      style={{ color }}>
+      style={{ color }}
+      {...STAGGER_DATA_PROPS}>
       {label}
     </h2>
   );
@@ -144,7 +152,8 @@ function WhisperQuote({ text, visible, motion }: {
   // The whisper is a quote; archetype name above is THE content. /80 was drift.
   return (
     <p className={`mt-sys-3 text-sys-caption ${WHISPER_TEXT} italic max-w-card-body
-      mx-auto typo-caption ${MIRROR_STAGGER_CLASS[3]} ${motion} ${fadeClass(visible)}`}>
+      mx-auto typo-caption ${MIRROR_STAGGER_CLASS[3]} ${motion} ${fadeClass(visible)}`}
+      {...STAGGER_DATA_PROPS}>
       &ldquo;{text}&rdquo;
     </p>
   );
