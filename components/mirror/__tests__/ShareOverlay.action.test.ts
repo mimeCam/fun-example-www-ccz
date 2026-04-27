@@ -157,8 +157,13 @@ describe('ShareOverlay — the bespoke COPY_TOAST_MS cascade is gone', () => {
 // ─── 6 · Width discipline — tooltip min-width pins the chip ──────────────
 
 describe('ShareOverlay — tooltip width is pinned across the verb swap', () => {
-  it('the tooltip carries `min-w-[6.5rem]` (Tanya UIX #99 §5)', () => {
-    expect(SOURCE).toMatch(/min-w-\[6\.5rem\]/);
+  it('the tooltip carries `swapWidthClassOf(2)` (Tanya UIX #99 §5, Mike #39 §3)', () => {
+    // The chip width across `Copy Link` ↔ `Copied!` is pinned through the
+    // canonical rung-2 helper from `lib/design/swap-width.ts`. Helper
+    // output is byte-identical (`min-w-[6.5rem]`); the source-grep moves
+    // to the helper so a future regression cannot reintroduce a magic
+    // number without flipping this test (Mike #39 POI-8).
+    expect(SOURCE).toMatch(/swapWidthClassOf\s*\(\s*2\s*\)/);
   });
 });
 

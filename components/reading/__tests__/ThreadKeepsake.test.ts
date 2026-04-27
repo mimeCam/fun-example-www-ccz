@@ -83,12 +83,15 @@ describe('ThreadKeepsake · single-primary action layout (Tanya UX §4.1)', () =
     expect(body).toMatch(/size="md"/);
   });
 
-  it('primary Share pins its bounding box via min-w-[14rem] (Tanya #81 §4)', () => {
+  it('primary Share pins its bounding box via swapWidthClassOf(3) (Tanya UX #41 §3, Mike #39 §3)', () => {
     // The 12-character shrink "Share this thread" → "Shared" must be a
-    // content swap, not a box reshape. min-w-[14rem] is the load-bearing
-    // width discipline — locked here so a future contributor cannot
-    // shrink the floor without flipping this test red on first run.
-    expect(primaryShareBody()).toMatch(/min-w-\[14rem\]/);
+    // content swap, not a box reshape. The rung-3 floor (14rem) is
+    // composed through the canonical `swapWidthClassOf(3)` helper — a
+    // future contributor cannot shrink the floor without flipping this
+    // test red on first run, AND cannot quietly re-introduce a bespoke
+    // `min-w-[Xrem]` literal without tripping the host-bound fence in
+    // `components/shared/__tests__/label-swap-width-fence.test.ts`.
+    expect(primaryShareBody()).toMatch(/swapWidthClassOf\s*\(\s*3\s*\)/);
   });
 
   it('one icon Pressable exists for the close affordance', () => {

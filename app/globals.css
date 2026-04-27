@@ -261,6 +261,18 @@
   --sys-space-11: calc(4rem     + var(--token-space-lift-11, 0px));  /* 64px+ — monumental */
   --sys-space-12: calc(6rem     + var(--token-space-lift-12, 0px));  /* 96px+ — expansive */
 
+  /* ─── Label-swap width floors ─────────────────────────────
+     Three discrete content-derived `min-width` floors for `<ActionPressable>`
+     hosts whose visible label crossfades between `idleLabel` ↔ `settledLabel`
+     (Copy ↔ Copied, Share this card ↔ Shared, …). The chamber holds across
+     the swap so the bounding box does not flinch (Tanya UX #41 §1, Mike #39
+     §3). Each rung is `max(width(idle), width(settled))`. NOT a row in the
+     spacing ledger: rem-on-the-x-axis at three discrete values that do not
+     align to the 12-rung continuum (Mike #39 §3, "different unit-space"). */
+  --label-swap-width-1: 5.5rem;  /* 88px  — 1-word verb (Copy ↔ Copied) */
+  --label-swap-width-2: 6.5rem;  /* 104px — 2-word phrase (Copy Link ↔ Copied!) */
+  --label-swap-width-3: 14rem;   /* 224px — full sentence CTA (Share this card ↔ Shared) */
+
   /* ─── Typography Scale ────────────────────────────────── */
   --sys-text-micro:  0.75rem;    /* 12px — badges, slot indicators */
   --sys-text-caption: 0.875rem;  /* 14px — metadata, labels, nav items */

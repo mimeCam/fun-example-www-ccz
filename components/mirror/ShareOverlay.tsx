@@ -55,6 +55,7 @@ import { ActionPressable } from '@/components/shared/ActionPressable';
 import { useActionPhase, type UseActionPhaseResult } from '@/lib/hooks/useActionPhase';
 import { MOTION } from '@/lib/design/motion';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
+import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 /**
@@ -205,10 +206,12 @@ function CopyLinkBtn({ onClick, slot, reduce }: {
 // out of the DeepLink paragraph's gutter; caret rotated from the bottom
 // edge points down to its anchor button.
 //
-// Width discipline (Tanya UIX #99 §5): `min-w-[6.5rem]` pins the chip
-// width across the `Copy Link` ↔ `Copied!` swap (9 ch ↔ 7 ch is 2 ch off
-// the ±1 ch contract; the min-width keeps the caret centred and the chip
-// from jittering). One Tailwind class, zero new motion.
+// Width discipline (Tanya UIX #99 §5, Tanya UX #41 §5.3, Mike #39 §3):
+// the chip width is pinned across the `Copy Link` ↔ `Copied!` swap via
+// `swapWidthClassOf(2)` — the canonical 2-word/short-phrase rung from the
+// label-swap-width facet. (9 ch ↔ 7 ch is 2 ch off the ±1 ch contract;
+// the min-width keeps the caret centred and the chip from jittering.)
+// One helper-composed Tailwind class, zero new motion.
 
 function Tooltip({ label, reduce }: { label: string; reduce: boolean }) {
   // alpha-ledger:exempt — motion fade endpoints (hover tooltip α=0/α=1 pair)
@@ -219,7 +222,7 @@ function Tooltip({ label, reduce }: { label: string; reduce: boolean }) {
   return (
     <span className={`pointer-events-none absolute -top-9 left-1/2
       -translate-x-1/2 rounded-sys-medium bg-void text-mist text-sys-micro px-sys-2 py-sys-1
-      shadow-sys-rest whitespace-nowrap min-w-[6.5rem] text-center
+      shadow-sys-rest whitespace-nowrap ${swapWidthClassOf(2)} text-center
       opacity-0 group-hover:opacity-100 transition-opacity
       ${gestureClassesForMotion('crossfade-inline', reduce)}`}>
       {label}

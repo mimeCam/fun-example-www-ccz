@@ -65,6 +65,7 @@ import {
 import { buildKeepsakeHref, buildUnfurlUrl } from '@/lib/sharing/thread-snapshot';
 import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
+import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
 import { ActionPressable } from '@/components/shared/ActionPressable';
@@ -211,9 +212,11 @@ function KeepsakeActions({ svg, snapshot, deepLink, unfurlUrl }: ActionsProps) {
  * Wears the same `<ActionPressable>` covenant as the secondary row
  * (Mike #26 §3 / Tanya #81 §5–§6): on a successful native share the glyph
  * crossfades to a checkmark and the label flips to "Shared", held ~1000 ms.
- * The bounding box is pinned by `min-w-[14rem]` so the 12-character
+ * The bounding box is pinned by `swapWidthClassOf(3)` so the 12-character
  * shrink (Share this thread → Shared) is a content swap, not a reshape
- * (Tanya #81 §4). No toast on success; the failover keeps the room voice.
+ * (Tanya UX #41 §3, Mike #39 §3 — three-rung label-swap floor; rung 3
+ * derived from the 17-ch idle label). No toast on success; the failover
+ * keeps the room voice.
  */
 function PrimaryShare({ onClick, slot }: { onClick: () => void; slot: UseActionPhaseResult }) {
   return (
@@ -228,7 +231,7 @@ function PrimaryShare({ onClick, slot }: { onClick: () => void; slot: UseActionP
         idleLabel="Share this thread"
         settledLabel="Shared"
         hint="Share this thread"
-        className="min-w-[14rem]"
+        className={swapWidthClassOf(3)}
       />
     </div>
   );

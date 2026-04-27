@@ -28,6 +28,7 @@ import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { useActionPhase } from '@/lib/hooks/useActionPhase';
+import { swapWidthClassOf } from '@/lib/design/swap-width';
 
 // ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
 //
@@ -360,6 +361,7 @@ function LetterCard({
             idleLabel="Copy"
             settledLabel="Copied"
             hint="Copy & Share this letter"
+            className={swapWidthClassOf(1)}
           />
           <Pressable variant="ghost" size="md" onClick={handleImage}>
             Save as Image

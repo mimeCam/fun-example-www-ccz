@@ -21,9 +21,11 @@
  * The whole point of this host (Mike #81 §1, Tanya #75 §4.3): N=2 native
  * speakers of the direct-gesture asymmetry contract. Same `<ActionPressable>`,
  * same `useActionPhase`, same sr-only `<PhaseAnnouncement>`, same
- * `min-w-[14rem]` width discipline on the primary CTA. **No success toast
- * on any of the four verbs.** Failure escalates one level via the existing
- * `showExportError` (warn intent) or `copyWithFeedback`'s default warn path.
+ * label-swap-width discipline on the primary CTA — composed through
+ * `swapWidthClassOf(3)` from `lib/design/swap-width.ts` (Mike #39 §3,
+ * Tanya UX #41 §3). **No success toast on any of the four verbs.** Failure
+ * escalates one level via the existing `showExportError` (warn intent) or
+ * `copyWithFeedback`'s default warn path.
  *
  * Reuse audit (per AGENTS.md "begin from shared code"):
  *   • <Threshold>          — modal mechanics (ESC / backdrop / focus / scroll-lock)
@@ -59,6 +61,7 @@ import {
 } from '@/lib/quote-cards/export-utils';
 import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
 import { Pressable } from '@/components/shared/Pressable';
 import { ActionPressable } from '@/components/shared/ActionPressable';
@@ -236,8 +239,9 @@ function KeepsakeActions({ data, dataUrl, deepLink, onSaved }: ActionsProps) {
 /**
  * Primary "Share this card" — gold solid, ↗ glyph, single verb. Wears the
  * same fingertip witness as the secondary row (Mike #26 §3 / Tanya #81 §5).
- * `min-w-[14rem]` pins the bounding box across the "Share this card" →
- * "Shared" content swap (Tanya §6 width discipline).
+ * `swapWidthClassOf(3)` pins the bounding box across the "Share this card"
+ * → "Shared" content swap (Tanya UX #41 §3, Mike #39 §3 — three-rung
+ * label-swap floor; rung 3 derived from the 15-ch idle label).
  */
 function PrimaryShare({ onClick, slot }: {
   onClick: () => void; slot: UseActionPhaseResult;
@@ -254,7 +258,7 @@ function PrimaryShare({ onClick, slot }: {
         idleLabel="Share this card"
         settledLabel="Shared"
         hint="Share this card"
-        className="min-w-[14rem]"
+        className={swapWidthClassOf(3)}
       />
     </div>
   );

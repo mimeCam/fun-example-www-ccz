@@ -98,8 +98,14 @@ describe('QuoteKeepsake · single-primary action layout (Tanya §75 §4.2)', () 
     expect(body).toMatch(/size="md"/);
   });
 
-  it('primary Share pins its bounding box via min-w-[14rem] (Tanya #81 §4)', () => {
-    expect(primaryShareBody()).toMatch(/min-w-\[14rem\]/);
+  it('primary Share pins its bounding box via swapWidthClassOf(3) (Tanya UX #41 §3, Mike #39 §3)', () => {
+    // Source-pin: the call-site composes the rung-3 floor through the
+    // canonical helper, not a hand-rolled `min-w-[14rem]` literal. The
+    // helper output is byte-identical (`min-w-[14rem]`) so rendered HTML
+    // tests on this surface stay green; this lock pins the helper at the
+    // call-site so a future regression cannot quietly re-introduce a
+    // bespoke magic number under a different rem (Mike #39 POI-8).
+    expect(primaryShareBody()).toMatch(/swapWidthClassOf\s*\(\s*3\s*\)/);
   });
 
   it('one icon Pressable exists for the close affordance', () => {
