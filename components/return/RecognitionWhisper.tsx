@@ -11,18 +11,15 @@
  * `useRecognitionPhase`. The resolver returns the `whisperTimeline()` plan
  * which now owns ALL FIVE durations including `liftMs` (the visible breath
  * before the cue speaks). Sister surface `ViaWhisper` inherits the same
- * timeline — both whispers paint as if they were one element seen twice
- * (Mike napkin §"Kernel-Owned Anticipation"; Tanya UX §1 "two doors, one
- * column").
+ * timeline AND the same paint policy — two surfaces converge here; a third
+ * joins when it earns it. (Mike napkin §"Kernel-Owned Anticipation"; #115
+ * §"Whisper Opacity Convergence"; Tanya UX #79 §1 "two doors, one column".)
  *
- * Phase → opacity rung mapping (the call-site policy):
- *   • `rest`           → opacity-0       (the breath; nothing visible)
- *   • `lift` / `settle`→ opacity-quiet   (the cue speaks at gold/70)
- *   • `hold` / `fold`  → opacity-muted   (the dim after the dwell)
- *
- * The fade between rungs is the existing `whisper-linger` gesture verb
- * (resolved via `gestureClassesOf` — see `lib/design/gestures.ts`).
- * Opacity only, no translate, no blur. Whispers speak; they do not arrive.
+ * Phase → opacity rung mapping is owned by `lib/return/recognition-paint.ts`
+ * (sibling to the timing kernel). The fade between rungs is the existing
+ * `whisper-linger` gesture verb (resolved via `gestureClassesOf` — see
+ * `lib/design/gestures.ts`). Opacity only, no translate, no blur. Whispers
+ * speak; they do not arrive.
  *
  * Design tokens: mist text, gold/50 accent on archetype keyword.
  */
@@ -33,10 +30,8 @@ import type { ReturnRecognitionState } from '@/lib/hooks/useReturnRecognition';
 import { gestureClassesOf } from '@/lib/design/gestures';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
-import {
-  resolveRecognitionTimeline,
-  type RecognitionPhase,
-} from '@/lib/return/recognition-timeline';
+import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
+import { phaseOpacityClass } from '@/lib/return/recognition-paint';
 
 interface Props {
   recognition: ReturnRecognitionState;
@@ -53,7 +48,6 @@ export function RecognitionWhisper({ recognition }: Props) {
 
   return (
     <p
-      // alpha-ledger:exempt — phase-driven opacity rungs (kernel-owned timing)
       className={`text-sys-caption italic font-display transition-opacity ${gestureClassesOf('whisper-linger')} thermal-drift ${phaseOpacityClass(phase)}`}
       style={{ color: 'var(--mist)' }}
     >
@@ -62,19 +56,6 @@ export function RecognitionWhisper({ recognition }: Props) {
       {recognition.lastWhisper}
     </p>
   );
-}
-
-/**
- * Map a recognition phase to its alpha rung class. Pure, ≤ 10 LoC.
- *
- *   `rest`           → opacity-0       (the breath before the cue)
- *   `lift` / `settle`→ opacity-quiet   (the speaking)
- *   `hold` / `fold`  → opacity-muted   (the dwell-out)
- */
-function phaseOpacityClass(phase: RecognitionPhase): string {
-  if (phase === 'rest') return 'opacity-0';
-  if (phase === 'hold' || phase === 'fold') return 'opacity-muted';
-  return 'opacity-quiet';
 }
 
 function formatArchetype(key: string | null): string {

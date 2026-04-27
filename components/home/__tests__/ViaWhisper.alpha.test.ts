@@ -117,13 +117,21 @@ describe('ViaWhisper · §2 SSR paints the snapped carrier verbatim', () => {
     expect(html).toContain('ease-out');
   });
 
-  it('the rendered markup is the initial dimmed=false markup (opacity-100)', () => {
+  it('the rendered markup is the initial phase=rest markup (opacity-0)', () => {
     // SSR fires no useEffect, so the markup pins the entry state. The
-    // `opacity-100` carrier is the motion fade endpoint (alpha-ledger
-    // exempt, owned by Motion). After T_LINGER the client swaps to
-    // `opacity-muted` — that is the runtime concern, not the SSR pin.
-    expect(renderWhisper()).toContain('opacity-100');
+    // entry phase is `'rest'` (`useRecognitionPhase`'s `useState` seed),
+    // which `phaseOpacityClass` maps to `opacity-0` — the kernel-owned
+    // breath before the cue speaks. (Tanya UIX #79 §2.2: the deep-link
+    // arrival now starts at `opacity-0` and lifts on the same breath
+    // the article-rail whisper takes. Two doors, one breath.)
+    //
+    // After `liftMs` the client swaps to `opacity-quiet` (the speaking
+    // rung, Tanya UIX #79 §2.1) and after the dwell to `opacity-muted` —
+    // those are runtime concerns, not the SSR pin.
+    expect(renderWhisper()).toContain('opacity-0');
+    expect(renderWhisper()).not.toContain('opacity-100');
     expect(renderWhisper()).not.toContain('opacity-muted');
+    expect(renderWhisper()).not.toContain('opacity-quiet');
   });
 });
 

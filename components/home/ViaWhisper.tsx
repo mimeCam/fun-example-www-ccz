@@ -1,16 +1,24 @@
 /**
  * ViaWhisper — "A Deep Diver sent you here" arrival whisper.
  *
- * Renders when a friend clicks a shared archetype deep link. Visible at
- * full intensity; after the canonical recognition silence (Mike napkin
- * §"Surgical adoption"), the cue dims to the muted register.
+ * Renders when a friend clicks a shared archetype deep link. Mounts at
+ * the rest rung (the kernel-owned silence) and lifts on the same breath
+ * as the article-rail whisper (`liftMs = MOTION.settle = 1500ms`); after
+ * the canonical recognition dwell the cue dims to the muted register.
  *
- * The italic gold text speaks at the `quiet` rung (`text-gold/70`) — the
- * same address as `RecognitionWhisper` (return), `GemHome` at luminous
- * (wayfinding), and `EvolutionThread` (memory). Four surfaces, one
- * voice — the gold-whisper register. The rung is owned by the alpha
- * ledger; this file routes through `alphaClassOf` so a future re-tune
- * happens at one address. (Mike napkin #114, Tanya UIX #94 §2.)
+ * Two surfaces converge here; a third joins when it earns it. The italic
+ * gold body speaks at the `quiet` rung (`text-gold/70`) — same address as
+ * `RecognitionWhisper`'s body. Tanya UIX #79 §2.1 adjudicated the rung:
+ * `quiet`, not `100`, because painting the wrapper at full would stack
+ * element opacity on top of the alpha-ledger color alpha (double
+ * attenuation) and the whisper would compete with the article body.
+ * The wrapper steps back; the gold body color speaks. (Mike napkin #115
+ * §"Whisper Opacity Convergence"; Tanya UIX #79 §2.1.)
+ *
+ * Phase → opacity rung mapping is owned by `lib/return/recognition-paint.ts`
+ * (sibling to the timing kernel). Both whisper surfaces resolve the same
+ * string per phase — the "one voice" claim is now a unit test, not a
+ * docblock (`lib/return/__tests__/whisper-paint-converges.fence.test.ts`).
  *
  * Timing — owned by the Recognition Timeline (Mike napkin §"Module shape").
  * The previous `T_LINGER = 6000ms` constant retired with this PR; the
@@ -28,6 +36,7 @@ import { alphaClassOf } from '@/lib/design/alpha';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
 import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
+import { phaseOpacityClass } from '@/lib/return/recognition-paint';
 
 /* ─── Alpha-ledger handle (JIT-safe literal via alphaClassOf) ──────────────
    The arrival whisper paints at the `quiet` rung — same address as the
@@ -46,13 +55,10 @@ export default function ViaWhisper({ via }: Props) {
   const reduce = useReducedMotion();
   const timeline = resolveRecognitionTimeline('whisper', { reducedMotion: reduce });
   const { phase } = useRecognitionPhase(timeline);
-  const dimmed = phase === 'hold' || phase === 'fold';
   const text = friendWhisperText(via);
 
   return (
-    // alpha-ledger:exempt — motion fade endpoint (opacity-100 is the visible transition target)
-    <p className={`text-center text-sys-caption transition-opacity ${gestureClassesOf('whisper-linger')} mb-sys-4
-      ${dimmed ? 'opacity-muted' : 'opacity-100'}`}>
+    <p className={`text-center text-sys-caption transition-opacity ${gestureClassesOf('whisper-linger')} mb-sys-4 ${phaseOpacityClass(phase)}`}>
       <span className={`${WHISPER_TEXT} italic`}>{text}</span>
     </p>
   );
