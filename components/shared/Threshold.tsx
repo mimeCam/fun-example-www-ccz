@@ -54,13 +54,9 @@ const BACKDROP_BASE =
   'fixed inset-0 z-sys-backdrop bg-void/65 backdrop-blur-sm ' +
   'motion-reduce:opacity-100';
 
-// // reader-invariant:forced-colors — thermal-shadow dissolves; the chamber gains
-// a `1px solid CanvasText` edge + `2px` outer outline (the "door frame" —
-// Tanya UX #53 §3.3) so it reads as a separate plane from the flat backdrop.
-// `held` posture — the chamber is a contained thing the reader acts on
-// (Tanya UX #92 §2.1 — radius does not warm with score; pixel parity ✓).
+// Chamber paints opaque; blur lives on the backdrop, where it has work to do.
 const CHAMBER_BASE =
-  'relative pointer-events-auto bg-surface/95 backdrop-blur-sm ' +
+  'relative pointer-events-auto bg-surface ' +
   'thermal-shadow ' + thermalRadiusClassByPosture('held') + ' overflow-hidden ' +
   'forced-colors:outline forced-colors:outline-2 ' +
   'forced-colors:outline-offset-0 forced-colors:outline-[CanvasText]';
@@ -215,3 +211,15 @@ function ChamberSurface({
     </div>
   );
 }
+
+/* ─── Test-only exports — per-file opacity pin ("Honest Doorway") ─────────── */
+
+/**
+ * Surface the chamber + backdrop class kernels to
+ * `__tests__/Threshold.opaque.test.ts`. The chamber paints opaque
+ * (default `bg-surface`, no shorthand, no chamber-side blur); the backdrop
+ * keeps its load-bearing translucency + blur duet untouched. Mirrors the
+ * `__testing__` shape used by sister chrome-paint surfaces (Toast,
+ * Keepsakes, ResonanceEntry).
+ */
+export const __testing__ = { CHAMBER_BASE, BACKDROP_BASE };

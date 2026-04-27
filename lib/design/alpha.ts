@@ -478,8 +478,19 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   (handles · SSR paint · drift sweep — three sections, the
   //   QuoteKeepsake.alpha shape). The grandfather list shrinks 3 → 2.
   //   The list ONLY shrinks.
+  // Live drifter retired (Mike napkin "Honest Doorway" + Elon §3.1 +
+  //   Tanya UIX #3 §2.1, Sid 2026-04-27): `components/shared/Threshold.tsx`
+  //   — chamber surface `bg-surface/95 backdrop-blur-sm` → `bg-surface`
+  //   default (Path C: opaque + blur deleted as dead compositor pass on an
+  //   opaque fill). Backdrop scrim (`bg-void/65 backdrop-blur-sm`)
+  //   unchanged — load-bearing on a translucent surface. Two layers that
+  //   disagreed with the chamber's "held" posture retire together; shadow +
+  //   radius become the sole carriers of containment. Pinned per-file in
+  //   `components/shared/__tests__/Threshold.opaque.test.ts`; pinned
+  //   site-wide by `lib/design/__tests__/alpha-adoption.test.ts` (the file
+  //   leaves the grandfather list and the absence-of-`/N` literal becomes
+  //   enforceable). The grandfather list shrinks 2 → 1. The list ONLY shrinks.
   'components/content/StratifiedRenderer.tsx',
-  'components/shared/Threshold.tsx',
 ] as const;
 
 // ─── Helpers — JIT-safe color-alpha class-string factories ────────────────
