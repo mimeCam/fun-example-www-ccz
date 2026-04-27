@@ -11,7 +11,7 @@
  * `swapWidthClassOf(n)` helper from `lib/design/swap-width.ts`.
  *
  * Three axes — kernel-first, no AST, ≤ 120 LOC of axis logic + bespoke
- * prose. Rides `_jsx-fence-walker.ts` (the same kernel three other fences
+ * prose. Rides `_fence.ts` (the same kernel three other fences
  * already share — Mike §POI-3 "do not fork the walker").
  *
  *   Axis A — Host inventory.
@@ -68,7 +68,7 @@ import {
   readBalancedDelimiters,
   lineAt,
   formatBlock,
-} from './_jsx-fence-walker';
+} from '../../../lib/design/__tests__/_fence';
 import {
   SWAP_WIDTH_RUNGS,
   swapWidthClassOf,

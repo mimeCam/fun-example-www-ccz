@@ -67,7 +67,7 @@ import {
   preloadFiles,
   lineAt,
   stripCommentsAndTemplates as preprocess,
-} from './_jsx-fence-walker';
+} from '../../../lib/design/__tests__/_fence';
 
 const ROOT = join(__dirname, '..', '..', '..');
 

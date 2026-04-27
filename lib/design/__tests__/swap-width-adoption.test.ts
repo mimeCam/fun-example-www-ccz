@@ -1,6 +1,6 @@
 /**
  * Swap-Width Adoption Test — the fourth grep-fence riding the
- * `_adoption-fence` kernel; the 15th sibling adoption ledger overall.
+ * `_fence` kernel; the 15th sibling adoption ledger overall.
  *
  * Three discrete `min-w-[Xrem]` literals carry the label-swap floors
  * across the codebase. The canonical home is exactly one file —
@@ -22,7 +22,7 @@
  * home — different blast radius, complementary fence (Mike #N §1).
  *
  * Walker / comment-stripper / exempt-token check live in
- * `_adoption-fence.ts` (kernel; precedents: `caption-metric-adoption`,
+ * `_fence.ts` (kernel; precedents: `caption-metric-adoption`,
  * `numeric-features-adoption`, `filled-glyph-lift-adoption`).
  *
  * **What this test does NOT try to assert** (Tanya UX §0, §7): the
@@ -48,7 +48,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runFence, formatViolations, type FenceDecl } from './_adoption-fence';
+import { runLinePatterns, formatViolations, type FenceDecl } from './_fence';
 import { SWAP_WIDTH_EXEMPT_TOKEN } from '../swap-width';
 
 const ROOT = join(__dirname, '..', '..', '..');
@@ -81,7 +81,7 @@ const FENCE: FenceDecl = {
 // ─── Tests — the grep-fence ──────────────────────────────────────────────
 
 describe('swap-width adoption — every rung literal routes through swapWidthClassOf', () => {
-  const violations = runFence(FENCE);
+  const violations = runLinePatterns(FENCE);
 
   /** Human-readable fix hint — names the helper, the three rung floors,
    * the canonical labels each rung was sized for, and the exit token.

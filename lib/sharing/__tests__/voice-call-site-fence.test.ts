@@ -58,9 +58,9 @@ import {
   preloadFiles,
   readBalancedDelimiters,
   lineAt,
-} from '@/components/shared/__tests__/_jsx-fence-walker';
+} from '@/lib/design/__tests__/_fence';
 
-// ─── Scan footprint (the walker primitives live in `_jsx-fence-walker.ts`) ─
+// ─── Scan footprint (the walker primitives live in `_fence.ts`) ───────────
 
 const SCAN_DIRS: readonly string[] = ['app', 'components'];
 

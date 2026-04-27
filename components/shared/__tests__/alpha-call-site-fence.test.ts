@@ -30,7 +30,7 @@
  * `lean-arrow-fence.test.ts` (Axes A–F) and `voice-call-site-fence.test.ts`
  * (Axes A–D); the rule-of-three for the *test pattern* has now fired,
  * and the file walker / preload / strip / balanced-delim primitives
- * have lifted into `_jsx-fence-walker.ts` (Mike #41 — kernel-lift
+ * have lifted into `_fence.ts` (Mike #41 — kernel-lift
  * napkin; Krystle #20 — named lint #3; Elon §4 — walker is the layer
  * that drifts, not the formatter).
  *
@@ -90,7 +90,7 @@ import {
   preloadFiles,
   readBalancedDelimiters,
   lineAt,
-} from './_jsx-fence-walker';
+} from '../../../lib/design/__tests__/_fence';
 import {
   ALPHA_COLOR_FAMILIES,
   ALPHA_ORDER,
@@ -98,7 +98,7 @@ import {
 
 const ROOT = join(__dirname, '..', '..', '..');
 
-// ─── Scan footprint (the walker primitives live in `_jsx-fence-walker.ts`)
+// ─── Scan footprint (the walker primitives live in `_fence.ts`) ──────────
 
 const SCAN_DIRS: readonly string[] = ['app', 'components'];
 

@@ -15,7 +15,7 @@
  * one allow-list. A third spelling fails CI and names the legal exits.
  *
  * Walker / comment-stripper / exempt-token check live in
- * `_adoption-fence.ts` (rule-of-three; precedents: `hue.ts`,
+ * `_fence.ts` (rule-of-three; precedents: `hue.ts`,
  * `hue-distance.ts`).
  *
  * **What this test does NOT try to assert** (Mike §4.5, Tanya §4.3): the
@@ -35,7 +35,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runFence, formatViolations, type FenceDecl } from './_adoption-fence';
+import { runLinePatterns, formatViolations, type FenceDecl } from './_fence';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
@@ -62,7 +62,7 @@ const FENCE: FenceDecl = {
 // ─── Tests — the grep-fence ──────────────────────────────────────────────
 
 describe('filled-glyph-lift adoption — every optical-lift literal routes through the canonical home', () => {
-  const violations = runFence(FENCE);
+  const violations = runLinePatterns(FENCE);
 
   /** Human-readable fix hint — names the home and the exit token. */
   const fixHint =

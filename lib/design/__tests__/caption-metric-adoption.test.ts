@@ -20,7 +20,7 @@
  * intentional bypasses tag the line with `// caption-metric:exempt — <reason>`.
  *
  * The walker, comment-stripper, exempt-token check and per-pattern
- * collector live one floor down in `_adoption-fence.ts` (rule-of-three;
+ * collector live one floor down in `_fence.ts` (rule-of-three;
  * precedents: `lib/design/hue.ts`, `lib/design/hue-distance.ts`).
  *
  * Credits: Mike K. (#38 §4 + #48 — adoption-guard spec, kernel-lift
@@ -31,7 +31,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runFence, formatViolations, type FenceDecl } from './_adoption-fence';
+import { runLinePatterns, formatViolations, type FenceDecl } from './_fence';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
@@ -61,7 +61,7 @@ const FENCE: FenceDecl = {
 // ─── Tests — the grep-fence ──────────────────────────────────────────────
 
 describe('caption-metric adoption — every hand-rolled metric face routes through the primitive', () => {
-  const violations = runFence(FENCE);
+  const violations = runLinePatterns(FENCE);
 
   /** Human-readable fix hint — names the primitive and the exit. */
   const fixHint =

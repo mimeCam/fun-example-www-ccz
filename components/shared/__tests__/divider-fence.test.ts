@@ -74,7 +74,7 @@ import {
   preloadFiles,
   lineAt,
   stripCommentsAndTemplates as preprocess,
-} from './_jsx-fence-walker';
+} from '../../../lib/design/__tests__/_fence';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
@@ -337,7 +337,7 @@ function isJitMirrorPath(rel: string): boolean {
  * lint, ≤ 10 LoC. Print-hairline + JIT-mirror domains are exempt by path
  * filter; everywhere else, the literal must route through `alphaClassOf`.
  * Operates on the preload's stripped source (comments + backtick-template
- * bodies blanked by `_jsx-fence-walker`) — JSDoc references to "the rung
+ * bodies blanked by `_fence`) — JSDoc references to "the rung
  * resolves to `border-gold/10`" stay free; the rule fires on bare class
  * literals only. Single-quoted class strings (like the `ExploreArticleCard`
  * mirror) are still visible and earn an exempt path.

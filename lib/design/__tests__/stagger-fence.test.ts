@@ -13,7 +13,7 @@
  * (excluded by extension). The TypeScript ledger holds the table. Any
  * other call site speaks through the lookup. The fence shape lifts
  * from `numeric-features-adoption` and `caption-metric-adoption`
- * (kernel: `_adoption-fence.ts`).
+ * (kernel: `_fence.ts`).
  *
  * Pure: no DOM, no Jest jsdom warmup. The fence is the lock that makes
  * the silence hook un-forgettable.

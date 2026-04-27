@@ -23,7 +23,7 @@
  * home for either literal fails CI and names the legal exits.
  *
  * Walker / comment-stripper / exempt-token check live in
- * `_adoption-fence.ts` (rule-of-three; precedents: `hue.ts`,
+ * `_fence.ts` (rule-of-three; precedents: `hue.ts`,
  * `hue-distance.ts`).
  *
  * Credits: Mike K. (#77 §3, §5 — adoption-guard spec, the *one literal,
@@ -38,7 +38,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { runFence, formatViolations, type FenceDecl } from './_adoption-fence';
+import { runLinePatterns, formatViolations, type FenceDecl } from './_fence';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
@@ -83,7 +83,7 @@ const FENCE: FenceDecl = {
 // ─── Tests — the grep-fence ──────────────────────────────────────────────
 
 describe('numeric-features adoption — every numeric-typography literal routes through one of the two homes', () => {
-  const violations = runFence(FENCE);
+  const violations = runLinePatterns(FENCE);
 
   /** Human-readable fix hint — names both homes and the exit token. */
   const fixHint =

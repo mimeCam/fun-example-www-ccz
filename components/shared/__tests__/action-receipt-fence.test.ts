@@ -71,7 +71,7 @@
  * that landed Link in the allowlist); Elon M. (via Mike #94 — the two-rule
  * reduction "discrete actions get a receipt; gestures release to rest",
  * the perceptibility caveat that kept MH-1 OUT of this cycle); the
- * `_jsx-fence-walker.ts` kernel + `lean-arrow-fence.test.ts` template
+ * `_fence.ts` kernel + `lean-arrow-fence.test.ts` template
  * — most decisions paid for already; this fence is the fourth tenant,
  * not the design.
  */
@@ -83,7 +83,7 @@ import {
   readBalancedDelimiters,
   lineAt,
   formatBlock,
-} from './_jsx-fence-walker';
+} from '../../../lib/design/__tests__/_fence';
 import {
   RECEIPT_BEARING_HOSTS,
   RECEIPT_BEARING_HOST_SET,

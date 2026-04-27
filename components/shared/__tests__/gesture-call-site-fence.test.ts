@@ -1,7 +1,7 @@
 /**
  * gesture-call-site-fence — explicit-literal regression lint at every
  * `gestureClassesOf(...)` invocation. **5th tenant** of the shared
- * `_jsx-fence-walker` kernel.
+ * `_fence` kernel.
  *
  * The Gesture Atlas ships a JIT-safe class factory at
  * `lib/design/gestures.ts` — `gestureClassesOf(verb)` returns a literal
@@ -32,7 +32,7 @@
  * shaking because they never touch React. Same shape as
  * `alpha-call-site-fence.test.ts` (Axes A–D) and `voice-call-site-fence.
  * test.ts` (Axes A–D); the kernel that makes this a one-PR shape lives in
- * `_jsx-fence-walker.ts` (Mike #41 — kernel-lift napkin).
+ * `_fence.ts` (Mike #41 — kernel-lift napkin).
  *
  *   Axis A — Explicit verb literal.
  *     Every `gestureClassesOf(...)` call's first arg is a quoted string
@@ -89,7 +89,7 @@ import {
   preloadFiles,
   readBalancedDelimiters,
   lineAt,
-} from './_jsx-fence-walker';
+} from '../../../lib/design/__tests__/_fence';
 import {
   GESTURE_VERBS,
   GESTURE_GRANDFATHERED_PATHS,
@@ -100,7 +100,7 @@ import {
 
 const ROOT = join(__dirname, '..', '..', '..');
 
-// ─── Scan footprint (the walker primitives live in `_jsx-fence-walker.ts`)
+// ─── Scan footprint (the walker primitives live in `_fence.ts`) ──────────
 
 const SCAN_DIRS: readonly string[] = ['app', 'components'];
 

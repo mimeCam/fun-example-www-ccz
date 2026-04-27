@@ -84,7 +84,7 @@ const ROOT = join(__dirname, '..', '..', '..');
 /** The directional glyphs we forbid as a label suffix. Order does not matter. */
 const FORBIDDEN_TRAILING_GLYPHS: readonly string[] = ['→', '↗', '⟶', '›', '»'];
 
-// ─── Scan footprint (the walker primitives live in `_jsx-fence-walker.ts`)
+// ─── Scan footprint (the walker primitives live in `_fence.ts`) ───────────
 
 /** This fence's directories — the kernel walks them, this file owns the list. */
 const SCAN_DIRS: readonly string[] = ['app', 'components', 'lib/sharing'];

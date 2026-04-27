@@ -43,7 +43,7 @@
  * actions" disambiguation that keeps Toast on the room-voice side);
  * Paul K. + Elon M. (via Mike #94 — the punch-list-to-multiplier
  * trim that scoped this allowlist to six entries instead of fifteen);
- * the `_jsx-fence-walker.ts` kernel (the transport layer this allowlist
+ * the `_fence.ts` kernel (the transport layer this allowlist
  * informs without owning).
  */
 
