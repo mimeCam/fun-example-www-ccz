@@ -15,9 +15,11 @@
  *     visibility lesson `alphaClassOf` already paid for, pinned per row;
  *   • `gestureInvariantHolds()` is `true` and the verb-list and class-
  *     table cardinalities agree (a verb without a class is drift);
- *   • the table is locked at exactly thirteen verbs (the four-domain
- *     vocabulary is seated; the rule-of-three for a 14th verb has not
- *     fired) and `GESTURE_GRANDFATHERED_PATHS` is closed at length 0
+ *   • the table is locked at exactly fourteen verbs (the four-domain
+ *     vocabulary is seated; verb #14 — `thread-settle` — earned its seat
+ *     by lifting `GoldenThread.tsx`'s inline fill transition onto the
+ *     Atlas baton, Mike #62 / Tanya UIX #23) and
+ *     `GESTURE_GRANDFATHERED_PATHS` is closed at length 0
  *     (the fence forbids new entries, doctrine flipped from tolerate to
  *     forbid in the Atlas-closure PR — Mike #36, Sid 2026-04-27).
  *
@@ -161,8 +163,8 @@ describe('gestures — structural invariants', () => {
     expect(new Set<GestureVerb>(GESTURE_VERBS).size).toBe(GESTURE_VERBS.length);
   });
 
-  it('exactly thirteen verbs — the table is locked until rule-of-three fires for verb #14', () => {
-    expect(GESTURE_VERBS.length).toBe(13);
+  it('exactly fourteen verbs — the table is locked until rule-of-three fires for verb #15', () => {
+    expect(GESTURE_VERBS.length).toBe(14);
   });
 });
 

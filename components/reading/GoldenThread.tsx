@@ -38,8 +38,10 @@
 import { useEffect, useState } from 'react';
 import { useScrollDepth } from '@/lib/hooks/useScrollDepth';
 import { useThreadDepth } from '@/lib/hooks/useThreadDepth';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { CEREMONY, MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { onCrossing, type ThermalStateCrossing } from '@/lib/thermal/state-crossing';
 import { peek } from '@/lib/thread/thread-driver';
 import { TIDE_CROSSING_EVENT } from '@/lib/thread/thread-tide';
@@ -133,9 +135,18 @@ interface SpineProps {
  * Renders the track + fill spine. Extracted to keep GoldenThread ≤ 10 LOC.
  * ARIA reports maxDepth (furthest point reached) via peek() — a synchronous
  * read at render time. Screen readers announce on focus; 60fps updates not needed.
+ *
+ * Motion contract (Mike #62, Tanya UIX #23): the fill's opacity+width fade
+ * rides the Gesture Atlas verb `thread-settle` via `gestureClassesForMotion`.
+ * Reduced-motion is honored at the seam — no inline timing/easing tokens
+ * on this surface. The `style={{...}}` block carries only dynamic CSS-var
+ * carriers (height, backgroundColor) — those are driver-owned and outside
+ * the Atlas's scope.
  */
 function ThreadSpine({ phase, crossingClass, tidePulseClass }: SpineProps) {
+  const reduce = useReducedMotion();
   const maxDepthPct = Math.round(peek().maxDepth * 100);
+  const fadeMotion = gestureClassesForMotion('thread-settle', reduce);
   return (
     <div
       className="fixed top-0 bottom-0 left-[var(--sys-thread-offset)] z-sys-thread pointer-events-none"
@@ -153,13 +164,13 @@ function ThreadSpine({ phase, crossingClass, tidePulseClass }: SpineProps) {
           golden-thread-fill: width-step at warm+ thermal.
           crossingClass:      thermal threshold pulse.
           tidePulseClass:     new-max-depth pulse at 25/50/75/100% bands.
+          fadeMotion:         Atlas-owned `thread-settle` curve on opacity+width.
           Breathing animation (tide-breathe) gated by data-thread-settled on <html>. */}
       <div
-        className={`${fillClassName(phase)} ${crossingClass} ${tidePulseClass}`}
+        className={`${fillClassName(phase)} ${crossingClass} ${tidePulseClass} transition-[opacity,width] ${fadeMotion}`}
         style={{
           height: 'calc(var(--thread-depth, 0) * 100%)',
           backgroundColor: 'var(--token-accent)',
-          transition: 'opacity var(--sys-time-settle) var(--sys-ease-out), width var(--sys-time-settle) var(--sys-ease-out)',
         }}
       />
     </div>

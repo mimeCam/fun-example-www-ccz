@@ -97,10 +97,10 @@ export interface GestureRow {
   readonly reduced: ReducedPolicy;
 }
 
-// ─── The vocabulary — thirteen verbs, four domains (Tanya UX §2) ───────────
+// ─── The vocabulary — fourteen verbs, four domains (Tanya UX §2) ───────────
 
 /**
- * Thirteen kebab-case verbs, grouped by domain in JSDoc only. Naming is
+ * Fourteen kebab-case verbs, grouped by domain in JSDoc only. Naming is
  * `noun-of-action` (the fingertip presses; the card lifts; the keepsake
  * reveals). Per AGENTS.md, do not promote verb-vocabulary doctrine to
  * AGENTS.md until verb #3 fires — the table proves itself first.
@@ -160,6 +160,19 @@ export const GESTURES = {
    *  The dwell pacing is owned by `CEREMONY.glowHold` (2000ms); the FADE
    *  on this verb is the `settle` beat (1500ms) with the `settle` curve. */
   'thread-glow-settle': { beat: 'settle',  ease: 'settle',  reduced: 'shorten' },
+  /** *"The Thread is laying its tide mark down — slow, patient, on the
+   *   same beat as the rest of the room."*
+   *  Sibling to `thread-glow-settle`: the FADE on the Thread's *fill*
+   *  (opacity + width) rides the `out` curve (the entrance/depth dialect
+   *  the rest of the room speaks), not the `settle` curve (which is the
+   *  glow-close arc). Verb earns the rule-of-two on the Thread surface —
+   *  `thread-glow-settle` named the box-shadow recede; `thread-settle`
+   *  names the fill recede that lifts the inline `style.transition` off
+   *  `GoldenThread.tsx:162` onto the Atlas baton. `reduced: 'shorten'`
+   *  (not `'skip'`) — this is the recede phase; a reader who turned
+   *  motion off still wants the rung to land at `opacity-muted`, just
+   *  not via a 1.5s sigh. Mike napkin #62, Tanya UIX #23. */
+  'thread-settle':      { beat: 'settle',  ease: 'out',     reduced: 'shorten' },
 } as const satisfies Record<string, GestureRow>;
 
 export type GestureVerb = keyof typeof GESTURES;
@@ -196,6 +209,7 @@ const VERB_CLASSES: Readonly<Record<GestureVerb, string>> = {
   'fade-neutral':       'duration-fade ease-sustain',
   'crossfade-inline':   'duration-crossfade ease-out',
   'thread-glow-settle': 'duration-settle ease-settle',
+  'thread-settle':      'duration-settle ease-out',
 };
 
 /**

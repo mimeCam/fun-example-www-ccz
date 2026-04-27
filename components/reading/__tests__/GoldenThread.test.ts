@@ -57,4 +57,23 @@ describe('GoldenThread — shape and adoption', () => {
     // And `0.3` must not appear as a magic number.
     expect(src).not.toMatch(/\b0\.3\b/);
   });
+
+  /**
+   * Atlas-baton pin (Mike napkin #62 §1, Tanya UIX #23 §3): the fill's
+   * opacity+width fade no longer carries a hand-rolled `var(--sys-time-*)`
+   * `var(--sys-ease-*)` `transition:` string. It rides
+   * `gestureClassesForMotion('thread-settle', reduce)` — same baton as
+   * `MirrorRevealCard`. If a future PR re-inlines the transition, this
+   * assertion fails BEFORE the fence test does, with a file-specific
+   * message that names the surface and the verb.
+   */
+  it("rides the Atlas verb 'thread-settle' through gestureClassesForMotion", () => {
+    expect(src).toMatch(/gestureClassesForMotion\(\s*['"]thread-settle['"]/);
+    expect(src).toMatch(/from ['"]@\/lib\/hooks\/useReducedMotion['"]/);
+  });
+
+  it('has no inline var(--sys-time-*) / var(--sys-ease-*) substring on the fill', () => {
+    expect(src).not.toMatch(/var\(--sys-time-/);
+    expect(src).not.toMatch(/var\(--sys-ease-/);
+  });
 });
