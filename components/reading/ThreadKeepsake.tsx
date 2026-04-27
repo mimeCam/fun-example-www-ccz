@@ -65,6 +65,7 @@ import {
 import { buildKeepsakeHref, buildUnfurlUrl } from '@/lib/sharing/thread-snapshot';
 import { copyWithFeedback } from '@/lib/sharing/clipboard-utils';
 import { copyPngToClipboard, downloadPng } from '@/lib/sharing/svg-to-png';
+import { alphaClassOf } from '@/lib/design/alpha';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { Threshold } from '@/components/shared/Threshold';
 import { OverlayHeader } from '@/components/shared/OverlayHeader';
@@ -141,12 +142,26 @@ export function ThreadKeepsake({ isOpen, onClose, snapshot }: ThreadKeepsakeProp
 
 /* ─── Preview ────────────────────────────────────────────────────────────── */
 
+/**
+ * Frame rung — `muted` (0.30) on `fog`. Same rung as the sibling
+ * `QuoteKeepsake.tsx:166` — siblings at the share boundary should frame
+ * at the same rung (Tanya UIX #43 §1.2 — concentric nesting; Mike #110 §6
+ * — pair-snap heuristic, narrowly justified). Felt-but-not-seen: traces
+ * the rounded corner so it reads as a deliberate shape, then disappears
+ * behind the artifact (the SVG is the subject; the frame is chrome).
+ *
+ * alpha-ledger:adopted (Mike napkin #110, Tanya UIX #43) — frame routes
+ * through the ledger like the rest of the system, mirror of the
+ * already-pinned `QuoteKeepsake` PREVIEW_FRAME.
+ */
+const PREVIEW_FRAME = alphaClassOf('fog', 'muted', 'border');
+
 function KeepsakePreview({ svg, title }: { svg: string; title: string }) {
   // Render trusted, locally-built SVG. dangerouslySetInnerHTML is safe here
   // because the string is produced by our pure builder with escaped inputs.
   return (
-    <div className="mx-sys-6 mb-sys-5 rounded-sys-medium overflow-hidden
-                    border border-fog/20 bg-void">
+    <div className={`mx-sys-6 mb-sys-5 rounded-sys-medium overflow-hidden
+                    border ${PREVIEW_FRAME} bg-void`}>
       <div
         role="img"
         aria-label={`Golden thread keepsake: ${title}`}
@@ -179,7 +194,7 @@ function KeepsakeActions({ svg, snapshot, deepLink, unfurlUrl }: ActionsProps) {
         onLink={a.onCopyLink}  linkSlot={a.linkSlot}
       />
       {isDev && (
-        <p className="mt-sys-4 text-mist/60 text-sys-micro break-all">
+        <p className={`mt-sys-4 ${alphaClassOf('mist', 'recede', 'text')} text-sys-micro break-all`}>
           unfurl: {unfurlUrl}
         </p>
       )}
@@ -388,3 +403,14 @@ async function runNativeShare(snapshot: ThreadSnapshot, deepLink: string): Promi
   });
   emitCheckpoint(CHECKPOINTS.SHARED);
 }
+
+/* ─── Test-only exports — per-file SSR pins (Mike #92, mirror of Quote) ──── */
+
+/**
+ * Surface the private `KeepsakePreview` + the resolved `PREVIEW_FRAME`
+ * literal to `__tests__/ThreadKeepsake.alpha.test.ts`. Mirrors the
+ * `__testing__` shape used by the sibling `QuoteKeepsake.tsx` so the
+ * per-file alpha pin can render the leaf without portal-mounting the
+ * whole modal.
+ */
+export const __testing__ = { KeepsakePreview, PREVIEW_FRAME };

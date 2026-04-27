@@ -261,6 +261,19 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   list (rule-of-three twin to napkin #51). Pinned in
   //   `lib/design/__tests__/archetype-accents.test.ts` +
   //   `components/reading/__tests__/NextRead.adoption.test.ts`.
+  // Live drifter retired (Mike napkin #110, Tanya UIX #43, Krystle drift-
+  //   density pick): `ThreadKeepsake.tsx` — TWO drift sites snapped to
+  //   the ledger. (1) keepsake preview frame: `border-fog/20` →
+  //   `alphaClassOf('fog','muted','border')` (= `border-fog/30`) — sister
+  //   surfaces at the share boundary now frame at the same rung as the
+  //   sibling `QuoteKeepsake.tsx:166` (Mike napkin #92). (2) dev-only
+  //   unfurl printout: `text-mist/60` (off-ledger) →
+  //   `alphaClassOf('mist','recede','text')` (= `text-mist/50`) — meta
+  //   line under the actions cluster, ledger calibration: recede = "the
+  //   frame around the subject; bylines, captions, attribution."
+  //   Pair-snap heuristic only; no `preview-frame.ts` kernel-lift (rule
+  //   of three; N=2 is two callers, not a kernel — Elon §2). Pinned in
+  //   `components/reading/__tests__/ThreadKeepsake.alpha.test.ts`.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
@@ -269,7 +282,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/home/ViaWhisper.tsx',
   'components/navigation/AmbientNav.tsx',
   'components/navigation/GemHome.tsx',
-  'components/reading/ThreadKeepsake.tsx',
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',
