@@ -35,6 +35,7 @@ import { gestureClassesOf } from '@/lib/design/gestures';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
+import { useThermal } from '@/components/thermal/ThermalProvider';
 import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
 import { phaseOpacityClass } from '@/lib/return/recognition-paint';
 
@@ -53,7 +54,15 @@ interface Props {
 
 export default function ViaWhisper({ via }: Props) {
   const reduce = useReducedMotion();
-  const timeline = resolveRecognitionTimeline('whisper', { reducedMotion: reduce });
+  // Recognition Cadence (Mike napkin §"Module shape", Tanya UIX §1.1):
+  // thread `state` so the deep-link greeting inherits the same approach
+  // tempo as its sister whisper on the article rail. Both doors speak
+  // the same opening breath — pinned in
+  // `whisper-surfaces-share-timeline.fence.test.ts`.
+  const { state: thermalState } = useThermal();
+  const timeline = resolveRecognitionTimeline('whisper', {
+    reducedMotion: reduce, thermal: thermalState,
+  });
   const { phase } = useRecognitionPhase(timeline);
   const text = friendWhisperText(via);
 

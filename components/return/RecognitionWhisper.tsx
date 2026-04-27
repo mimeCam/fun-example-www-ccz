@@ -30,6 +30,7 @@ import type { ReturnRecognitionState } from '@/lib/hooks/useReturnRecognition';
 import { gestureClassesOf } from '@/lib/design/gestures';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
+import { useThermal } from '@/components/thermal/ThermalProvider';
 import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
 import { phaseOpacityClass } from '@/lib/return/recognition-paint';
 
@@ -39,7 +40,14 @@ interface Props {
 
 export function RecognitionWhisper({ recognition }: Props) {
   const reduce = useReducedMotion();
-  const timeline = resolveRecognitionTimeline('whisper', { reducedMotion: reduce });
+  // Recognition Cadence (Mike napkin §"Module shape", Tanya UIX §1.1):
+  // thread `state` into the resolver so warm/luminous returners get a
+  // slightly longer approach. Reduced-motion still floors the plan;
+  // cold readers receive identity tempo. The dwell stays sacred.
+  const { state: thermalState } = useThermal();
+  const timeline = resolveRecognitionTimeline('whisper', {
+    reducedMotion: reduce, thermal: thermalState,
+  });
   const { phase } = useRecognitionPhase(timeline);
 
   if (!recognition.isReturning || !recognition.lastWhisper) return null;

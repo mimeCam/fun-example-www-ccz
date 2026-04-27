@@ -56,6 +56,8 @@
 
 import { MOTION, MOTION_REDUCED_MS, CEREMONY, type MotionEase } from '@/lib/design/motion';
 import type { RecognitionSurface } from '@/lib/return/recognition-surface';
+import type { ThermalState } from '@/lib/thermal/thermal-score';
+import { recognitionTempo, type TempoMod } from '@/lib/return/recognition-tempo';
 
 // ─── Phase vocabulary — closed union, exhaustive over the state machine ────
 
@@ -173,13 +175,44 @@ export function silentTimeline(): RecognitionTimeline {
  *
  * Closed-union exhaustive switch — adding a `RecognitionSurface` member
  * without a case here is a TypeScript error (`never` falls through).
+ *
+ * `prefs.thermal` is the Recognition-Cadence input (Mike napkin
+ * §"Module shape" — narrowest viable cut). When present and motion is
+ * not reduced, `recognitionTempo(thermal)` modulates the *approach*
+ * (`liftMs` and `settleMs`) and may override the `ease`. When absent,
+ * behaviour is byte-identical to today (the optional field defaults to
+ * `undefined` for every existing caller). Reduced motion always wins —
+ * the floor short-circuits before tempo is consulted (Tanya §3, Mike
+ * POI-2).
  */
 export function resolveRecognitionTimeline(
   surface: RecognitionSurface,
-  prefs: { reducedMotion: boolean },
+  prefs: { reducedMotion: boolean; thermal?: ThermalState },
 ): RecognitionTimeline {
   if (prefs.reducedMotion) return reducedTimeline(easeFor(surface));
-  return planFor(surface);
+  const plan = planFor(surface);
+  if (prefs.thermal === undefined) return plan;
+  return applyTempo(plan, recognitionTempo(prefs.thermal));
+}
+
+/**
+ * Apply a `TempoMod` to a timeline plan. Pure.
+ *
+ * Multiplies *only* `liftMs` and `settleMs` (the approach); preserves
+ * `holdMs` / `foldMs` byte-for-byte (the dwell is sacred — Mike POI-3,
+ * Tanya §1 "Only `lift` and `settle` warm"). The ease overrides the
+ * plan's ease only when `tempo.ease !== null`.
+ *
+ * Pure, ≤ 10 LoC.
+ */
+function applyTempo(plan: RecognitionTimeline, tempo: TempoMod): RecognitionTimeline {
+  return {
+    liftMs:   Math.round(plan.liftMs * tempo.approachScale),
+    settleMs: Math.round(plan.settleMs * tempo.approachScale),
+    holdMs:   plan.holdMs,
+    foldMs:   plan.foldMs,
+    ease:     tempo.ease ?? plan.ease,
+  };
 }
 
 /** Named-plan dispatch — exhaustive over RecognitionSurface. Pure. */
@@ -257,4 +290,5 @@ export const __testing__ = {
   reducedTimeline,
   planFor,
   easeFor,
+  applyTempo,
 } as const;

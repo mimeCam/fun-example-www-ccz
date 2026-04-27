@@ -17,6 +17,7 @@ import type { ArchetypeKey } from '@/types/content';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
+import { useThermal } from '@/components/thermal/ThermalProvider';
 import {
   resolveRecognitionTimeline,
   silentTimeline,
@@ -406,6 +407,7 @@ function mapLetterPhase(p: RecognitionPhase): { phase: Phase; settled: boolean }
 export function ReturnLetter() {
   const rec = useReturnRecognition();
   const reduce = useReducedMotion();
+  const { state: thermalState } = useThermal();
   const [dismissed, setDismissed] = useState(false);
 
   // Build letter context + compose
@@ -426,11 +428,17 @@ export function ReturnLetter() {
   // immediately interactive — no hand-rolled `setTimeout` cascade in
   // this file. The deps `[showLetter, letter, reduce]` survive on the
   // memo so a future contributor reads the same wiring contract.
+  //
+  // Recognition Cadence (Mike napkin §"Module shape", Tanya UIX §1.1):
+  // pass `thermal` through so warm/luminous returners get a slightly
+  // longer approach. Reduced-motion still floors the plan (resolver
+  // short-circuits before tempo is consulted). Cold readers get the
+  // baseline timing — `recognitionTempo('dormant') === TEMPO_IDENTITY`.
   const timeline = useMemo(
     () => (showLetter && letter)
-      ? resolveRecognitionTimeline('letter', { reducedMotion: reduce })
+      ? resolveRecognitionTimeline('letter', { reducedMotion: reduce, thermal: thermalState })
       : silentTimeline(),
-    [showLetter, letter, reduce],
+    [showLetter, letter, reduce, thermalState],
   );
   const { phase: timelinePhase } = useRecognitionPhase(timeline);
   const { phase, settled } = mapLetterPhase(timelinePhase);

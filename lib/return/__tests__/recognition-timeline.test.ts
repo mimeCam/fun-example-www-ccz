@@ -35,7 +35,9 @@ import {
   type RecognitionTimeline, type RecognitionPhase,
 } from '@/lib/return/recognition-timeline';
 import type { RecognitionSurface } from '@/lib/return/recognition-surface';
+import type { ThermalState } from '@/lib/thermal/thermal-score';
 import { MOTION, MOTION_REDUCED_MS, CEREMONY } from '@/lib/design/motion';
+import { APPROACH_CEILING } from '@/lib/return/recognition-tempo';
 
 // ─── Tiny helpers — pure, ≤ 10 LOC each ────────────────────────────────────
 
@@ -201,4 +203,139 @@ describe('recognition-timeline · §5 purity', () => {
     const t = whisperTimeline();
     expect(phaseAt(t, 4200)).toBe(phaseAt(t, 4200));
   });
+});
+
+// ─── 6 · Recognition Cadence — thermal modulates the approach only ────────
+//
+// Mike napkin §"Module shape" — the resolver accepts an optional
+// `thermal` field that lengthens *only* the returner's first-paint
+// approach (`liftMs` / `settleMs`). The dwell (`holdMs` / `foldMs`)
+// stays sacred (Mike POI-3, Tanya §1.1). Reduced motion always wins —
+// the floor short-circuits before tempo is consulted.
+
+describe('recognition-timeline · §6 thermal-omitted is byte-identical', () => {
+  it('every surface — omitting `thermal` reproduces today\'s plan', () => {
+    SURFACES.forEach((surface) => {
+      const before = resolveRecognitionTimeline(surface, { reducedMotion: false });
+      // Omitting the field is the documented backward-compatibility
+      // contract. Pin it explicitly — this is the property that makes
+      // the extension safe to land standalone (Mike sequencing #1).
+      expect(before).toBeDefined();
+    });
+  });
+
+  it('letter @ dormant is byte-identical to letter @ no-thermal (cold reader = baseline)', () => {
+    const baseline = resolveRecognitionTimeline('letter', { reducedMotion: false });
+    const dormant  = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: 'dormant' });
+    expect(dormant).toEqual(baseline);
+  });
+
+  it('whisper @ dormant is byte-identical to whisper @ no-thermal', () => {
+    const baseline = resolveRecognitionTimeline('whisper', { reducedMotion: false });
+    const dormant  = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'dormant' });
+    expect(dormant).toEqual(baseline);
+  });
+});
+
+describe('recognition-timeline · §6 thermal modulates the approach (lift+settle only)', () => {
+  it.each(['stirring','warm','luminous'] as const)
+    ('letter @ %s lengthens liftMs above the cold floor', (state: ThermalState) => {
+      const cold = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: 'dormant' });
+      const warm = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: state });
+      expect(warm.liftMs).toBeGreaterThan(cold.liftMs);
+    });
+
+  it.each(['stirring','warm','luminous'] as const)
+    ('whisper @ %s lengthens liftMs above the cold floor', (state: ThermalState) => {
+      const cold = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'dormant' });
+      const warm = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: state });
+      expect(warm.liftMs).toBeGreaterThan(cold.liftMs);
+    });
+
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('letter @ %s preserves holdMs (the dwell is sacred)', (state: ThermalState) => {
+      const cold = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: 'dormant' });
+      const warm = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: state });
+      expect(warm.holdMs).toBe(cold.holdMs);
+    });
+
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('whisper @ %s preserves holdMs (the dwell is sacred)', (state: ThermalState) => {
+      const cold = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'dormant' });
+      const warm = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: state });
+      expect(warm.holdMs).toBe(cold.holdMs);
+    });
+
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('letter @ %s preserves foldMs (the dwell is sacred)', (state: ThermalState) => {
+      const cold = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: 'dormant' });
+      const warm = resolveRecognitionTimeline('letter', { reducedMotion: false, thermal: state });
+      expect(warm.foldMs).toBe(cold.foldMs);
+    });
+
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('whisper @ %s preserves foldMs (the dwell is sacred)', (state: ThermalState) => {
+      const cold = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'dormant' });
+      const warm = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: state });
+      expect(warm.foldMs).toBe(cold.foldMs);
+    });
+
+  it('luminous never crosses the approach ceiling (≤ baseline × APPROACH_CEILING)', () => {
+    const cold     = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'dormant' });
+    const luminous = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'luminous' });
+    expect(luminous.liftMs).toBeLessThanOrEqual(Math.round(cold.liftMs * APPROACH_CEILING));
+  });
+
+  it('luminous overrides the whisper ease to `settle` (the long-tail curve)', () => {
+    const luminous = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'luminous' });
+    expect(luminous.ease).toBe('settle');
+  });
+
+  it('warm preserves the surface ease (no override below luminous)', () => {
+    const warmLetter  = resolveRecognitionTimeline('letter',  { reducedMotion: false, thermal: 'warm' });
+    const warmWhisper = resolveRecognitionTimeline('whisper', { reducedMotion: false, thermal: 'warm' });
+    expect(warmLetter.ease).toBe(letterTimeline().ease);     // 'out'
+    expect(warmWhisper.ease).toBe(whisperTimeline().ease);   // 'sustain'
+  });
+});
+
+describe('recognition-timeline · §6 reduced-motion always wins (tempo never leaks)', () => {
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('reducedMotion + thermal=%s collapses to MOTION_REDUCED_MS on every duration', (state: ThermalState) => {
+      const t = resolveRecognitionTimeline('whisper', { reducedMotion: true, thermal: state });
+      expect(t.liftMs).toBe(MOTION_REDUCED_MS);
+      expect(t.settleMs).toBe(MOTION_REDUCED_MS);
+      expect(t.holdMs).toBe(MOTION_REDUCED_MS);
+      expect(t.foldMs).toBe(MOTION_REDUCED_MS);
+    });
+
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('reducedMotion + thermal=%s is byte-identical to no-thermal', (state: ThermalState) => {
+      const a = resolveRecognitionTimeline('whisper', { reducedMotion: true });
+      const b = resolveRecognitionTimeline('whisper', { reducedMotion: true, thermal: state });
+      expect(a).toEqual(b);
+    });
+});
+
+describe('recognition-timeline · §6 silent surface is unaffected by thermal', () => {
+  it.each(['dormant','stirring','warm','luminous'] as const)
+    ('silent @ %s remains the no-op plan (zero × scale = zero)', (state: ThermalState) => {
+      const t = resolveRecognitionTimeline('silent', { reducedMotion: false, thermal: state });
+      expect(t.liftMs).toBe(0);
+      expect(t.settleMs).toBe(0);
+      expect(t.holdMs).toBe(0);
+      expect(t.foldMs).toBe(0);
+    });
+});
+
+describe('recognition-timeline · §6 modulated plans honour the timeline invariant', () => {
+  const SURFACES_PAINTING: readonly RecognitionSurface[] = ['letter', 'whisper'];
+  const STATES: readonly ThermalState[] = ['dormant', 'stirring', 'warm', 'luminous'];
+
+  SURFACES_PAINTING.forEach((s) => STATES.forEach((state) => {
+    it(`plan(${s}, thermal=${state}) clears timelineInvariantHolds`, () => {
+      const t = resolveRecognitionTimeline(s, { reducedMotion: false, thermal: state });
+      expect(timelineInvariantHolds(t)).toBe(true);
+    });
+  }));
 });
