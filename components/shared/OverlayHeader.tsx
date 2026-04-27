@@ -110,7 +110,13 @@ interface HeaderColumnProps {
 /**
  * Title leads (full presence); blurb whispers (mist rung). The 4 px
  * `mt-sys-1` is the only inter-atom rhythm in the row — no border, no
- * divider; the body's `pb-sys-4` is the seam (Tanya UIX #21 §5.1).
+ * divider; the body's `pb-sys-4` is the seam (Tanya UIX #21 §5.1, #33 §5).
+ *
+ * The doorway-is-air doctrine binds out into Axis F of `overlay-header-
+ * fence`: no `<div border-t>`, `<hr>`, or `<Divider>` may follow an
+ * `<OverlayHeader>` outside this kernel. The breath here is the breath
+ * everywhere; ink at the doorway is rejected at lint level (Mike #4
+ * §"Decision" — fence the doctrine, do not crown the drift).
  */
 function HeaderColumn(props: HeaderColumnProps): JSX.Element {
   const { title, titleId, blurb, blurbId } = props;

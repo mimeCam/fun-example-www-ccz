@@ -13,6 +13,9 @@ import { OverlayHeader } from '@/components/shared/OverlayHeader';
 import { Field } from '@/components/shared/Field';
 import { TextLink } from '@/components/shared/TextLink';
 import { alphaClassOf } from '@/lib/design/alpha';
+// Doorway is air, not ink — the body's `pt-sys-5` exhale carries the seam,
+// matching the keepsake siblings' `mb-sys-5` from the body side. Pinned by
+// Axis F of `overlay-header-fence`. (Tanya UIX #33 §5; Mike #4 §"Decision".)
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
@@ -49,18 +52,6 @@ const QUOTE_FRAME_CLASS = [
 ].join(' ');
 
 const QUOTE_BODY_CLASS = `${QUOTE_FRAME_BODY} italic text-sys-caption typo-caption`;
-
-/**
- * Header hairline — divider between `<OverlayHeader>` and the form/ceremony
- * body. Snapped off the `/20` off-ledger drift to the `hairline` rung
- * ("it's geometry. The eye registers it as space, not surface." — Tanya
- * UX #80 §2). Sister-surface continuity: the four-rung chrome register
- * (`AmbientNav`, `ThreadKeepsake`, `QuoteKeepsake`, `Toast`) speaks at
- * `muted`; this divider sits one rung lighter — it's a *separator inside
- * a card-shaped overlay*, not the chrome around the viewport. Routed
- * through `alphaClassOf` so the JIT sees the literal in source.
- */
-const HEADER_HAIRLINE = alphaClassOf('fog', 'hairline', 'border');
 
 interface ResonanceDrawerProps {
   isOpen: boolean;
@@ -184,7 +175,6 @@ export function ResonanceDrawer({
         blurb={<>Why does <span className="sr-only">{articleTitle} </span>this matter to you?</>}
         onClose={onClose}
       />
-      <div className={`mx-sys-6 border-t ${HEADER_HAIRLINE}`} />
 
       <div className="flex-1 p-sys-6 pt-sys-5">
         <SlotIndicator used={usedSlots} total={SLOT_COUNT} pulsing={success} />

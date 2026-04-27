@@ -38,14 +38,27 @@
  *                            not fired (Mike #87 §6 — "a registry of one
  *                            is not a registry"; N=2 still is not).
  *
+ *   Axis F · Doorway is air  no `<div … border-t …>`, no `<hr>`, no
+ *                            `<Divider…>` immediately follows
+ *                            `<OverlayHeader>` outside the kernel. Promotes
+ *                            the kernel's prose-doctrine (`OverlayHeader.tsx`
+ *                            lines 110–114 — *"no border, no divider; the
+ *                            body's pb-sys-4 is the seam"*) to a guarded
+ *                            invariant. The seam is breath, not ink (Tanya
+ *                            UIX #33 §5; Mike #4 §"Decision"). Catches the
+ *                            `ResonanceDrawer` regression we just retired.
+ *
  * Credits: Mike K. (#77 napkin §"Modules involved" + §"Fence shape" — the
  * five-axis spec, the SCAN_DIRS scope, the source-string lint stance, the
- * second application of the kernel-plus-fence pattern), Tanya D. (UIX #21
- * §6 — the kill list this fence enforces; §8 — the contract-fence-not-
- * pixel-fence call), Krystle C. (#47 — the three-call-site audit the
- * fence is the receipt for; the negative-LOC discipline), Sid (this fence
- * — same shape, second time, in the right neighborhood for the right
- * family).
+ * second application of the kernel-plus-fence pattern; #4 §"Decision" — the
+ * Axis F shape: rule-of-one outlier + two doctrine-compliers, fence the
+ * doctrine, do not crown the drift), Tanya D. (UIX #21 §6 — the kill list
+ * this fence enforces; §8 — the contract-fence-not-pixel-fence call;
+ * UIX #33 §§4–5 — the air-not-ink call, the three-lens reading that earned
+ * Axis F), Krystle C. (#47 — the three-call-site audit the fence is the
+ * receipt for; the negative-LOC discipline), Sid (this fence — same shape,
+ * second time, in the right neighborhood for the right family; Axis F as
+ * the receipt for the deletion).
  */
 
 import { readFileSync } from 'node:fs';
@@ -261,6 +274,145 @@ describe('overlay-header-fence — Axis E · five utterances spell `overlay-head
   it('utterance #5 — JSDoc anchors the kernel as the room\'s nameplate', () => {
     const src = readFileSync(join(ROOT, KERNEL_PATH), 'utf8');
     expect(src).toMatch(/OverlayHeader\b[^\n]*nameplate/i);
+  });
+});
+
+// ─── Axis F · Doorway is air — no hairline between OverlayHeader and body ─
+
+interface DoorwayViolation {
+  file: string;
+  line: number;
+  snippet: string;
+  reason: string;
+}
+
+/**
+ * Forbidden JSX tokens that may not appear immediately after the closing
+ * `>` of an `<OverlayHeader>`. The kernel's JSDoc (lines 110–114) documents
+ * the doctrine in prose; this list pins it as enforceable source-string
+ * regex. Three forms cover every dialect a future drift might reach for:
+ * `<div className="… border-t …">` (the retired `ResonanceDrawer` shape),
+ * `<hr>` (the lazy HTML reach), `<Divider…>` (the wrong-tone primitive).
+ */
+const DOORWAY_FORBIDDEN: ReadonlyArray<{ rx: RegExp; reason: string }> = [
+  { rx: /<div\b[^>]*\bborder-t\b/, reason: '<div className="… border-t …">' },
+  { rx: /<hr\b/,                   reason: '<hr> element' },
+  { rx: /<Divider\b/,              reason: '<Divider…> JSX element' },
+];
+
+/**
+ * Walk forward from `<OverlayHeader`, balancing JSX `{ }` expression depth
+ * and skipping over `"…"` / `'…'` attribute strings, until the first `>`
+ * at depth 0. The `blurb` prop carries fragment JSX (`{<>…</>}`) whose
+ * inner `>` would mis-close a naïve `indexOf('>')` — this scanner is the
+ * fix. Returns the byte offset just past that `>`, or -1 (defensive).
+ */
+function endOfOpenTag(src: string, openIdx: number): number {
+  let depth = 0; let quote: '"' | "'" | null = null;
+  for (let i = openIdx; i < src.length; i++) {
+    const c = src[i];
+    if (quote)            { if (c === quote) quote = null; continue; }
+    if (c === '"' || c === "'") { quote = c; continue; }
+    if (c === '{') depth++;
+    else if (c === '}') depth--;
+    else if (c === '>' && depth === 0) return i + 1;
+  }
+  return -1;
+}
+
+/**
+ * Return the byte offset just after the OverlayHeader element. Self-
+ * closing (`/>`) returns immediately; explicit-close hunts for the
+ * matching `</OverlayHeader>`. Returns -1 when unclosed (defensive).
+ */
+function endOfOverlayHeader(src: string, openIdx: number): number {
+  const openEnd = endOfOpenTag(src, openIdx);
+  if (openEnd === -1) return -1;
+  if (src[openEnd - 2] === '/') return openEnd;
+  const m = /<\/OverlayHeader\s*>/g.exec(src.slice(openEnd));
+  return m ? openEnd + m.index + m[0].length : -1;
+}
+
+/**
+ * Slice the JSX text immediately following the OverlayHeader element. The
+ * 400-char window is generous cover for whitespace + the next sibling's
+ * open tag — call sites place that sibling within ~3 lines per doctrine.
+ */
+function tailAfterOverlayHeader(
+  src: string, openIdx: number,
+): { tail: string; tailIdx: number } | null {
+  const close = endOfOverlayHeader(src, openIdx);
+  if (close === -1) return null;
+  return { tail: src.slice(close, close + 400), tailIdx: close };
+}
+
+/** Return the candidate JSX open-tag text right after `<OverlayHeader/>`. */
+function nextSiblingHead(tail: string): { head: string; offset: number } | null {
+  const at = tail.indexOf('<');
+  if (at === -1) return null;
+  return { head: tail.slice(at, at + 200), offset: at };
+}
+
+function buildDoorwayViolation(
+  rel: string, src: string, tailIdx: number,
+  offset: number, head: string, reason: string,
+): DoorwayViolation {
+  return {
+    file: rel,
+    line: lineAt(src, tailIdx + offset),
+    snippet: head.split('\n')[0].slice(0, 140),
+    reason,
+  };
+}
+
+function classifyDoorway(
+  rel: string, src: string, m: RegExpMatchArray,
+): DoorwayViolation[] {
+  const sliced = tailAfterOverlayHeader(src, m.index ?? 0);
+  if (sliced === null) return [];
+  const next = nextSiblingHead(sliced.tail);
+  if (next === null) return [];
+  const hit = DOORWAY_FORBIDDEN.find(({ rx }) => rx.test(next.head));
+  if (!hit) return [];
+  return [buildDoorwayViolation(
+    rel, src, sliced.tailIdx, next.offset, next.head, hit.reason)];
+}
+
+function findDoorwayViolations(rel: string, src: string): DoorwayViolation[] {
+  if (rel === KERNEL_PATH) return [];
+  const opens = [...src.matchAll(/<OverlayHeader\b/g)];
+  return opens.flatMap((m) => classifyDoorway(rel, src, m));
+}
+
+let cachedDoorwayViolations: DoorwayViolation[] | null = null;
+
+function scanAllDoorways(): DoorwayViolation[] {
+  if (cachedDoorwayViolations !== null) return cachedDoorwayViolations;
+  cachedDoorwayViolations = preloadAll()
+    .filter(({ rel }) => rel.endsWith('.tsx'))
+    .flatMap(({ rel, src }) => findDoorwayViolations(rel, src));
+  return cachedDoorwayViolations;
+}
+
+function formatDoorwayFailure(v: DoorwayViolation): string {
+  return (
+    `  ${v.file}:${v.line} — ${v.reason} immediately follows <OverlayHeader>\n\n` +
+    `    snippet: ${v.snippet}\n` +
+    `    The doorway is air, not ink. The kernel's pb-sys-4 + the body's\n` +
+    `    first-breath padding is the seam — no hairline, no <hr>, no\n` +
+    `    <Divider/>. (OverlayHeader.tsx lines 110–114; Tanya UIX #33 §5;\n` +
+    `    Mike #4 §"Decision".) Remove the line and let the body's first\n` +
+    `    breath carry the seam.`
+  );
+}
+
+describe('overlay-header-fence — Axis F · doorway is air, not ink', () => {
+  it('no <div border-t>, <hr>, or <Divider> follows <OverlayHeader> outside the kernel', () => {
+    const violations = scanAllDoorways();
+    expect(violations.map((v) => `${v.file}:${v.line}`)).toEqual([]);
+    if (violations.length > 0) {
+      throw new Error('\n' + violations.map(formatDoorwayFailure).join('\n\n'));
+    }
   });
 });
 
