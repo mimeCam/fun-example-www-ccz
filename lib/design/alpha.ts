@@ -431,9 +431,32 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   Remaining literals on the file are all on-ledger (`text-gold/70`
   //   = quiet, `text-mist/50` = recede); the file leaves the grandfather
   //   list with zero off-ledger drift.
+  // Live drifter retired (Mike napkin #114 — graduate ViaWhisper to /70
+  //   (gold-whisper voice, 5→4) — + Tanya UIX #94 §2, Sid 2026-04-27):
+  //   `components/home/ViaWhisper.tsx` — the arrival whisper graduates
+  //   onto the role-based 4-rung vocabulary. ONE drift site snapped +
+  //   module-scope handle planted:
+  //     quiet — `text-gold/80` → `alphaClassOf('gold','quiet','text')`
+  //             (= `text-gold/70`; "content, but not THE content"). The
+  //             only loud sibling in the four-site rhythm fence steps
+  //             back one rung and joins its peers (`RecognitionWhisper`
+  //             at /50 archetype-label/intentional pair-rule exception,
+  //             `GemHome` at luminous /70 via `gemPaint`, `EvolutionThread`
+  //             at /70). The arrival, return, wayfinding, and memory
+  //             surfaces now share the rung anchor: one voice, four
+  //             locations. The `WHISPER_TEXT` handle joins the family of
+  //             module-scope alpha tokens already surfaced via
+  //             `__testing__` on the sister sites — N=4 callers of
+  //             `alphaClassOf('gold','quiet','text')`/`text-gold/70` route
+  //             through the resolver directly (no `goldWhisper()` kernel-
+  //             lift; the resolver IS the kernel — Mike #114 §PoI #4 /
+  //             Elon §3). Pinned per-file in
+  //             `components/home/__tests__/ViaWhisper.alpha.test.ts`;
+  //             pinned site-wide by `lib/design/__tests__/
+  //             alpha-adoption.test.ts` (`/80` is no longer a legal rung).
+  //   The grandfather list shrinks 5 → 4. The list ONLY shrinks.
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
-  'components/home/ViaWhisper.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',
 ] as const;
