@@ -1156,6 +1156,31 @@ body {
    does not perform. */
 .empty-stagger-headline { animation-delay: var(--sys-time-crossfade); }
 
+/* ─── ShareOverlay sibling cascade ──────────────────────────────────────────
+   Three icons (Save PNG · Copy Link · Share on X) land left → right at
+   0 / half-hover / hover. Cadence sourced from `--sys-time-hover` (200ms);
+   one place to retime the breath. Half-step between beats reads as a
+   *cluster that politely yields* rather than a queue (Tanya UIX #19 §2).
+
+   `animation-fill-mode: both` paints the 0% keyframe during the delay so
+   the icon is invisible until its beat — without it, the fade-in's default
+   fill leaves the element at 100% opacity during the delay, snapping to 0
+   when the animation finally fires. Same trick the `archetype-reveal`
+   shorthand bakes in via `both`.
+
+   Reduced-motion override below hard-zeroes the per-icon delay: all three
+   icons are simply present at the same instant the row mounts. The
+   universal `*` rule below collapses animation-DURATION but does not zero
+   animation-DELAY — that gap is the bug Krystle caught (Tanya UIX #19
+   §2.1, Mike napkin #96 §POI-2). Pattern parity with
+   `.empty-stagger-headline` one row up: two surfaces, one shape. */
+.share-stagger-1,
+.share-stagger-2,
+.share-stagger-3 { animation-fill-mode: both; }
+.share-stagger-1 { animation-delay: 0ms; }
+.share-stagger-2 { animation-delay: calc(var(--sys-time-hover) / 2); }
+.share-stagger-3 { animation-delay: var(--sys-time-hover); }
+
 /* Respect reduced motion — hard kill on all animations + transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1175,6 +1200,13 @@ body {
   /* Empty-surface choreography — zero the stagger so the room arrives instantly
      (presence preserved; the breath sequence does not perform). Tanya UX §6. */
   .empty-stagger-headline {
+    animation-delay: 0ms !important;
+  }
+  /* ShareOverlay sibling cascade — same shape, same fix. The breath is
+     optional; the receipt (the icon row arriving) is not. Tanya UIX #19 §2.1. */
+  .share-stagger-1,
+  .share-stagger-2,
+  .share-stagger-3 {
     animation-delay: 0ms !important;
   }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {

@@ -2,9 +2,18 @@
  * ShareOverlay — icon-based share actions after mirror card reveal.
  *
  * Three icon buttons (Save PNG, Copy Link, Share on X) in a row.
- * Staggered reveal: delays sourced from `lib/design/motion.ts` so every
- * stagger on the site reads from the same motion ledger.
+ * Staggered reveal: cadence lives at the paint layer in
+ * `app/globals.css` as `.share-stagger-1|2|3` — each class derives its
+ * `animation-delay` from `--sys-time-hover` (200ms). One place to retime
+ * the breath; the component owns no millisecond literal.
  * Icons > text for instant visual parsing (Picture Superiority effect).
+ *
+ * Reduced-motion (Tanya UIX #19 §2.1, Mike napkin #96): the
+ * `prefers-reduced-motion: reduce` block in globals.css zeroes the
+ * per-icon delay so all three icons are present at the same instant the
+ * share row mounts. The breath is optional; the receipt is not. The
+ * universal `*` reduced-motion rule collapses animation-DURATION but
+ * does not zero animation-DELAY — the per-class override is the fix.
  *
  * Verb graduation (Mike napkin #92, Tanya UIX #99) — the hover tooltip's
  * opacity transition reads off the Gesture Atlas via
@@ -53,19 +62,29 @@ import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { Pressable } from '@/components/shared/Pressable';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import { useActionPhase, type UseActionPhaseResult } from '@/lib/hooks/useActionPhase';
-import { MOTION } from '@/lib/design/motion';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 
 /**
- * Stagger step between icon reveals — half the `instant` beat (75ms… but
- * we want 100ms, which is a half-`hover` or 5x `MOTION_REDUCED_MS`).
- * The siblings reveal at 0, STAGGER, 2×STAGGER so each button is its own
- * held breath before landing. Sourced so every stagger on the site reads
- * from motion tokens.
+ * Stagger step → paint class (closed table of literals).
+ *
+ * Discrete `step: 1 | 2 | 3` instead of `delay: number` — the JIT-safe
+ * lookup pattern this codebase pays for elsewhere (`alphaClassOf`,
+ * `swapWidthClassOf`). NEVER template-interpolate the class name; Tailwind
+ * cannot see what it cannot grep.
+ *
+ * The actual delays live one layer over in `app/globals.css`:
+ *   1 → 0ms · 2 → calc(var(--sys-time-hover) / 2) · 3 → var(--sys-time-hover)
+ * If a future cycle wants to re-time the cadence, it changes
+ * `--sys-time-hover` once and every stagger built on it follows.
  */
-const SHARE_STAGGER_MS = MOTION.hover / 2;              // 100
+const STAGGER_CLASS = {
+  1: 'share-stagger-1',
+  2: 'share-stagger-2',
+  3: 'share-stagger-3',
+} as const;
+type StaggerStep = keyof typeof STAGGER_CLASS;
 
 interface Props {
   result: QuickMirrorResult;
@@ -84,12 +103,12 @@ export default function ShareOverlay({ result, articleId }: Props) {
   return (
     <div className="mt-sys-4 flex flex-col items-center gap-sys-4">
       <div className="flex justify-center gap-sys-4">
-        <StaggeredIconBtn delay={0}
+        <StaggeredIconBtn step={1}
           onClick={useSaveImage(result)}
           label="Save PNG" icon={<DownloadIcon />} reduce={reduce} />
-        <StaggeredCopyLink delay={SHARE_STAGGER_MS}
+        <StaggeredCopyLink step={2}
           onClick={onCopy} slot={copySlot} reduce={reduce} />
-        <StaggeredIconBtn delay={SHARE_STAGGER_MS * 2}
+        <StaggeredIconBtn step={3}
           onClick={useXShare(result.archetype, articleId)}
           label="Share on X" icon={<XIcon />} reduce={reduce} />
       </div>
@@ -103,21 +122,29 @@ export default function ShareOverlay({ result, articleId }: Props) {
 // gesture-ledger:exempt — `animate-fade-in` is a CSS keyframe (paint, not
 // gesture) per Tanya UIX §5.3; out of the verb registry's scope, same
 // exemption pattern as `mirror-archetype-label` in MirrorRevealCard.
+//
+// The `share-stagger-N` class derives its `animation-delay` from
+// `--sys-time-hover` in `app/globals.css`. The reduced-motion @media block
+// in the same file zeroes the delay so all three icons land instantly under
+// `prefers-reduced-motion: reduce` (Tanya UIX #19 §2.1, Mike napkin #96).
+// The component owns no millisecond literal; the design-system file owns
+// the cadence. Two surfaces (`.empty-stagger-headline` is the cousin),
+// one shape — rule-of-two earns a paint pattern, not yet a TS factory.
 
-function StaggerSlot({ delay, children }: { delay: number; children: React.ReactNode }) {
+function StaggerSlot({ step, children }: { step: StaggerStep; children: React.ReactNode }) {
   return (
-    <div className="animate-fade-in" style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}>
+    <div className={`animate-fade-in ${STAGGER_CLASS[step]}`}>
       {children}
     </div>
   );
 }
 
-function StaggeredIconBtn({ onClick, label, icon, delay, reduce }: {
+function StaggeredIconBtn({ onClick, label, icon, step, reduce }: {
   onClick: () => void; label: string; icon: React.ReactNode;
-  delay: number; reduce: boolean;
+  step: StaggerStep; reduce: boolean;
 }) {
   return (
-    <StaggerSlot delay={delay}>
+    <StaggerSlot step={step}>
       <IconBtn onClick={onClick} label={label} icon={icon} reduce={reduce} />
     </StaggerSlot>
   );
@@ -135,11 +162,11 @@ function StaggeredIconBtn({ onClick, label, icon, delay, reduce }: {
  *   `opacity-0` / `group-hover:opacity-100` Motion fade endpoints live on
  *   `<Tooltip>`'s JSX with their own carve-out comment (see line ~217).
  */
-function StaggeredCopyLink({ onClick, slot, delay, reduce }: {
-  onClick: () => void; slot: UseActionPhaseResult; delay: number; reduce: boolean;
+function StaggeredCopyLink({ onClick, slot, step, reduce }: {
+  onClick: () => void; slot: UseActionPhaseResult; step: StaggerStep; reduce: boolean;
 }) {
   return (
-    <StaggerSlot delay={delay}>
+    <StaggerSlot step={step}>
       <CopyLinkBtn onClick={onClick} slot={slot} reduce={reduce} />
     </StaggerSlot>
   );
