@@ -25,6 +25,7 @@ import { useEffect } from 'react';
 import {
   CHECKPOINTS, type CheckpointName,
 } from '@/lib/engagement/loop-checkpoints';
+import { bucketFor } from '@/lib/engagement/archetype-bucket';
 
 export { CHECKPOINTS, type CheckpointName };
 
@@ -42,6 +43,10 @@ interface QueuedCheckpoint {
 let currentArticleId: string | null = null;
 let currentArchetype: string | null = null;
 let currentSessionId: string | null = null;
+/** Frozen bucket label for this session — `'control'` or the archetype.
+ *  Captured once at first emit so all four checkpoints carry the same label
+ *  (Mike napkin §6.3 — protect against archetype-store drift mid-session). */
+let currentBucket: string | null = null;
 const sentForArticle = new Map<string, Set<CheckpointName>>();
 let queue: QueuedCheckpoint[] = [];
 let flushTimer: ReturnType<typeof setTimeout> | null = null;
@@ -142,15 +147,19 @@ export function emitCheckpoint(
   scheduleFlush();
 }
 
-/** Compose a payload with the most specific archetype available. */
+/** Compose a payload with the most specific archetype available, then
+ *  freeze it through the A/B bucket so the four checkpoints of one session
+ *  all carry the same label (`'control'` or the archetype). The freeze is
+ *  intentional — see `archetype-bucket.ts` and Mike napkin §6.3. */
 function buildPayload(
   sessionId: string,
   name: CheckpointName,
   extra?: { archetype?: string | null },
 ): QueuedCheckpoint {
   const articleId = currentArticleId as string;
-  const archetype = extra?.archetype ?? currentArchetype ?? null;
-  return { sessionId, articleId, checkpoint: name, archetype };
+  const raw = extra?.archetype ?? currentArchetype ?? null;
+  if (currentBucket === null) currentBucket = bucketFor(sessionId, raw);
+  return { sessionId, articleId, checkpoint: name, archetype: currentBucket };
 }
 
 /** Attach lifecycle listeners that flush the queue before the page goes away. */
@@ -179,6 +188,11 @@ export function useLoopFunnel(articleId: string, archetype?: string | null): voi
     currentArticleId = articleId;
     currentArchetype = archetype ?? null;
     currentSessionId = ensureSessionId();
+    // Bucket is deterministic per sessionId — recompute is a no-op for the
+    // same session, but null-on-mount ensures a fresh tab boots cleanly.
+    if (currentBucket === null && currentSessionId) {
+      currentBucket = bucketFor(currentSessionId, currentArchetype);
+    }
     const detach = bindLifecycleFlush();
     return () => {
       detach();
@@ -195,6 +209,7 @@ export function __resetLoopFunnelForTests(): void {
   currentArticleId = null;
   currentArchetype = null;
   currentSessionId = null;
+  currentBucket = null;
 }
 
 /** Test-only — peek at the queued payloads without flushing. */

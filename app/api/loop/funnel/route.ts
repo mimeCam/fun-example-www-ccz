@@ -10,12 +10,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getWeeklyFunnel, type WeeklyFunnelRow } from '@/lib/engagement/loop-funnel';
+import {
+  getWeeklyFunnelByArchetype,
+  type FunnelByArchetypeRow,
+} from '@/lib/engagement/funnel-by-archetype';
 import { logInfo } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 
 const TOKEN_HEADER = 'x-loop-funnel-token';
 const DEFAULT_WINDOW_DAYS = 28;
+const BREAKDOWN_PARAM = 'breakdown';
+const BREAKDOWN_ARCHETYPE = 'archetype';
 
 /** Constant-time-ish env-token compare. Empty env => endpoint disabled. */
 function isAuthorized(req: NextRequest): boolean {
@@ -41,11 +47,27 @@ function logSummary(rows: WeeklyFunnelRow[], days: number): void {
   });
 }
 
+/** True iff the caller asked for an archetype-level breakdown. Pure. */
+function wantsArchetypeBreakdown(req: NextRequest): boolean {
+  return req.nextUrl.searchParams.get(BREAKDOWN_PARAM) === BREAKDOWN_ARCHETYPE;
+}
+
+/** Log a one-line summary of the per-archetype read. No PII. */
+function logArchetypeSummary(rows: FunnelByArchetypeRow[], days: number): void {
+  const arms = new Set(rows.map((r) => r.archetype)).size;
+  logInfo('loop-funnel.read.archetype', { days, weeks: rows.length, arms });
+}
+
 export async function GET(req: NextRequest): Promise<NextResponse> {
   if (!isAuthorized(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   const days = readWindowDays(req);
+  if (wantsArchetypeBreakdown(req)) {
+    const rows = getWeeklyFunnelByArchetype(days);
+    logArchetypeSummary(rows, days);
+    return NextResponse.json({ days, breakdown: BREAKDOWN_ARCHETYPE, rows });
+  }
   const rows = getWeeklyFunnel(days);
   logSummary(rows, days);
   return NextResponse.json({ days, rows });

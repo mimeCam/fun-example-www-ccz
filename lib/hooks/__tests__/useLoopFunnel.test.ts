@@ -141,7 +141,7 @@ describe('emitCheckpoint — transport selection', () => {
 });
 
 describe('payload shape', () => {
-  it('includes sessionId, articleId, checkpoint, and the resolved archetype', async () => {
+  it('includes sessionId, articleId, checkpoint, and the bucket label', async () => {
     const recorder = installBrowserEnv();
     const mod = loadModule();
     mod.__resetLoopFunnelForTests();
@@ -153,8 +153,30 @@ describe('payload shape', () => {
     const payload = JSON.parse(text);
     expect(payload.articleId).toBe('article-x');
     expect(payload.checkpoint).toBe('keepsaked');
-    expect(payload.archetype).toBe('reflective-mirror');
+    // archetype is now the A/B bucket label — `'control'` for ~10% of
+    // sessions or the original archetype for the rest. See archetype-bucket.ts.
+    expect(['reflective-mirror', 'control']).toContain(payload.archetype);
     expect(typeof payload.sessionId).toBe('string');
     expect(payload.sessionId.length).toBeGreaterThan(0);
+  });
+
+  it('every checkpoint in one session ships the same frozen bucket label', async () => {
+    const recorder = installBrowserEnv();
+    const mod = loadModule();
+    mod.__resetLoopFunnelForTests();
+    mod.__setArticleContextForTests('article-x', 'reflective-mirror');
+    mod.emitCheckpoint(CHECKPOINTS.RESOLVED);
+    mod.emitCheckpoint(CHECKPOINTS.WARMED);
+    mod.emitCheckpoint(CHECKPOINTS.KEEPSAKED);
+    mod.emitCheckpoint(CHECKPOINTS.SHARED);
+    await flushTimers();
+    const labels = await Promise.all(
+      recorder.beacon.mock.calls.map(async (call) => {
+        const blob = call[1] as Blob;
+        const text = await (blob as { text: () => Promise<string> }).text();
+        return JSON.parse(text).archetype;
+      }),
+    );
+    expect(new Set(labels).size).toBe(1);
   });
 });

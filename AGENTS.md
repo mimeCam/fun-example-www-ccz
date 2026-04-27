@@ -17,6 +17,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons, etc.
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, etc.
 - `lib/resonances/` — visited-launcher paint resolver (session-scoped launcher repaint)
+- `lib/engagement/` — loop-funnel (4-checkpoint reader-loop persistence), `archetype-bucket` (deterministic ~10% control split, FNV-1a, SSR-safe), `funnel-by-archetype` (grouped read path), `funnel-lift` (pure stats — rates, lift, Wilson 95% CI). Read at token-gated `/admin/funnel` or `/api/loop/funnel?breakdown=archetype`.
 - `components/articles/` — QuoteKeepsake (quote-card host #2 for direct-gesture asymmetry)
 - `scripts/` — build-time codegen
 
