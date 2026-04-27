@@ -141,6 +141,11 @@ export const GESTURES = {
   'whisper-linger':   { beat: 'linger',    ease: 'out',     reduced: 'shorten' },
 
   // ─── Content swap — one thing dissolves while another arrives ────────────
+  // TODO(rename-pass): scope-grew beyond keepsakes — `ReturnLetter` joined
+  //                    `MirrorRevealCard` on this row (Sid napkin, Tanya §6,
+  //                    Mike POI-4). Candidate names: `slow-reveal` or
+  //                    `precious-reveal`. Hold until rule-of-three fires
+  //                    (a third, non-keepsake consumer earns the rename).
   /** *"Something precious is emerging — slow, delicate, earned."*
    *  The killer-feature carrier — keepsake reveal is the project's "blog
    *  reads you back" moment landing visually. Tanya UX §2.3. */
@@ -342,7 +347,21 @@ export const GESTURE_GRANDFATHERED_PATHS: readonly string[] = [
   // RecognitionWhisper / GemHome on the (linger, out) breath. The page's
   // gold thread of memory now runs through chapter break + carrying divider
   // + this whisper as one chord. The list ONLY shrinks.
-  'components/return/ReturnLetter.tsx',
+  // Sid napkin (Mike #9 / Tanya UIX #9) — `components/return/ReturnLetter.tsx`
+  // redeemed onto two verbs in one breath: the card transition reads
+  // `gestureClassesForMotion('reveal-keepsake', reduce)` (the killer-feature
+  // verb shows up at the front door for returning readers); the divider
+  // hairline reads `gestureClassesForMotion('fade-neutral', reduce)`. The
+  // file wires `useReducedMotion()` once at the component top — and, the
+  // load-bearing fix this PR ships, the `useEffect` phase timeline is also
+  // branched on `reduce` (Mike POI-1, Tanya §3): a returning reader with
+  // motion off lands at rest+settled in the same render with the dismiss
+  // button, Copy & Share, and Save as Image immediately interactive (no
+  // 1.2s gap). Three scattered `// alpha-ledger:exempt — motion fade
+  // endpoint` annotations are now joined by one paragraph header above
+  // the verb resolvers (Mike POI-3, Tanya §4.3) — three ledgers, one
+  // surface, one prose block. The list ONLY shrinks; one entry remains.
+  // Pinned by `components/return/__tests__/ReturnLetter.gestures.test.ts`.
   'lib/resonances/visited-launcher.ts',
 ] as const;
 

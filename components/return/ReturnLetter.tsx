@@ -15,12 +15,14 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Letter, LetterContext } from '@/types/book-narration';
 import type { ArchetypeKey } from '@/types/content';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { getSeason } from '@/lib/mirror/season-engine';
 import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 
@@ -54,6 +56,24 @@ const RETURN_LETTER_SETTLE_MS = MOTION.linger + MOTION.hover; // 1200ms
 /** Copy toast dwell — two `linger` beats, long enough to read. */
 const COPY_TOAST_MS = MOTION.linger * 2; // 2000ms
 
+// ─── Verb-resolved class fragments (Mike napkin #9 §2, Tanya UX §2) ──────
+//
+// Ledger crossings on this card surface — one paragraph beats three
+// scattered annotations (Mike POI-3, Tanya §4.3):
+//
+//   • Alpha ledger   — rung handles (LABEL_RECEDE, CLOSING_QUIET, …) above.
+//   • Motion ledger  — opacity-0/100 endpoints inside `phaseStyles`
+//                      (alpha-ledger:exempt — motion fade endpoint).
+//   • Gesture ledger — transition timing routes through
+//                      `gestureClassesForMotion(verb, reduce)` below.
+//                      Verbs: `reveal-keepsake` (card), `fade-neutral`
+//                      (divider hairline + Copy & Share label swap).
+//
+// Both pre-resolve to JIT-visible literal strings via the (perform /
+// shorten) table in `lib/design/gestures.ts`. ≤ 10 LoC each.
+const REVEAL_GESTURE = (r: boolean): string => gestureClassesForMotion('reveal-keepsake', r);
+const FADE_GESTURE   = (r: boolean): string => gestureClassesForMotion('fade-neutral',    r);
+
 // ─── Phase animation ─────────────────────────────────────
 
 type Phase = 'approach' | 'settle' | 'rest';
@@ -65,9 +85,10 @@ function phaseStyles(phase: Phase, settled: boolean): string {
   if (phase === 'settle') {
     // Tanya §2.1: bloom halo arrives with the copy — flat warmth, not lift.
     // The border speaks `hairline` (it IS a line); shadow owns elevation.
+    // The transition timing now lives on the outer `<div>` via the gesture
+    // ledger (`REVEAL_GESTURE(reduce)`); this map stays state-only.
     // alpha-ledger:exempt — motion fade endpoint (opacity-100 = transition target)
-    return `opacity-100 translate-y-0 transition-all duration-reveal ease-out
-            ${BORDER_HAIRLINE} shadow-sys-bloom`;
+    return `opacity-100 translate-y-0 ${BORDER_HAIRLINE} shadow-sys-bloom`;
   }
   // At rest: settled letters keep the bloom (warmth stays); un-settled
   // drop to `sys-rest` (the letter keeps its seat; the warmth leaves).
@@ -75,6 +96,25 @@ function phaseStyles(phase: Phase, settled: boolean): string {
   // shadow (`shadow-sys-bloom` vs `shadow-sys-rest`), not in border alpha.
   // alpha-ledger:exempt — motion fade endpoint (opacity-100 = transition target)
   return `opacity-100 translate-y-0 ${BORDER_HAIRLINE} ${settled ? 'shadow-sys-bloom' : 'shadow-sys-rest'}`;
+}
+
+/**
+ * Reduced-motion landing for the phase machine (Mike POI-1, Tanya §3).
+ *
+ * A reader who turned motion off would otherwise see the card snap into
+ * place visually and then sit in front of a frozen card with no dismiss
+ * button, no Copy & Share, no Save as Image for ~1.2 seconds — because
+ * the timer cascade gates `visible = phase === 'rest'`. This pure helper
+ * captures the binary decision so the test fence can pin it without
+ * spinning up the React effect machinery.
+ *
+ *   reduce=true  → land at rest+settled in the same render.
+ *   reduce=false → null; the useEffect runs the 50ms / 1200ms cascade.
+ *
+ * Pure, ≤ 10 LoC. Pinned by `__tests__/ReturnLetter.gestures.test.ts`.
+ */
+function reducedMotionLanding(reduce: boolean): { phase: Phase; settled: boolean } | null {
+  return reduce ? { phase: 'rest', settled: true } : null;
 }
 
 // ─── Compact greeting (known readers, < 3 days) ──────────
@@ -193,12 +233,14 @@ function buildLetterEnvelope(): {
 // ─── Letter Card ─────────────────────────────────────────
 
 function LetterCard({
-  letter, phase, settled, onDismiss,
+  letter, phase, settled, onDismiss, reduce = false,
 }: {
   letter: Letter;
   phase: Phase;
   settled: boolean;
   onDismiss: () => void;
+  /** `prefers-reduced-motion` flag, propagated from `useReducedMotion()`. */
+  reduce?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -232,7 +274,7 @@ function LetterCard({
     <div className={`relative max-w-[32rem] mx-auto my-sys-10 p-sys-8 md:p-sys-9
       max-h-[40vh] overflow-y-auto
       bg-gradient-to-b from-surface to-background
-      rounded-sys-medium ${thermalRadiusClassByPosture('held')} border transition-all duration-reveal
+      rounded-sys-medium ${thermalRadiusClassByPosture('held')} border transition-all ${REVEAL_GESTURE(reduce)}
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss — typography-ledger:exempt — icon glyph (&times;), no reading
           rhythm; leading-none collapses the line-box around a single char. */}
@@ -265,9 +307,13 @@ function LetterCard({
           {para}
         </p>
       ))}
-      {/* Divider — `hairline` (0.10): geometry, not surface. */}
+      {/* Divider — `hairline` (0.10): geometry, not surface. The transform
+          rides `fade-neutral` (Tanya §2.2: "one thing dissolves while another
+          arrives — neither rushing"). The verb resolves to the (fade, sustain)
+          row at full motion and to the crossfade floor under reduce — same
+          row the Copy/Share label swap rides. */}
       <div className="my-sys-7 flex justify-center">
-        <div className={`h-px max-w-divider ${DIVIDER_HAIRLINE} transition-transform duration-fade ${dividerScale}`} />
+        <div className={`h-px max-w-divider ${DIVIDER_HAIRLINE} transition-transform ${FADE_GESTURE(reduce)} ${dividerScale}`} />
       </div>
       {/* Closing — `quiet` (0.70): "the closing of a letter."
           Pair invariant: same rung as the whisper-quote register in
@@ -294,6 +340,7 @@ function LetterCard({
 
 export function ReturnLetter() {
   const rec = useReturnRecognition();
+  const reduce = useReducedMotion();
   const [phase, setPhase] = useState<Phase>('approach');
   const [settled, setSettled] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -309,14 +356,19 @@ export function ReturnLetter() {
   const letterCtx = showLetter ? buildContext(rec) : null;
   const letter = letterCtx ? composeLetter(letterCtx) : null;
 
-  // Animation timeline (approach → settle → rest)
-  // Seed a frame later than reduced-motion floor, settle on `linger + hover`.
+  // Animation timeline (approach → settle → rest).
+  // POI-1 (Mike §3.1, Tanya §3): under `prefers-reduced-motion: reduce`
+  // we land at rest+settled in the same render so the dismiss + Copy &
+  // Share + Save as Image buttons are immediately interactive — without
+  // the branch the reader sits in front of a frozen card for ~1.2s.
   useEffect(() => {
     if (!showLetter || !letter) return;
+    const landing = reducedMotionLanding(reduce);
+    if (landing !== null) { setPhase(landing.phase); setSettled(landing.settled); return; }
     const t1 = setTimeout(() => setPhase('settle'), RETURN_LETTER_SEED_MS);
     const t2 = setTimeout(() => { setPhase('rest'); setSettled(true); }, RETURN_LETTER_SETTLE_MS);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [showLetter, letter]);
+  }, [showLetter, letter, reduce]);
 
   const handleDismiss = useCallback(() => {
     setDismissed(true);
@@ -339,6 +391,7 @@ export function ReturnLetter() {
       phase={phase}
       settled={settled}
       onDismiss={handleDismiss}
+      reduce={reduce}
     />
   );
 }
@@ -349,11 +402,19 @@ export function ReturnLetter() {
  * card with a fixed letter object (no hooks, no localStorage, no jsdom).
  * Mirrors the `MirrorRevealCard.__testing__` and `ArticleWhisperPortalInner`
  * idioms (Mike #38 §5; Tanya UX §4).
+ *
+ * Verb resolvers — `REVEAL_GESTURE(reduce)` and `FADE_GESTURE(reduce)` —
+ * plus the `reducedMotionLanding(reduce)` planner are exposed for the
+ * gesture-resolution + POI-1 timer-under-reduce pin in
+ * `__tests__/ReturnLetter.gestures.test.ts` (Mike napkin #9 §6, Tanya §7).
  */
 export const __testing__ = {
   LetterCard,
   CompactGreeting,
   phaseStyles,
+  reducedMotionLanding,
+  REVEAL_GESTURE,
+  FADE_GESTURE,
   LABEL_RECEDE,
   CLOSING_QUIET,
   COMPACT_QUIET,

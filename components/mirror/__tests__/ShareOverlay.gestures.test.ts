@@ -118,13 +118,16 @@ describe('ShareOverlay — the path is OFF the grandfather list', () => {
     expect(GESTURE_GRANDFATHERED_PATHS).not.toContain('components/mirror/ShareOverlay.tsx');
   });
 
-  it('the list has shrunk to exactly two remaining entries', () => {
-    expect(GESTURE_GRANDFATHERED_PATHS.length).toBe(2);
+  it('the list has shrunk to exactly one remaining entry', () => {
+    // ShareOverlay's PR shrunk the list from 3 → 2 (ShareOverlay redeemed).
+    // Sid napkin (this PR) shrunk the list from 2 → 1 (ReturnLetter
+    // redeemed onto `reveal-keepsake` + `fade-neutral`). Next graduation
+    // closes the Atlas to length 0 — *"room speaks in one accent."*
+    expect(GESTURE_GRANDFATHERED_PATHS.length).toBe(1);
   });
 
-  it('the two remaining entries are ReturnLetter + visited-launcher', () => {
+  it('the remaining entry is visited-launcher (the last unmigrated site)', () => {
     expect([...GESTURE_GRANDFATHERED_PATHS].sort()).toEqual([
-      'components/return/ReturnLetter.tsx',
       'lib/resonances/visited-launcher.ts',
     ]);
   });

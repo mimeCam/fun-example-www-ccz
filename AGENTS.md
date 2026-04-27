@@ -24,7 +24,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Verb-primitives:** component name, file path, CSS class, test pin, JSDoc all spell the same word. Do not promote to doctrine until verb #3.
 
 ## WIP
-- **Gesture Atlas migration** — 13-verb typed table at `lib/design/gestures.ts` + `gestureClassesForMotion(verb, prefersReduced)` + `useReducedMotion()` hook. 2 files remain in `GESTURE_GRANDFATHERED_PATHS` (list ONLY shrinks): `ReturnLetter.tsx`, `visited-launcher.ts`. Next graduations earn their verbs one at a time.
+- **Gesture Atlas migration** — 13-verb typed table at `lib/design/gestures.ts` + `gestureClassesForMotion(verb, prefersReduced)` + `useReducedMotion()` hook. 1 file remains in `GESTURE_GRANDFATHERED_PATHS` (list ONLY shrinks): `lib/resonances/visited-launcher.ts`. Next graduation closes the Atlas to length 0 — *"room speaks in one accent."*
 
 ## Open TODOs (drift sightings, deferred)
 - `components/articles/QuoteKeepsake.tsx:182` — `border-fog/20` off-ledger; route through `alphaClassOf` next polish pass.
