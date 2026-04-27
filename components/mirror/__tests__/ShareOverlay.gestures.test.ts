@@ -113,23 +113,20 @@ describe('ShareOverlay — no bare duration/ease class survives', () => {
 
 // ─── Grandfather discipline — the file is off the list ────────────────────
 
-describe('ShareOverlay — the path is OFF the grandfather list', () => {
+describe('ShareOverlay — the path is OFF the (now closed) grandfather list', () => {
   it("'components/mirror/ShareOverlay.tsx' is not a grandfathered path", () => {
     expect(GESTURE_GRANDFATHERED_PATHS).not.toContain('components/mirror/ShareOverlay.tsx');
   });
 
-  it('the list has shrunk to exactly one remaining entry', () => {
-    // ShareOverlay's PR shrunk the list from 3 → 2 (ShareOverlay redeemed).
-    // Sid napkin (this PR) shrunk the list from 2 → 1 (ReturnLetter
-    // redeemed onto `reveal-keepsake` + `fade-neutral`). Next graduation
-    // closes the Atlas to length 0 — *"room speaks in one accent."*
-    expect(GESTURE_GRANDFATHERED_PATHS.length).toBe(1);
-  });
-
-  it('the remaining entry is visited-launcher (the last unmigrated site)', () => {
-    expect([...GESTURE_GRANDFATHERED_PATHS].sort()).toEqual([
-      'lib/resonances/visited-launcher.ts',
-    ]);
+  it('the list is closed — Atlas at thirteen verbs, zero grandfathered paths', () => {
+    // History — Sid 2026-04-27 closed the Atlas (Mike #36): the fence
+    // flipped from *tolerate* to *forbid*. Earlier shrinks: 3 → 2
+    // (ShareOverlay redeemed onto `crossfade-inline`); 2 → 1 (ReturnLetter
+    // onto `reveal-keepsake` + `fade-neutral`); 1 → 0 (visited-launcher
+    // removed as fence-residue — paint-only resolver, no transition
+    // strings to migrate). *"Room speaks in one accent."*
+    expect(GESTURE_GRANDFATHERED_PATHS.length).toBe(0);
+    expect([...GESTURE_GRANDFATHERED_PATHS]).toEqual([]);
   });
 });
 

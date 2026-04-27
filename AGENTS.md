@@ -24,7 +24,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Verb-primitives:** component name, file path, CSS class, test pin, JSDoc all spell the same word. Do not promote to doctrine until verb #3.
 
 ## WIP
-- **Gesture Atlas migration** — 13-verb typed table at `lib/design/gestures.ts` + `gestureClassesForMotion(verb, prefersReduced)` + `useReducedMotion()` hook. 1 file remains in `GESTURE_GRANDFATHERED_PATHS` (list ONLY shrinks): `lib/resonances/visited-launcher.ts`. Next graduation closes the Atlas to length 0 — *"room speaks in one accent."*
+- **Gesture Atlas closed** (2026-04-27): 13 verbs, 0 grandfathered paths, fence flipped from tolerate→forbid. A typed 13-row table + a JIT-literal class factory + a shrink-only fence make a class of motion-drift bugs structurally impossible at zero added complexity. Source receipt: `lib/design/gestures.ts` § `GESTURE_GRANDFATHERED_PATHS`. Pinned by `gestures-sync.test.ts` (`toEqual([])`) and `gesture-call-site-fence.test.ts` Axis C (`toBe(0)`).
 
 ## Open TODOs (drift sightings, deferred)
 - `components/articles/QuoteKeepsake.tsx:182` — `border-fog/20` off-ledger; route through `alphaClassOf` next polish pass.

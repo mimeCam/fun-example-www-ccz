@@ -5,7 +5,7 @@
  *
  * Rationale (Mike's tech-lead napkin #9, Tanya UX #78):
  *
- *   • The site already speaks twelve coherent gestures. They were authored
+ *   • The site already speaks thirteen coherent gestures. They were authored
  *     one PR at a time, and the duration/ease pairs scattered across ~30
  *     call sites under `components/**` and `app/**`. A reduced-motion
  *     designer-pass had to grep for thirty class fragments across thirty
@@ -29,21 +29,19 @@
  *     is `MirrorRevealCard` via `useReducedMotion()` (Mike napkin #88).
  *     Future call sites read the same composer.
  *
- *   • Twelve verbs, four domains (Tanya UX §2): **input** (fingertip),
+ *   • Thirteen verbs, four domains (Tanya UX §2): **input** (fingertip),
  *     **surface** (room leans), **content-swap** (one dissolves, another
  *     arrives), **ceremony** (narrative pacing). Each row carries a
  *     **felt sentence** in JSDoc — the line a reviewer reads aloud during
  *     PR review: *"Does this code make a reader feel {sentence}?"*
  *
- * Migration footprint: ~30 existing call sites currently spell
- * `transition-X duration-Y ease-Z` directly. Migrating them onto
- * `gestureClassesOf('verb')` is a multi-PR effort; in this sprint we land
- * the table + the call-site fence + a small starter migration. The
- * remaining call-site files live in `GESTURE_GRANDFATHERED_PATHS`, where
- * the fence's bare-class axis tolerates them while still enforcing axes A,
- * B, and D site-wide. Each entry on the grandfather list is a future
- * micro-PR receipt; the list should ONLY shrink. (Same shape as
- * `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS` in `lib/design/alpha.ts`.)
+ * Migration footprint: closed. `GESTURE_GRANDFATHERED_PATHS` is the empty
+ * array — the fence's bare-class axis (Axis C) now FORBIDS bare
+ * `duration-* ease-*` pairs across `app/**` and `components/**` site-wide,
+ * not merely tolerates a shrinking allowlist. New entries are not added
+ * without a tech-lead-approved migration plan; the list shape is
+ * preserved (same as `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS`) so the
+ * doctrine is structural, not advisory.
  *
  * IMPORTANT: every (beat, ease) pair in this table must be a key of
  * `MOTION` and `EASE` in `lib/design/motion.ts`. The sync test catches
@@ -99,10 +97,10 @@ export interface GestureRow {
   readonly reduced: ReducedPolicy;
 }
 
-// ─── The vocabulary — twelve verbs, four domains (Tanya UX §2) ─────────────
+// ─── The vocabulary — thirteen verbs, four domains (Tanya UX §2) ───────────
 
 /**
- * Twelve kebab-case verbs, grouped by domain in JSDoc only. Naming is
+ * Thirteen kebab-case verbs, grouped by domain in JSDoc only. Naming is
  * `noun-of-action` (the fingertip presses; the card lifts; the keepsake
  * reveals). Per AGENTS.md, do not promote verb-vocabulary doctrine to
  * AGENTS.md until verb #3 fires — the table proves itself first.
@@ -284,85 +282,50 @@ export const GESTURE_LEDGER_EXEMPT_TOKEN = 'gesture-ledger:exempt';
 
 /**
  * Path-allow-list for files that already speak the duration/ease dialect
- * directly (pre-Atlas). Each entry is a migration receipt waiting to be
- * redeemed: a future micro-PR replaces the bare classes with
- * `gestureClassesOf('verb')` and removes the path from this list. The
- * list should ONLY shrink. (Same shape as
- * `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS`.)
+ * directly (pre-Atlas). **The list is empty by design — the fence forbids;
+ * do not re-add without a tech-lead-approved migration plan.** Mirrors
+ * `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS` (same shape, same shrink-
+ * only doctrine).
  *
- * Why grandfathering rather than a one-PR migration: ~30 sites across 12
- * files. A single-PR migration is high-risk for a polish sprint; an
- * incremental migration with the fence in place ensures *new* call sites
- * land on the verb registry while existing ones get redeemed file by file.
+ * Atlas closure receipt — Sid (2026-04-27): the Gesture Atlas closed at
+ * thirteen verbs and zero grandfathered paths. The fence flipped from
+ * *tolerate* to *forbid*: Axis C (no bare `duration-* ease-*` outside the
+ * factory) now fails CI on any new entry rather than waving it through
+ * via this list. A typed 13-row table + a JIT-literal class factory + a
+ * shrink-only fence make a class of motion-drift bugs structurally
+ * impossible at zero added complexity.
  *
- * When migrating a file off this list:
- *   (a) replace `transition-X duration-Y ease-Z` with
- *       `transition-X ${gestureClassesOf('verb')}`, OR
- *   (b) wrap the class composition in a verb-named helper that calls
- *       `gestureClassesOf` once and is referenced everywhere downstream.
+ * The annotation `: readonly string[]` is preserved through the empty-
+ * array case to keep TS from inferring `never[]` if `as const` ever
+ * widens (Mike #36 §7).
+ *
+ * History — receipts of the migration that closed this list:
+ *
+ *   • Mike #88 — `MirrorRevealCard.tsx` redeemed onto
+ *     `gestureClassesForMotion('reveal-keepsake' | 'fade-neutral', reduce)`;
+ *     killer-feature carrier.
+ *   • Sid / Tanya UIX #53 (Mike #42) — `app/resonances/ResonanceEntry.tsx`
+ *     redeemed two transitions in one breath onto `card-settle` +
+ *     `fade-neutral`.
+ *   • Sid / Tanya UIX #99 (Mike #92) — `components/mirror/ShareOverlay.tsx`
+ *     redeemed onto `crossfade-inline`.
+ *   • Mike #91 — `whisper-linger` (verb #13) redeemed `ViaWhisper`,
+ *     `RecognitionWhisper`, `GemHome` in one breath; later joined by
+ *     `app/resonances/EvolutionThread.tsx`.
+ *   • Sid / Tanya UIX §3 (Mike #9) — `components/return/ReturnLetter.tsx`
+ *     redeemed onto `reveal-keepsake` + `fade-neutral`.
+ *   • Sid / Mike (this PR, 2026-04-27) — `lib/resonances/visited-launcher.ts`
+ *     removed as fence-residue. The launcher is a paint-only resolver
+ *     (alpha + color, no transition strings); its transition rides
+ *     `<Pressable>` upstream. The entry was never gating anything — the
+ *     fence scans `app/**` + `components/**`, and `lib/resonances/` is
+ *     out-of-scope for the bare-class lint. Deleting the entry is the
+ *     receipt; nothing in the file moves.
  */
 export const GESTURE_GRANDFATHERED_PATHS: readonly string[] = [
-  // Mike napkin #88 — `MirrorRevealCard.tsx` redeemed: now reads
-  // `gestureClassesForMotion('reveal-keepsake' | 'fade-neutral', reduce)`
-  // and honors `prefers-reduced-motion` via `useReducedMotion()`. The list
-  // ONLY shrinks; do not re-add without a new migration receipt.
-  // Sid napkin #N (Tanya UX spec, "One Mirror, One Room") — the
-  // `components/mirror/QuickMirrorCard.tsx` entry is gone because the
-  // file is gone. The orphan was never rendered: `app/mirror/page.tsx`
-  // adapts a quick-mirror result into `MirrorRevealCard` for both
-  // branches; the article page removed the inline reveal long ago.
-  // Retiring the file is the cleanest possible noun-shaped answer to
-  // "what word did I retire today?" — one fewer surface, one fewer
-  // dialect, one shorter ledger. The list ONLY shrinks.
-  // Sid napkin (Mike #42 / Tanya UIX #53) — `app/resonances/ResonanceEntry.tsx`
-  // redeemed two transitions in one breath, both onto verbs already in the
-  // Atlas. The wrapper's settle is `card-settle` (*"the card is drifting
-  // back down to sleep"*); the vitality fill's % crossfade is `fade-neutral`
-  // (*"one thing dissolves while another arrives — neither rushing"*). The
-  // file now reads `gestureClassesForMotion(verb, reduce)` once per call
-  // site and honors `prefers-reduced-motion` via `useReducedMotion()` —
-  // the same shape `MirrorRevealCard` set down. No new helper, no new
-  // ledger crossing; the rose vitality pill stayed inside the gesture
-  // ledger because `vitality: number` is a TTL countdown, not a thermal
-  // score (Elon §1 atom audit, Tanya UIX §6). The list ONLY shrinks.
-  // Sid napkin (Mike #92 / Tanya UIX #99) — `components/mirror/ShareOverlay.tsx`
-  // redeemed onto `crossfade-inline` (verb #12). The hover-tooltip opacity
-  // transition reads `gestureClassesForMotion('crossfade-inline', reduce)`
-  // and the file wires `useReducedMotion()` once at the component top.
-  // Felt sentence: *"One label replacing another — instant enough I don't
-  // see the seam."* The verb's `reduced: 'perform'` row keeps labels fast
-  // and predictable even under `prefers-reduced-motion: reduce` — Tanya's
-  // discipline that "reduced-motion users especially need fast,
-  // predictable labels" landed in source. The post-click "Copied!" handoff
-  // is intentionally NOT graduated this cycle (separate verb, separate
-  // PR); the existing `mirror-share-confirm` recipe stays in place. The
-  // list ONLY shrinks. Pinned by `components/mirror/__tests__/
-  // ShareOverlay.gestures.test.ts`.
-  // Mike napkin #91 — `whisper-linger` (verb #13) redeemed three sites in
-  // one breath: `ViaWhisper`, `RecognitionWhisper`, `GemHome`. They all
-  // shared the (linger, out) rhythm longhand; the verb names it. The
-  // call-site rhythm fence pins them to the same string forever.
-  // Mike napkin #N (Tanya UX §3) — `app/resonances/EvolutionThread.tsx`
-  // redeemed onto `whisper-linger`; the fourth site joins ViaWhisper /
-  // RecognitionWhisper / GemHome on the (linger, out) breath. The page's
-  // gold thread of memory now runs through chapter break + carrying divider
-  // + this whisper as one chord. The list ONLY shrinks.
-  // Sid napkin (Mike #9 / Tanya UIX #9) — `components/return/ReturnLetter.tsx`
-  // redeemed onto two verbs in one breath: the card transition reads
-  // `gestureClassesForMotion('reveal-keepsake', reduce)` (the killer-feature
-  // verb shows up at the front door for returning readers); the divider
-  // hairline reads `gestureClassesForMotion('fade-neutral', reduce)`. The
-  // file wires `useReducedMotion()` once at the component top — and, the
-  // load-bearing fix this PR ships, the `useEffect` phase timeline is also
-  // branched on `reduce` (Mike POI-1, Tanya §3): a returning reader with
-  // motion off lands at rest+settled in the same render with the dismiss
-  // button, Copy & Share, and Save as Image immediately interactive (no
-  // 1.2s gap). Three scattered `// alpha-ledger:exempt — motion fade
-  // endpoint` annotations are now joined by one paragraph header above
-  // the verb resolvers (Mike POI-3, Tanya §4.3) — three ledgers, one
-  // surface, one prose block. The list ONLY shrinks; one entry remains.
-  // Pinned by `components/return/__tests__/ReturnLetter.gestures.test.ts`.
-  'lib/resonances/visited-launcher.ts',
+  // receipt: closed at length 0 (Sid 2026-04-27). The fence forbids new
+  // entries; the line above this annotation IS the entire migration
+  // doctrine going forward. See JSDoc for the historical receipts.
 ] as const;
 
 /**

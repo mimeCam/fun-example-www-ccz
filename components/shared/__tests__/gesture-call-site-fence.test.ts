@@ -45,13 +45,15 @@
  *     re-exports, no aliasing. One source, one seam.
  *
  *   Axis C — No bare `duration-* ease-*` class composition outside the
- *     factory's own home (and the migration grandfather list).
+ *     factory's own home. The fence FORBIDS — it does not tolerate.
  *     If a future caller wants a duration/ease pair on a transition, the
  *     only legal route is `gestureClassesOf(verb)`. Catches the JIT-
- *     bypass shape `motion-adoption.test.ts` cannot see (templates).
- *     Path-allowlist mirrors `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS`:
- *     each grandfathered path is a migration receipt, the list shrinks
- *     only.
+ *     bypass shape `motion-adoption.test.ts` cannot see (templates). The
+ *     migration grandfather list (`GESTURE_GRANDFATHERED_PATHS`) is closed
+ *     at length 0 (Sid 2026-04-27, Mike #36) — it is preserved as the
+ *     structural seam that names the doctrine, not as a tolerance window.
+ *     Mirror of `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS` shape; same
+ *     shrink-only doctrine, same closure receipt.
  *
  *   Axis D — Cross-verb coherence is structural.
  *     Trivial: it's one table; pin the fact that the same verb at any two
@@ -333,8 +335,12 @@ describe('gesture-call-site-fence — Axis C · no `duration-X ease-Y` outside t
     if (violations.length > 0) throw new Error('\n' + violations.map(formatBareGesture).join('\n\n'));
   });
 
-  it('the grandfather list is non-empty during migration (it should ONLY shrink)', () => {
-    expect(GESTURE_GRANDFATHERED_PATHS.length).toBeGreaterThan(0);
+  it('the grandfather list is closed at length 0 — the fence forbids new entries', () => {
+    // Atlas closure (Sid 2026-04-27, Mike #36): doctrine flipped from
+    // *tolerate* to *forbid*. A future contributor's "temporary" re-add is
+    // a CI-red event, not a review-time conversation. The seam stays so
+    // the doctrine has a named home; the list stays empty by design.
+    expect(GESTURE_GRANDFATHERED_PATHS.length).toBe(0);
   });
 });
 

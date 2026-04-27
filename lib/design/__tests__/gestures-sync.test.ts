@@ -14,17 +14,23 @@
  *     `"duration-<beat> ease-<ease>"` for the matching row — the JIT-
  *     visibility lesson `alphaClassOf` already paid for, pinned per row;
  *   • `gestureInvariantHolds()` is `true` and the verb-list and class-
- *     table cardinalities agree (a verb without a class is drift).
+ *     table cardinalities agree (a verb without a class is drift);
+ *   • the table is locked at exactly thirteen verbs (the four-domain
+ *     vocabulary is seated; the rule-of-three for a 14th verb has not
+ *     fired) and `GESTURE_GRANDFATHERED_PATHS` is closed at length 0
+ *     (the fence forbids new entries, doctrine flipped from tolerate to
+ *     forbid in the Atlas-closure PR — Mike #36, Sid 2026-04-27).
  *
  * Pure: no DOM, no Jest jsdom warmup, no top-level side effects. Each
  * assertion ≤ 10 LoC.
  *
- * Credits: Mike K. (#9 — sync-test-as-invariant pattern lifted from
- * alpha-sync / motion-sync, the per-row enumeration shape), Tanya D.
- * (UIX #78 — the twelve verbs and their reduced policies, the felt-
- * sentence-as-JSDoc-string-stays-with-the-row rule we honor by reading
- * GESTURES directly instead of mirroring it), Elon M. (the typed-table-
- * is-the-registry teardown that justifies one test file, not two).
+ * Credits: Mike K. (#9, #36 — sync-test-as-invariant pattern lifted from
+ * alpha-sync / motion-sync, the per-row enumeration shape, the closed-
+ * list assertion at the structural seam), Tanya D. (UIX #78, #100 — the
+ * thirteen verbs and their reduced policies, the felt-sentence-as-JSDoc-
+ * string-stays-with-the-row rule we honor by reading GESTURES directly
+ * instead of mirroring it), Elon M. (the typed-table-is-the-registry
+ * teardown that justifies one test file, not two).
  */
 
 import {
@@ -155,8 +161,28 @@ describe('gestures — structural invariants', () => {
     expect(new Set<GestureVerb>(GESTURE_VERBS).size).toBe(GESTURE_VERBS.length);
   });
 
-  it('at least thirteen verbs — the four-domain vocabulary is seated', () => {
-    expect(GESTURE_VERBS.length).toBeGreaterThanOrEqual(13);
+  it('exactly thirteen verbs — the table is locked until rule-of-three fires for verb #14', () => {
+    expect(GESTURE_VERBS.length).toBe(13);
+  });
+});
+
+// ─── Tests — the grandfather list is CLOSED (fence flipped to forbid) ─────
+
+/**
+ * Atlas closure receipt — the structural pin (Mike #36 §3, Sid 2026-04-27).
+ * `GESTURE_GRANDFATHERED_PATHS` is checked here (not just `length === 0`)
+ * with `toEqual([])` so a future "temporary re-add" surfaces the offending
+ * entries in the failure message rather than just a count. The doctrine
+ * flip — *tolerate → forbid* — lives in the source, not in the comments.
+ */
+describe('gestures — the grandfather list is closed (length === 0, fence forbids)', () => {
+  it('GESTURE_GRANDFATHERED_PATHS is the empty array — no exceptions', () => {
+    expect(GESTURE_GRANDFATHERED_PATHS).toEqual([]);
+  });
+
+  it('the closed list still type-resolves as a readonly string[]', () => {
+    expect(Array.isArray(GESTURE_GRANDFATHERED_PATHS)).toBe(true);
+    expect(GESTURE_GRANDFATHERED_PATHS.length).toBe(0);
   });
 });
 
