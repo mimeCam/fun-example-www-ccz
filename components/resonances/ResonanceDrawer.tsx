@@ -12,10 +12,55 @@ import { Pressable } from '@/components/shared/Pressable';
 import { OverlayHeader } from '@/components/shared/OverlayHeader';
 import { Field } from '@/components/shared/Field';
 import { TextLink } from '@/components/shared/TextLink';
+import { alphaClassOf } from '@/lib/design/alpha';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'resonance-slot-cache';
 const MAX_CHARS = 280;
+
+/* ─── Echo Frame chassis (Tanya UX #12 §1.1) ────────────────────────── */
+/**
+ * The "Echo Frame" — the rose-ribbon quoted-line rectangle that paints
+ * twice in this file (form preview + ceremony). One register, never
+ * staggered (Tanya UX #62 §2). Hoisted here so both call sites paint
+ * byte-identical chrome — the Form → Ceremony transition reads as a
+ * state change *on the same object*, not a swap of two objects.
+ *
+ * Alpha bits route through `alphaClassOf` (Mike napkin #30 §"Path A"):
+ *   • surface  — `bg-background/50`  (recede; floats on the page)
+ *   • ribbon   — `border-rose/30`    (muted; the reader's voice marker)
+ *   • body     — `text-foreground/70` (quiet; cited, not authored here)
+ *
+ * Two callers in one file is a `const`, not a kernel (Mike #30 PoI #1).
+ * When a third caller arrives (e.g. Threshold quote register), THEN lift
+ * to `lib/design/`.
+ */
+const QUOTE_FRAME_SURFACE = alphaClassOf('background', 'recede', 'bg');
+const QUOTE_FRAME_RIBBON  = alphaClassOf('rose', 'muted', 'border');
+const QUOTE_FRAME_BODY    = alphaClassOf('foreground', 'quiet', 'text');
+
+const QUOTE_FRAME_CLASS = [
+  'mb-sys-5',
+  QUOTE_FRAME_SURFACE,
+  'border-l-2',
+  QUOTE_FRAME_RIBBON,
+  'rounded-sys-medium',
+  'p-sys-4',
+].join(' ');
+
+const QUOTE_BODY_CLASS = `${QUOTE_FRAME_BODY} italic text-sys-caption typo-caption`;
+
+/**
+ * Header hairline — divider between `<OverlayHeader>` and the form/ceremony
+ * body. Snapped off the `/20` off-ledger drift to the `hairline` rung
+ * ("it's geometry. The eye registers it as space, not surface." — Tanya
+ * UX #80 §2). Sister-surface continuity: the four-rung chrome register
+ * (`AmbientNav`, `ThreadKeepsake`, `QuoteKeepsake`, `Toast`) speaks at
+ * `muted`; this divider sits one rung lighter — it's a *separator inside
+ * a card-shaped overlay*, not the chrome around the viewport. Routed
+ * through `alphaClassOf` so the JIT sees the literal in source.
+ */
+const HEADER_HAIRLINE = alphaClassOf('fog', 'hairline', 'border');
 
 interface ResonanceDrawerProps {
   isOpen: boolean;
@@ -139,7 +184,7 @@ export function ResonanceDrawer({
         blurb={<>Why does <span className="sr-only">{articleTitle} </span>this matter to you?</>}
         onClose={onClose}
       />
-      <div className="mx-sys-6 border-t border-fog/20" />
+      <div className={`mx-sys-6 border-t ${HEADER_HAIRLINE}`} />
 
       <div className="flex-1 p-sys-6 pt-sys-5">
         <SlotIndicator used={usedSlots} total={SLOT_COUNT} pulsing={success} />
@@ -212,8 +257,8 @@ function CeremonyContent({
     <div className="resonance-success-enter">
       {quote && (
         <ResonanceShimmer intensity={shimmerIntensity} active={showShimmer}>
-          <div className={`mb-sys-5 bg-background/60 border-l-2 border-rose/40 rounded-sys-medium p-sys-4 ${settledClass}`}>
-            <p className="text-foreground/70 italic text-sys-caption typo-caption">
+          <div className={`${QUOTE_FRAME_CLASS} ${settledClass}`.trim()}>
+            <p className={QUOTE_BODY_CLASS}>
               &ldquo;{quote}&rdquo;
             </p>
           </div>
@@ -263,8 +308,8 @@ function DrawerForm({
 
 function QuotePreview({ quote }: { quote: string }) {
   return (
-    <div className="mb-sys-5 bg-background/60 border-l-2 border-rose/40 rounded-sys-medium p-sys-4">
-      <p className="text-foreground/70 italic text-sys-caption typo-caption">
+    <div className={QUOTE_FRAME_CLASS}>
+      <p className={QUOTE_BODY_CLASS}>
         &ldquo;{quote}&rdquo;
       </p>
     </div>
@@ -320,3 +365,25 @@ function SlotsFullMessage() {
     </div>
   );
 }
+
+/* ─── Test handles — Echo Frame chassis (Mike napkin #30 §DoD) ────── */
+/**
+ * Surfaces the hoisted Echo-Frame tokens to
+ * `components/resonances/__tests__/ResonanceDrawer.alpha.test.ts`. The
+ * pin asserts each handle resolves to the canonical `alphaClassOf(...)`
+ * literal AND to its expected wire-format (e.g. `bg-background/50`),
+ * so a future rung-vocabulary swap cannot silently shift the register.
+ *
+ * Mirror of the `__testing__` shape used by `ResonanceEntry.tsx`,
+ * `ThreadKeepsake.tsx`, etc. — readonly, tree-shaken from runtime
+ * consumers, exists only for the SSR pin.
+ */
+export const __testing__ = {
+  QUOTE_FRAME_CLASS,
+  QUOTE_BODY_CLASS,
+  QUOTE_FRAME_SURFACE,
+  QUOTE_FRAME_RIBBON,
+  QUOTE_FRAME_BODY,
+  CeremonyContent,
+  QuotePreview,
+} as const;

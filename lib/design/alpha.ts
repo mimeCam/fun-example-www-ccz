@@ -363,12 +363,39 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   (the function call IS the vocabulary — Tanya §5). Pinned in
   //   `components/shared/__tests__/Toast.alpha.test.ts`.
   //   The list ONLY shrinks.
+  // Live drifter retired (Mike napkin #30 — Quote-Frame Const, Grandfather
+  //   Shrink — + Tanya UIX #12 §1 — The Echo Frame, Sid 2026-04-27):
+  //   `components/resonances/ResonanceDrawer.tsx` — the duplicated quoted-
+  //   line frame ("the Echo Frame" — the single surface where "the blog
+  //   reads you back" becomes literal pixels) graduates off the alpha
+  //   grandfather list. Two drift sites snapped + literal hoisted to a
+  //   module-scope `QUOTE_FRAME_CLASS` const so the form-preview and
+  //   ceremony render paths paint byte-identical chrome:
+  //     surface — `bg-background/60` → `alphaClassOf('background','recede',
+  //                'bg')` (= `bg-background/50`; "context around the
+  //                subject" — the line floats on the page, not in a
+  //                pulled-out card).
+  //     ribbon  — `border-rose/40`   → `alphaClassOf('rose','muted',
+  //                'border')` (= `border-rose/30`; the reader's voice
+  //                marker, ambient-chrome rung — siblings the
+  //                `ResonanceEntry` dimmed ribbon at the same `muted`
+  //                rung; one register, two surfaces).
+  //   Plan A snap from Mike napkin #30 §PoI #2 — half a rung in each
+  //   direction, both arrive on the ledger; Path B (hoist + grandfather)
+  //   was the fallback if UX rejected the snap (it didn't — Tanya UIX
+  //   #12 §1.1 ratifies the rung anchors). Three callers across the
+  //   project now sit on `border-rose/30` (`ResonanceEntry` dimmed,
+  //   `ResonanceDrawer` form, `ResonanceDrawer` ceremony) — the rose
+  //   ribbon speaks at one rung site-wide. No kernel-lift to
+  //   `lib/design/`: two callers in one file is a const, not a kernel
+  //   (Mike #30 §PoI #1 / Elon §2). Pinned in
+  //   `components/resonances/__tests__/ResonanceDrawer.alpha.test.ts`.
+  //   The list ONLY shrinks.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonancesClient.tsx',
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
   'components/home/ViaWhisper.tsx',
-  'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',
 ] as const;

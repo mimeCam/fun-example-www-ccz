@@ -128,8 +128,12 @@ function StaggeredIconBtn({ onClick, label, icon, delay, reduce }: {
  * The tooltip remains the visible verb (`Copy Link` ↔ `Copied!`); the
  * canonical primitive owns the icon glyph swap, the settled hold dwell,
  * and the SR-only `aria-live="polite"` receipt. Wrapper paints
- * `relative group` so the existing tooltip's `group-hover:opacity-100`
+ * `relative group` so the existing tooltip's hover-opacity transition
  * still pivots off the parent's hover state. (Mike napkin #100 §5 path A.)
+ *
+ * alpha-ledger:exempt — JSDoc reference, not a class literal. The actual
+ *   `opacity-0` / `group-hover:opacity-100` Motion fade endpoints live on
+ *   `<Tooltip>`'s JSX with their own carve-out comment (see line ~217).
  */
 function StaggeredCopyLink({ onClick, slot, delay, reduce }: {
   onClick: () => void; slot: UseActionPhaseResult; delay: number; reduce: boolean;

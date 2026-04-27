@@ -1503,20 +1503,26 @@ body {
   overflow: hidden;
 }
 
-/* The child content (quote card) — border transitions from rose to gold. */
+/* The child content (quote card) — gold halo glow during shimmer.
+   Tanya UIX #12 §3.1: the left ribbon stays rose end-to-end (the reader's
+   voice marker). Only the radius + box-shadow speak gold here; the
+   border-color override that previously turned the rose ribbon gold has
+   been removed so the marker survives the sweep without flickering. */
 .resonance-shimmer > :first-child {
-  border-color: color-mix(in srgb, var(--gold) 60%, transparent) !important;
   border-radius: var(--sys-radius-wide);
   box-shadow: 0 0 20px color-mix(in srgb, var(--gold) 15%, transparent);
-  transition: border-color var(--sys-anim-reveal) var(--sys-ease-out),  /* reveal = gold border sweeps in */
+  transition: border-color var(--sys-time-linger) var(--sys-ease-out),  /* linger = ribbon-warm heartbeat (Tanya §1.2) */
               border-radius var(--sys-anim-enter) var(--sys-ease-out),  /* enter = radius closes on entry */
               box-shadow var(--sys-anim-reveal) var(--sys-ease-out);
 }
 
-/* Gold sweep pseudo-element — one-shot left-to-right. */
+/* Gold sweep pseudo-element — one-shot left-to-right.
+   `inset: 0 0 0 4px` keeps the sweep clear of the 2px rose ribbon
+   (ribbon width + 2px cushion, Tanya UIX #12 §3.1). The sweep animates
+   across the body of the line; the ribbon stays rose throughout. */
 .resonance-shimmer-sweep {
   position: absolute;
-  inset: 0;
+  inset: 0 0 0 4px;
   pointer-events: none;
   background: linear-gradient(
     90deg,
@@ -1573,24 +1579,33 @@ body {
   box-shadow: 0 0 24px color-mix(in srgb, var(--gold) 25%, transparent);
 }
 
-/* Settled state — border stays gold/40, glow fades. */
+/* Settled state — ribbon warms one rung (rose/30 → rose/50), glow fades.
+   Tanya UIX #12 §1.2: "the ribbon warms over one MOTION.linger beat" —
+   the smallest possible felt acknowledgement that the room remembers,
+   without the gold-border swap that previously hid the reader's marker
+   under the room's voice. Surface stays at /50 (no fill change); the
+   warmth lives at the edge, not the center. */
 .resonance-shimmer--settled > :first-child {
-  border-color: color-mix(in srgb, var(--gold) 40%, transparent) !important;
+  border-color: color-mix(in srgb, var(--rose) 50%, transparent);
   box-shadow: none;
 }
 .resonance-shimmer--settled .resonance-shimmer-sweep {
   display: none;
 }
 
-/* Respect reduced motion — static gold border, no sweep, no text glow. */
+/* Respect reduced motion — ribbon lands directly at the warm rung, no
+   sweep, no text glow (Tanya UIX #12 §1.2 reduced-motion floor). */
 @media (prefers-reduced-motion: reduce) {
   .resonance-shimmer-sweep {
     animation: none;
     display: none;
   }
   .resonance-shimmer > :first-child {
-    border-color: color-mix(in srgb, var(--gold) 40%, transparent) !important;
     box-shadow: none;
+    transition: none;
+  }
+  .resonance-shimmer--settled > :first-child {
+    border-color: color-mix(in srgb, var(--rose) 50%, transparent);
   }
   .resonance-shimmer > :first-child p {
     animation: none;
