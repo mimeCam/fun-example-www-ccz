@@ -68,8 +68,14 @@
  * Mike §5; not promoted to project doctrine).
  */
 
-import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import {
+  preloadFiles,
+  readBalancedDelimiters,
+  lineAt,
+  stripCommentsAndTemplates as preprocess,
+} from './_jsx-fence-walker';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
@@ -78,61 +84,15 @@ const ROOT = join(__dirname, '..', '..', '..');
 /** The directional glyphs we forbid as a label suffix. Order does not matter. */
 const FORBIDDEN_TRAILING_GLYPHS: readonly string[] = ['→', '↗', '⟶', '›', '»'];
 
-// ─── File walker (pure, ≤10 LOC each — pattern-cloned from empty-adoption)
+// ─── Scan footprint (the walker primitives live in `_jsx-fence-walker.ts`)
 
+/** This fence's directories — the kernel walks them, this file owns the list. */
 const SCAN_DIRS: readonly string[] = ['app', 'components', 'lib/sharing'];
-const SCAN_EXTS: ReadonlySet<string> = new Set<string>(['.ts', '.tsx']);
 
-function isScannableFile(path: string): boolean {
-  const ext = path.slice(path.lastIndexOf('.'));
-  if (!SCAN_EXTS.has(ext)) return false;
-  if (path.endsWith('.test.ts') || path.endsWith('.test.tsx')) return false;
-  if (path.endsWith('.d.ts')) return false;
-  return !path.includes(`${sep}__tests__${sep}`);
-}
-
-function walk(dir: string, acc: string[] = []): string[] {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) walk(full, acc);
-    else if (isScannableFile(full)) acc.push(full);
-  }
-  return acc;
-}
-
-function collectFiles(): string[] {
-  return SCAN_DIRS.flatMap((d) => walk(join(ROOT, d)));
-}
-
-function relativePath(full: string): string {
-  return relative(ROOT, full).split(sep).join('/');
-}
-
-// ─── Comment / template stripping (so prose docs cannot trigger) ──────────
-
-function stripComments(src: string): string {
-  const blocks = src.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
-  return blocks.replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
-}
-
-function preprocess(src: string): string {
-  return stripComments(src);
-}
-
-function lineAt(src: string, index: number): number {
-  return src.slice(0, index).split(/\r?\n/).length;
-}
-
-// ─── Balanced-brace reader (the `primary={{ … }}` body, recursively) ──────
-
+/** Read a `{ … }` body and return just the substring (back-compat shape). */
 function readBalancedBraces(src: string, start: number): string | null {
-  let depth = 0;
-  for (let i = start; i < src.length; i++) {
-    const c = src[i];
-    if (c === '{') depth++;
-    else if (c === '}') { depth--; if (depth === 0) return src.slice(start + 1, i); }
-  }
-  return null;
+  const r = readBalancedDelimiters(src, start, '{', '}');
+  return r === null ? null : r.body;
 }
 
 // ─── EmptySurface attribute extraction ─────────────────────────────────────
@@ -225,20 +185,10 @@ function classifyLabel(
   return [{ file: rel, line: lineAt(src, callIndex), prop, label: hit.value, glyph }];
 }
 
-// ─── Single-pass collector (memoized — multiple describes read it) ────────
+// ─── Per-fence violation memo (the file-preload cache lives in the kernel) ─
 
-interface FilePreload { rel: string; src: string }
-
-let cachedFiles: FilePreload[] | null = null;
-
-function preloadAll(): FilePreload[] {
-  if (cachedFiles !== null) return cachedFiles;
-  cachedFiles = collectFiles().map((p) => ({
-    rel: relativePath(p),
-    src: preprocess(readFileSync(p, 'utf8')),
-  }));
-  return cachedFiles;
-}
+/** Read-once memo for the label-axis sweep (Axis A's expensive flatMap). */
+const preloadAll = (): readonly { rel: string; src: string }[] => preloadFiles(SCAN_DIRS);
 
 let cachedLabelViolations: LabelViolation[] | null = null;
 

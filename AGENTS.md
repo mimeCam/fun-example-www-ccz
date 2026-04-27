@@ -5,31 +5,23 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 
 ## Key Paths
 - `lib/thermal/` — score engine, tokens, ceremony
-- `lib/design/` — 8 ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), voice-ledger, WCAG contrast pairs
-- `lib/design/hue.ts` — canonical hex↔RGB↔HSL kernel + `circularHueDelta` + `oklchDeltaE`
-- `lib/design/hue-distance.ts` — per-surface dual-axis audit kernel (Δh + ΔE)
+- `lib/design/` — 8 design ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index), WCAG contrast pairs
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG, toast-store
-- `lib/ceremony/` — quiet-store (gifting-phase pub/sub)
-- `lib/mirror/` — archetype scoring + archetype-store
-- `lib/return/` — recognition-surface selector
-- `lib/thread/` — ThreadPulse: RAF sub-pixel depth driver for Golden Thread
-- `lib/hooks/` — phase-machine hooks (Threshold, Press, Field, useToast, etc.)
-- `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons, etc.
-- `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark, etc.
-- `lib/resonances/` — visited-launcher paint resolver (session-scoped launcher repaint)
-- `lib/engagement/` — loop-funnel (4-checkpoint reader-loop persistence), `archetype-bucket` (deterministic ~10% control split, FNV-1a, SSR-safe), `funnel-by-archetype` (grouped read path), `funnel-lift` (pure stats — rates, lift, Wilson 95% CI). Read at token-gated `/admin/funnel` or `/api/loop/funnel?breakdown=archetype`.
-- `components/articles/` — QuoteKeepsake (quote-card host #2 for direct-gesture asymmetry)
+- `lib/engagement/` — loop-funnel, archetype-bucket, funnel stats
+- `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons
+- `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark
+- `components/articles/` — QuoteKeepsake
+- `components/shared/__tests__/_jsx-fence-walker.ts` — shared transport kernel for call-site fences
 - `scripts/` — build-time codegen
 
 ## Core Feature
-"The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible — Thread Keepsake lets readers share a unique artifact of *their* read.
+"The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible.
 
-## Design System Rules
-**Direct-gesture asymmetry.** When a user gesture has a fingertip-local witness (an `<ActionPressable>` or equivalent: glyph swap + verb tense flip + same-source `<PhaseAnnouncement>` sr-only peer), success stays at the fingertip — no toast. Failure escalates one level to the room (warn-intent toast) because the reader needs to know when the contract breaks. Surfaces with no fingertip witness (e.g. `runShare`'s `navigator.share` failover) opt in to the room voice explicitly via `copyWithFeedback(text, { announce: 'room' })`. *Primary buttons are not exempt. If a fingertip witness fits the verb, the primary uses it too — visual prominence does not change the witness selection.* Prose, not a token — the registry earns its keep on the third independent reintroduction (Mike rule of three; doctrine: Mike #70 §A — *"no ninth ledger; the type-pinned tuple is the only registry"*).
-
-**Voice peer — explicit `announce:` at every share call site.** Every `copyWithFeedback(...)` invocation under `app/` and `components/` MUST spell `announce: 'fingertip' | 'room'` literally — no inferred default, no template literal, no ternary. The helper still defaults to `'fingertip'` (unit tests + helper-internal fixtures rely on it), but at the *reader-facing call site* the decision must be visible. The fence lives at `lib/sharing/__tests__/voice-call-site-fence.test.ts` (4 axes — explicit announce · allowed values · canonical import · share-failover opts into `'room'`). This is regression lint #2 (#1 = `lean-arrow-fence`); call-site-fence pattern stays per-fence until #3 (Color peer next sprint) earns the helper extraction (rule of three). Tanya UX §9 / Mike voice-peer #76 / Paul "Protect the Pause".
-
-**Verb-primitives spell the same word in component name, file path, CSS class, test pin, and JSDoc — drift is debt.** Today's only verb is `<LeanArrow />`/`.lean-arrow` (Krystle #32, Mike #87, Tanya UIX #79); the local *Address Test* for that one verb lives as prose in `LeanArrow.tsx` JSDoc and as Axes E–F in `lean-arrow-fence.test.ts`. Axis F pins load-bearing JSDoc claims to falsifiable test peers (no props, reduced-motion silence, forced-colors via currentColor). Do NOT promote the rule to project doctrine, nor sweep `components/shared/` (mostly nouns), until verb-primitive #3 graduates — then factor out a shared fence helper (rule of three).
+## Design Rules
+- **Direct-gesture asymmetry:** fingertip witness → no toast; no witness → room voice via `announce: 'room'`
+- **Voice peer:** `copyWithFeedback()` must spell `announce:` literally at every call site (fence: `lib/sharing/__tests__/voice-call-site-fence.test.ts`)
+- **Alpha call-site:** `alphaClassOf()` must pass quoted literals — no variables, no templates (fence: `components/shared/__tests__/alpha-call-site-fence.test.ts`)
+- **Verb-primitives:** component name, file path, CSS class, test pin, JSDoc all spell the same word. Do not promote to doctrine until verb #3
 
 ## WIP
 - *(none)*

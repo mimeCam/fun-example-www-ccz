@@ -54,97 +54,28 @@
  * QuoteKeepsake/ThreadKeepsake announce: 'fingertip' make-explicit).
  */
 
-import { readFileSync, readdirSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import {
+  preloadFiles,
+  readBalancedDelimiters,
+  lineAt,
+} from '@/components/shared/__tests__/_jsx-fence-walker';
 
-const ROOT = join(__dirname, '..', '..', '..');
-
-// ─── Scan footprint ───────────────────────────────────────────────────────
+// ─── Scan footprint (the walker primitives live in `_jsx-fence-walker.ts`) ─
 
 const SCAN_DIRS: readonly string[] = ['app', 'components'];
-const SCAN_EXTS: ReadonlySet<string> = new Set<string>(['.ts', '.tsx']);
 
 const ALLOWED_ANNOUNCE: ReadonlySet<string> = new Set(['fingertip', 'room']);
 
 const CANONICAL_IMPORT = '@/lib/sharing/clipboard-utils';
 
-// ─── File walker (pattern-cloned from lean-arrow-fence; ≤ 10 LOC each) ────
-
-function isScannableFile(path: string): boolean {
-  const ext = path.slice(path.lastIndexOf('.'));
-  if (!SCAN_EXTS.has(ext)) return false;
-  if (path.endsWith('.test.ts') || path.endsWith('.test.tsx')) return false;
-  if (path.endsWith('.d.ts')) return false;
-  return !path.includes(`${sep}__tests__${sep}`);
-}
-
-function walk(dir: string, acc: string[] = []): string[] {
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const full = join(dir, entry.name);
-    if (entry.isDirectory()) walk(full, acc);
-    else if (isScannableFile(full)) acc.push(full);
-  }
-  return acc;
-}
-
-function collectFiles(): string[] {
-  return SCAN_DIRS.flatMap((d) => walk(join(ROOT, d)));
-}
-
-function relativePath(full: string): string {
-  return relative(ROOT, full).split(sep).join('/');
-}
-
-// ─── Comment / template stripping (so prose docs cannot trigger) ──────────
-
-function stripComments(src: string): string {
-  const blocks = src.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
-  return blocks.replace(/\/\/[^\n]*/g, (m) => ' '.repeat(m.length));
-}
-
-function stripTemplates(src: string): string {
-  return src.replace(/`[^`]*`/g, (m) => m.replace(/[^\n]/g, ' '));
-}
-
-function preprocess(src: string): string {
-  return stripTemplates(stripComments(src));
-}
-
-function lineAt(src: string, index: number): number {
-  return src.slice(0, index).split(/\r?\n/).length;
-}
-
-// ─── Balanced-paren reader (the `copyWithFeedback(...)` body) ─────────────
-
-/**
- * Read the contents between a paren at `start` and its matching close,
- * accounting for nested `(` `{` `[` and string literals. Returns `null`
- * when the source ends before the close paren — defensive, not load-bearing.
- */
+/** Read a balanced `(…)` body and return just the substring (back-compat shape). */
 function readBalancedParens(src: string, start: number): string | null {
-  let depth = 0;
-  for (let i = start; i < src.length; i++) {
-    const c = src[i];
-    if (c === '(') depth++;
-    else if (c === ')') { depth--; if (depth === 0) return src.slice(start + 1, i); }
-  }
-  return null;
+  const r = readBalancedDelimiters(src, start, '(', ')');
+  return r === null ? null : r.body;
 }
 
-// ─── Single-pass collector (memoized — three describes share the read) ───
-
-interface FilePreload { rel: string; src: string; raw: string }
-
-let cachedFiles: FilePreload[] | null = null;
-
-function preloadAll(): FilePreload[] {
-  if (cachedFiles !== null) return cachedFiles;
-  cachedFiles = collectFiles().map((p) => {
-    const raw = readFileSync(p, 'utf8');
-    return { rel: relativePath(p), src: preprocess(raw), raw };
-  });
-  return cachedFiles;
-}
+/** Per-fence preload — the kernel does the read; this binds to our SCAN_DIRS. */
+const preloadAll = (): readonly { rel: string; src: string }[] => preloadFiles(SCAN_DIRS);
 
 // ─── Call-site extractor ──────────────────────────────────────────────────
 
@@ -254,21 +185,22 @@ interface BadImport { file: string; line: number; from: string }
  * For every file that uses `copyWithFeedback`, find its `import` and
  * confirm the source path is the canonical one. We keep the regex narrow
  * (one import statement per file in practice) so the failure points at
- * the actual offending line.
+ * the actual offending line. The walker preserves newlines under stripping,
+ * so `lineAt(src, ...)` agrees with the raw source line numbers.
  */
-function scanBadImports(rel: string, src: string, raw: string): BadImport[] {
+function scanBadImports(rel: string, src: string): BadImport[] {
   if (!/\bcopyWithFeedback\b/.test(src)) return [];
   const m = src.match(/import\s*\{[^}]*\bcopyWithFeedback\b[^}]*\}\s*from\s*(['"])([^'"]+)\1/);
   if (m === null) return [];
   if (m[2] === CANONICAL_IMPORT) return [];
-  return [{ file: rel, line: lineAt(raw, raw.indexOf(m[0])), from: m[2] }];
+  return [{ file: rel, line: lineAt(src, src.indexOf(m[0])), from: m[2] }];
 }
 
 let cachedBadImports: BadImport[] | null = null;
 
 function scanAllBadImports(): BadImport[] {
   if (cachedBadImports !== null) return cachedBadImports;
-  cachedBadImports = preloadAll().flatMap(({ rel, src, raw }) => scanBadImports(rel, src, raw));
+  cachedBadImports = preloadAll().flatMap(({ rel, src }) => scanBadImports(rel, src));
   return cachedBadImports;
 }
 
@@ -303,20 +235,9 @@ function failoverViolationsAt(
   rel: string, src: string, headIndex: number, headLen: number,
 ): FailoverViolation[] {
   const bodyOpen = headIndex + headLen - 1;
-  const body = readBalancedBraces(src, bodyOpen);
-  if (body === null) return [];
-  return classifyFailover(rel, src, headIndex, body);
-}
-
-/** Skim a `{ … }` block for balanced braces. ≤ 10 LOC. */
-function readBalancedBraces(src: string, start: number): string | null {
-  let depth = 0;
-  for (let i = start; i < src.length; i++) {
-    const c = src[i];
-    if (c === '{') depth++;
-    else if (c === '}') { depth--; if (depth === 0) return src.slice(start + 1, i); }
-  }
-  return null;
+  const r = readBalancedDelimiters(src, bodyOpen, '{', '}');
+  if (r === null) return [];
+  return classifyFailover(rel, src, headIndex, r.body);
 }
 
 function classifyFailover(
