@@ -59,7 +59,7 @@ import { __testing__ } from '../ReturnLetter';
 import { RecognitionWhisper } from '../RecognitionWhisper';
 
 const { LetterCard, CompactGreeting, phaseStyles } = __testing__;
-const { LABEL_RECEDE, CLOSING_QUIET, COMPACT_QUIET, DIVIDER_HAIRLINE, BORDER_HAIRLINE } = __testing__;
+const { LABEL_RECEDE, CLOSING_QUIET, COMPACT_QUIET, BORDER_HAIRLINE } = __testing__;
 
 // ─── Tiny helpers — pure, ≤ 10 LOC each ────────────────────────────────────
 
@@ -135,10 +135,11 @@ describe('ReturnLetter — alpha-ledger handles point at the canonical rungs', (
     expect(COMPACT_QUIET).toBe('text-mist/70');
   });
 
-  it('DIVIDER_HAIRLINE is bg-accent/10 (geometry, not surface)', () => {
-    expect(DIVIDER_HAIRLINE).toBe(alphaClassOf('accent', 'hairline', 'bg'));
-    expect(DIVIDER_HAIRLINE).toBe('bg-accent/10');
-  });
+  // DIVIDER_HAIRLINE assertion retired (Sid · Tanya UIX #28 §3.2): the
+  // section-divider primitive moved to `<Divider.Reveal />`; the kernel
+  // paints `bg-gold/10` by construction (the canonical-accent rung, not
+  // archetype-tinted). The handle is gone from the production file; the
+  // contract migrates to `components/shared/__tests__/Divider.test.ts`.
 
   it('BORDER_HAIRLINE is border-accent/10 (a border IS a line)', () => {
     expect(BORDER_HAIRLINE).toBe(alphaClassOf('accent', 'hairline', 'border'));
@@ -162,10 +163,15 @@ describe('LetterCard — every snapped surface paints the ledger rung', () => {
     expect(html).not.toContain('text-foreground/90');
   });
 
-  it('divider uses bg-accent/10 (= `hairline`, not /20 drift)', () => {
-    expect(html).toContain(DIVIDER_HAIRLINE);
-    expect(html).toContain(alphaClassOf('accent', 'hairline', 'bg'));
+  it('divider renders the gold/10 hairline (= `hairline`, kernel-owned)', () => {
+    // The section-divider primitive moved to `<Divider.Reveal />`. The
+    // kernel paints `bg-gold/10` by construction (Tanya §3.2 veto on the
+    // archetype-tinted dialect). No bare `bg-accent/<N>` survives in the
+    // SSR markup of this card — divider geometry is no longer this file's
+    // responsibility. (Sid · Mike #37 §5 / Tanya UIX #28 §3.2.)
+    expect(html).toContain('bg-gold/10');
     expect(html).not.toContain('bg-accent/20');
+    expect(html).not.toContain('bg-accent/10');
   });
 
   it('closing uses text-foreground/70 (= `quiet`, not /80 drift)', () => {

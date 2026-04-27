@@ -19,6 +19,7 @@ import { ARCHETYPE_COLORS } from '@/lib/content/content-layers';
 import { useMirrorPhases, MIRROR_PAGE_TIMINGS, type Phase } from '@/lib/hooks/useMirrorPhases';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import ShareOverlay from './ShareOverlay';
+import { Divider } from '@/components/shared/Divider';
 import { MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
@@ -64,7 +65,14 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
         <RevealLabel visible={showContent} color={colors.hex} reduce={reduce} />
         <ArchetypeName label={mirror.archetypeLabel} visible={showContent} color={colors.hex} />
         <WhisperQuote text={mirror.whisper} visible={showContent} reduce={reduce} />
-        <GoldDivider visible={showContent} color={colors.hex} reduce={reduce} />
+        {/* Divider — the section-divider primitive (Sid · Tanya UIX #28
+            §3.2 / Mike #37 §5). The archetype-tinted dialect this card used
+            to speak (`<GoldDivider color={colors.hex}>`) retired with the
+            kernel landing — Tanya's veto: warmth lives in the surrounding
+            card glow, the archetype name's hue, and the GoldenThread on the
+            page edge; the divider stays gold/10 like everywhere else.
+            Layer separation is what makes layers feel right. */}
+        <Divider.Reveal visible={showContent} reduce={reduce} spacing="sys-6" />
         {showShares && <ShareOverlay result={shareResult} articleId={articleId} />}
       </div>
     </div>
@@ -129,23 +137,13 @@ function WhisperQuote({ text, visible, reduce }: {
   );
 }
 
-function GoldDivider({ visible, color, reduce }: {
-  visible: boolean; color: string; reduce: boolean;
-}) {
-  // Alpha ledger: `muted` (0.30) — "ambient chrome; skip past it."
-  // Same rung as the GoldenThread fading posture. Reduced-motion:
-  // `fade-neutral` policy = `shorten` → 120ms crossfade-floor; the divider
-  // lands at scale-x-1 nearly instantly. Tanya UX §4.1.
-  // gesture-ledger:exempt — `transition-transform` continuous gesture; no
-  // verb minted (rule of three not met — the only consumer of this rhythm
-  // is this card; the orphan sibling was retired). Tanya UX "One Mirror,
-  // One Room" §3 + Mike napkin #88 §4.
-  return (
-    <div className={`my-sys-6 h-px max-w-divider mx-auto transition-transform ${FADE_GESTURE(reduce)} opacity-muted
-      ${visible ? 'scale-x-100' : 'scale-x-0'}`}
-      style={{ backgroundColor: color }} />
-  );
-}
+/* `GoldDivider` retired (Sid · Tanya UIX #28 §3.2 / Mike #37 §5): the
+   section-divider primitive moved to `<Divider.Reveal />`. The archetype-
+   tinted dialect (the `style={{ backgroundColor }}` hex hatch + the
+   `opacity-muted` rung that diverged from the gold/10 single-rung
+   doctrine) retires with the lift. The kernel owns geometry, motion, and
+   the reduced-motion floor in one place. Six near-duplicates collapse to
+   one frozen primitive. */
 
 /* ─── Helpers ───────────────────────────────────────────── */
 

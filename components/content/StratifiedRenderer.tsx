@@ -21,6 +21,7 @@ import {
   getExtensionBorderColor,
 } from '@/lib/content/content-layers';
 import { passageThermalClass } from '@/lib/design/typography';
+import { Divider } from '@/components/shared/Divider';
 import { NewContentBadge } from './NewContentBadge';
 
 interface StratifiedRendererProps {

@@ -21,6 +21,7 @@ import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
 import { DismissButton } from '@/components/shared/DismissButton';
+import { Divider } from '@/components/shared/Divider';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import { CopyIcon } from '@/components/shared/Icons';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
@@ -43,14 +44,17 @@ import { swapWidthClassOf } from '@/lib/design/swap-width';
 //   • LABEL_RECEDE     — "the frame around the subject" (the kicker label).
 //   • CLOSING_QUIET    — "the closing of a letter" (verbatim).
 //   • COMPACT_QUIET    — "content, but not THE content" (hushed greeting).
-//   • DIVIDER_HAIRLINE — "it's geometry; the eye registers it as space."
-//   • BORDER_HAIRLINE  — same: a border IS a line. Shadow owns elevation.
+//   • BORDER_HAIRLINE  — a border IS a line. Shadow owns elevation.
+//
+// `DIVIDER_HAIRLINE` retired (Sid · Tanya UIX #28 §3.2 / Mike #37 §5):
+// the section-divider primitive moved to `<Divider.Reveal />`, the
+// kernel paints gold/10 by construction, and the archetype-tinted
+// dialect is vetoed at the kernel level. The handle is gone with it.
 
-const LABEL_RECEDE     = alphaClassOf('accent',     'recede',   'text');   // text-accent/50
-const CLOSING_QUIET    = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
-const COMPACT_QUIET    = alphaClassOf('mist',       'quiet',    'text');   // text-mist/70
-const DIVIDER_HAIRLINE = alphaClassOf('accent',     'hairline', 'bg');     // bg-accent/10
-const BORDER_HAIRLINE  = alphaClassOf('accent',     'hairline', 'border'); // border-accent/10
+const LABEL_RECEDE    = alphaClassOf('accent',     'recede',   'text');   // text-accent/50
+const CLOSING_QUIET   = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
+const COMPACT_QUIET   = alphaClassOf('mist',       'quiet',    'text');   // text-mist/70
+const BORDER_HAIRLINE = alphaClassOf('accent',     'hairline', 'border'); // border-accent/10
 
 // ─── Timing — sourced from motion tokens ───────────────────
 
@@ -284,7 +288,6 @@ function LetterCard({
   }, [letter]);
 
   const visible = phase === 'rest';
-  const dividerScale = phase === 'approach' ? 'scaleX(0)' : 'scaleX(1)';
 
   // Posture-first corner: the helper resolves to the canonical thermal-radius
   // class. The literal lives in `lib/design/radius.ts` only — this surface
@@ -324,14 +327,13 @@ function LetterCard({
           {para}
         </p>
       ))}
-      {/* Divider — `hairline` (0.10): geometry, not surface. The transform
-          rides `fade-neutral` (Tanya §2.2: "one thing dissolves while another
-          arrives — neither rushing"). The verb resolves to the (fade, sustain)
-          row at full motion and to the crossfade floor under reduce — same
-          row the Copy/Share label swap rides. */}
-      <div className="my-sys-7 flex justify-center">
-        <div className={`h-px max-w-divider ${DIVIDER_HAIRLINE} transition-transform ${FADE_GESTURE(reduce)} ${dividerScale}`} />
-      </div>
+      {/* Divider — `Divider.Reveal` (Sid · Mike #37 / Tanya UIX #28). The
+          section-divider primitive owns geometry (gold/10 hairline at 120px
+          with rounded endpoints), motion (fade-neutral verb, scale-x reveal
+          gated on `visible`), and the reduced-motion floor in one place.
+          The `accent`-tinted dialect this site used to speak retired with
+          the kernel landing — Tanya §3.2 veto. */}
+      <Divider.Reveal visible={visible} reduce={reduce} spacing="sys-7" />
       {/* Closing — `quiet` (0.70): "the closing of a letter."
           Pair invariant: same rung as the whisper-quote register in
           RecognitionWhisper. Pinned in __tests__/ReturnLetter.alpha. */}
@@ -452,6 +454,5 @@ export const __testing__ = {
   LABEL_RECEDE,
   CLOSING_QUIET,
   COMPACT_QUIET,
-  DIVIDER_HAIRLINE,
   BORDER_HAIRLINE,
 } as const;
