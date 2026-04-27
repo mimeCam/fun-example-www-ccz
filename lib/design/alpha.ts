@@ -290,13 +290,33 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   Pair-snap heuristic only; no `preview-frame.ts` kernel-lift (rule
   //   of three; N=2 is two callers, not a kernel — Elon §2). Pinned in
   //   `components/reading/__tests__/ThreadKeepsake.alpha.test.ts`.
+  // Live drifter retired (Mike napkin #110 §4 + Tanya UIX #43, Sid
+  //   2026-04-27): `AmbientNav.tsx` — chassis graduated to the Voice
+  //   Ledger via the new `navBarChassis()` resolver in
+  //   `lib/design/nav-paint.ts`. Two literals were on the bar's frame:
+  //     hairline — `border-fog/20` → `alphaClassOf('fog','muted','border')`
+  //                (= `border-fog/30`). Third occurrence of the pair-snap
+  //                after `ThreadKeepsake bdb7608` and `QuoteKeepsake
+  //                3f25b18`; rule-of-three threshold (Mike #110 §6) —
+  //                licenses the snap, NOT a kernel-lift. Sister chrome
+  //                surfaces now share the `muted` rung (Tanya UIX #43 §2.1).
+  //     scrim    — `bg-void/80 backdrop-blur-sm` → exempt token. `void`
+  //                ∉ ALPHA_COLOR_FAMILIES, `/80` ∉ legal rungs; routing
+  //                through `alphaClassOf` would either lie about the
+  //                scrim or dilute the four-rung discipline. The
+  //                `// alpha-ledger:exempt — structural scrim` token
+  //                inside `navBarChassis()` is the audit trail (Elon #80
+  //                option (a), adopted verbatim).
+  //   The AmbientNav source now contains zero `bg-void/<N>` and zero
+  //   `border-fog/<N>` matches; the chassis fence (§1 of
+  //   `nav-voice-adoption.test.ts`, widened) catches re-introduction.
+  //   The list ONLY shrinks.
   'app/resonances/EvolutionThread.tsx',
   'app/resonances/ResonanceEntry.tsx',
   'app/resonances/ResonancesClient.tsx',
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
   'components/home/ViaWhisper.tsx',
-  'components/navigation/AmbientNav.tsx',
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',

@@ -147,3 +147,54 @@ export function navItemPaint(href: string): string {
 export function navItemActivePaint(): string {
   return 'nav-active-link';
 }
+
+// ─── Bottom-bar chassis — geometry + frosted scrim + on-ledger hairline ───
+
+/**
+ * Bottom navigation bar chassis className — a duet, not a chorus solo.
+ *
+ * The chassis is two-natured (Mike napkin #110 §4a, Tanya UIX #43 §2):
+ *
+ *   1. The HAIRLINE is voice. `border-fog/<rung>` is a Tailwind
+ *      shorthand on the alpha ledger; it routes through `alphaClassOf`
+ *      and snaps to `muted` (= 0.30) — one register up from the gem's
+ *      `hairline` (= 0.10), exactly where Tanya UIX #43 §1 calibrates
+ *      the felt-sentence "a faint line marks where the bar begins."
+ *      This is the third pair-snap of `border-fog/20 → /30` after
+ *      `ThreadKeepsake` (bdb7608) and `QuoteKeepsake` (3f25b18); the
+ *      rule-of-three threshold (Mike #110 §6) licenses the snap but
+ *      NOT a kernel-lift — two callers are not a kernel.
+ *
+ *   2. The SCRIM is structural — `bg-void/80 backdrop-blur-sm` is the
+ *      frosted-glass carrier that lets content under the bar read as
+ *      visible-but-hushed. `void` ∉ `ALPHA_COLOR_FAMILIES` and `/80`
+ *      ∉ legal alpha rungs `{10,30,50,70,100}`; routing this through
+ *      `alphaClassOf` would either lie about the scrim (Tanya §2.2 (a))
+ *      or dilute the four-rung discipline (option (c)). The honest
+ *      mechanism is the inline `// alpha-ledger:exempt — <reason>`
+ *      token (Elon teardown §3 recommendation (a), Tanya §2.2 pick).
+ *
+ * Pure, ≤ 10 LOC. Returns one className string composed of geometry,
+ * animation + scrim, and the on-ledger hairline. The `bg-void/80`
+ * literal lives HERE so the literal and its exempt token grep together;
+ * `AmbientNav.tsx` then contains zero `bg-void/<N>` and zero
+ * `border-fog/<N>` matches (fence § §1, widened in this PR).
+ *
+ * Credits: Mike K. (napkin #110 — sprint shape, the duet framing,
+ * pair-snap-no-kernel-lift heuristic, the LOC budget); Tanya D. (UIX
+ * #43 — felt-sentence calibration, the option-(a) honest-exempt pick,
+ * the layer/sibling check, the "stillness is part of the felt-sentence"
+ * micro-detail); Elon M. (#80 — first-principles falsification that
+ * `bg-void/80` cannot honestly route through `alphaClassOf`, and the
+ * inline-exempt recommendation adopted verbatim).
+ */
+export function navBarChassis(): string {
+  // alpha-ledger:exempt — `bg-void/80` is a structural scrim (frosted-
+  // glass carrier doing layout work), NOT a voice register. `void` is
+  // not in ALPHA_COLOR_FAMILIES; `/80` is not a legal rung. The hairline
+  // below IS voice (fog/muted) and routes through alphaClassOf.
+  const geom = 'fixed bottom-0 inset-x-0 z-sys-nav';
+  const scrim = 'bg-void/80 backdrop-blur-sm animate-fade-in';
+  const hairline = `border-t ${alphaClassOf('fog', 'muted', 'border')}`;
+  return `${geom} ${scrim} ${hairline}`;
+}

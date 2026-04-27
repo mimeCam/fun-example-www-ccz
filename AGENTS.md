@@ -24,7 +24,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Universal Exit:** overlay close → `<DismissButton.Inline />` / `<DismissButton.Absolute />`. Fence: `dismiss-verb-fence.test.ts`.
 - **Overlay nameplate:** every overlay opens with `<OverlayHeader title blurb onClose />` — `items-center`, no `className`. Fence: `overlay-header-fence.test.ts`.
 - **Section divider:** `<Divider.Static />` / `<Divider.Reveal />` / `<Divider.Centered />` — gold/10, `max-w-divider`, `rounded-full`, no `className`/`style`. Fence: `divider-fence.test.ts`.
-- **Navigation paint:** `gemPaint` / `gemShadow` / `navItemPaint` / `navItemActivePaint` — Voice-Ledger surfaces `gem` / `nav` / `navPulseDot`. No raw `text-{mist|gold|rose|fog}/<N>` literals in `GemHome.tsx` or `AmbientNav.tsx`; resolver routes through `alphaClassOf`. Fence: `nav-voice-adoption.test.ts`.
+- **Navigation paint:** `gemPaint` / `gemShadow` / `navBarChassis` / `navItemPaint` / `navItemActivePaint` — Voice-Ledger surfaces `gem` / `nav` / `navPulseDot`. No raw `text-{mist|gold|rose|fog}/<N>` literals in `GemHome.tsx` or `AmbientNav.tsx`; no raw `bg-void/<N>` or `border-fog/<N>` literals in `AmbientNav.tsx`. The chassis is a duet — hairline routes through `alphaClassOf('fog','muted','border')`; the `bg-void/80` scrim is a structural-carrier honest exempt (`// alpha-ledger:exempt — structural scrim` token at the resolver). Fence: `nav-voice-adoption.test.ts`.
 
 ## WIP
 (none)

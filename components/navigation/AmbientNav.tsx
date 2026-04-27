@@ -7,10 +7,17 @@
  *   plus `<NavPulseDot />` (CSS-driven three-layer halo).
  * Inactive: `mist/recede` (text-mist/50), per-route hover voice.
  *
- * Paint dialect graduated to the Voice Ledger via `lib/design/nav-paint.ts`
- * (Mike napkin #90). The per-item literals (inactive baseline + four
- * hover voices) live in one file now; this component stays focused on
- * routing, visibility, and ARIA semantics.
+ * Paint dialect graduated to the Voice Ledger via `lib/design/nav-paint.ts`:
+ *   • per-item literals (inactive baseline + four hover voices) — Mike #90.
+ *   • bottom-bar chassis (geometry + frosted scrim + hairline) — Mike #110 +
+ *     Tanya UIX #43. The chassis is a duet: the hairline is on-ledger
+ *     (fog at the `muted` rung); the scrim is structurally exempt (the
+ *     frosted-glass carrier does layout work, not voice — see the inline
+ *     exempt token at the resolver's call site in `navBarChassis()`).
+ *
+ * This component stays focused on routing, visibility, and ARIA semantics.
+ * No `bg-void` or `border-fog` Tailwind literals live here; both are
+ * pinned by `nav-voice-adoption.test.ts` §1.
  */
 
 'use client';
@@ -20,6 +27,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { gestureClassesOf } from '@/lib/design/gestures';
 import {
+  navBarChassis,
   navItemPaint,
   navItemActivePaint,
 } from '@/lib/design/nav-paint';
@@ -63,7 +71,7 @@ export function AmbientNav() {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-sys-nav bg-void/80 backdrop-blur-sm border-t border-fog/20 animate-fade-in"
+      className={navBarChassis()}
       aria-label="Site navigation"
     >
       <div className="flex items-center justify-center gap-sys-8 h-14">

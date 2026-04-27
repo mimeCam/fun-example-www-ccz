@@ -14,6 +14,10 @@
  *      `AmbientNav.tsx` contain ZERO `text-(mist|gold|rose|fog)/<N>`
  *      Tailwind literals (after stripping comments). The paint dialect
  *      lives in `lib/design/nav-paint.ts`, not in the components.
+ *      AmbientNav's chassis fence is widened (Mike #110, Tanya UIX #43)
+ *      to also forbid `bg-void/<N>` and `border-fog/<N>` literals — the
+ *      bottom-bar frame now routes through `navBarChassis()`, with the
+ *      scrim's exempt token living inside the resolver.
  *
  *   2. **Resolver paints every licensed family** — for each of `gem` /
  *      `nav` / `navPulseDot`, the families resolved at runtime by the
@@ -56,6 +60,7 @@ import {
 import {
   gemPaint,
   gemShadow,
+  navBarChassis,
   navItemPaint,
   navItemActivePaint,
 } from '../nav-paint';
@@ -88,16 +93,26 @@ function familiesIn(src: string): Set<string> {
 
 /**
  * Match a TEXT-color-alpha literal (`text-mist/20` style); used by §1
- * fence. Scoped to the `text-` prefix on purpose — the graduation moves
- * the *paint dialect* (text color literals) into `nav-paint.ts`. Border
- * and background literals on the AmbientNav frame (`border-fog/20`,
- * `bg-void/80`) are pre-existing chrome-frame drift held under the alpha
- * grandfather list; they are explicitly out of scope for THIS sprint
- * (Mike napkin #90 §7 — defer non-paint chrome). Widening this regex
- * conflates two refactors and breaks the green-on-merge contract.
+ * fence on `text-` paint dialect. The paint-dialect graduation (Mike #90)
+ * moved these literals into `nav-paint.ts`.
  */
 const COLOR_ALPHA_LITERAL_RX =
   /\btext-(?:mist|gold|rose|fog)\/\d+\b/g;
+
+/**
+ * Match a CHROME-FRAME literal — `bg-void/<N>` or `border-fog/<N>`. Used
+ * by §1 fence on `AmbientNav.tsx` only; the chassis graduation (Mike #110
+ * §4 + Tanya UIX #43) moved both literals into `navBarChassis()` inside
+ * `nav-paint.ts`. The hairline now routes through `alphaClassOf`; the
+ * scrim earns an inline `// alpha-ledger:exempt — structural scrim`
+ * token at the resolver's call site (Elon #80 option (a)).
+ *
+ * NOT widened to other files this sprint — the remaining grandfathered
+ * paths come off the list one by one (Mike #110 §6, "no while-we're-in-
+ * there for the other 19 grandfathered files").
+ */
+const CHROME_FRAME_LITERAL_RX =
+  /\b(?:bg-void|border-fog)\/\d+\b/g;
 
 /** Closed list of every thermal state, for resolver enumeration. */
 const ALL_STATES: readonly ThermalState[] =
@@ -123,6 +138,15 @@ describe('navigation chrome — no raw color-alpha literals in component source'
     expect(hits).toEqual([]);
   });
 
+  it('AmbientNav.tsx contains zero `bg-void/<N>` or `border-fog/<N>` literals', () => {
+    // Chassis fence (Mike #110 §4 + Tanya UIX #43): both the scrim and the
+    // hairline now route through `navBarChassis()` in `nav-paint.ts`. The
+    // component should grep clean for both chrome-frame literals — the
+    // scrim's exempt token lives at the resolver, not here.
+    const hits = Array.from(navSrc.matchAll(CHROME_FRAME_LITERAL_RX)).map((m) => m[0]);
+    expect(hits).toEqual([]);
+  });
+
   it('NavPulseDot.tsx contains zero Tailwind text-color literals (CSS-only)', () => {
     const hits = Array.from(dotSrc.matchAll(/\btext-[a-z]+(?:\/\d+)?\b/g)).map((m) => m[0]);
     expect(hits).toEqual([]);
@@ -138,6 +162,7 @@ describe('navigation chrome — no raw color-alpha literals in component source'
   it('AmbientNav.tsx imports the paint resolver from `lib/design/nav-paint`', () => {
     const raw = readSource('components/navigation/AmbientNav.tsx');
     expect(raw).toContain("from '@/lib/design/nav-paint'");
+    expect(raw).toMatch(/\bnavBarChassis\b/);
     expect(raw).toMatch(/\bnavItemPaint\b/);
     expect(raw).toMatch(/\bnavItemActivePaint\b/);
   });
@@ -215,6 +240,15 @@ describe('nav-paint — (state, quiet) → className snapshot', () => {
     const matrix: Record<string, string> = {};
     NAV_ROUTES.forEach((r) => { matrix[r] = navItemPaint(r); });
     expect(matrix).toMatchSnapshot();
+  });
+
+  it('navBarChassis() output is byte-pinned (chassis graduation)', () => {
+    // Mike #110 §4e + Tanya UIX #43 §6.5: the chassis className is a
+    // single string with a structural scrim and an on-ledger hairline.
+    // Drift on either token (rung change, exempt-token loss, geometry
+    // edit) becomes a deliberate review via the snapshot diff — never
+    // a silent regression.
+    expect(navBarChassis()).toMatchSnapshot();
   });
 });
 
