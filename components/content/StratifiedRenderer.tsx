@@ -25,12 +25,48 @@ import { Divider } from '@/components/shared/Divider';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { NewContentBadge } from './NewContentBadge';
 
-/* ─── Alpha-ledger handle (JIT-safe literal via alphaClassOf) ──────────────
-   Sister to `Divider.HAIRLINE_BG`, `MirrorRevealCard.BORDER_HAIRLINE`, and
-   `EvolutionThread.HAIRLINE_BORDER`. The variant accent on a core paragraph
-   sits at the `hairline` rung (= `border-gold/10`) — geometry, not surface;
-   the same gold thread the page already speaks. Mike napkin #113. */
-const HAIRLINE_BORDER = alphaClassOf('gold', 'hairline', 'border'); // border-gold/10
+/* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
+   Sister to `Divider.HAIRLINE_BG`, `MirrorRevealCard.BORDER_HAIRLINE`,
+   `EvolutionThread.HAIRLINE_BORDER`, and `ResonanceEntry`'s ledger family.
+
+   This file is the LAST file to graduate off
+   `ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS` (Mike napkin #117 / Tanya UIX
+   "Stratified Room"). Every translucent surface this renderer paints now
+   resolves through `alphaClassOf()` — JIT-safe table lookup, never template
+   interpolation. Pinned per-file by `StratifiedRenderer.alpha.test.ts`.
+
+   Pair-rule cool-side chrome: marginalia rest border AND extension wrap
+   surface both sit at `muted` (Tanya §3.4) — the reader's peripheral vision
+   sees one band of marginalia, not two. The marginalia border arc steps two
+   rungs (`muted` → `quiet`) on warmer; the resonance card holds at `quiet`
+   always — *"this surface is precious"* (Tanya §3.3 / §4 Path A). */
+
+/** Variant-paragraph hairline — gold thread, geometry-not-surface. */
+const HAIRLINE_BORDER     = alphaClassOf('gold',       'hairline', 'border'); // border-gold/10
+
+/** Marginalia border, warm/return state — the room noticed you. */
+const MARG_BORDER_WARM    = alphaClassOf('cyan',       'quiet',    'border'); // border-cyan/70
+
+/** Marginalia border, rest state — ambient chrome, drawn in pencil. */
+const MARG_BORDER_COOL    = alphaClassOf('cyan',       'muted',    'border'); // border-cyan/30
+
+/** Marginalia surface — cool side-of-page chrome, sibling to extension wrap. */
+const MARG_SURFACE        = alphaClassOf('surface',    'muted',    'bg');     // bg-surface/30
+
+/** Extension surface — the floor at which "this is one wrap" stays legible. */
+const EXT_SURFACE         = alphaClassOf('surface',    'muted',    'bg');     // bg-surface/30
+
+/** Resonance-marginalia surface — the killer surface, painted like one. */
+const RES_SURFACE         = alphaClassOf('surface',    'quiet',    'bg');     // bg-surface/70
+
+/** Resonance label — "Your resonance" micro-eyebrow. */
+const RES_LABEL_TEXT      = alphaClassOf('rose',       'quiet',    'text');   // text-rose/70
+
+/** Resonance quoted line — the article's words, content-not-the-content. */
+const RES_QUOTE_TEXT      = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
+
+/** Resonance "Saved …" timestamp — the frame around the subject. */
+const RES_META_TEXT       = alphaClassOf('mist',       'recede',   'text');   // text-mist/50
 
 interface StratifiedRendererProps {
   blocks: ContentBlock[];
@@ -71,11 +107,11 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
  *  ledger by design (TINTED_ACCENTS in lib/design/elevation.ts); the
  *  adoption guard allow-lists this file explicitly. */
 function MarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
-  const border = warmer ? 'border-l-cyan/70' : 'border-l-cyan/40';
+  const border = warmer ? MARG_BORDER_WARM : MARG_BORDER_COOL;
   const shadow = warmer ? 'shadow-cyan-whisper' : '';
   return (
     <aside
-      className={`my-sys-9 pl-sys-5 border-l-2 ${border} bg-surface/30 rounded-r-sys-soft py-sys-4 pr-sys-5 ${shadow}
+      className={`my-sys-9 pl-sys-5 border-l-2 ${border} ${MARG_SURFACE} rounded-r-sys-soft py-sys-4 pr-sys-5 ${shadow}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}`}
     >
       {block.isNew && <NewContentBadge />}
@@ -99,7 +135,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
       data-layer={block.layer}
       className={`my-sys-10 pl-sys-5 pr-sys-5 py-sys-4 rounded-r-sys-soft border-l-2 ${borderColor}
         ${block.isNew ? 'animate-discovery-shimmer' : ''}
-        bg-surface/20`}
+        ${EXT_SURFACE}`}
     >
       <div className="flex items-center gap-sys-3 mb-sys-3">
         <span className="text-sys-micro uppercase tracking-sys-caption text-cyan font-sys-accent">
@@ -203,7 +239,7 @@ export function StratifiedRenderer({ blocks, archetype, articleId, warmer }: Str
           return <MarginaliaBlock key={`margin-${i}`} block={block} warmer={warmer} />;
         }
         if (block.layer === 'resonance-marginalia') {
-          return <ResonanceMarginaliaBlock key={`res-${i}`} block={block} warmer={warmer} />;
+          return <ResonanceMarginaliaBlock key={`res-${i}`} block={block} />;
         }
         return <ExtensionBlock key={`ext-${i}`} block={block} />;
       })}
@@ -220,36 +256,66 @@ export function StratifiedRenderer({ blocks, archetype, articleId, warmer }: Str
  * (TINTED_ACCENTS in lib/design/elevation.ts); rose = *remembered*,
  * the reader's own voice speaking back. Allow-listed per-file.
  */
-function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warmer?: boolean }) {
+function ResonanceMarginaliaBlock({ block }: { block: ContentBlock }) {
   const data = block.resonance;
   if (!data) return null;
 
-  const glow = warmer ? 'shadow-rose-glow' : '';
-
+  // Path A (Tanya UIX §4): one base `shadow-rose-glow`, always on. The
+  // killer surface is precious on every visit; intensity differs (warmer
+  // is the system's job), presence does not. The pre-snap doubled the
+  // shadow-rose-glow token in the same string when warmer — Tailwind
+  // deduped the class so the pixel was unchanged, but the *intent* was
+  // muddled. One shadow, one address, one read.
   return (
     <aside
-      className={`my-sys-10 px-sys-6 py-sys-5 bg-surface/60 border-l-4 border-rose rounded-sys-medium shadow-rose-glow ${glow}
+      className={`my-sys-10 px-sys-6 py-sys-5 ${RES_SURFACE} border-l-4 border-rose rounded-sys-medium shadow-rose-glow
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
-      <p className="text-sys-micro uppercase tracking-sys-caption text-rose/70 mb-sys-4">
+      <p className={`text-sys-micro uppercase tracking-sys-caption ${RES_LABEL_TEXT} mb-sys-4`}>
         Your resonance
       </p>
-      <p className={`text-sys-body text-foreground/70 italic ${passageThermalClass()}`}>
+      <p className={`text-sys-body ${RES_QUOTE_TEXT} italic ${passageThermalClass()}`}>
         &ldquo;{data.quote}&rdquo;
       </p>
       {/* Resonance-marginalia inner divider — the comma between the quoted
           line and the reader's note. Routes through the `Divider.Static`
           kernel so the geometry/alpha pair-rule stays one address (Mike
           napkin #37 §1, divider-fence Axis A). Pre-snap was a raw
-          `h-px bg-gold/20 max-w-divider my-sys-4` literal — the sibling
-          `bg-gold/20` drift retired at the same time the geometry did. */}
+          h-px / max-w-divider / my-sys-4 literal at the gold/hairline rung
+          — the sibling drift retired at the same time the geometry did. */}
       <Divider.Static spacing="sys-4" />
       <p className={`text-sys-body text-rose italic ${passageThermalClass()}`}>
         {data.note}
       </p>
-      <p className="text-sys-micro text-mist/50 mt-sys-4">
+      <p className={`text-sys-micro ${RES_META_TEXT} mt-sys-4`}>
         Saved {data.createdAt}
       </p>
     </aside>
   );
 }
+
+// ─── Test seam — pure handles for the per-file SSR alpha pin ─────────────
+//
+// Mirrors `ResonanceEntry.__testing__` (Mike napkin #117 / #111 §4 — same
+// shape, same discipline). Tiny named handles let
+// `StratifiedRenderer.alpha.test.ts` assert against canonical
+// `alphaClassOf(...)` literals AND wire strings. A future swap of the rung
+// vocabulary cannot silently shift any register without flipping the
+// per-file pin. This is the LAST of the eleven graduations — when the
+// grandfather array empties, the fence is structural; the test below this
+// export becomes the doctrine.
+export const __testing__ = {
+  HAIRLINE_BORDER,
+  MARG_BORDER_WARM,
+  MARG_BORDER_COOL,
+  MARG_SURFACE,
+  EXT_SURFACE,
+  RES_SURFACE,
+  RES_LABEL_TEXT,
+  RES_QUOTE_TEXT,
+  RES_META_TEXT,
+  // Internal sub-renderers, exposed for SSR pinning.
+  MarginaliaBlock,
+  ExtensionBlock,
+  ResonanceMarginaliaBlock,
+} as const;

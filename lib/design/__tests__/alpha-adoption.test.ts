@@ -118,11 +118,6 @@ const INLINE_OPACITY_RX = /opacity\s*:\s*(0?\.\d+|\d+)\b/g;
  */
 const COLOR_ALPHA_RX = /(?<![\w-])(bg|text|border|shadow)-([a-z][\w-]*)\/(\d+)(?![\w-])/g;
 
-/** Files grandfathered — drift pending migration (shrinks as PRs land). */
-const COLOR_GRANDFATHER = new Set<string>(
-  ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS,
-);
-
 /** Split source on newlines so we can check exemption per line. */
 function lines(src: string): string[] {
   return src.split(/\r?\n/);
@@ -194,13 +189,12 @@ function collectColorAlphaLine(
 
 function scanFile(rel: string, src: string): Violation[] {
   if (ALLOW.has(rel)) return [];
-  const skipColor = COLOR_GRANDFATHER.has(rel);
   const ls = lines(src);
   const out: Violation[] = [];
   ls.forEach((_, i) => {
     out.push(...collectLine(rel, ls, i, RAW_OPACITY_RX, 'raw-tw'));
     out.push(...collectLine(rel, ls, i, INLINE_OPACITY_RX, 'inline-style'));
-    if (!skipColor) out.push(...collectColorAlphaLine(rel, ls, i));
+    out.push(...collectColorAlphaLine(rel, ls, i));
   });
   return out;
 }
@@ -294,9 +288,19 @@ describe('alphaClassOf — JIT-safe color-alpha literal factory', () => {
   });
 });
 
-// ─── Grandfather list — drift receipts, shrinking ─────────────────────────
+// ─── Grandfather list — empty after napkin #117 (structural invariant) ────
+//
+// Post-#117 the array is `[]`. The two forEach loops below now sweep zero
+// entries — vestigial, by design (Mike #117 §5.6): if drift ever returns
+// (a future PR re-adds a path), the same per-entry invariants will hold
+// without any test rewrite. The empty array IS the monument; this block
+// is the receipt that says "the fence is structural now."
 
-describe('color-alpha grandfather list — auditable drift, shrinking', () => {
+describe('color-alpha grandfather list — empty, structural fence', () => {
+  it('the grandfather array is empty (no scaffolding remains)', () => {
+    expect(ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS.length).toBe(0);
+  });
+
   it('every entry is a real, scannable source path', () => {
     ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS.forEach((p) => {
       expect(() => readFileSync(join(ROOT, p), 'utf8')).not.toThrow();
