@@ -1181,6 +1181,13 @@ body {
 .share-stagger-2 { animation-delay: calc(var(--sys-time-hover) / 2); }
 .share-stagger-3 { animation-delay: var(--sys-time-hover); }
 
+/* ─── MirrorRevealCard inner cascade ────────────────────────────────────────
+   Sibling shape to `.share-stagger-*` (Mike #95 §1). Cadence sourced from two
+   kernel tokens — no new `--sys-time-*`. Reduced-motion floor below. */
+.mirror-stagger-1 { transition-delay: 0ms; }
+.mirror-stagger-2 { transition-delay: var(--sys-time-instant); } /* 150ms */
+.mirror-stagger-3 { transition-delay: var(--sys-time-enter);   } /* 300ms */
+
 /* Respect reduced motion — hard kill on all animations + transitions */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -1208,6 +1215,13 @@ body {
   .share-stagger-2,
   .share-stagger-3 {
     animation-delay: 0ms !important;
+  }
+  /* MirrorRevealCard inner cascade — same shape, same fix. The `*` rule
+     above zeros transition-DURATION; this rule zeros transition-DELAY. */
+  .mirror-stagger-1,
+  .mirror-stagger-2,
+  .mirror-stagger-3 {
+    transition-delay: 0ms !important;
   }
   .thermal-breath, .thermal-glow, .thermal-drift, .thermal-candle, .golden-thread-glow {
     animation: none !important;

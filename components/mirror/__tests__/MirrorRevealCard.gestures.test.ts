@@ -50,8 +50,9 @@ import { join } from 'node:path';
 import { __testing__ } from '../MirrorRevealCard';
 
 const {
-  phaseClass, fadeStyle, shimmerStyle,
+  phaseClass, shimmerStyle,
   REVEAL_GESTURE, FADE_GESTURE,
+  MIRROR_STAGGER_CLASS,
 } = __testing__;
 
 const SOURCE_PATH = join(__dirname, '..', 'MirrorRevealCard.tsx');
@@ -111,20 +112,31 @@ describe('MirrorRevealCard — reduced-motion suppresses the shimmer bloom', () 
   });
 });
 
-// ─── Stagger collapse — Tanya UX §4.1 "All three at delay 0" ──────────────
+// ─── Stagger graduated to paint — Mike #95 §1 ─────────────────────────────
+// `fadeStyle()` retired; the cascade lives in `app/globals.css` as
+// `.mirror-stagger-1|2|3`. Pin: (a) source carries the literals (JIT-safe),
+// (b) seam exposes the table, (c) no `transitionDelay` slips back into a
+// JSX `style={…}` block, (d) `fadeStyle` is gone from the seam.
 
-describe('MirrorRevealCard — reduced-motion collapses the cascade stagger', () => {
-  it('reduce=false + visible=true preserves the authored delay', () => {
-    expect(fadeStyle(true, 300, false)).toEqual({ transitionDelay: '300ms' });
+describe('MirrorRevealCard — inner cascade lives at the paint layer', () => {
+  it('exposes the JIT-safe `MIRROR_STAGGER_CLASS` table on the seam', () => {
+    expect(MIRROR_STAGGER_CLASS).toEqual({
+      1: 'mirror-stagger-1', 2: 'mirror-stagger-2', 3: 'mirror-stagger-3',
+    });
   });
 
-  it('reduce=true + visible=true forces delay to 0', () => {
-    expect(fadeStyle(true, 300, true)).toEqual({ transitionDelay: '0ms' });
+  it("'mirror-stagger-1' / -2 / -3 appear as literal class strings", () => {
+    expect(SOURCE).toMatch(/['"`\s]mirror-stagger-1['"`\s]/);
+    expect(SOURCE).toMatch(/['"`\s]mirror-stagger-2['"`\s]/);
+    expect(SOURCE).toMatch(/['"`\s]mirror-stagger-3['"`\s]/);
   });
 
-  it('visible=false returns an empty style on both branches', () => {
-    expect(fadeStyle(false, 300, false)).toEqual({});
-    expect(fadeStyle(false, 300, true)).toEqual({});
+  it('no `transitionDelay` literal appears inside any style={…} block', () => {
+    expect(SOURCE).not.toMatch(/style\s*=\s*\{[^}]*transitionDelay/);
+  });
+
+  it('`fadeStyle` is retired from the `__testing__` seam', () => {
+    expect(__testing__).not.toHaveProperty('fadeStyle');
   });
 });
 

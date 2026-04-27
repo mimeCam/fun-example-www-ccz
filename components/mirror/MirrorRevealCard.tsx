@@ -20,7 +20,6 @@ import { useMirrorPhases, MIRROR_PAGE_TIMINGS, type Phase } from '@/lib/hooks/us
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import ShareOverlay from './ShareOverlay';
 import { Divider } from '@/components/shared/Divider';
-import { MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
@@ -52,6 +51,8 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
   const reduce = useReducedMotion();
   const colors = ARCHETYPE_COLORS[(mirror.archetype as ArchetypeKey) ?? 'collector'];
   const shareResult = buildShareResult(mirror);
+  // Mike #95 §6 — leaves are dumb about reduced-motion; CSS owns the floor.
+  const fadeMotion = `transition-all ${FADE_GESTURE(reduce)}`;
 
   return (
     <div className="flex justify-center">
@@ -62,9 +63,9 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
         ${phaseClass(phase)}
       `}
         style={shimmerStyle(phase, colors, reduce)}>
-        <RevealLabel visible={showContent} color={colors.hex} reduce={reduce} />
+        <RevealLabel visible={showContent} color={colors.hex} motion={fadeMotion} />
         <ArchetypeName label={mirror.archetypeLabel} visible={showContent} color={colors.hex} />
-        <WhisperQuote text={mirror.whisper} visible={showContent} reduce={reduce} />
+        <WhisperQuote text={mirror.whisper} visible={showContent} motion={fadeMotion} />
         {/* Divider — the section-divider primitive (Sid · Tanya UIX #28
             §3.2 / Mike #37 §5). The archetype-tinted dialect this card used
             to speak (`<GoldDivider color={colors.hex}>`) retired with the
@@ -93,15 +94,28 @@ export default function MirrorRevealCard({ mirror, articleId }: Props) {
 const REVEAL_GESTURE = (r: boolean): string => gestureClassesForMotion('reveal-keepsake', r);
 const FADE_GESTURE   = (r: boolean): string => gestureClassesForMotion('fade-neutral',    r);
 
+/* ─── Inner-cascade stagger → paint class (closed table of literals) ──────
+   Sibling to `STAGGER_CLASS` in `ShareOverlay.tsx` (Mike #95 §1). Delays
+   live in `app/globals.css` (1→0ms · 2→`--sys-time-instant` · 3→`--sys-time-
+   enter`); reduced-motion floor is one @media block in the same file.
+   NEVER template-interpolate; Tailwind cannot grep a runtime concat. */
+const MIRROR_STAGGER_CLASS = {
+  1: 'mirror-stagger-1',
+  2: 'mirror-stagger-2',
+  3: 'mirror-stagger-3',
+} as const;
+
 /* ─── Sub-components (each ≤ 10 lines) ──────────────────── */
 
-function RevealLabel({ visible, color, reduce }: {
-  visible: boolean; color: string; reduce: boolean;
+function RevealLabel({ visible, color, motion }: {
+  visible: boolean; color: string; motion: string;
 }) {
+  // `style={…}` carries archetype-runtime values only (color, opacity rung) —
+  // no motion timing tokens. Tanya UX §4e.
   return (
     <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-2
-      transition-all ${FADE_GESTURE(reduce)} ${fadeClass(visible)}`}
-      style={{ ...fadeStyle(visible, 0, reduce), color, opacity: visible ? 0.7 : 0 }}>
+      ${MIRROR_STAGGER_CLASS[1]} ${motion} ${fadeClass(visible)}`}
+      style={{ color, opacity: visible ? 0.7 : 0 }}>
       Because you stayed…
     </p>
   );
@@ -110,28 +124,27 @@ function RevealLabel({ visible, color, reduce }: {
 function ArchetypeName({ label, visible, color }: {
   label: string; visible: boolean; color: string;
 }) {
-  // The visible state rides the bespoke `mirror-archetype-label` keyframe
-  // (a CSS animation, not a transition) — out of the verb registry's scope
-  // by Tanya UX §5.3 (paint, not gesture). Reduced-motion is owned by the
-  // keyframe's own `@media (prefers-reduced-motion: reduce)` pair (CSS).
+  // Visible state rides the bespoke `mirror-archetype-label` keyframe —
+  // paint, not gesture (Tanya UX §5.3). `mirror-stagger-2` is a no-op while
+  // the keyframe wins, correct on the visible→false edge (Mike #95 §5 #4).
   return (
     <h2 className={`text-sys-h3 font-display font-sys-display tracking-sys-heading
+      ${MIRROR_STAGGER_CLASS[2]}
       ${visible ? 'mirror-archetype-label' : fadeClass(false)}`}
-      style={{ ...fadeStyle(visible, MOTION.instant, false), color }}>
+      style={{ color }}>
       {label}
     </h2>
   );
 }
 
-function WhisperQuote({ text, visible, reduce }: {
-  text: string; visible: boolean; reduce: boolean;
+function WhisperQuote({ text, visible, motion }: {
+  text: string; visible: boolean; motion: string;
 }) {
   // Alpha ledger: `quiet` (0.70) — "content, but not THE content."
   // The whisper is a quote; archetype name above is THE content. /80 was drift.
   return (
     <p className={`mt-sys-3 text-sys-caption ${WHISPER_TEXT} italic max-w-card-body
-      mx-auto typo-caption transition-all ${FADE_GESTURE(reduce)} ${fadeClass(visible)}`}
-      style={fadeStyle(visible, MOTION.enter, reduce)}>
+      mx-auto typo-caption ${MIRROR_STAGGER_CLASS[3]} ${motion} ${fadeClass(visible)}`}>
       &ldquo;{text}&rdquo;
     </p>
   );
@@ -184,12 +197,9 @@ function fadeClass(visible: boolean): string {
   return visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-enter-md';
 }
 
-/** Stagger the inner cascade — except under reduced motion, where every
- *  child lands at delay 0 (Tanya UX §4.1 — "All three at delay 0"). */
-function fadeStyle(visible: boolean, delayMs: number, reduce: boolean): React.CSSProperties {
-  if (!visible) return {};
-  return { transitionDelay: `${reduce ? 0 : delayMs}ms` };
-}
+/* `fadeStyle()` retired (Mike #95 §1): the cascade's transition-delay moved
+   onto `.mirror-stagger-1|2|3` in `app/globals.css`. The component owns no
+   millisecond literal; the kernel owns the cadence. */
 
 /**
  * Test seam — pure helpers + alpha-ledger handles + verb-resolved class
@@ -203,10 +213,10 @@ function fadeStyle(visible: boolean, delayMs: number, reduce: boolean): React.CS
  */
 export const __testing__ = {
   phaseClass,
-  fadeStyle,
   shimmerStyle,
   REVEAL_GESTURE,
   FADE_GESTURE,
+  MIRROR_STAGGER_CLASS,
   WHISPER_TEXT,
   BORDER_HAIRLINE,
   BORDER_MUTED,
