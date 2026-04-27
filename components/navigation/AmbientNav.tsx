@@ -12,6 +12,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { gestureClassesOf } from '@/lib/design/gestures';
 import { NavPulseDot } from './NavPulseDot';
 
 const NAV_ITEMS = [
@@ -20,6 +21,14 @@ const NAV_ITEMS = [
   { href: '/mirror', label: 'Mirror', accent: 'hover:text-gold' },
   { href: '/resonances', label: 'Book', accent: 'hover:text-rose' },
 ] as const;
+
+/* ─── Gesture-Atlas handle (verb-routed transition class) ──────────────────
+   `crossfade-inline` verb (Tanya UX #78 §2.3): "One label replacing another
+   — instant enough that I don't see the seam." duration-crossfade (120ms),
+   ease-out. Module-scope binding so the call is greppable at the source
+   level (the `gesture-call-site-fence` reads it through the kernel walker,
+   which blanks template-literal bodies). */
+const NAV_HOVER_GESTURE = gestureClassesOf('crossfade-inline');
 
 const HIDDEN_ROUTES = ['/', '/article'];
 
@@ -57,7 +66,10 @@ export function AmbientNav() {
               aria-current={active ? 'page' : undefined}
               // `rounded-sys-soft` pairs with the global :focus-visible ring —
               // the ring inherits the 6px curve (honoring-ring, Tanya #93 §4).
-              className={`rounded-sys-soft px-sys-1 py-sys-1 text-sys-caption tracking-sys-caption transition-colors duration-crossfade ease-out ${
+              // `crossfade-inline` verb (Gesture Atlas / Tanya UX #78 §2.3):
+              // "One label replacing another — instant enough that I don't see
+              // the seam." 120ms color swap, ease-out.
+              className={`rounded-sys-soft px-sys-1 py-sys-1 text-sys-caption tracking-sys-caption transition-colors ${NAV_HOVER_GESTURE} ${
                 active
                   ? 'nav-active-link'
                   : `text-mist/50 ${accent}`

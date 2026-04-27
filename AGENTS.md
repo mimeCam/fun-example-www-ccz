@@ -11,7 +11,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `components/shared/` — Threshold, Pressable, ActionPressable, Field, TextLink, Skeleton, Toast, Icons
 - `components/reading/` — Golden Thread, ceremony, keepsake, ReadersMark
 - `components/articles/` — QuoteKeepsake
-- `components/shared/__tests__/_jsx-fence-walker.ts` — shared transport kernel for call-site fences (4 tenants: lean-arrow, alpha, voice, action-receipt)
+- `components/shared/__tests__/_jsx-fence-walker.ts` — shared transport kernel for call-site fences (5 tenants: lean-arrow, alpha, voice, action-receipt, gesture)
 - `lib/design/__tests__/action-receipt-allowlist.ts` — single source of truth for receipt-bearing JSX hosts
 - `scripts/` — build-time codegen
 
@@ -27,7 +27,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Verb-primitives:** component name, file path, CSS class, test pin, JSDoc all spell the same word. Do not promote to doctrine until verb #3
 
 ## WIP
-- *(none)*
+- **Gesture Atlas migration** — `lib/design/gestures.ts` ships the 12-verb typed table + `gestureClassesOf(verb)` JIT-safe factory + the 5th `_jsx-fence-walker` tenant (`gesture-call-site-fence`). Two call sites migrated as proof of wiring (`ExploreArticleCard` `title-warm`, `AmbientNav` `crossfade-inline`). Remaining ~10 files in `GESTURE_GRANDFATHERED_PATHS` — each is a future micro-PR receipt (the list ONLY shrinks). `reduced` policy column is locked at the type level; the resolver wiring is a follow-up sprint (verbs settle first). Verb-vocabulary doctrine line waits for verb #3 firing per AGENTS.md rule.
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

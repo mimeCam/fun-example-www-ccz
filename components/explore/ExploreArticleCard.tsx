@@ -10,6 +10,7 @@ import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
+import { gestureClassesOf } from '@/lib/design/gestures';
 import {
   WORLDVIEW_COLORS,
   WORLDVIEW_FALLBACK_BG,
@@ -61,6 +62,15 @@ const ORGANIC_HOVER   = alphaClassOf('fog',  'recede',   'border'); // border-fo
    UX §4.1, posture-card cadence: ExploreArticleCard → MirrorLoadingSurface
    → mirror/page.tsx → press-phase.ts.) */
 const THERM_HELD = thermalRadiusClassByPosture('held');
+
+/* ─── Gesture-Atlas handle (verb-routed transition class) ──────────────────
+   `title-warm` verb (Tanya UX #78 §2.3): "The room's accent voice reaches
+   this title first — color, not shape." duration-crossfade (120ms), ease-out.
+   Module-scope binding so the call is greppable at the source level (Tailwind
+   JIT and the `gesture-call-site-fence` both rely on the literal verb being
+   visible OUTSIDE the template — same convention as `alphaClassOf` calls
+   above; same convention as `thermalRadiusClassByPosture('held')` below). */
+const TITLE_WARM = gestureClassesOf('title-warm');
 
 /**
  * Card edge class — one decision, two voices. Hover variants are written
@@ -124,11 +134,13 @@ export default function ExploreArticleCard({
         {/* Tanya §2.4: cards are surfaces, not buttons. Rest → sys-rest
             (grid visibly quieter); hover lift is owned by .card-alive in
             globals.css, so no hover shadow class is needed here. */}
-        {/* duration-crossfade (120ms): title color warms before card lifts (200ms).
+        {/* `title-warm` verb (Gesture Atlas / Tanya UX #78 §2.3):
+            "The room's accent voice reaches this title first — color, not shape."
+            duration-crossfade (120ms): title color warms before card lifts (200ms).
             Hierarchy: color signal first → surface responds. Tanya §1.2.
             text-thermal-accent = var(--token-accent) = violet dormant → gold luminous.
             Cards warm with the reader — gold is earned, not preset. Tanya §3.1. */}
-        <h3 className="font-display text-foreground font-sys-display text-sys-lg mb-sys-3 group-hover:text-thermal-accent transition-colors duration-crossfade">
+        <h3 className={`font-display text-foreground font-sys-display text-sys-lg mb-sys-3 group-hover:text-thermal-accent transition-colors ${TITLE_WARM}`}>
           {article.title}
         </h3>
 
