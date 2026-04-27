@@ -88,12 +88,22 @@ export interface ActionPressableProps {
    * inner `<Pressable>` size resolver, no per-call-site math).
    */
   size?: PressSize;
+  /**
+   * Visible-label discipline. Default `'visible'` paints `<PhaseLabel>` next
+   * to the glyph (the secondary-row pattern). `'hidden'` omits the visible
+   * label entirely — for icon-only call sites that paint the verb in an
+   * external tooltip (ShareOverlay's icon row, Mike #100 §5 path A). The
+   * SR receipt still lands via `<PhaseAnnouncement>`; `aria-label={hint}`
+   * carries the static name, so the witness reaches both organs without a
+   * double-paint of the verb in the icon row. (Tanya UIX #99 §6 path A.)
+   */
+  labelMode?: 'visible' | 'hidden';
 }
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function ActionPressable(props: ActionPressableProps): JSX.Element {
-  const { phase, reduced, variant = 'ghost', size = 'sm' } = props;
+  const { phase, reduced, variant = 'ghost', size = 'sm', labelMode = 'visible' } = props;
   return (
     <Pressable
       variant={variant}
@@ -105,10 +115,12 @@ export function ActionPressable(props: ActionPressableProps): JSX.Element {
       className={mergeClass('gap-sys-2', props.className)}
     >
       <PhaseGlyph phase={phase} reduced={reduced} idle={props.icon} />
-      <PhaseLabel
-        phase={phase} reduced={reduced}
-        idle={props.idleLabel} settled={props.settledLabel}
-      />
+      {labelMode === 'visible' && (
+        <PhaseLabel
+          phase={phase} reduced={reduced}
+          idle={props.idleLabel} settled={props.settledLabel}
+        />
+      )}
       <PhaseAnnouncement
         phase={phase}
         idle={props.idleLabel} settled={props.settledLabel}

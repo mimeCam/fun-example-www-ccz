@@ -20,11 +20,14 @@ import { getSeason } from '@/lib/mirror/season-engine';
 import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
 import { Pressable } from '@/components/shared/Pressable';
+import { ActionPressable } from '@/components/shared/ActionPressable';
+import { CopyIcon } from '@/components/shared/Icons';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
+import { useActionPhase } from '@/lib/hooks/useActionPhase';
 
 // ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
 //
@@ -53,8 +56,13 @@ const BORDER_HAIRLINE  = alphaClassOf('accent',     'hairline', 'border'); // bo
 const RETURN_LETTER_SEED_MS = MOTION_REDUCED_MS * 5; // 50ms
 /** Settle dwell — `linger` beat plus one `hover` breath. */
 const RETURN_LETTER_SETTLE_MS = MOTION.linger + MOTION.hover; // 1200ms
-/** Copy toast dwell — two `linger` beats, long enough to read. */
-const COPY_TOAST_MS = MOTION.linger * 2; // 2000ms
+//
+// `COPY_TOAST_MS` retired (Mike napkin #100 §"The change"): the resolved-
+// layer dwell now lives inside `useActionPhase` (`ACTION_HOLD_MS`), so the
+// hand-rolled setTimeout cascade is gone. `ShareOverlay` graduated next —
+// the `mirror-share-confirm` keyframe + the parallel `COPY_TOAST_MS`
+// constant are gone too (Mike napkin #100 / this PR). The constant
+// disappeared for good; the verb is the only home now.
 
 // ─── Verb-resolved class fragments (Mike napkin #9 §2, Tanya UX §2) ──────
 //
@@ -242,18 +250,28 @@ function LetterCard({
   /** `prefers-reduced-motion` flag, propagated from `useReducedMotion()`. */
   reduce?: boolean;
 }) {
-  const [copied, setCopied] = useState(false);
+  // Copy verb: the third native speaker of the action-receipt fingertip
+  // witness (after `QuoteKeepsake` + `ThreadKeepsake`). The hook owns the
+  // resolved-layer dwell, the SR peer, the reduced-motion contract and the
+  // CheckIcon swap; the component is presentational. (Mike napkin #100 §3,
+  // Tanya UX #27 §4.) `Save as Image` stays a plain `<Pressable>` — it's a
+  // download (the tab leaves; the browser handles the receipt) and is
+  // explicitly out of scope for this PR (Mike POI-6).
+  const [copyBusy, setCopyBusy] = useState(false);
+  const copySlot = useActionPhase(copyBusy);
 
-  const handleCopy = useCallback(() => {
-    const text = [letter.salutation, '', letter.opening, ...letter.body, '', letter.closing, '', letter.signOff].join('\n');
-    // Envelope: the letter travels with its source on rich-paste targets.
-    // Plain targets see byte-identical prose (Mike §1, Tanya §6).
-    copyToClipboard(text, buildLetterEnvelope()).then((ok) => {
-      if (!ok) return;
-      setCopied(true);
-      setTimeout(() => setCopied(false), COPY_TOAST_MS);
-    });
-  }, [letter]);
+  const handleCopy = useCallback(async () => {
+    // Build the envelope inside the callback (Mike POI-10): the letter
+    // travels with its source on rich-paste targets; plain targets see
+    // byte-identical prose. `pulse(false)` keeps the fingertip quiet on
+    // failure (the `useActionPhase` fail-quiet covenant).
+    const text = [letter.salutation, '', letter.opening, ...letter.body,
+      '', letter.closing, '', letter.signOff].join('\n');
+    setCopyBusy(true);
+    const ok = await copyToClipboard(text, buildLetterEnvelope());
+    setCopyBusy(false);
+    copySlot.pulse(ok);
+  }, [letter, copySlot.pulse]);
 
   const handleImage = useCallback(() => {
     const url = generateLetterCard(letter);
@@ -321,12 +339,28 @@ function LetterCard({
       <p className={`${CLOSING_QUIET} text-sys-md italic text-center`}>{letter.closing}</p>
       {/* Sign-off */}
       <p className="text-mist text-sys-caption italic text-center mt-sys-4">{letter.signOff}</p>
-      {/* Actions */}
+      {/* Actions — Copy rides the canonical action-receipt primitive
+          (`<ActionPressable>` + `useActionPhase`); the glyph swaps to
+          `<CheckIcon>`, the verb to past tense, and the sr-only
+          `<PhaseAnnouncement>` peer mounts the witness on settle. The
+          long-form name lives in `hint=` (becomes `aria-label` + `title`)
+          so the visible label stays inside the primitive's ±1 ch swap
+          contract — `Copy` ↔ `Copied`. (Mike napkin #100 §"The change",
+          Tanya UX #27 §4.) Save stays a plain `<Pressable>` — the tab
+          leaves, the browser owns the receipt (Mike POI-6). */}
       {visible && (
         <div className="mt-sys-7 flex justify-center gap-sys-4">
-          <Pressable variant="ghost" size="md" onClick={handleCopy}>
-            {copied ? 'Copied!' : 'Copy & Share'}
-          </Pressable>
+          <ActionPressable
+            variant="ghost"
+            size="md"
+            onClick={handleCopy}
+            phase={copySlot.phase}
+            reduced={copySlot.reduced}
+            icon={<CopyIcon size={14} />}
+            idleLabel="Copy"
+            settledLabel="Copied"
+            hint="Copy & Share this letter"
+          />
           <Pressable variant="ghost" size="md" onClick={handleImage}>
             Save as Image
           </Pressable>

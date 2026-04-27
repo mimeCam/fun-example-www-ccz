@@ -230,7 +230,6 @@ const config: Config = {
         // Mirror reveal — archetype label blur-to-sharp
         'archetype-reveal': 'archetypeReveal 600ms cubic-bezier(0.0, 0.0, 0.2, 1) both',
         'mirror-radius-breathe': 'mirrorRadiusBreathe 0.8s ease-in-out',
-        'share-confirm': 'shareConfirmFlash 300ms ease-out',
         // SelectionPopover — spring bloom on entry, quick retreat on exit
         'popover-enter': 'popoverEnter 180ms cubic-bezier(0.16, 1, 0.3, 1) both',
         'popover-exit':  'popoverExit 120ms ease-in both',
@@ -317,11 +316,6 @@ const config: Config = {
         popoverExit: {
           from: { opacity: '1', transform: 'scale(1)' },
           to:   { opacity: '0', transform: 'scale(0.85)' },
-        },
-        // Share confirm — brief gold flash
-        shareConfirmFlash: {
-          '0%': { boxShadow: `0 0 0 0 color-mix(in srgb, var(--gold) 40%, transparent)` },
-          '100%': { boxShadow: '0 0 12px 4px transparent' },
         },
         // Resonance shimmer — gold border sweep on quote card
         resonanceBorderSweep: {

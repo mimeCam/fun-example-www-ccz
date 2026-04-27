@@ -347,9 +347,15 @@ describe('action-receipt-fence — Axis E · the fence is wired to live call sit
     expect(hits.length).toBeGreaterThanOrEqual(3);
   });
 
-  it('the canonical ActionPressable host is exercised by at least one live .tsx', () => {
+  it('the canonical ActionPressable host is exercised by at least two live .tsx', () => {
+    // Floor lifted 1 → 2 alongside ShareOverlay's `mirror-share-confirm`
+    // graduation (Mike #100 §4 / this PR). Speakers as of the lift:
+    // ReturnLetter, QuoteKeepsake (×2), ThreadKeepsake (×2), ShareOverlay.
+    // The literal floor stays conservative — the test is the *invariant*,
+    // not the count; ratchet only when a future graduation re-shapes the
+    // verb's population (Tanya UIX #99 §6, the verb-primitive rule of three).
     const hits = scanAllCandidates().filter((c) => c.host === 'ActionPressable');
-    expect(hits.length).toBeGreaterThanOrEqual(1);
+    expect(hits.length).toBeGreaterThanOrEqual(2);
   });
 
   it('the audit-close pass left zero raw-DOM violations in the live tree', () => {

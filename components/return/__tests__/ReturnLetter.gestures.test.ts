@@ -163,11 +163,30 @@ describe('ReturnLetter — under reduce the dismiss + action row render immediat
     expect(html).toContain('aria-label="Dismiss"');
   });
 
-  it('the Copy & Share button is in the SSR markup at first paint', () => {
-    expect(html).toContain('Copy &amp; Share');
+  it('the Copy button rides the canonical fingertip witness via aria-label', () => {
+    // Long-form name moves to `hint=` (→ `aria-label` + `title`) so the
+    // visible label can ride the primitive's ±1 ch swap (Mike POI-1).
+    expect(html).toContain('aria-label="Copy &amp; Share this letter"');
+    expect(html).toContain('title="Copy &amp; Share this letter"');
+  });
+
+  it('the Copy button paints the idle "Copy" label (within ±1 ch of "Copied")', () => {
+    // Idle phase renders the short-form verb. A future drift to
+    // "Copy & Share" inside `idleLabel` would reintroduce the bounding-
+    // box flinch the primitive's contract explicitly forbids.
+    expect(html).toMatch(/>Copy<\/span>/);
+  });
+
+  it('the Copy button paints the idle <CopyIcon> glyph (CheckIcon swap is owned by the primitive)', () => {
+    // The 14-px viewBox + the canonical Copy-glyph path proves the idle
+    // glyph is in markup. The primitive owns the post-`pulse(true)` swap
+    // to `<CheckIcon>` — that path is pinned in the primitive's own tests.
+    expect(html).toMatch(/<svg[^>]+width="14"[^>]+height="14"/);
   });
 
   it('the Save as Image button is in the SSR markup at first paint', () => {
+    // Out of scope for the migration (Mike POI-6): a download leaves the
+    // tab; the browser owns the receipt. Plain `<Pressable>` survives.
     expect(html).toContain('Save as Image');
   });
 
@@ -241,5 +260,24 @@ describe('ReturnLetter — both verbs are greppable in source', () => {
     // Match `[showLetter, letter, reduce]` (whitespace-tolerant) — proves the
     // effect re-runs when the OS-level preference toggles mid-session.
     expect(SOURCE).toMatch(/\[\s*showLetter\s*,\s*letter\s*,\s*reduce\s*\]/);
+  });
+
+  it('imports the canonical action-receipt primitive (Mike napkin #100)', () => {
+    expect(SOURCE).toMatch(/import\s*\{[^}]*\bActionPressable\b[^}]*\}\s*from\s*['"]@\/components\/shared\/ActionPressable['"]/);
+  });
+
+  it('imports the action-phase hook from the canonical seam', () => {
+    expect(SOURCE).toMatch(/import\s*\{[^}]*\buseActionPhase\b[^}]*\}\s*from\s*['"]@\/lib\/hooks\/useActionPhase['"]/);
+  });
+
+  it('the hand-rolled COPY_TOAST_MS setTimeout cascade is gone', () => {
+    // The resolved-layer dwell now lives inside `useActionPhase`
+    // (`ACTION_HOLD_MS`). A future contributor cannot accidentally re-
+    // mint the bespoke toast cascade in this file. The parallel constant
+    // in `ShareOverlay` is also gone — that surface graduated to
+    // `<ActionPressable>` in Mike #100 / Sid's lift; the verb is the
+    // only home for the dwell now.
+    const offending = nonCommentLines().filter((l) => /\bCOPY_TOAST_MS\b/.test(l));
+    expect(offending).toEqual([]);
   });
 });

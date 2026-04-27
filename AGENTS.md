@@ -24,11 +24,13 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Verb-primitives:** component name, file path, CSS class, test pin, JSDoc all spell the same word. Do not promote to doctrine until verb #3.
 
 ## WIP
-- **Gesture Atlas closed** (2026-04-27): 13 verbs, 0 grandfathered paths, fence flipped from tolerate→forbid. A typed 13-row table + a JIT-literal class factory + a shrink-only fence make a class of motion-drift bugs structurally impossible at zero added complexity. Source receipt: `lib/design/gestures.ts` § `GESTURE_GRANDFATHERED_PATHS`. Pinned by `gestures-sync.test.ts` (`toEqual([])`) and `gesture-call-site-fence.test.ts` Axis C (`toBe(0)`).
-- **Keepsake frame snapped to the alpha ledger** (2026-04-27): the killer-feature surface's preview border (`QuoteKeepsake.tsx`) routes through `alphaClassOf('fog', 'muted', 'border')` — JIT-safe literal-table factory — instead of a hand-typed `border-fog/20`. The file was never on the grandfather list; the fence was already armed and silently red in CI. Pinned by `components/articles/__tests__/QuoteKeepsake.alpha.test.ts`. (No `tolerate→forbid` lifecycle name yet — wait for verb #3.)
+- **Gesture Atlas closed** (2026-04-27): 13 verbs, 0 grandfathered paths, fence flipped tolerate→forbid. `lib/design/gestures.ts`.
+- **Keepsake alpha snap** (2026-04-27): `QuoteKeepsake.tsx` border routes through `alphaClassOf()`. Pinned by `QuoteKeepsake.alpha.test.ts`.
+- **ReturnLetter Copy → canonical receipt** (2026-04-27): `ActionPressable` + `useActionPhase`. Third speaker of `action-swap` — rule-of-three fires. `Save as Image` stays `<Pressable>` (download = browser receipt). Pinned by `ReturnLetter.gestures.test.ts`.
+- **ShareOverlay Copy Link → action-swap** (2026-04-27): the last bespoke `mirror-share-confirm` flash is retired; the Copy Link icon graduates to `<ActionPressable variant="icon" labelMode="hidden">`. The verb is spoken at every settle/release/copy/save site in tree. SR readers now hear "Copied!" once on settle. `Save PNG` and `Share on X` stay `<Pressable>` (download / nav = browser receipt). Pinned by `ShareOverlay.action.test.ts`; fence Axis E floor lifted 1→2.
 
-## Open TODOs (drift sightings, deferred)
-- ShareOverlay's post-click "Copied!" handoff (`mirror-share-confirm`) is a *receipt*, not a label — earns `action-swap` on its own micro-PR once the rule-of-three fires (Tanya UIX #99 §7).
+## Open TODOs
+- (none open this cycle)
 
 ## Deployment
 Docker on port 7200 via `deploy.sh`. Volumes: `persona-blog-db`, `persona-blog-logs`.

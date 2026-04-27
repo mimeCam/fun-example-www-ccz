@@ -21,10 +21,20 @@
  * rather than decorative noise. A 6×6 `rotate-45 bg-void` caret pins the
  * tooltip to its anchor button.
  *
- * The post-click "Copied!" handoff is intentionally NOT graduated this
- * cycle (Tanya UIX #99 §7) — that surface is a *receipt*, not a label,
- * and earns `action-swap` on its own micro-PR once the rule-of-three has
- * fired. The current `mirror-share-confirm` recipe stays in place.
+ * Copy Link receipt (Mike napkin #100, Tanya UIX #99 §3 — *graduated this
+ * cycle*): the bespoke `mirror-share-confirm` gold-flash recipe is retired;
+ * the Copy Link button now rides the canonical `<ActionPressable>` +
+ * `useActionPhase` primitive (verb #4 of `action-swap`, fourth speaker
+ * after ReturnLetter, QuoteKeepsake, ThreadKeepsake). The icon glyph swaps
+ * Clipboard → Check on settled; the tooltip flips `Copy Link` → `Copied!`
+ * sourced from the same phase. The genuine win is the SR receipt — an
+ * `aria-live="polite"` peer mounts on the `idle → settled` edge so a blind
+ * reader hears "Copied!" once, sourced from the same phase the eye sees.
+ * `labelMode='hidden'` keeps the icon row's icon-only aesthetic (the verb
+ * paints in the tooltip, not next to the glyph). The `mirror-share-confirm`
+ * keyframe is deleted from `app/globals.css` in the same PR — no tombstone
+ * comment, the fence + this file's source IS the tombstone (Tanya §7,
+ * Elon §4).
  */
 
 'use client';
@@ -41,6 +51,8 @@ import {
 import { encodeDeepLink } from '@/lib/sharing/deep-link';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { Pressable } from '@/components/shared/Pressable';
+import { ActionPressable } from '@/components/shared/ActionPressable';
+import { useActionPhase, type UseActionPhaseResult } from '@/lib/hooks/useActionPhase';
 import { MOTION } from '@/lib/design/motion';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
@@ -53,8 +65,6 @@ import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
  * from motion tokens.
  */
 const SHARE_STAGGER_MS = MOTION.hover / 2;              // 100
-/** Copy toast dwell — two `linger` beats; Matches ReturnLetter COPY_TOAST_MS. */
-const COPY_TOAST_MS    = MOTION.linger * 2;             // 2000
 
 interface Props {
   result: QuickMirrorResult;
@@ -62,9 +72,11 @@ interface Props {
 }
 
 export default function ShareOverlay({ result, articleId }: Props) {
-  const [copied, setCopied] = useState(false);
+  const [copyBusy, setCopyBusy] = useState(false);
+  const copySlot = useActionPhase(copyBusy);
   const reduce = useReducedMotion();
   const deepUrl = encodeDeepLink(result.archetype, articleId);
+  const onCopy = useCopyText(result.archetype, articleId, setCopyBusy, copySlot.pulse);
 
   // Outer column gap stepped from `sys-3` → `sys-4` (Tanya UIX #99 §2b) —
   // gives the DeepLink paragraph below airspace clear of the icon row.
@@ -74,11 +86,8 @@ export default function ShareOverlay({ result, articleId }: Props) {
         <StaggeredIconBtn delay={0}
           onClick={useSaveImage(result)}
           label="Save PNG" icon={<DownloadIcon />} reduce={reduce} />
-        <StaggeredIconBtn delay={SHARE_STAGGER_MS}
-          onClick={useCopyText(result.archetype, articleId, setCopied)}
-          label={copied ? 'Copied!' : 'Copy Link'}
-          icon={copied ? <CheckIcon /> : <ClipboardIcon />}
-          confirm={copied} reduce={reduce} />
+        <StaggeredCopyLink delay={SHARE_STAGGER_MS}
+          onClick={onCopy} slot={copySlot} reduce={reduce} />
         <StaggeredIconBtn delay={SHARE_STAGGER_MS * 2}
           onClick={useXShare(result.archetype, articleId)}
           label="Share on X" icon={<XIcon />} reduce={reduce} />
@@ -88,28 +97,53 @@ export default function ShareOverlay({ result, articleId }: Props) {
   );
 }
 
-/* ─── Staggered icon button with fade-in ─────────────────── */
+/* ─── Staggered fade-in wrappers ─────────────────────────── */
 //
 // gesture-ledger:exempt — `animate-fade-in` is a CSS keyframe (paint, not
 // gesture) per Tanya UIX §5.3; out of the verb registry's scope, same
 // exemption pattern as `mirror-archetype-label` in MirrorRevealCard.
 
-function StaggeredIconBtn({ onClick, label, icon, delay, confirm, reduce }: {
-  onClick: () => void; label: string; icon: React.ReactNode;
-  delay: number; confirm?: boolean; reduce: boolean;
-}) {
+function StaggerSlot({ delay, children }: { delay: number; children: React.ReactNode }) {
   return (
     <div className="animate-fade-in" style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}>
-      <IconBtn onClick={onClick} label={label} icon={icon} confirm={confirm} reduce={reduce} />
+      {children}
     </div>
+  );
+}
+
+function StaggeredIconBtn({ onClick, label, icon, delay, reduce }: {
+  onClick: () => void; label: string; icon: React.ReactNode;
+  delay: number; reduce: boolean;
+}) {
+  return (
+    <StaggerSlot delay={delay}>
+      <IconBtn onClick={onClick} label={label} icon={icon} reduce={reduce} />
+    </StaggerSlot>
+  );
+}
+
+/**
+ * Copy Link slot — graduated to `<ActionPressable>` (action-swap verb #4).
+ * The tooltip remains the visible verb (`Copy Link` ↔ `Copied!`); the
+ * canonical primitive owns the icon glyph swap, the settled hold dwell,
+ * and the SR-only `aria-live="polite"` receipt. Wrapper paints
+ * `relative group` so the existing tooltip's `group-hover:opacity-100`
+ * still pivots off the parent's hover state. (Mike napkin #100 §5 path A.)
+ */
+function StaggeredCopyLink({ onClick, slot, delay, reduce }: {
+  onClick: () => void; slot: UseActionPhaseResult; delay: number; reduce: boolean;
+}) {
+  return (
+    <StaggerSlot delay={delay}>
+      <CopyLinkBtn onClick={onClick} slot={slot} reduce={reduce} />
+    </StaggerSlot>
   );
 }
 
 /* ─── Icon button with tooltip ──────────────────────────── */
 
-function IconBtn({ onClick, label, icon, confirm, reduce }: {
-  onClick: () => void; label: string; icon: React.ReactNode;
-  confirm?: boolean; reduce: boolean;
+function IconBtn({ onClick, label, icon, reduce }: {
+  onClick: () => void; label: string; icon: React.ReactNode; reduce: boolean;
 }) {
   return (
     <Pressable
@@ -117,11 +151,43 @@ function IconBtn({ onClick, label, icon, confirm, reduce }: {
       size="sm"
       onClick={onClick}
       aria-label={label}
-      className={`group ${confirm ? 'mirror-share-confirm' : ''}`}
+      className="group"
     >
       {icon}
       <Tooltip label={label} reduce={reduce} />
     </Pressable>
+  );
+}
+
+/**
+ * Copy Link button — the third sibling, but the only one that owns a
+ * receipt (the click resolves locally; no tab leaves, no download begins).
+ * `<ActionPressable variant="icon" labelMode="hidden">` pulls in the
+ * canonical glyph-swap + SR peer; the tooltip is mounted as a sibling
+ * inside a `relative group` wrapper so the existing `group-hover` opacity
+ * toggle still resolves. The visible verb in the tooltip flips off the
+ * same `phase` the SR peer reads. (Mike #100 path A; Tanya UIX #99 §3.1.)
+ */
+function CopyLinkBtn({ onClick, slot, reduce }: {
+  onClick: () => void; slot: UseActionPhaseResult; reduce: boolean;
+}) {
+  const tooltipLabel = slot.phase === 'settled' ? 'Copied!' : 'Copy Link';
+  return (
+    <span className="relative group inline-flex">
+      <ActionPressable
+        variant="icon"
+        size="sm"
+        labelMode="hidden"
+        onClick={onClick}
+        phase={slot.phase}
+        reduced={slot.reduced}
+        icon={<ClipboardIcon />}
+        idleLabel="Copy Link"
+        settledLabel="Copied!"
+        hint="Copy share link"
+      />
+      <Tooltip label={tooltipLabel} reduce={reduce} />
+    </span>
   );
 }
 
@@ -138,6 +204,11 @@ function IconBtn({ onClick, label, icon, confirm, reduce }: {
 // Layout (Tanya UIX #99 §2a): tooltip pinned ABOVE the icon (`-top-9`),
 // out of the DeepLink paragraph's gutter; caret rotated from the bottom
 // edge points down to its anchor button.
+//
+// Width discipline (Tanya UIX #99 §5): `min-w-[6.5rem]` pins the chip
+// width across the `Copy Link` ↔ `Copied!` swap (9 ch ↔ 7 ch is 2 ch off
+// the ±1 ch contract; the min-width keeps the caret centred and the chip
+// from jittering). One Tailwind class, zero new motion.
 
 function Tooltip({ label, reduce }: { label: string; reduce: boolean }) {
   // alpha-ledger:exempt — motion fade endpoints (hover tooltip α=0/α=1 pair)
@@ -148,7 +219,7 @@ function Tooltip({ label, reduce }: { label: string; reduce: boolean }) {
   return (
     <span className={`pointer-events-none absolute -top-9 left-1/2
       -translate-x-1/2 rounded-sys-medium bg-void text-mist text-sys-micro px-sys-2 py-sys-1
-      shadow-sys-rest whitespace-nowrap
+      shadow-sys-rest whitespace-nowrap min-w-[6.5rem] text-center
       opacity-0 group-hover:opacity-100 transition-opacity
       ${gestureClassesForMotion('crossfade-inline', reduce)}`}>
       {label}
@@ -192,16 +263,6 @@ function ClipboardIcon() {
   );
 }
 
-function CheckIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round"
-      strokeLinejoin="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
 function XIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -241,17 +302,23 @@ function useSaveImage(result: QuickMirrorResult) {
   }, [result]);
 }
 
+/**
+ * Copy Link handler — composes the share envelope, drives `copyBusy`, and
+ * pulses the action slot with the result. `pulse(false)` returns the slot
+ * to idle silently — the fail-quiet covenant Tanya §3.3 / Krystle's
+ * original spec named: silence is the receipt for failure.
+ */
 function useCopyText(
   archetype: ArchetypeKey, articleId: string | undefined,
-  setCopied: (v: boolean) => void,
+  setBusy: (v: boolean) => void, pulse: (ok: boolean) => void,
 ) {
   return useCallback(async () => {
     const text = generateShareText(archetype, articleId);
+    setBusy(true);
     const ok = await copyToClipboard(text);
-    if (!ok) return;
-    setCopied(true);
-    setTimeout(() => setCopied(false), COPY_TOAST_MS);
-  }, [archetype, articleId, setCopied]);
+    setBusy(false);
+    pulse(ok);
+  }, [archetype, articleId, setBusy, pulse]);
 }
 
 function useXShare(archetype: ArchetypeKey, articleId: string | undefined) {

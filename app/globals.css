@@ -778,16 +778,6 @@ body {
     mirrorGlow var(--sys-anim-reveal) ease-in-out infinite;
 }
 
-/* Share action confirmation — brief gold flash */
-@keyframes shareConfirmFlash {
-  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 40%, transparent); }
-  100% { box-shadow: 0 0 12px 4px transparent; }
-}
-
-.mirror-share-confirm {
-  animation: shareConfirmFlash var(--sys-anim-enter) ease-out;
-}
-
 /* slideUp, gemAppear, whisperShadow, thermalBreath/Glow/Drift —
    defined in tailwind.config.ts keyframes. Single source of truth: Tailwind config. */
 
