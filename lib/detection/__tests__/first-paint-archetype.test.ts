@@ -60,6 +60,16 @@ describe('first-paint-archetype — returner short-circuit', () => {
     }));
     expect(tone).toBeNull();
   });
+
+  it('hasReturnerCookie short-circuit pins the trust clause (Mike §1)', () => {
+    // Named pin: the heuristic itself MUST refuse to guess for a known
+    // returner — defense-in-depth alongside the middleware `shouldGuess()`
+    // gate. If this test fails, the middleware short-circuit becomes the
+    // only thing protecting a returner from a wrong-tone guess.
+    expect(guessProvisionalTone(signals({
+      pathname: '/resonances', hasReturnerCookie: true,
+    }))).toBeNull();
+  });
 });
 
 // ─── Empty / floor-only inputs — silence is a feature ──────────────────────

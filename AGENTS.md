@@ -7,6 +7,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/design/` — design ledgers (motion · elevation · color · typography · spacing · radius · alpha · z-index) + gesture atlas + swap-width
 - `lib/thermal/` — score engine, tokens, ceremony
 - `lib/detection/` — first-paint archetype heuristic (provisional tone)
+- `lib/mirror/` — Mirror snapshot store, layered archetype read, `__rt=1` returner sentinel
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG
 - `lib/engagement/` — loop-funnel, archetype-bucket
 - `components/shared/` — shared primitives + fence walker kernel at `__tests__/_jsx-fence-walker.ts`

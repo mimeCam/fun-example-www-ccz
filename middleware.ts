@@ -29,7 +29,7 @@ import {
   PROVISIONAL_COOKIE,
   type FirstPaintSignals,
 } from '@/lib/detection/first-paint-archetype';
-import { MIRROR_STORAGE_KEY } from '@/lib/mirror/archetype-store';
+import { RETURNER_COOKIE } from '@/lib/mirror/returner-sentinel';
 
 const REDIRECTS: Record<string, string> = {
   '/explore': '/articles',
@@ -81,20 +81,31 @@ function maybeSetProvisionalCookie(
   });
 }
 
-/** Skip when path is excluded OR a `__pt` cookie already exists. */
+/**
+ * Skip when path is excluded, OR a `__pt` cookie already exists, OR the
+ * reader carries the `__rt=1` returner sentinel — that last one is the
+ * trust clause: a reader who has answered the Mirror once is never re-
+ * guessed (Mike §1, Tanya UX §1). Sibling check to the `__pt` short-
+ * circuit, deliberately adjacent so the symmetry is visible.
+ */
 function shouldGuess(request: NextRequest, pathname: string): boolean {
   if (PROVISIONAL_SKIP_PREFIXES.some((p) => pathname.startsWith(p))) return false;
   if (request.cookies.has(PROVISIONAL_COOKIE)) return false;
+  if (request.cookies.has(RETURNER_COOKIE)) return false;
   return true;
 }
 
 /**
  * Build the heuristic input bag from the request. Pure, ≤ 10 LOC. The
- * `hasReturnerCookie` rule is opportunistic — we sniff the Mirror's
- * localStorage key as a cookie hint when the client has set it as a
- * sentinel (TODO below), AND we honor an explicit returner cookie if it
- * shows up. Today, on the server, we conservatively treat the absence of
- * any signal as "not a returner."
+ * `hasReturnerCookie` field stays on the signal shape because the heuristic
+ * itself short-circuits on it (defense in depth) — but in practice the
+ * `shouldGuess()` gate above already returns `false` before we reach this
+ * builder for any returner. The two checks are belt-and-braces, not
+ * redundancy: one stops the cookie write, one stops a wrong guess.
+ *
+ * Telemetry follow-up: a `first_paint_vs_mirror_agreement` counter belongs
+ * with the next observability seam, not bolted on here (Mike §5, deferred
+ * per Paul's focus contract). TODO(telemetry-followup).
  */
 function signalsFrom(request: NextRequest, pathname: string): FirstPaintSignals {
   return {
@@ -102,24 +113,8 @@ function signalsFrom(request: NextRequest, pathname: string): FirstPaintSignals 
     userAgent: request.headers.get('user-agent'),
     pathname,
     hourLocal: new Date().getUTCHours(),
-    hasReturnerCookie: hasReturnerSignal(request),
+    hasReturnerCookie: request.cookies.has(RETURNER_COOKIE),
   };
-}
-
-/**
- * True when the client carries any "I've been here before" sentinel. Today
- * we look for a few cheap markers; the client never short-circuits if it
- * lies, because the Mirror layer always wins downstream anyway.
- *
- * TODO(returner-sentinel): once the Mirror flow writes a small
- * `__rt=1` (returner) cookie alongside the localStorage snapshot, key off
- * that exclusively — `localStorage` keys are not visible from middleware.
- */
-function hasReturnerSignal(request: NextRequest): boolean {
-  if (request.cookies.has('__rt')) return true;
-  // Some legacy paths may set the storage key as a cookie sentinel.
-  if (request.cookies.has(MIRROR_STORAGE_KEY)) return true;
-  return false;
 }
 
 export const config = {

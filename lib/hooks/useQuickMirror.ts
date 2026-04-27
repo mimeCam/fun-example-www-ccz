@@ -24,6 +24,7 @@ import {
 import { appendSnapshot } from './useEvolution';
 import { shouldReveal, QUICK_MIRROR_GATE } from '@/lib/thermal/dwell-gate';
 import { shouldAllowReveal, enterQuietZone, trackArticleVisit } from '@/lib/mirror/quiet-zone';
+import { markReturner } from '@/lib/mirror/returner-sentinel';
 
 const STORAGE_KEY = 'quick-mirror-result';
 
@@ -35,9 +36,17 @@ function loadCached(): QuickMirrorResult | null {
   } catch { return null; }
 }
 
+/**
+ * Persist a Mirror result and mark the reader as a returner on the wire.
+ * The two writes share a `try` so a failed `localStorage.setItem` does NOT
+ * leave the cookie promising a Mirror answer that wasn't actually stored —
+ * Elon's "cleared-storage drift" risk handled at the write side (Mike §4).
+ */
 function persist(result: QuickMirrorResult): void {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(result)); }
-  catch { /* ephemeral fallback — quick mirror is session-only */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+    markReturner();
+  } catch { /* ephemeral fallback — quick mirror is session-only */ }
 }
 
 export function useQuickMirror(
