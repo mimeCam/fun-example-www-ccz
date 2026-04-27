@@ -11,11 +11,17 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import type { Letter, LetterContext } from '@/types/book-narration';
 import type { ArchetypeKey } from '@/types/content';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
+import {
+  resolveRecognitionTimeline,
+  silentTimeline,
+  type RecognitionPhase,
+} from '@/lib/return/recognition-timeline';
 import { getSeason } from '@/lib/mirror/season-engine';
 import { composeLetter } from '@/lib/mirror/letter-engine';
 import { generateLetterCard } from '@/lib/mirror/letter-card-generator';
@@ -24,7 +30,6 @@ import { DismissButton } from '@/components/shared/DismissButton';
 import { Divider } from '@/components/shared/Divider';
 import { ActionPressable } from '@/components/shared/ActionPressable';
 import { CopyIcon } from '@/components/shared/Icons';
-import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { thermalRadiusClassByPosture } from '@/lib/design/radius';
@@ -56,12 +61,14 @@ const CLOSING_QUIET   = alphaClassOf('foreground', 'quiet',    'text');   // tex
 const COMPACT_QUIET   = alphaClassOf('mist',       'quiet',    'text');   // text-mist/70
 const BORDER_HAIRLINE = alphaClassOf('accent',     'hairline', 'border'); // border-accent/10
 
-// ─── Timing — sourced from motion tokens ───────────────────
-
-/** Seed delay so approach → settle fires one frame after mount. */
-const RETURN_LETTER_SEED_MS = MOTION_REDUCED_MS * 5; // 50ms
-/** Settle dwell — `linger` beat plus one `hover` breath. */
-const RETURN_LETTER_SETTLE_MS = MOTION.linger + MOTION.hover; // 1200ms
+// ─── Timing — owned by the Recognition Timeline (Mike napkin §"Module shape") ─
+//
+// `RETURN_LETTER_SEED_MS` (50ms) and `RETURN_LETTER_SETTLE_MS` (1200ms)
+// retired: the timing for the Return Recognition Moment now lives in
+// `lib/return/recognition-timeline.ts` (the typed plan) and
+// `lib/hooks/useRecognitionPhase.ts` (the runtime adapter). One ledger
+// owns the "when"; this surface owns the "what colour" (Mike napkin
+// §"Why this, not the other four sprint candidates" #1).
 //
 // `COPY_TOAST_MS` retired (Mike napkin #100 §"The change"): the resolved-
 // layer dwell now lives inside `useActionPhase` (`ACTION_HOLD_MS`), so the
@@ -118,12 +125,19 @@ function phaseStyles(phase: Phase, settled: boolean): string {
  * A reader who turned motion off would otherwise see the card snap into
  * place visually and then sit in front of a frozen card with no dismiss
  * button, no Copy & Share, no Save as Image for ~1.2 seconds — because
- * the timer cascade gates `visible = phase === 'rest'`. This pure helper
- * captures the binary decision so the test fence can pin it without
- * spinning up the React effect machinery.
+ * the visible gate is `phase === 'rest'`. This pure helper captures the
+ * binary decision so the test fence can pin it without spinning up the
+ * React effect machinery.
  *
  *   reduce=true  → land at rest+settled in the same render.
- *   reduce=false → null; the useEffect runs the 50ms / 1200ms cascade.
+ *   reduce=false → null; the Recognition Timeline cascade runs as authored.
+ *
+ * Now-redundant at runtime — the Recognition Timeline + `useRecognitionPhase`
+ * hook short-circuit reduced-motion plans to `'fold'` in one render
+ * (`mapLetterPhase('fold') = { phase: 'rest', settled: true }`). The
+ * helper survives as a load-bearing TEST SEAM: a structural pin on the
+ * "no frozen card" property, decoupled from the runtime carrier so
+ * future contributors cannot accidentally regress the contract.
  *
  * Pure, ≤ 10 LoC. Pinned by `__tests__/ReturnLetter.gestures.test.ts`.
  */
@@ -372,13 +386,26 @@ function LetterCard({
   );
 }
 
+// ─── Letter phase derivation — pure mapping from Recognition Timeline ────
+//
+// The Return Recognition Moment's TIMING lives in
+// `lib/return/recognition-timeline.ts`; this surface only translates the
+// timeline's five-phase vocabulary back into the local
+// `'approach'|'settle'|'rest'` register the `phaseStyles` map and the
+// `__testing__` seam already speak. Pure, ≤ 10 LoC. Mike napkin
+// §"Module shape" #2 — surface-side adoption is a phase rename, no
+// re-authored cascade.
+function mapLetterPhase(p: RecognitionPhase): { phase: Phase; settled: boolean } {
+  if (p === 'rest') return { phase: 'approach', settled: false };
+  if (p === 'lift') return { phase: 'settle',   settled: false };
+  return { phase: 'rest', settled: p !== 'fold' };
+}
+
 // ─── Main Component ──────────────────────────────────────
 
 export function ReturnLetter() {
   const rec = useReturnRecognition();
   const reduce = useReducedMotion();
-  const [phase, setPhase] = useState<Phase>('approach');
-  const [settled, setSettled] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   // Build letter context + compose
@@ -392,19 +419,21 @@ export function ReturnLetter() {
   const letterCtx = showLetter ? buildContext(rec) : null;
   const letter = letterCtx ? composeLetter(letterCtx) : null;
 
-  // Animation timeline (approach → settle → rest).
+  // Animation timeline — owned by the Recognition Timeline ledger.
   // POI-1 (Mike §3.1, Tanya §3): under `prefers-reduced-motion: reduce`
-  // we land at rest+settled in the same render so the dismiss + Copy &
-  // Share + Save as Image buttons are immediately interactive — without
-  // the branch the reader sits in front of a frozen card for ~1.2s.
-  useEffect(() => {
-    if (!showLetter || !letter) return;
-    const landing = reducedMotionLanding(reduce);
-    if (landing !== null) { setPhase(landing.phase); setSettled(landing.settled); return; }
-    const t1 = setTimeout(() => setPhase('settle'), RETURN_LETTER_SEED_MS);
-    const t2 = setTimeout(() => { setPhase('rest'); setSettled(true); }, RETURN_LETTER_SETTLE_MS);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, [showLetter, letter, reduce]);
+  // the resolver returns the all-floor plan; the hook short-circuits to
+  // 'fold' on mount so the dismiss + Copy & Share + Save as Image are
+  // immediately interactive — no hand-rolled `setTimeout` cascade in
+  // this file. The deps `[showLetter, letter, reduce]` survive on the
+  // memo so a future contributor reads the same wiring contract.
+  const timeline = useMemo(
+    () => (showLetter && letter)
+      ? resolveRecognitionTimeline('letter', { reducedMotion: reduce })
+      : silentTimeline(),
+    [showLetter, letter, reduce],
+  );
+  const { phase: timelinePhase } = useRecognitionPhase(timeline);
+  const { phase, settled } = mapLetterPhase(timelinePhase);
 
   const handleDismiss = useCallback(() => {
     setDismissed(true);
@@ -449,6 +478,7 @@ export const __testing__ = {
   CompactGreeting,
   phaseStyles,
   reducedMotionLanding,
+  mapLetterPhase,
   REVEAL_GESTURE,
   FADE_GESTURE,
   LABEL_RECEDE,

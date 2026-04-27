@@ -2,34 +2,40 @@
  * RecognitionWhisper — ambient return-visit recognition.
  *
  * Renders the archetype whisper as an atmospheric element, not a modal/toast.
- * Hidden on first visit (stranger tier). Fades in, settles to 30% opacity.
- * A breath. The blog saying "I remember you" without saying it.
+ * Hidden on first visit (stranger tier). Fades in via a CSS animation-delay
+ * (the *visible* lift gate); after the canonical recognition silence dwells
+ * out, the cue drops to muted. A breath. The blog saying "I remember you"
+ * without saying it.
+ *
+ * Timing — the cue's full state machine (rest → lift → settle → hold → fold)
+ * lives in `lib/return/recognition-timeline.ts` and is walked by
+ * `useRecognitionPhase`. The resolver returns the `whisperTimeline()` plan
+ * (`holdMs = MOTION.linger * 8`, `foldMs = MOTION.settle`) — the canonical
+ * eight-`linger`-breath dwell shared with `ViaWhisper`. The local hand-rolled
+ * `WHISPER_SETTLE_MS = MOTION.linger * 8` constant retired with this PR
+ * (Mike napkin §"Surgical adoption").
  *
  * Design tokens: mist text, rose accent on archetype keyword, gold glow.
  */
 
 'use client';
 
-import { useEffect, useState } from 'react';
 import type { ReturnRecognitionState } from '@/lib/hooks/useReturnRecognition';
 import { MOTION } from '@/lib/design/motion';
 import { gestureClassesOf } from '@/lib/design/gestures';
-
-/** Whisper-settle dwell: eight `linger` breaths. A long, ambient quiet. */
-const WHISPER_SETTLE_MS = MOTION.linger * 8; // 8000ms
+import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
+import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
+import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
 
 interface Props {
   recognition: ReturnRecognitionState;
 }
 
 export function RecognitionWhisper({ recognition }: Props) {
-  const [settled, setSettled] = useState(false);
-
-  useEffect(() => {
-    if (!recognition.isReturning) return;
-    const id = setTimeout(() => setSettled(true), WHISPER_SETTLE_MS);
-    return () => clearTimeout(id);
-  }, [recognition.isReturning]);
+  const reduce = useReducedMotion();
+  const timeline = resolveRecognitionTimeline('whisper', { reducedMotion: reduce });
+  const { phase } = useRecognitionPhase(timeline);
+  const settled = phase === 'hold' || phase === 'fold';
 
   if (!recognition.isReturning || !recognition.lastWhisper) return null;
 

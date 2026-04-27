@@ -9,6 +9,8 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - `lib/detection/` — first-paint archetype heuristic
 - `lib/mirror/` — Mirror snapshot store, `__rt=1` returner sentinel
 - `lib/sharing/` — clipboard, share cards, keepsake SVG/PNG
+- `lib/return/` — recognition surface selector, recognition timeline
+- `lib/hooks/` — shared React hooks
 - `lib/engagement/` — loop-funnel, archetype-bucket
 - `components/shared/` — shared primitives
 - `scripts/` — build-time codegen
