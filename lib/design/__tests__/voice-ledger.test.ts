@@ -42,6 +42,8 @@ import {
 const ALL_SURFACES: readonly Surface[] = [
   'chip', 'thread', 'ceremony', 'keepPlate', 'keepsake', 'letter', 'whisper',
   'textLink',
+  // ─── Navigation surfaces (Mike napkin #90 / Tanya UX #42) ──────────
+  'gem', 'nav', 'navPulseDot',
 ] as const;
 
 /** Every voice referenced anywhere in the ledger, deduped. */
@@ -59,7 +61,7 @@ describe('voice-ledger — exhaustive over Surface', () => {
     expect(Array.isArray(VOICE_LEDGER[s])).toBe(true);
   });
 
-  it('VOICE_LEDGER keys are exactly the eight Surface members', () => {
+  it('VOICE_LEDGER keys are exactly the eleven Surface members', () => {
     expect(new Set(Object.keys(VOICE_LEDGER))).toEqual(new Set(ALL_SURFACES));
   });
 

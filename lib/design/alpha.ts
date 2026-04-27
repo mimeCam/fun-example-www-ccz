@@ -261,6 +261,22 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   list (rule-of-three twin to napkin #51). Pinned in
   //   `lib/design/__tests__/archetype-accents.test.ts` +
   //   `components/reading/__tests__/NextRead.adoption.test.ts`.
+  // Live drifter retired (Mike napkin #90 + Tanya UX #42, Sid 2026-04-27):
+  //   `GemHome.tsx` graduated to the Voice Ledger via the new resolver in
+  //   `lib/design/nav-paint.ts`. Four state classes now route through
+  //   `alphaClassOf` and snap to ledger rungs:
+  //     quiet/dormant — `text-mist/20` → `text-mist/10`  (hairline)
+  //     stirring      — `text-gold/30` (no change)        (muted)
+  //     warm          — `text-gold/60` → `text-gold/50`  (recede)
+  //     luminous      — `text-gold/80` → `text-gold/70`  (quiet)
+  //   The asymmetric move (mist/20 → mist/10) is deliberate (Tanya UX #42
+  //   §1): "on article pages the gem is waypoint, not lantern" — the
+  //   `hairline` rung's felt sentence ("it's geometry") matches the intent
+  //   exactly. The gold rungs step BACK to honour Krystle's pair-rule for
+  //   sister gold surfaces (Mike #92): the Golden Thread paints at full
+  //   presence at its tide-mark crest; the gem at every state sits at
+  //   least one rung lower. The list ONLY shrinks. Pinned in
+  //   `lib/design/__tests__/nav-voice-adoption.test.ts`.
   // Live drifter retired (Mike napkin #110, Tanya UIX #43, Krystle drift-
   //   density pick): `ThreadKeepsake.tsx` — TWO drift sites snapped to
   //   the ledger. (1) keepsake preview frame: `border-fog/20` →
@@ -281,7 +297,6 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   'components/content/StratifiedRenderer.tsx',
   'components/home/ViaWhisper.tsx',
   'components/navigation/AmbientNav.tsx',
-  'components/navigation/GemHome.tsx',
   'components/resonances/ResonanceDrawer.tsx',
   'components/resonances/ResonanceSectionHeader.tsx',
   'components/shared/Threshold.tsx',

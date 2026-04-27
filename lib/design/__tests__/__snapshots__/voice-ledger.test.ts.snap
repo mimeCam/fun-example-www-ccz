@@ -16,6 +16,10 @@ exports[`voice-ledger — snapshot pin (any change is a deliberate review) VOICE
     "voice.rose",
     "voice.mist",
   ],
+  "gem": [
+    "nav.dormant",
+    "nav.warmth",
+  ],
   "keepPlate": [
     "archetype.gold",
   ],
@@ -28,6 +32,16 @@ exports[`voice-ledger — snapshot pin (any change is a deliberate review) VOICE
   "letter": [
     "recognition.accent",
     "recognition.mist",
+  ],
+  "nav": [
+    "nav.dormant",
+    "nav.warmth",
+    "nav.hover-mist",
+    "nav.hover-rose",
+    "thermal.accent",
+  ],
+  "navPulseDot": [
+    "thermal.accent",
   ],
   "textLink": [
     "thermal.accent",

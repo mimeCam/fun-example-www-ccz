@@ -73,7 +73,18 @@ export type Surface =
   | 'keepsake'
   | 'letter'
   | 'whisper'
-  | 'textLink';
+  | 'textLink'
+  // ─── Navigation surfaces — the chrome that paints on every page ─────
+  // The nav is global chrome (Elon #53 §3 — "global → chrome → page; sort
+  // by token count within a tier"). Three surfaces, three rows, all
+  // routing through `lib/design/nav-paint.ts` so the literals stay in one
+  // file and the audit can grep them. Mike napkin #90 §1.
+  //   gem          — top-left `<GemHome />` (one icon, one focus pill)
+  //   nav          — bottom `<AmbientNav />` items (inactive + per-route hover)
+  //   navPulseDot  — three-layer pulse on the active nav item (CSS-driven)
+  | 'gem'
+  | 'nav'
+  | 'navPulseDot';
 
 // ─── Voices — the only paint atoms the system admits ──────────────────────
 
@@ -98,7 +109,16 @@ export type Voice =
   | 'recognition.accent'   // ReturnLetter heading
   | 'recognition.mist'     // ReturnLetter sign-off, Whisper body
   | 'archetype.gold'       // KeepsakePlate, Ceremony, Whisper keyword
-  | 'archetype.halo';      // ThreadKeepsake archetype-tinted orb
+  | 'archetype.halo'       // ThreadKeepsake archetype-tinted orb
+  // ─── Navigation voices — chrome paint, one role per atom ─────────────
+  // Family-shared with existing voices but role-namespaced — same trick
+  // `voice.accent` / `recognition.accent` / `thermal.accent` use to keep
+  // the same hue's many roles auditable per surface. Tanya UX #42 §1
+  // pinned the *rungs*; this naming pins the *role*.
+  | 'nav.dormant'          // gem quiet/dormant, nav inactive (mist family)
+  | 'nav.warmth'           // gem stirring/warm/luminous, nav hover-gold (gold family)
+  | 'nav.hover-mist'       // nav Articles hover (mist family)
+  | 'nav.hover-rose';      // nav Book hover (rose family)
 
 // ─── The ledger — exhaustive Record<Surface, readonly Voice[]> ─────────────
 
@@ -146,6 +166,32 @@ export const VOICE_LEDGER: Record<Surface, readonly Voice[]> = {
   // row pins what is *new* here: the destination-accent foreshadow paint.
   // (Mike napkin #45 §"Points of interest #2"; Tanya UX #46 §4.)
   textLink:  ['thermal.accent', 'voice.accent', 'archetype.gold', 'worldview.rose'],
+  // ─── gem — the top-left waypoint, two voices on one icon ─────────────
+  // Tanya UX #42 §1 felt-sentence calibration:
+  //   nav.dormant  — quiet/dormant — `mist/hairline` ("it's geometry").
+  //   nav.warmth   — stirring/warm/luminous — `gold` at three rungs
+  //                  (`muted`/`recede`/`quiet`) — single voice, alpha
+  //                  carries the warming, family carries the welcome.
+  // The hover rule (`hover:text-gold`) lives on the same `gold` family;
+  // counted under `nav.warmth` (the pair-rule sister of the warm states).
+  gem: ['nav.dormant', 'nav.warmth'],
+  // ─── nav — bottom AmbientNav items: inactive + per-route hover + active
+  // The active item routes through `nav-active-link` CSS which paints
+  // `var(--token-accent)` — that is `thermal.accent` by voice (same
+  // address as the Golden Thread). The four hover voices fan out by
+  // destination: Threshold/Mirror → gold, Articles → mist, Book → rose.
+  nav: [
+    'nav.dormant',     // text-mist/50 (recede) — inactive baseline
+    'nav.warmth',      // hover:text-gold — Threshold + Mirror destinations
+    'nav.hover-mist',  // hover:text-mist — Articles destination
+    'nav.hover-rose',  // hover:text-rose — Book destination
+    'thermal.accent',  // .nav-active-link — current route via --token-accent
+  ],
+  // ─── navPulseDot — three CSS layers, one voice ───────────────────────
+  // The pulse is CSS-only (`.nav-pulse-{core,ring,aura}` in globals.css);
+  // each layer paints `color-mix` over `var(--token-accent)`. One voice,
+  // no Tailwind literals in the component source — that is the design.
+  navPulseDot: ['thermal.accent'],
 } as const;
 
 // ─── Helpers — pure, each ≤ 10 LOC ─────────────────────────────────────────
@@ -186,6 +232,10 @@ const TAILWIND_FAMILY_OF: Record<Voice, string> = {
   'recognition.mist':   'mist',
   'archetype.gold':     'gold',
   'archetype.halo':     'arch',
+  'nav.dormant':        'mist',
+  'nav.warmth':         'gold',
+  'nav.hover-mist':     'mist',
+  'nav.hover-rose':     'rose',
 };
 
 /** Tailwind family literal for a voice (e.g. `'accent'` for `voice.accent`). Pure. */
@@ -219,6 +269,10 @@ const CSS_VAR_OF: Record<Voice, string> = {
   'recognition.mist':   '--mist',
   'archetype.gold':     '--gold',
   'archetype.halo':     '--arch',
+  'nav.dormant':        '--mist',
+  'nav.warmth':         '--gold',
+  'nav.hover-mist':     '--mist',
+  'nav.hover-rose':     '--rose',
 };
 
 /** CSS custom-property name for a voice (e.g. `'--token-accent'`). Pure. */

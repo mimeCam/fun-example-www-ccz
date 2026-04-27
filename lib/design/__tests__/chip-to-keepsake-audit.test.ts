@@ -288,7 +288,9 @@ describe('journey invariant — no surface borrows another surface\'s family', (
   it('every Surface has a non-empty license (sanity guard for the ledger)', () => {
     const SURFACES: Surface[] =
       ['chip', 'thread', 'ceremony', 'keepPlate', 'keepsake', 'letter', 'whisper',
-       'textLink'];
+       'textLink',
+       // Navigation chrome surfaces (Mike napkin #90 / Tanya UX #42).
+       'gem', 'nav', 'navPulseDot'];
     SURFACES.forEach((s) => expect(licenseFor(s).length).toBeGreaterThan(0));
   });
 });

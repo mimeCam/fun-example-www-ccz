@@ -24,6 +24,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 - **Universal Exit:** overlay close → `<DismissButton.Inline />` / `<DismissButton.Absolute />`. Fence: `dismiss-verb-fence.test.ts`.
 - **Overlay nameplate:** every overlay opens with `<OverlayHeader title blurb onClose />` — `items-center`, no `className`. Fence: `overlay-header-fence.test.ts`.
 - **Section divider:** `<Divider.Static />` / `<Divider.Reveal />` / `<Divider.Centered />` — gold/10, `max-w-divider`, `rounded-full`, no `className`/`style`. Fence: `divider-fence.test.ts`.
+- **Navigation paint:** `gemPaint` / `gemShadow` / `navItemPaint` / `navItemActivePaint` — Voice-Ledger surfaces `gem` / `nav` / `navPulseDot`. No raw `text-{mist|gold|rose|fog}/<N>` literals in `GemHome.tsx` or `AmbientNav.tsx`; resolver routes through `alphaClassOf`. Fence: `nav-voice-adoption.test.ts`.
 
 ## WIP
 (none)

@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`nav-paint — (state, quiet) → className snapshot gemPaint (state, quiet) map is byte-pinned 1`] = `
+{
+  "dormant|quiet=false": "text-mist/10",
+  "dormant|quiet=true": "text-mist/10",
+  "luminous|quiet=false": "text-gold/70",
+  "luminous|quiet=true": "text-mist/10",
+  "stirring|quiet=false": "text-gold/30",
+  "stirring|quiet=true": "text-mist/10",
+  "warm|quiet=false": "text-gold/50",
+  "warm|quiet=true": "text-mist/10",
+}
+`;
+
+exports[`nav-paint — (state, quiet) → className snapshot gemShadow (state, quiet) map is byte-pinned (luminous halo, all else bare) 1`] = `
+{
+  "dormant|quiet=false": "",
+  "dormant|quiet=true": "",
+  "luminous|quiet=false": "drop-shadow-sys-whisper",
+  "luminous|quiet=true": "",
+  "stirring|quiet=false": "",
+  "stirring|quiet=true": "",
+  "warm|quiet=false": "",
+  "warm|quiet=true": "",
+}
+`;
+
+exports[`nav-paint — (state, quiet) → className snapshot navItemPaint (route) map is byte-pinned 1`] = `
+{
+  "/": "text-mist/50 hover:text-gold",
+  "/articles": "text-mist/50 hover:text-mist",
+  "/mirror": "text-mist/50 hover:text-gold",
+  "/resonances": "text-mist/50 hover:text-rose",
+}
+`;
