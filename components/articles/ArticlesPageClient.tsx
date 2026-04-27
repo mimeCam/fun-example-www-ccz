@@ -18,6 +18,18 @@ import { ArchetypeKey } from '@/types/content';
 import { getExtensionLabel } from '@/lib/content/content-layers';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import ExploreArticleCard from '@/components/explore/ExploreArticleCard';
+import { alphaClassOf } from '@/lib/design/alpha';
+
+// ─── Alpha-ledger handles (Mike napkin #116, Tanya UIX #3 §2.1) ───────────
+//
+// The curated heading rule and the curated card border (`CURATED_REST` in
+// `ExploreArticleCard.tsx`) share a rung — both `gold/muted`. Same warmth
+// speaking the same line; the eye reads the curated band as one object,
+// not "header + cards" (Tanya UIX #3 §2.1 — "one breath of gold").
+// Module-scope so the per-file SSR pin can reach the handle without
+// mounting the page; idiom mirrors `EvolutionThread.HAIRLINE_BORDER` /
+// `ViaWhisper.WHISPER_TEXT` / `ResonanceSectionHeader.GOLD_RUNG`.
+const CURATED_HEADING_RULE = alphaClassOf('gold', 'muted', 'bg');
 
 // ─── Archetype affinity scoring ────────────────────────────
 
@@ -90,16 +102,17 @@ function CuratedRow({
 }) {
   return (
     <section className="mb-sys-10">
-      {/* Tanya UX #58 §7: the curated row's heading rule and the curated
-          card border share a rung — both `muted` (0.30). Same warmth
-          speaking the same line. The grandfather entry stays for now
-          (other drift in this file may surface in a future audit; this
-          file remains scoped out per Mike napkin #50 §9). */}
+      {/* Tanya UIX #3 §2.1, Mike napkin #116: the curated row's heading
+          rule and the curated card border (`CURATED_REST`) share a rung —
+          both `gold/muted`. Routed through the ledger via
+          `CURATED_HEADING_RULE` at module scope so the SSR pin can reach
+          the handle. The list goes 3 → 2; the curated band reads as one
+          breath of gold. */}
       <div className="flex items-center gap-sys-4 mb-sys-7">
         <h2 className="font-display text-gold text-sys-xl font-sys-heading">
           {getExtensionLabel(archetype)}
         </h2>
-        <div className="flex-1 h-px bg-gold/30" />
+        <div className={`flex-1 h-px ${CURATED_HEADING_RULE}`} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-sys-5">
         {curated.map((article, i) => (
@@ -114,3 +127,11 @@ function CuratedRow({
     </section>
   );
 }
+
+// ─── Test-only surface ────────────────────────────────────────────────────
+//
+// Surface the private `CuratedRow` + the resolved `CURATED_HEADING_RULE` to
+// the per-file SSR pin (`__tests__/ArticlesPageClient.alpha.test.ts`). The
+// shape mirrors `QuoteKeepsake.__testing__` and `ExploreArticleCard.
+// __testing__` — the alpha-ledger graduation idiom in this repo.
+export const __testing__ = { CuratedRow, CURATED_HEADING_RULE };

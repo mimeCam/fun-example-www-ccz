@@ -451,7 +451,33 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   .test.ts`; pinned site-wide by `lib/design/__tests__/alpha-adoption
   //   .test.ts` (`/40` and `/60` are no longer legal rungs).
   //   The grandfather list shrinks 4 → 3. The list ONLY shrinks.
-  'components/articles/ArticlesPageClient.tsx',
+  // Live drifter retired (Mike napkin #116 — One Breath Of Gold, Ledger-
+  //   Routed — + Tanya UIX #3 §2.1, Krystle drift-density pick, Sid
+  //   2026-04-27): `components/articles/ArticlesPageClient.tsx` — the
+  //   curated row's heading rule graduates to the role-based 4-rung
+  //   vocabulary. ONE drift site snapped (already on-ledger numerically;
+  //   the snap is pure routing) + module-scope handle planted:
+  //     muted — `bg-gold/30` → `alphaClassOf('gold','muted','bg')`
+  //             (= `bg-gold/30`; "ambient chrome; skip past it." The
+  //             curated heading rule and `ExploreArticleCard`'s
+  //             `CURATED_REST` border now sit on the same rung via the
+  //             same path — same warmth speaking the same line, the eye
+  //             reads the curated band as one object. Tanya UIX #3 §2.1:
+  //             "the curated band is one quiet breath of gold.")
+  //   The `CURATED_HEADING_RULE` handle joins the family of module-scope
+  //   alpha tokens already surfaced via `__testing__` on the sister sites
+  //   (`EvolutionThread.HAIRLINE_BORDER`, `ViaWhisper.WHISPER_TEXT`,
+  //   `ResonanceSectionHeader.GOLD_RUNG / MIST_RUNG`,
+  //   `QuoteKeepsake.PREVIEW_FRAME`). N=2 callers of
+  //   `alphaClassOf('gold','muted','bg'|'border')` route through the
+  //   resolver directly (this surface + `ExploreArticleCard.CURATED_REST`
+  //   on the border kind) — the resolver IS the kernel; no
+  //   `goldMutedRule()` kernel-lift (Mike #113 §6 PoI #4 / Elon §3,
+  //   rule of three not yet earned). Pinned per-file in
+  //   `components/articles/__tests__/ArticlesPageClient.alpha.test.ts`
+  //   (handles · SSR paint · drift sweep — three sections, the
+  //   QuoteKeepsake.alpha shape). The grandfather list shrinks 3 → 2.
+  //   The list ONLY shrinks.
   'components/content/StratifiedRenderer.tsx',
   'components/shared/Threshold.tsx',
 ] as const;
