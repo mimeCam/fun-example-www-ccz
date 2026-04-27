@@ -80,6 +80,12 @@ const TITLE_WARM = gestureClassesOf('title-warm');
  * keeps it from drifting back into noise. Pure, ≤ 10 LOC.
  */
 function edgeClass(isCurated: boolean): string {
+  // alpha-ledger:exempt — JIT mirror of CURATED_REST/CURATED_HOVER (and the
+  // ORGANIC_REST/ORGANIC_HOVER pair). Tailwind's JIT cannot see
+  // `hover:${X}` interpolation; the full token must appear verbatim in
+  // source. These literals are intentionally byte-identical to the
+  // `alphaClassOf` consts above so the compiler picks both spellings up.
+  // Mike napkin #113 §6 PoI #3 — option (a), pinned by divider-fence Axis F.
   return isCurated
     ? 'border border-gold/30 hover:border-gold/50 card-alive-curated'
     : 'border border-fog/10 hover:border-fog/50';

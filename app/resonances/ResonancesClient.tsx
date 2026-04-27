@@ -36,6 +36,7 @@ import ResonanceEntry from './ResonanceEntry';
 import EvolutionThread from './EvolutionThread';
 import { ResonanceSectionHeader } from '@/components/resonances/ResonanceSectionHeader';
 import ResonanceExport from './ResonanceExport';
+import { Divider } from '@/components/shared/Divider';
 import { LeanArrow } from '@/components/shared/LeanArrow';
 import { TextLink } from '@/components/shared/TextLink';
 import { Skeleton } from '@/components/shared/Skeleton';
@@ -234,14 +235,15 @@ export default function ResonancesClient() {
 
             return (
               <div key={r.id}>
-                {/* Chapter break marker */}
+                {/* Chapter break marker — routes through `Divider.Centered`
+                    (Mike napkin #37 §1, divider-fence Axis A). The kernel
+                    paints the hairline at `bg-gold/10` via alphaClassOf,
+                    centers via `mx-auto`, and renders the optional italic
+                    micro-label below the line — the same shape this section
+                    already had, sourced from the canonical primitive
+                    (Tanya UIX #28 §3.4 "the comma between chapters"). */}
                 {brk?.isBreak && (
-                  <div className="my-sys-9 text-center">
-                    <div className="h-px bg-gold/20 max-w-divider mx-auto" />
-                    <p className="text-mist/50 text-sys-micro italic mt-sys-3">
-                      {brk.label}
-                    </p>
-                  </div>
+                  <Divider.Centered label={brk.label} />
                 )}
                 <ResonanceEntry
                   resonance={r}

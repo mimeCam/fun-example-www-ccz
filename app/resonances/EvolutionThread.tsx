@@ -8,9 +8,10 @@
  * silence, not boilerplate"; Paul MH-6 generalized — when the system can't
  * recognize the reader, it fails silently and politely.)
  *
- * Tile chrome (Tanya UX §3.1): a single hairline `border-l-2 border-gold/20`
- * running down the page's spine — the same gold thread the chapter-break
- * hairline and carrying-section divider already use. No fill, no rounded
+ * Tile chrome (Tanya UX §3.1, Mike napkin #113): a single hairline
+ * `border-l-2 border-gold/10` (= `alphaClassOf('gold','hairline','border')`)
+ * running down the page's spine — the same gold thread `Divider.Static` and
+ * `MirrorRevealCard`'s `BORDER_HAIRLINE` already speak. No fill, no rounded
  * corners, no posture lie. The italic gold/70 line IS the whole flag.
  *
  * Motion: rides the same scroll-rise wave as `ResonanceEntry` — one
@@ -38,7 +39,16 @@ import { type RefObject } from 'react';
 import type { BookNarrationContext } from '@/types/book-narration';
 import { synthesizeBookWhisper } from '@/lib/mirror/book-whisper-engine';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
+import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesOf } from '@/lib/design/gestures';
+
+/* ─── Alpha-ledger handle (JIT-safe literal via alphaClassOf) ──────────────
+   Same shape as `Divider.HAIRLINE_BG` and `MirrorRevealCard.BORDER_HAIRLINE`.
+   Sister surfaces, one rung, one address — the whisper line and the section
+   divider above/below it now paint at the same `hairline` rung
+   (= `border-gold/10`). Mike napkin #113, Tanya UIX #54 §3 — "one filament,
+   one voice." */
+const HAIRLINE_BORDER = alphaClassOf('gold', 'hairline', 'border'); // border-gold/10
 
 interface Props {
   /** Data-driven context from resonance signals. Required — no fallback voice. */
@@ -56,7 +66,7 @@ export default function EvolutionThread({ context, index }: Props) {
     // alpha-ledger:exempt — motion fade endpoint (the rise keyframe owns the opacity transition)
     <div
       ref={ref as RefObject<HTMLDivElement>}
-      className={`pl-sys-5 my-sys-7 border-l-2 border-gold/20 transition-opacity ${gestureClassesOf('whisper-linger')}`}
+      className={`pl-sys-5 my-sys-7 border-l-2 ${HAIRLINE_BORDER} transition-opacity ${gestureClassesOf('whisper-linger')}`}
     >
       <p className="text-gold/70 italic text-sys-caption typo-caption">
         {whisper}
@@ -64,3 +74,11 @@ export default function EvolutionThread({ context, index }: Props) {
     </div>
   );
 }
+
+/**
+ * Test seam — exposes the module-scope alpha-ledger handle so the per-file
+ * adoption test can assert the rung tag without spinning up a renderer for
+ * every assertion. Mirrors the `__testing__` idiom on `MirrorRevealCard`
+ * and `ResonanceEntry` (Mike napkin #19 §5; #111 §4.1).
+ */
+export const __testing__ = { HAIRLINE_BORDER } as const;

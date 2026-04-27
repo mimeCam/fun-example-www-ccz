@@ -391,8 +391,46 @@ export const ALPHA_COLOR_SHORTHAND_GRANDFATHERED_PATHS: readonly string[] = [
   //   (Mike #30 §PoI #1 / Elon §2). Pinned in
   //   `components/resonances/__tests__/ResonanceDrawer.alpha.test.ts`.
   //   The list ONLY shrinks.
-  'app/resonances/EvolutionThread.tsx',
-  'app/resonances/ResonancesClient.tsx',
+  // Live drifter retired (Mike napkin #113 — One Filament, Ledger-Routed,
+  //   Fenced — + Tanya UIX #54 §1, Sid 2026-04-27):
+  //   `app/resonances/EvolutionThread.tsx` — the single off-ledger literal
+  //   on the whisper-line carrier graduates to the role-based 4-rung
+  //   vocabulary. ONE drift site snapped + module-scope handle planted:
+  //     hairline — `border-gold/20` → `alphaClassOf('gold','hairline',
+  //                'border')` (= `border-gold/10`; "it's geometry; the eye
+  //                registers it as space, not surface."). The whisper line
+  //                and the section dividers above/below it now paint at
+  //                the same rung — the reader's eye no longer sees the
+  //                frame trying to introduce the words. The `HAIRLINE_BORDER`
+  //                handle joins `Divider.HAIRLINE_BG`, `MirrorRevealCard.
+  //                BORDER_HAIRLINE`, and `StratifiedRenderer.HAIRLINE_BORDER`
+  //                as sister surfaces — N=4 callers of `alphaClassOf('gold',
+  //                'hairline','border'|'bg')` route through the resolver
+  //                directly (no `goldHairlineBorder()` kernel-lift; the
+  //                resolver IS the kernel — Mike #113 §6 PoI #4 / Elon §3).
+  //   The four-site rhythm fence (`ViaWhisper`, `RecognitionWhisper`,
+  //   `GemHome`, `EvolutionThread`) now shares the rung anchor: one
+  //   filament, one voice. Pinned per-file in `app/resonances/__tests__/
+  //   EvolutionThread.alpha.test.ts`; pinned site-wide by `components/
+  //   shared/__tests__/divider-fence.test.ts` Axis F (no raw `border-
+  //   gold/<N>` outside the kernel + ledger + print domain + JIT-mirror
+  //   carve-out).
+  // Live drifter retired (Mike napkin #113 §6 PoI ride-along, Sid
+  //   2026-04-27): `app/resonances/ResonancesClient.tsx` — the chapter
+  //   break marker graduates onto the `Divider.Centered` kernel. ONE
+  //   drift site retired with the snap:
+  //     hairline — `<div className="h-px bg-gold/20 max-w-divider mx-auto" />`
+  //                + sibling label `<p>` → `<Divider.Centered label={brk.
+  //                label} />`. The kernel resolves the geometry to
+  //                `bg-gold/10` via alphaClassOf, the label sits below
+  //                the line as italic micro-caption (Tanya UIX #28 §3.4
+  //                "the comma between chapters"). The duplicated
+  //                hand-rolled-hairline + label-below pair retires; one
+  //                primitive, one address. Divider-fence Axis A goes
+  //                green for this file as a side effect.
+  //   Remaining literals on the file are all on-ledger (`text-gold/70`
+  //   = quiet, `text-mist/50` = recede); the file leaves the grandfather
+  //   list with zero off-ledger drift.
   'components/articles/ArticlesPageClient.tsx',
   'components/content/StratifiedRenderer.tsx',
   'components/home/ViaWhisper.tsx',

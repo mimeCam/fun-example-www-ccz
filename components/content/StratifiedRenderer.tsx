@@ -22,7 +22,15 @@ import {
 } from '@/lib/content/content-layers';
 import { passageThermalClass } from '@/lib/design/typography';
 import { Divider } from '@/components/shared/Divider';
+import { alphaClassOf } from '@/lib/design/alpha';
 import { NewContentBadge } from './NewContentBadge';
+
+/* ─── Alpha-ledger handle (JIT-safe literal via alphaClassOf) ──────────────
+   Sister to `Divider.HAIRLINE_BG`, `MirrorRevealCard.BORDER_HAIRLINE`, and
+   `EvolutionThread.HAIRLINE_BORDER`. The variant accent on a core paragraph
+   sits at the `hairline` rung (= `border-gold/10`) — geometry, not surface;
+   the same gold thread the page already speaks. Mike napkin #113. */
+const HAIRLINE_BORDER = alphaClassOf('gold', 'hairline', 'border'); // border-gold/10
 
 interface StratifiedRendererProps {
   blocks: ContentBlock[];
@@ -48,7 +56,7 @@ function CoreBlock({ paragraphs, prefix, offset, resolved }: {
             key={i}
             data-paragraph-id={`${prefix}-p${offset + i}`}
             data-variant={variant?.source ?? undefined}
-            className={`text-foreground max-w-prose-ch ${variant ? 'pl-sys-4 border-l-2 border-gold/10' : ''}`}
+            className={`text-foreground max-w-prose-ch ${variant ? `pl-sys-4 border-l-2 ${HAIRLINE_BORDER}` : ''}`}
           >
             {p.trim()}
           </p>
@@ -229,7 +237,13 @@ function ResonanceMarginaliaBlock({ block, warmer }: { block: ContentBlock; warm
       <p className={`text-sys-body text-foreground/70 italic ${passageThermalClass()}`}>
         &ldquo;{data.quote}&rdquo;
       </p>
-      <div className="h-px bg-gold/20 max-w-divider my-sys-4" />
+      {/* Resonance-marginalia inner divider — the comma between the quoted
+          line and the reader's note. Routes through the `Divider.Static`
+          kernel so the geometry/alpha pair-rule stays one address (Mike
+          napkin #37 §1, divider-fence Axis A). Pre-snap was a raw
+          `h-px bg-gold/20 max-w-divider my-sys-4` literal — the sibling
+          `bg-gold/20` drift retired at the same time the geometry did. */}
+      <Divider.Static spacing="sys-4" />
       <p className={`text-sys-body text-rose italic ${passageThermalClass()}`}>
         {data.note}
       </p>
