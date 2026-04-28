@@ -29,11 +29,20 @@
  *                                   (forbid the three rung literals
  *                                    outside the canonical home)
  *
- * Three rungs, derived from the longest-settled-label per host:
+ * Three rungs, derived from the longest-settled-label per host. The five
+ * compositional carriers (Mike #94 §2.1 — JSDoc on `<ActionPressable>` is
+ * the source of truth for *which file* speaks each rung) land as follows:
  *
  *   rung 1 — `Copied` (6 ch)              → 5.5rem · ReturnLetter Copy
+ *                                                  · Quote/ThreadKeepsake
+ *                                                    SecondaryAction × 3 each
  *   rung 2 — `Copy Link` ↔ `Copied!`      → 6.5rem · ShareOverlay tooltip
  *   rung 3 — `Share this card`/`thread`   → 14rem  · Quote/ThreadKeepsake
+ *                                                    primary CTA
+ *
+ *   exempt — icon-only hosts with `labelMode='hidden'` (no label swap, glyph
+ *            byte-identical at size 14): ShareOverlay CopyLinkBtn,
+ *            SelectionShareTrigger. See `// swap-width:exempt` tokens in source.
  *
  * No build-time codegen pipeline (Mike #39 §3, Paul §5): three documented
  * constants whose source labels live in JSDoc on each rung. If `Copying…`

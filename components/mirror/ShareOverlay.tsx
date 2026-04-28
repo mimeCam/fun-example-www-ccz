@@ -207,6 +207,11 @@ function CopyLinkBtn({ onClick, slot, reduce }: {
   const tooltipLabel = slot.phase === 'settled' ? 'Copied!' : 'Copy Link';
   return (
     <span className="relative group inline-flex">
+      {/* swap-width:exempt — icon-only host (labelMode='hidden'). The visible
+          verb lives on the sibling <Tooltip>, which carries `swapWidthClassOf(2)`
+          for the `Copy Link` ↔ `Copied!` reflow. The host's own bounding box
+          is icon-glyph-only and reflows by 0 ch — Mike #94 §POI-4 host-bound
+          scope, Tanya UX #76 §3.4 felt-discipline. */}
       <ActionPressable
         variant="icon"
         size="sm"

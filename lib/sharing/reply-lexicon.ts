@@ -223,6 +223,32 @@ export const CONFIRM_VERBS: readonly string[] = [
   'copied', 'saved', 'downloaded',
 ];
 
+// ─── Settled-receipt verbs (Mike #94 §2.4 — fingertip-witness parity) ──────
+
+/**
+ * Past-tense verbs that are legal `settledLabel="…"` values on the
+ * `<ActionPressable>` carriers (Tanya UX #76 §3.4 — visible label stays
+ * hard-coded English-past-tense; the archetype tone lives on Toast, not
+ * on the fingertip). The lexicon owns the *closed set*; the JSX writes
+ * the literal verbatim. Pinned by the
+ * `settled-label-lexicon-parity.fence.test.ts` smoke — a settled-label
+ * literal off this set fails CI before it reaches the screen.
+ *
+ * Intentionally separate from `CONFIRM_VERBS` (which gates the Toast
+ * lexicon's confirm cells, where every cell MUST contain at least one of
+ * `copied/saved/downloaded`). The fingertip witness has its own four-word
+ * vocabulary because the verb the FINGER pressed is not always the verb
+ * the ROOM speaks (`Share` vs. `Card copied`, etc.).
+ *
+ * Trailing `!` is tolerated (one carrier, ShareOverlay's `Copied!`,
+ * carries an exclamation that mirrors the toast-lexicon's tone-tinted
+ * shape). The parity test strips trailing punctuation before the
+ * membership check.
+ */
+export const SETTLED_RECEIPT_VERBS: readonly string[] = [
+  'Copied', 'Saved', 'Shared',
+];
+
 /** Semantic guard: every confirm cell carries one of CONFIRM_VERBS. Pure. */
 export function confirmVerbInvariantHolds(): boolean {
   return CONFIRM_KINDS.every((k) => TONE_BUCKETS.every((t) =>

@@ -270,6 +270,15 @@ interface SecondaryActionProps {
   hint: string;
 }
 
+/**
+ * Secondary-row sibling — `swapWidthClassOf(1)` pins the bounding box across
+ * the 4 ch → 5/6 ch verb-tense shift (`Copy ↔ Copied`, `Save ↔ Saved`,
+ * `Link ↔ Copied`). Mirrors `QuoteKeepsake.SecondaryAction` byte-for-byte
+ * — same rung, same helper, same compositional shape (Mike #94 — "the
+ * dialect is identical, only the work changes"). Without the floor, each
+ * press jitters the row by ~6 px and the three siblings drift right of
+ * one another. Pinned by `label-swap-width-fence.test.ts` Axis D.
+ */
 function SecondaryAction(p: SecondaryActionProps) {
   return (
     <ActionPressable
@@ -280,6 +289,7 @@ function SecondaryAction(p: SecondaryActionProps) {
       idleLabel={p.idleLabel}
       settledLabel={p.settledLabel}
       hint={p.hint}
+      className={swapWidthClassOf(1)}
     />
   );
 }

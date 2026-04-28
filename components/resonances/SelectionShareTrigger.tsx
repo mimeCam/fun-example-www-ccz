@@ -69,6 +69,11 @@ export function SelectionShareTrigger({ getQuote, onAfterCopy }: ShareTriggerPro
   const slot = useActionPhase(busy);
   const handleClick = useShareClick(setBusy, slot.pulse, getQuote, onAfterCopy);
   return (
+    // swap-width:exempt — icon-only host (variant='icon' + labelMode='hidden').
+    // The visible label is suppressed by labelMode; only the glyph swaps
+    // (LinkIcon size=14 ↔ CheckIcon size=14, byte-identical width). Zero ch
+    // of bounding-box reflow, no rung needed — same exemption shape as
+    // ShareOverlay.CopyLinkBtn. (Mike #94 §POI-4 host-bound scope.)
     <ActionPressable
       onClick={handleClick}
       phase={slot.phase}

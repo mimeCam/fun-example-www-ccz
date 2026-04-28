@@ -2,16 +2,21 @@
  * label-swap-width-fence — host-scoped CI gate for the three label-swap
  * width floors.
  *
- * Three call sites previously hand-rolled three different `min-w-[Xrem]`
- * floors on `<ActionPressable>` to stop the bounding box reflowing on a
- * verb-tense label swap (Mike #39 §1, Tanya UX #41 §0). The rule of three
- * has fired. This fence does what the kernel-first siblings do: scan
- * `<ActionPressable>` opening tags, forbid bare `min-w-[Xrem]` literals on
- * the className surface, and route every host through the canonical
- * `swapWidthClassOf(n)` helper from `lib/design/swap-width.ts`.
+ * Five compositional `<ActionPressable>` carriers ride this primitive
+ * (Mike #94 §2.1 — JSDoc carrier list on the host). The earlier three
+ * hand-rolled `min-w-[Xrem]` floors collapsed into a three-rung helper
+ * (Mike #39 §1, Tanya UX #41 §0); the carrier list grew to four (the
+ * `<SelectionShareTrigger>` orphan-graduation), and now to five with the
+ * Settled-Rhythm Rung Lock (Mike #94 §2 — secondary rows pinned at rung 1,
+ * icon-only hosts honestly exempt). This fence is the bounding-box
+ * invariant pinned in source: scan `<ActionPressable>` opening tags,
+ * forbid bare `min-w-[Xrem]` literals on the className surface, AND
+ * REQUIRE every host either compose `swapWidthClassOf(N)` (rung wire) OR
+ * carry a `// swap-width:exempt — <reason>` token in the same comment
+ * paragraph (honest exemption, single legal escape hatch).
  *
- * Three axes — kernel-first, no AST, ≤ 120 LOC of axis logic + bespoke
- * prose. Rides `_fence.ts` (the same kernel three other fences
+ * Four axes — kernel-first, no AST, ≤ 200 LOC of axis logic + bespoke
+ * prose. Rides `_fence.ts` (the same kernel several other fences
  * already share — Mike §POI-3 "do not fork the walker").
  *
  *   Axis A — Host inventory.
@@ -29,12 +34,21 @@
  *     elsewhere (modals, columns) are out of this fence's business
  *     (Mike #39 §POI-4 — host-scoped, not literal-scoped).
  *
- *   Axis C — Ledger opt-out grep.
- *     `// swap-width:exempt — <reason>` on the call's source line marks an
- *     honest exemption (e.g., a temporary tolerate path during a multi-PR
- *     migration). First-class escape hatch, mirrors the spacing-ledger /
- *     receipt-opt-out precedent. Tolerate→forbid flipped in this PR — no
- *     grandfathered allowlist entries on day one (Mike #39 §POI-6).
+ *   Axis C — Ledger opt-out shape (every exemption carries a reason).
+ *     `// swap-width:exempt — <reason>` is the documented escape hatch
+ *     (Mike #39 §POI-6, mirrors `// receipt-opt-out:` shape). Each token
+ *     occurrence MUST carry a non-empty reason after the em-dash — abuse
+ *     stays visible at a glance, drift cannot sneak in under a token-only
+ *     comment.
+ *
+ *   Axis D — Helper-or-exempt invariant (the 5th-carrier rung lock).
+ *     Every `<ActionPressable>` opening tag in scope either:
+ *       (a) composes `swapWidthClassOf(N)` somewhere on its `className`,
+ *           OR
+ *       (b) sits inside a comment paragraph carrying the exempt token.
+ *     The bounding box does not move during the `idle ↔ settled`
+ *     crossfade at any host — pinned in source, not deferred to QA
+ *     (Mike #94 §2 single invariant, Tanya UX #76 §3.2 felt-jitter).
  *
  * Failure prose is the product (Mike §6 / Tanya §2 — see action-receipt-
  * fence). Three blocks per violation: `loc — summary` / `detail` /
@@ -68,6 +82,7 @@ import {
   readBalancedDelimiters,
   lineAt,
   formatBlock,
+  stripComments,
 } from '../../../lib/design/__tests__/_fence';
 import {
   SWAP_WIDTH_RUNGS,
@@ -168,36 +183,56 @@ function candidatesForCall(rel: string, src: string, op: HostOpening): Candidate
   }));
 }
 
-// ─── Raw-source opt-out detector (Axis C) ─────────────────────────────────
+// ─── Raw-source opt-out detector (Axis C/D) ───────────────────────────────
 //
 // The kernel preprocesses comments to spaces; the `swap-width:exempt`
 // ledger comment is part of the SOURCE contract, not docs, so we re-read
 // the raw file once per scanned tsx (same pattern the action-receipt and
 // alpha-call-site fences use).
 
-const rawCache: Map<string, readonly string[]> = new Map();
+interface RawCacheEntry { raw: readonly string[]; stripped: readonly string[] }
+const rawCache: Map<string, RawCacheEntry> = new Map();
 
-function rawLines(rel: string): readonly string[] {
+function rawAndStripped(rel: string): RawCacheEntry {
   const hit = rawCache.get(rel);
   if (hit !== undefined) return hit;
-  const lines = readFileSync(join(ROOT, rel), 'utf8').split(/\r?\n/);
-  rawCache.set(rel, lines);
-  return lines;
+  const fileText = readFileSync(join(ROOT, rel), 'utf8');
+  const entry: RawCacheEntry = {
+    raw: fileText.split(/\r?\n/),
+    stripped: stripComments(fileText).split(/\r?\n/),
+  };
+  rawCache.set(rel, entry);
+  return entry;
 }
 
 interface OptOut { ok: boolean; reason: string }
 
-/** True iff `// swap-width:exempt …` sits on or near the call's source line. */
+/**
+ * True iff `// swap-width:exempt …` sits on the call's line or in the
+ * contiguous comment paragraph immediately above it. Walk upward in the
+ * RAW source looking for the token; STOP when the corresponding STRIPPED
+ * line has non-whitespace content (which means it's code, not a comment).
+ * The kernel's `stripComments` blanks every comment line to spaces while
+ * preserving newlines, so a code/comment boundary is one `trim() === ''`
+ * away — abuse cannot sneak under a token two paragraphs above.
+ */
 function readOptOut(rel: string, line: number): OptOut {
-  // Inspect the call's line + the two lines above (an attribute may sit
-  // on a dedicated source line; the comment may sit one line up). Keep
-  // the lookup window tiny — abuse is visible at a glance, not by lint.
-  for (let l = line; l >= Math.max(1, line - 2); l--) {
-    const text = rawLines(rel)[l - 1] ?? '';
+  const { raw, stripped } = rawAndStripped(rel);
+  for (let l = line; l >= 1; l--) {
+    const text = raw[l - 1] ?? '';
     const idx = text.indexOf(SWAP_WIDTH_EXEMPT_TOKEN);
-    if (idx >= 0) return { ok: true, reason: text.slice(idx + SWAP_WIDTH_EXEMPT_TOKEN.length).trim() };
+    if (idx >= 0) return { ok: true, reason: extractExemptReason(text, idx) };
+    if (l < line && (stripped[l - 1] ?? '').trim() !== '') {
+      return { ok: false, reason: '' };
+    }
   }
   return { ok: false, reason: '' };
+}
+
+/** Reason text after `swap-width:exempt[ — ]`, stripped of comment tail. */
+function extractExemptReason(text: string, idx: number): string {
+  const tail = text.slice(idx + SWAP_WIDTH_EXEMPT_TOKEN.length);
+  return tail.replace(/^\s*[—\-:]\s*/, '').replace(/\*\/\}?\s*$/, '').trim();
 }
 
 // ─── Violation collection ─────────────────────────────────────────────────
@@ -245,24 +280,32 @@ function formatViolation(v: Violation): string {
 
 // ─── Tests — Axis A · host inventory + sanity ─────────────────────────────
 
+/** Five compositional carriers; mirrors the JSDoc on `<ActionPressable>`. */
+const CANONICAL_CARRIERS: readonly string[] = [
+  'components/return/ReturnLetter.tsx',
+  'components/mirror/ShareOverlay.tsx',
+  'components/articles/QuoteKeepsake.tsx',
+  'components/reading/ThreadKeepsake.tsx',
+  'components/resonances/SelectionShareTrigger.tsx',
+];
+
 describe('label-swap-width-fence — Axis A · <ActionPressable> inventory', () => {
-  it('at least one <ActionPressable> exists in the scanned tree (not a no-op)', () => {
+  it('at least five <ActionPressable> opening tags exist in the scanned tree', () => {
+    // The five carriers include two files (Quote/ThreadKeepsake) with two
+    // host openings each (PrimaryShare + SecondaryAction); the floor is
+    // therefore seven, not five. Assert the lower bound that proves the
+    // fence isn't a no-op AND that the rung-lock saw the secondary rows.
     const total = preloadAll()
       .filter(({ rel }) => rel.endsWith('.tsx'))
       .reduce((n, { src }) => n + findHostOpenings(src).length, 0);
-    expect(total).toBeGreaterThanOrEqual(4);
+    expect(total).toBeGreaterThanOrEqual(7);
   });
 
-  it('the four canonical call-sites are all present in the scanned tree', () => {
+  it('the five canonical carriers are all present in the scanned tree', () => {
     const rels = preloadAll()
       .filter(({ src }) => /\<ActionPressable\b/.test(src))
       .map(({ rel }) => rel);
-    expect(rels).toEqual(expect.arrayContaining([
-      'components/return/ReturnLetter.tsx',
-      'components/mirror/ShareOverlay.tsx',
-      'components/articles/QuoteKeepsake.tsx',
-      'components/reading/ThreadKeepsake.tsx',
-    ]));
+    expect(rels).toEqual(expect.arrayContaining([...CANONICAL_CARRIERS]));
   });
 });
 
@@ -282,30 +325,108 @@ describe('label-swap-width-fence — Axis B · forbid bare min-w-[…] on <Actio
   });
 });
 
-// ─── Tests — Axis C · ledger opt-out grep ─────────────────────────────────
+// ─── Tests — Axis C · ledger opt-out shape ────────────────────────────────
 
-describe('label-swap-width-fence — Axis C · ledger opt-out grep', () => {
+interface ExemptOccurrence { file: string; line: number; reason: string }
+
+function collectExemptOccurrences(): ExemptOccurrence[] {
+  const out: ExemptOccurrence[] = [];
+  for (const { rel } of preloadAll()) {
+    if (!rel.endsWith('.tsx')) continue;
+    const lines = readFileSync(join(ROOT, rel), 'utf8').split(/\r?\n/);
+    lines.forEach((text, i) => {
+      const idx = text.indexOf(SWAP_WIDTH_EXEMPT_TOKEN);
+      if (idx >= 0) out.push({ file: rel, line: i + 1, reason: extractExemptReason(text, idx) });
+    });
+  }
+  return out;
+}
+
+describe('label-swap-width-fence — Axis C · ledger opt-out shape', () => {
   it('SWAP_WIDTH_EXEMPT_TOKEN is the documented opt-out marker', () => {
     expect(SWAP_WIDTH_EXEMPT_TOKEN).toBe('swap-width:exempt');
   });
 
-  it('no opt-out comment appears in the scanned tree on day one (Mike §POI-6)', () => {
-    // Tolerate→forbid flips in this PR. The four call-sites migrate in
-    // the same diff; no grandfathered allowlist entries earn a token at
-    // birth. Mirrors the Gesture Atlas closure shape.
-    const carriers: string[] = [];
-    for (const { rel, src } of preloadAll()) {
-      if (!rel.endsWith('.tsx')) continue;
-      // Scan the RAW file (kernel preprocessor blanks comments) — that
-      // is exactly where the ledger token lives.
-      const raw = readFileSync(join(ROOT, rel), 'utf8');
-      if (raw.includes(SWAP_WIDTH_EXEMPT_TOKEN)) carriers.push(rel);
+  it('every opt-out token carries a non-empty reason after the em-dash', () => {
+    // The opt-out is first-class; abuse-prevention is the reason text.
+    // A token-only comment (no reason) is the failure mode.
+    const tokenless = collectExemptOccurrences().filter((o) => o.reason === '');
+    expect(tokenless.map((o) => `${o.file}:${o.line}`)).toEqual([]);
+  });
+
+  it('only icon-only carriers carry the exempt token (Tanya UX #76 §3.2)', () => {
+    // The two legal exemptions today: ShareOverlay.CopyLinkBtn and
+    // SelectionShareTrigger — both `variant='icon' labelMode='hidden'`.
+    // Any other file growing an exempt token earns a code review, not a
+    // grandfathered pass.
+    const allowed: ReadonlySet<string> = new Set([
+      'components/mirror/ShareOverlay.tsx',
+      'components/resonances/SelectionShareTrigger.tsx',
+    ]);
+    const carriers = new Set(collectExemptOccurrences().map((o) => o.file));
+    for (const rel of carriers) expect(allowed.has(rel)).toBe(true);
+  });
+});
+
+// ─── Tests — Axis D · helper-or-exempt invariant (the rung lock) ──────────
+
+interface MissingHelper { file: string; line: number }
+
+function findMissingHelper(rel: string, src: string): MissingHelper[] {
+  return findHostOpenings(src)
+    .filter((op) => !classNameComposesHelper(extractClassNameBody(op.attrs)))
+    .map((op) => ({ file: rel, line: lineAt(src, op.index) }));
+}
+
+/** True iff the className body composes `swapWidthClassOf(…)` on this host. */
+function classNameComposesHelper(body: string | null): boolean {
+  if (body === null) return false;
+  return /\bswapWidthClassOf\s*\(/.test(body);
+}
+
+interface HelperViolation { file: string; line: number }
+
+function helperViolationsAcrossTree(): HelperViolation[] {
+  return preloadAll()
+    .filter(({ rel }) => rel.endsWith('.tsx'))
+    .flatMap(({ rel, src }) => findMissingHelper(rel, src))
+    .filter((m) => !readOptOut(m.file, m.line).ok);
+}
+
+function formatHelperFailure(v: HelperViolation): string {
+  const summary = `<${HOST_NAME}> at ${v.file}:${v.line} has no rung wire`;
+  const body =
+    `    Every <${HOST_NAME}> host must compose \`swapWidthClassOf(N)\` so the\n` +
+    `    bounding box does not move during the idle ↔ settled crossfade\n` +
+    `    (Mike #94 §2 — single invariant).\n\n` +
+    rungTable() + `\n\n` +
+    `    Wire it on the host:\n` +
+    `      <${HOST_NAME} … className={swapWidthClassOf(N)} />\n\n` +
+    `    Or, if this is icon-only (\`labelMode='hidden'\` + same-size glyph\n` +
+    `    swap), add a same-paragraph ledger comment with a reason:\n` +
+    `      // ${SWAP_WIDTH_EXEMPT_TOKEN} — <reason>`;
+  return formatBlock(`${v.file}:${v.line}`, summary, body);
+}
+
+describe('label-swap-width-fence — Axis D · helper-or-exempt invariant', () => {
+  it('every <ActionPressable> host either composes swapWidthClassOf(N) or carries an exempt token', () => {
+    const violations = helperViolationsAcrossTree();
+    expect(violations.map((v) => `${v.file}:${v.line}`)).toEqual([]);
+    if (violations.length > 0) {
+      throw new Error('\n' + violations.map(formatHelperFailure).join('\n\n'));
     }
-    expect(carriers).toEqual([]);
   });
 });
 
 // ─── Tests — kernel-binding sanity — the helper is the only authoring path ─
+
+/** Carriers that wire a rung; the icon-only exempt carriers are excluded. */
+const WIRED_CARRIERS: readonly string[] = [
+  'components/return/ReturnLetter.tsx',
+  'components/mirror/ShareOverlay.tsx',
+  'components/articles/QuoteKeepsake.tsx',
+  'components/reading/ThreadKeepsake.tsx',
+];
 
 describe('label-swap-width-fence — helper authoring path', () => {
   it('swapWidthClassOf(1..3) returns three byte-identical floor literals', () => {
@@ -314,15 +435,9 @@ describe('label-swap-width-fence — helper authoring path', () => {
     expect(swapWidthClassOf(3)).toBe('min-w-[14rem]');
   });
 
-  it('the four canonical call-sites import the helper from @/lib/design/swap-width', () => {
-    const callers = [
-      'components/return/ReturnLetter.tsx',
-      'components/mirror/ShareOverlay.tsx',
-      'components/articles/QuoteKeepsake.tsx',
-      'components/reading/ThreadKeepsake.tsx',
-    ];
+  it('every wired carrier imports the helper from @/lib/design/swap-width', () => {
     const rx = /from\s+['"]@\/lib\/design\/swap-width['"]/;
-    for (const rel of callers) {
+    for (const rel of WIRED_CARRIERS) {
       const src = readFileSync(join(ROOT, rel), 'utf8');
       expect(src).toMatch(rx);
     }

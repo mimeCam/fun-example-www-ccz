@@ -43,6 +43,29 @@ describe('action invariant', () => {
   it('actionInvariantHolds() returns true', () => {
     expect(actionInvariantHolds()).toBe(true);
   });
+
+  // ─── Numeric pin (Mike #94 §2.5 — measure-then-change gate) ──────────────
+  //
+  // The dwell beat is felt by readers without being named. A casual edit
+  // that drops 1000 ms → 800 ms (Tanya UX #76 §3.1 audit) IS the right
+  // conversation — but only with a stopwatch receipt from staging AND a
+  // decoupling from `MOTION.linger` so passage-breathing stays untouched.
+  // Until both land, this pin fails CI before the reader notices.
+
+  it('ACTION_FADE_MS is pinned at 120 ms (the canonical crossfade beat)', () => {
+    expect(ACTION_FADE_MS).toBe(120);
+  });
+
+  it('ACTION_HOLD_MS is pinned at 1000 ms (measure-then-change gate)', () => {
+    // Pinning the current value, not the intended value. A future PR
+    // dropping to 800 ms must update this line AND attach a stopwatch
+    // receipt — see action-phase.ts ACTION_HOLD_MS docstring.
+    expect(ACTION_HOLD_MS).toBe(1000);
+  });
+
+  it('ACTION_HOLD_BUDGET_MS is pinned at 1136 ms (hold + fade + one frame)', () => {
+    expect(ACTION_HOLD_BUDGET_MS).toBe(1136);
+  });
 });
 
 describe('resolveFadeMs — motion vs reduced', () => {

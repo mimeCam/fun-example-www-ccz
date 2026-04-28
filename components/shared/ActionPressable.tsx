@@ -33,6 +33,35 @@
  * the eye sees, sourced from the same `resolvePhaseLabel`. Zero pixels,
  * zero new layers — the receipt lands in two organs from one source.
  *
+ * ─── Carrier list (Mike #94 §2.1, Elon §7 minimum-viable answer) ──────────
+ *
+ * Five compositional carriers — read this list before adding a sixth.
+ * Promote to a `const` ONLY on the second demonstrated pain (rule of
+ * three guard, Mike #94 §POI-5). JSDoc is the contract today.
+ *
+ *   1. `components/return/ReturnLetter.tsx`            — Copy & Share
+ *      `<LetterCard>` Copy CTA            · ghost · md   · rung 1 (5.5rem)
+ *
+ *   2. `components/mirror/ShareOverlay.tsx`            — Copy Link
+ *      `<CopyLinkBtn>` icon button        · icon  · sm   · exempt
+ *      (label hidden; verb lives on sibling `<Tooltip>` at rung 2)
+ *
+ *   3. `components/articles/QuoteKeepsake.tsx`         — Share + Copy/Save/Link
+ *      `<PrimaryShare>` "Share this card" · solid · md   · rung 3 (14rem)
+ *      `<SecondaryAction>` × 3 ghost row  · ghost · sm   · rung 1 (5.5rem)
+ *
+ *   4. `components/reading/ThreadKeepsake.tsx`         — Share + Copy/Save/Link
+ *      `<PrimaryShare>` "Share this thread" · solid · md · rung 3 (14rem)
+ *      `<SecondaryAction>` × 3 ghost row  · ghost · sm   · rung 1 (5.5rem)
+ *
+ *   5. `components/resonances/SelectionShareTrigger.tsx` — Copy share-link
+ *      icon popover trigger               · icon  · sm   · exempt
+ *      (label hidden; glyph-only swap is byte-identical at size 14)
+ *
+ * Pinned by `components/shared/__tests__/label-swap-width-fence.test.ts`
+ * (Axis D — every host either composes `swapWidthClassOf(N)` or carries
+ * a `// swap-width:exempt — <reason>` token within 2 source lines).
+ *
  * Credits: Mike K. (napkin §4 — compose-only primitive, two-layer split,
  * `phase` prop; #71 — `PhaseAnnouncement` peer, same-source rule; #26 §3 —
  * `variant` pass-through is presentational, semantic layer untouched),

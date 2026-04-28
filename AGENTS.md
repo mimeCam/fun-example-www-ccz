@@ -15,6 +15,7 @@ Design rules are enforced by fence tests (`*.fence.test.ts`) and sync tests. Sin
 _None._
 
 ## Live
+- **Settled-Rhythm Rung Lock** *(2026-04-28)*. Five `<ActionPressable>` carriers pin bounding boxes via `swapWidthClassOf(N)`; two icon-only hosts carry honest `// swap-width:exempt` tokens. Fence: `label-swap-width-fence` (4 axes). Settled-receipt verb lexicon (`SETTLED_RECEIPT_VERBS`) gates every `settledLabel` literal. Fence: `settled-label-lexicon-parity` (2 axes). Timing pins: 120 ms / 1000 ms / 1136 ms.
 - **Selection Share** *(2026-04-28)*. Select a sentence → press the link icon → `#highlight=HASH&text=ENC` hits the clipboard. Recipient lands centered on that paragraph with a one-shot pulse. Orphan graduation (`share-links` + `highlight-finder` get their first non-test callers). Shell extracted from `SelectionPopoverTrigger` → `SelectionPopoverShell` (one paint, many actions). Hook: `useSharedHighlightOnLand`. Fences: `orphan-graduates`, `share-links-roundtrip`, source-pin tests.
 - **Passage Body-Hang** *(2026-04-28)*. `hangPunctClassOf('passage')` → `hanging-punctuation: first last allow-end` × 3 carriers. Safari-only. Fences: `passage-hang-converges` + `hang-progressive-enhancement` + `passage-trinity-disjoint`.
 - **Caption-Chrome Register** *(2026-04-28)*. `CAPTION_CHROME_CARRIERS` (5). Fence: `caption-chrome-adoption`.

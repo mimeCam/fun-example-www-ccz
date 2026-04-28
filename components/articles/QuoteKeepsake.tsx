@@ -284,6 +284,15 @@ interface SecondaryActionProps {
   hint: string;
 }
 
+/**
+ * Secondary-row sibling — `swapWidthClassOf(1)` pins the bounding box across
+ * the 4 ch → 5/6 ch verb-tense shift (`Copy ↔ Copied`, `Save ↔ Saved`,
+ * `Link ↔ Copied`). Without the floor, each press jitters the row by ~6 px
+ * and the three siblings drift right of one another (Tanya UX #76 §3.2 —
+ * "the row will reflow by ~6 px per button on each press"). One helper-
+ * composed Tailwind class; same byte-string the primary CTA uses, just on
+ * a different rung. Pinned by `label-swap-width-fence.test.ts` Axis D.
+ */
 function SecondaryAction(p: SecondaryActionProps) {
   return (
     <ActionPressable
@@ -294,6 +303,7 @@ function SecondaryAction(p: SecondaryActionProps) {
       idleLabel={p.idleLabel}
       settledLabel={p.settledLabel}
       hint={p.hint}
+      className={swapWidthClassOf(1)}
     />
   );
 }

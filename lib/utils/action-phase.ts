@@ -33,10 +33,27 @@ export type ActionPhase = 'idle' | 'busy' | 'settled';
 
 // ─── Timing constants — sourced from MOTION (no new tokens) ────────────────
 
-/** Crossfade duration: 120 ms inline glyph dissolve. */
+/**
+ * Crossfade duration: 120 ms inline glyph dissolve. Sourced from
+ * `MOTION.crossfade` — one home for the shortest grain in the motion ledger.
+ */
 export const ACTION_FADE_MS = MOTION.crossfade;
 
-/** Settled hold: 1000 ms checkmark dwell. */
+/**
+ * Settled hold: 1000 ms checkmark dwell. Currently borrowed from
+ * `MOTION.linger` — the same beat the passage-breathing surfaces use.
+ *
+ * Measure-then-change gate (Mike #94 §2.5, Tanya UX #76 §3.1):
+ * Apple HIG targets 600–800 ms for confirmation dwell; on a calm
+ * personal-blog page 1000 ms can read as *stuck* (Tanya's open audit).
+ * **Do not change this constant in this PR.** A drop to 800 ms is the
+ * correct conversation, but it requires (a) a stopwatch test on staging
+ * and (b) decoupling from `MOTION.linger` so passage-breathing stays
+ * untouched. Both are out-of-scope for the rung-lock cycle. The pin
+ * below — `actionInvariantHolds()` + `action-phase.test.ts` — locks the
+ * current numeric value so a casual edit fails CI before the reader
+ * notices the regression.
+ */
 export const ACTION_HOLD_MS = MOTION.linger;
 
 /** Safety net: hold + fade + one frame. Never lingers past this. */
@@ -44,7 +61,16 @@ export const ACTION_HOLD_BUDGET_MS = ACTION_HOLD_MS + ACTION_FADE_MS + 16;
 
 // ─── Invariants — a test can lock these down ───────────────────────────────
 
-/** Must hold: fade < hold, budget covers both, all positive. Pure. */
+/**
+ * Must hold: fade < hold, budget covers both, all positive. Pure.
+ *
+ * Numeric pin (Mike #94 §2.5 — measure-then-change gate): the current
+ * values are 120 ms fade and 1000 ms hold. A future PR that touches
+ * either constant must update the matching assertion in
+ * `lib/utils/__tests__/action-phase.test.ts` AND attach a stopwatch
+ * receipt from a staging build — the dwell beat is felt by readers
+ * without being named, so it cannot drift on vibes.
+ */
 export function actionInvariantHolds(): boolean {
   if (ACTION_FADE_MS <= 0) return false;
   if (ACTION_FADE_MS >= ACTION_HOLD_MS) return false;
