@@ -69,6 +69,87 @@
 
 import type { ArchetypeKey } from '@/types/content';
 
+// ─── Two-Lane Contract — Ambient (sealed) / Reciprocal (open by invitation) ──
+//
+// From this slice forward the accent-bias system has exactly two lanes.
+// Both are felt; neither is announced. The comment is the architectural
+// fence; the fence tests below are the enforcers.
+//
+//   ┌──────────────────────┬──────────────────┬──────────────────────────┐
+//   │ Lane                 │ Trigger          │ Surfaces                 │
+//   ├──────────────────────┼──────────────────┼──────────────────────────┤
+//   │ AMBIENT (SEALED)     │ site state       │ GoldenThread spine fill  │
+//   │                      │ (no user act)    │ (`--thread-alpha-pre`,   │
+//   │                      │                  │  spine `filter: hue-     │
+//   │                      │                  │  rotate(var(--thread-    │
+//   │                      │                  │  bias, 0deg))`)          │
+//   ├──────────────────────┼──────────────────┼──────────────────────────┤
+//   │ RECIPROCAL (OPEN BY  │ USER GESTURE     │ `:focus-visible` ring    │
+//   │  INVITATION)         │ (Tab / keyboard  │ (single CSS rule, paints │
+//   │                      │  reach)          │  via `::after` pseudo so │
+//   │                      │                  │  host content stays      │
+//   │                      │                  │  reader-invariant)       │
+//   └──────────────────────┴──────────────────┴──────────────────────────┘
+//
+// Why the seal matters (the rule the next ten "easy wins" must fail):
+//   • The AMBIENT lane is sealed at one entry. Scrollbar-thumb tint,
+//     `::placeholder` lean, `::selection` lean — all forbidden. A second
+//     ambient surface earns its slot only via graduation to a perceptual
+//     ledger directory (`lib/design/perceptual/`), which itself does not
+//     exist until the rule-of-three fires. Today: rule-of-two on the
+//     RECIPROCAL lane (Golden Thread spine + focus ring). Two consumers
+//     ≠ a kernel. *Polymorphism is a killer.*
+//   • The RECIPROCAL lane opens *by invitation only*. A second reciprocal
+//     surface (e.g. `caret-color` on typing, link `:active` flash) needs
+//     a fresh brief AND a separate review — not a copy-paste through the
+//     fence. The fence prose teaches the contract on failure (Mike #38 §4,
+//     the failure-message-is-documentation discipline).
+//   • Anything without a real user gesture AND a real site response
+//     belongs to NEITHER lane. The deferred slate is a feature: shorter,
+//     not longer, by design (Tanya UIX #46 §10; Paul §"deferred-as-feature").
+//
+// Stranger floor — the three-layer zero — is preserved at every cell in
+// every lane: `:root { --thread-bias: 0deg }` ⇒ `var(--thread-bias, 0deg)`
+// fallback ⇒ `hue-rotate(0deg)` no-op ⇒ byte-identical pixels for
+// first-time visitors. A stranger's `:focus-visible` and a stranger's
+// Golden Thread fill MUST be byte-identical to today; if either drifts by
+// one byte for a stranger, the lane contract failed and a sync fence fires.
+//
+// Enforcement (the contract made executable):
+//   • `accent-bias-allowlist.fence.test.ts`     — AMBIENT lane allow-list
+//                                                  (one JSX call site).
+//   • `focus-reciprocal-lane.fence.test.ts`     — RECIPROCAL lane allow-
+//                                                  list (one CSS rule).
+//   • `accent-bias-calibration.fence.test.ts`   — ΔE2000 windows per stop.
+//   • `focus-ring-contrast-audit.test.ts`       — WCAG 1.4.11 swept across
+//                                                  all five archetype leans.
+//
+// What this file owns and what it does NOT:
+//   This file owns the SINGLE carrier expression (`THREAD_ACCENT_BIAS_FILTER`)
+//   and the geometry/perceptual budgets. It does NOT own a per-lane factory,
+//   a `accentBiasFilter(surface)` helper, or a `--focus-bias` synonym. The
+//   carrier expression is named after the surface that introduced it
+//   (`THREAD_*`). When a third reciprocal surface earns its slot, that PR
+//   mints the kernel name and graduates the math; until then, the surface
+//   name is the architecture (Tanya UIX §3 — name the variable after the
+//   felt thing; Mike #54 POI 2 — speculative abstraction is the bug).
+//
+// Credits (this lane-contract block):
+//   • Jason Fried (Creative Director) — the Ambient/Reciprocal lens itself
+//     (the durable architectural deposit; the rest of the rhetoric does
+//     not survive code review per Elon's cut).
+//   • Tanya Donska (UIX #46 §2 / §10) — the lane table, the deferred slate
+//     as a feature, the "neither lane = does not ship" rule.
+//   • Mike Koch (architect, napkin #54 §POI 2 / §"What I am explicitly
+//     NOT doing") — the rule-of-zero discipline, the no-factory cut, the
+//     surface-name-is-the-architecture rule preserved through the lift.
+//   • Elon Musk (first principles) — "identical bits ⇒ pick one framing":
+//     the lane comment is the only narrative artifact in source.
+//   • Paul Kim (strategy) — the must-not-do list (no animation, no token
+//     mint, no second reciprocal surface this sprint) baked into the fence.
+//   • Sid (50-yr coder) — the source-string fence pattern both lanes
+//     inherit from (`presence-pre-lit-allowlist`, `accent-bias-allowlist`).
+
 // ─── Single carrier expression — the ONE call to hue-rotate in this codebase ──
 
 /**

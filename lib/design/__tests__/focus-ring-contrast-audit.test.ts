@@ -119,9 +119,10 @@ import {
   WCAG_AA_TEXT,
   type ReaderInvariantPair,
 } from '../voice-ledger';
-import { contrast, compositeOver } from '../contrast';
+import { contrast, compositeOver, hexToRgb, rgbToHex } from '../contrast';
 import { FOCUS, FOCUS_INK } from '../focus';
 import { THERMAL, THERMAL_WARM } from '../color-constants';
+import { __testing__ as ACCENT_BIAS_TESTING } from '../accent-bias';
 import { assertTrustAnchor } from '@/lib/sharing/__tests__/_helpers';
 
 // ─── §0 ANCHOR — this audit owns TRUST_INVARIANTS[0] ──────────────────────
@@ -278,6 +279,85 @@ describe('focus-ring-contrast-audit · §2.5 INK IDENTITY (FG bytes invariant)',
     const cold = paintedRatio(ANCHORS[0]);
     const warm = paintedRatio(ANCHORS[1]);
     expect(Math.abs(cold - warm)).toBeLessThan(0.5);
+  });
+});
+
+// ─── §SWEEP — five-archetype WCAG 1.4.11 sweep (the reciprocal-lane lift) ─
+//
+// Mike #54 §POI 5 / Tanya UIX #46 §6 — the painted ring is now leaned by
+// `filter: hue-rotate(var(--thread-bias, 0deg))` on the `::after` pseudo
+// (the RECIPROCAL lane). Each archetype shifts the hue by ≤ ±2.5°. WCAG
+// 1.4.11 must clear at EVERY lean, not only at stranger-floor (0°). A
+// rotation in sRGB leaves L roughly invariant — but verify mechanically;
+// don't assume.
+//
+// Math: CSS `filter: hue-rotate(N deg)` applies the W3C luminance-preserving
+// rotation matrix (https://www.w3.org/TR/filter-effects-1/#funcdef-filter-hue-rotate).
+// We compute the rotated ink hex per archetype, composite at FOCUS.alpha
+// over each anchor surface, and assert ≥ FOCUS_RING_PAINTED_FLOOR.
+
+/** CSS filter `hue-rotate(N deg)` applied to a hex (W3C matrix). Pure, ≤ 10 LOC. */
+function hueRotateHex(hex: string, deg: number): string {
+  const [r, g, b] = hexToRgb(hex).map((v) => v / 255);
+  const rad = (deg * Math.PI) / 180;
+  const c = Math.cos(rad), s = Math.sin(rad);
+  const row = (a: number, b2: number, c2: number, d: number, e: number, f: number) =>
+    Math.max(0, Math.min(1, (a + c * b2 + s * c2) * r + (d + c * e + s * f) * g));
+  const rr = row(0.213, 0.787, -0.213, 0.715, -0.715, -0.715) + (0.072 + c * -0.072 + s * 0.928) * b;
+  const gg = row(0.213, -0.213, 0.143, 0.715, 0.285, 0.140)  + (0.072 + c * -0.072 + s * -0.283) * b;
+  const bb = row(0.213, -0.213, -0.787, 0.715, -0.715, 0.715) + (0.072 + c * 0.928 + s * 0.072) * b;
+  const clip = (v: number): number => Math.round(Math.max(0, Math.min(1, v)) * 255);
+  return rgbToHex(clip(rr), clip(gg), clip(bb));
+}
+
+/** The painted ring's effective hex per archetype lean over a surface. */
+function leanedPaintedHex(deg: number, anchor: Anchor): string {
+  return compositeOver(hueRotateHex(FOCUS_INK, deg), anchor.surface, FOCUS.alpha);
+}
+
+/** WCAG ratio for a leaned painted ring against a surface anchor. Pure. */
+function leanedRatio(deg: number, anchor: Anchor): number {
+  return contrast(leanedPaintedHex(deg, anchor), anchor.surface);
+}
+
+const ARCHETYPE_LEANS = ACCENT_BIAS_TESTING.THREAD_BIAS_BY_ARCHETYPE;
+
+describe('focus-ring-contrast-audit · §SWEEP (5-archetype WCAG 1.4.11)', () => {
+  it('the lean magnitudes are bounded by THREAD_BIAS_MAX_ABS_DEG (±3°)', () => {
+    // Belt-and-braces: the geometry guard guarantees every magnitude is
+    // sub-JND. If a future calibration widens this past ±3°, the sweep
+    // below would still run but the JSDoc claim "≤ ±2.5°" no longer holds.
+    for (const [, deg] of Object.entries(ARCHETYPE_LEANS)) {
+      expect(Math.abs(deg)).toBeLessThanOrEqual(3);
+    }
+  });
+
+  for (const [archetype, deg] of Object.entries(ARCHETYPE_LEANS)) {
+    for (const anchor of ANCHORS) {
+      it(`@ ${anchor.name} × ${archetype} (${deg}°): leaned ring clears ≥ ${FOCUS_RING_PAINTED_FLOOR}:1`, () => {
+        const ratio = leanedRatio(deg, anchor);
+        if (ratio < FOCUS_RING_PAINTED_FLOOR) {
+          throw new Error(
+            `focus-ring (${archetype} ${deg}°) over ${anchor.name}: `
+            + `${ratio.toFixed(2)}:1 < floor ${FOCUS_RING_PAINTED_FLOOR}:1`,
+          );
+        }
+        expect(ratio).toBeGreaterThanOrEqual(FOCUS_RING_PAINTED_FLOOR);
+      });
+    }
+  }
+
+  it('the worst leaned ratio across (archetype × anchor) is within 0.3 of the stranger-floor worst', () => {
+    // sRGB hue-rotation is luminance-preserving by construction; ±2.5° on
+    // a saturated violet at L≈63 must not move WCAG by more than a few
+    // basis points. If this delta widens past 0.3, the matrix or palette
+    // changed — review them. Pinned belt-and-braces with §SWEEP per cell.
+    const leans = Object.values(ARCHETYPE_LEANS);
+    const worstLeaned = Math.min(
+      ...leans.flatMap((deg) => ANCHORS.map((a) => leanedRatio(deg, a))),
+    );
+    const drift = Math.abs(worstRatio() - worstLeaned);
+    expect(drift).toBeLessThan(0.3);
   });
 });
 

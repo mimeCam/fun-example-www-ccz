@@ -84,9 +84,17 @@ const FENCE: JsxBlockDecl = {
 function formatViolation(v: Violation): string {
   return (
     `  ${v.file} — inline style={…} carries ${v.kind}\n` +
-    `    → only ${ALLOWED_CALL_SITE} may lean via THREAD_ACCENT_BIAS_FILTER.\n` +
-    `      A new leaning surface earns its own surface-keyed delta and a fresh\n` +
-    `      review — not a copy-paste through this fence.`
+    `    [lane: ambient — sealed]\n` +
+    `    → only ${ALLOWED_CALL_SITE} may lean via THREAD_ACCENT_BIAS_FILTER\n` +
+    `      on the AMBIENT lane (the Golden Thread spine fill — the one\n` +
+    `      site-state-triggered surface that consumes --thread-bias).\n` +
+    `      The AMBIENT lane is SEALED — no new entries this year.\n` +
+    `      A new gesture-triggered surface (caret-color, link :active flash,\n` +
+    `      …) belongs to the RECIPROCAL lane — see\n` +
+    `      \`focus-reciprocal-lane.fence.test.ts\` and\n` +
+    `      \`accent-bias.ts §"Two-Lane Contract"\`. A new leaning surface\n` +
+    `      earns its own surface-keyed delta and a fresh review — not a\n` +
+    `      copy-paste through this fence.`
   );
 }
 

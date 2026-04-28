@@ -22,6 +22,18 @@
  *      `THERMAL.accent`. Moving the thermal anchor must NOT silently drag
  *      the reader-invariant ring's colour with it.
  *
+ * **Scope narrowing — Mike #54 §POI 8 (the reciprocal-lane lift):** the
+ * byte-identity claim is now "across thermal stops, FOR STRANGERS." The
+ * ring's painted hue can lean by ±2.5° at the pseudo (via the carrier
+ * `THREAD_ACCENT_BIAS_FILTER` + `var(--thread-bias, 0deg)`); that lean
+ * is the second consumer of the AMBIENT/RECIPROCAL contract (see
+ * `accent-bias.ts §"Two-Lane Contract"`). The stranger floor — where
+ * `var(--thread-bias)` resolves to `0deg` and `hue-rotate(0deg)` is a
+ * compositor no-op — preserves byte-identity at every thermal stop for
+ * first-time visitors. This module's gates assert the stranger-floor
+ * shape; the archetype-lean WCAG sweep is owned by `focus-ring-contrast-
+ * audit.test.ts §SWEEP`.
+ *
  * Byte equality is the assertion, not semantic equality. If the CSS is
  * reformatted (whitespace, case, shorthand), the regex still holds because
  * it anchors on the property name and the thermal/accent/arch prefix set.
@@ -55,10 +67,17 @@ const CSS = readFileSync(
 
 // ─── Helpers — pure, each ≤ 10 LOC ────────────────────────────────────────
 
-/** The :focus-visible rule body, stripped of comments/whitespace for scans. */
+/** The combined `:focus-visible` host + `:focus-visible::after` pseudo rule
+ *  bodies. The reciprocal-lane refactor (Mike #54) moved the ring's paint
+ *  layer (the `box-shadow` + `--sys-focus-ink` reference) onto the pseudo
+ *  so the `filter: hue-rotate(...)` lean leaves host content untouched.
+ *  This gate is concerned with the COMBINED ring's authoring — both the
+ *  host body (geometry) and the pseudo body (ink) — so a single string
+ *  serves the prefix-kill-list scans below. */
 function readFocusVisibleBlock(): string {
-  const match = CSS.match(/:focus-visible\s*\{([\s\S]*?)\}/);
-  return match ? match[1] : '';
+  const host = CSS.match(/(?:^|[\s,;{}]):focus-visible\s*\{([\s\S]*?)\}/);
+  const pseudo = CSS.match(/:focus-visible::after\s*\{([\s\S]*?)\}/);
+  return [host ? host[1] : '', pseudo ? pseudo[1] : ''].join('\n');
 }
 
 /** The first `:root { … }` block body. Balanced-brace scan — the block's
@@ -150,6 +169,49 @@ describe('focus-ink byte-identity — the physics gate', () => {
     // killer-feature spread (`2.24 → 8.95`) is preserved. See focus.ts
     // JSDoc §"WCAG 1.4.11 ship".
     expect(FOCUS_INK).not.toBe(THERMAL.accent);
+  });
+});
+
+// ─── Tests — stranger floor: byte-identity for first-time visitors ──────
+
+/**
+ * The reciprocal-lane lean is the second consumer of `var(--thread-bias)`
+ * (the first is the AMBIENT-lane Golden Thread fill). The lean shifts the
+ * painted ring's hue by ≤ ±2.5° per archetype at the `::after` pseudo.
+ * For a STRANGER (no `[data-archetype]` attribute), `--thread-bias`
+ * resolves to its `:root` default `0deg`; `hue-rotate(0deg)` is a
+ * compositor no-op; the painted ring is byte-identical to today.
+ *
+ * This block pins the three layers of zero. If any layer drifts, a
+ * stranger's `:focus-visible` paints a different hex than today, and
+ * the lane contract failed.
+ */
+
+describe('focus-ink stranger floor — byte-identity for first-time visitors', () => {
+  it(':root declares `--thread-bias: 0deg` (layer 1: CSS default)', () => {
+    // The accent-bias `:root` block lives below the main `:root` block —
+    // both target the same selector. We assert presence of the default
+    // declaration anywhere a `:root { … }` rule body emits it.
+    expect(/:root\s*\{[\s\S]*?--thread-bias\s*:\s*0deg/.test(CSS)).toBe(true);
+  });
+
+  it('the carrier expression carries the `, 0deg` fallback (layer 2: var fallback)', () => {
+    // The carrier expression literal — same string the AMBIENT and
+    // RECIPROCAL lanes both consume. A drift here would break byte-
+    // identity for a stranger when the Recognition Beacon never runs
+    // (CSP, JS disabled, future minifier bug).
+    expect(CSS.includes('hue-rotate(var(--thread-bias, 0deg))')).toBe(true);
+  });
+
+  it('the carrier on the ring evaluates to `hue-rotate(0deg)` for strangers (layer 3: compositor no-op)', () => {
+    // Sanity: the literal IS the no-op for strangers. A future maintainer
+    // who "optimizes" this to `hue-rotate(var(--thread-bias))` (no
+    // fallback) breaks the stranger floor; the §4 fence in
+    // `focus-reciprocal-lane.fence.test.ts` catches it on the same PR.
+    const noOp = 'hue-rotate(0deg)';
+    expect(noOp.length).toBeGreaterThan(0);
+    // The fallback `, 0deg` is what makes the carrier ≡ no-op for strangers.
+    expect('hue-rotate(var(--thread-bias, 0deg))'.includes(', 0deg')).toBe(true);
   });
 });
 

@@ -50,28 +50,55 @@ const CSS = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf-8'
 
 // ─── Parser helpers — pure, each ≤ 10 LOC ─────────────────────────────────
 
-/** Extract the full body of the `:focus-visible { … }` rule. */
+/** Extract the body of the bare `:focus-visible { … }` rule (host element).
+ *  The pseudo `:focus-visible::after { … }` block is read separately. The
+ *  regex anchors a token boundary BEFORE `:focus-visible` (start, whitespace,
+ *  `,` `;` `{` `}`) AND requires `{` to follow `:focus-visible` directly so
+ *  `::after` does not match. */
 function readFocusVisibleBlock(): string | undefined {
-  const rx = /:focus-visible\s*\{([\s\S]*?)\}/;
+  const rx = /(?:^|[\s,;{}]):focus-visible\s*\{([\s\S]*?)\}/;
   const match = CSS.match(rx);
   return match ? match[1] : undefined;
 }
 
-/** Pull the `box-shadow:` declaration out of the `:focus-visible` block.
- *  The shadow spans multiple lines by design (two-stop composition) — the
- *  regex stops at the terminating `;` which the CSS always emits. */
+/** Extract the body of `:focus-visible::after { … }` — the reciprocal-lane
+ *  paint layer. The pseudo carries the box-shadow (the ring) and the
+ *  hue-rotate filter (the lean) so host content stays reader-invariant. */
+function readFocusVisibleAfterBlock(): string | undefined {
+  const rx = /:focus-visible::after\s*\{([\s\S]*?)\}/;
+  const match = CSS.match(rx);
+  return match ? match[1] : undefined;
+}
+
+/** Pull the `box-shadow:` declaration out of the `:focus-visible::after`
+ *  pseudo block — that is where the painted ring lives now. The shadow
+ *  spans multiple lines by design (two-stop composition) — the regex
+ *  stops at the terminating `;` which the CSS always emits. */
 function readBoxShadowDecl(): string | undefined {
-  const block = readFocusVisibleBlock();
+  const block = readFocusVisibleAfterBlock();
   if (!block) return undefined;
   const rx = /box-shadow:\s*([^;]+);/;
   const match = block.match(rx);
   return match ? normaliseWhitespace(match[1].trim()) : undefined;
 }
 
-/** Detect any `border-radius:` declaration inside the `:focus-visible` block.
- *  This is the inverted physics gate — if ANY commit re-introduces a
- *  radius into the ring rule body, the ring starts rewriting pill hosts
- *  into 8px squares again and this predicate flips to `true`. */
+/** Pull the `filter:` declaration out of the `:focus-visible::after` block —
+ *  the reciprocal-lane lean carrier. Used to pin the carrier expression
+ *  byte-for-byte against `THREAD_ACCENT_BIAS_FILTER`. */
+function readFilterDecl(): string | undefined {
+  const block = readFocusVisibleAfterBlock();
+  if (!block) return undefined;
+  const rx = /filter:\s*([^;]+);/;
+  const match = block.match(rx);
+  return match ? normaliseWhitespace(match[1].trim()) : undefined;
+}
+
+/** Detect any `border-radius:` declaration inside the `:focus-visible` host
+ *  rule body. The pseudo's `border-radius: inherit` is correct (it inherits
+ *  the host's corner posture) and is checked separately — this gate is the
+ *  inverted physics check on the HOST rule: if any commit re-introduces a
+ *  radius declaration on the HOST `:focus-visible` body, the ring would
+ *  start rewriting pill hosts into 8px squares again. */
 function focusVisibleDeclaresBorderRadius(): boolean {
   const block = readFocusVisibleBlock();
   if (!block) return false;
@@ -167,19 +194,26 @@ function parseHexLiteral(value: string | undefined): string | undefined {
 
 // ─── Tests — CSS ↔ TS sync ─────────────────────────────────────────────────
 
-describe('FOCUS ↔ globals.css :focus-visible sync (two-stop box-shadow)', () => {
-  it('the :focus-visible block exists in globals.css', () => {
+describe('FOCUS ↔ globals.css :focus-visible sync (pseudo-painted ring)', () => {
+  it('the :focus-visible host block exists in globals.css', () => {
     expect(readFocusVisibleBlock()).toBeDefined();
+  });
+
+  it('the :focus-visible::after pseudo block exists (the paint layer)', () => {
+    // The ring moved from the host to the ::after pseudo so the
+    // reciprocal-lane `filter: hue-rotate(...)` can lean without tinting
+    // host content. See accent-bias.ts §"Two-Lane Contract".
+    expect(readFocusVisibleAfterBlock()).toBeDefined();
   });
 
   it('CSS declares NO `outline:` inside `:focus-visible` (shadow composition)', () => {
     const block = readFocusVisibleBlock();
     expect(block).toBeDefined();
-    // Allow `box-shadow`, reject `outline:` (the old mechanism).
+    // Allow `box-shadow` (on the pseudo), reject `outline:` (the old mechanism).
     expect(/(^|\s|;)\s*outline\s*:/.test(block!)).toBe(false);
   });
 
-  it('CSS declares a `box-shadow:` inside `:focus-visible`', () => {
+  it('CSS declares a `box-shadow:` inside `:focus-visible::after`', () => {
     expect(readBoxShadowDecl()).toBeDefined();
   });
 
@@ -216,6 +250,49 @@ describe('FOCUS ↔ globals.css :focus-visible sync (two-stop box-shadow)', () =
     expect(spacer.includes('transparent')).toBe(true);
     expect(spacer.includes('color-mix')).toBe(false);
     expect(ring.includes('color-mix')).toBe(true);
+  });
+
+  it('the pseudo carries the reciprocal-lane filter — hue-rotate(var(--thread-bias, 0deg))', () => {
+    // The carrier expression IS the byte-for-byte literal exported by
+    // `lib/design/accent-bias.ts#THREAD_ACCENT_BIAS_FILTER`. A second
+    // string in the codebase that drifts from this one is the fence's
+    // job (see `focus-reciprocal-lane.fence.test.ts`); the sync gate
+    // here just pins the presence of the carrier on the pseudo.
+    const filter = readFilterDecl();
+    expect(filter).toBeDefined();
+    expect(filter).toBe('hue-rotate(var(--thread-bias, 0deg))');
+  });
+
+  it('the pseudo declares `border-radius: inherit` (corner honours the host)', () => {
+    const block = readFocusVisibleAfterBlock();
+    expect(block).toBeDefined();
+    expect(/border-radius\s*:\s*inherit/.test(block!)).toBe(true);
+  });
+
+  it('the pseudo declares `pointer-events: none` (does not steal hits)', () => {
+    const block = readFocusVisibleAfterBlock();
+    expect(block).toBeDefined();
+    expect(/pointer-events\s*:\s*none/.test(block!)).toBe(true);
+  });
+
+  it('the host body declares NO `box-shadow` (paint moved to the pseudo)', () => {
+    const block = readFocusVisibleBlock();
+    expect(block).toBeDefined();
+    // The host's only job is `position: relative; z-index: 1` (stacking
+    // context for the pseudo). A `box-shadow:` declaration on the host
+    // would be a regression — the lean would tint host content via
+    // composition, which the reciprocal-lane contract forbids.
+    expect(/(^|\s|;)\s*box-shadow\s*:/.test(block!)).toBe(false);
+  });
+
+  it('the host body declares NO `filter:` (the lean is on the pseudo only)', () => {
+    const block = readFocusVisibleBlock();
+    expect(block).toBeDefined();
+    // Mike #54 §POI 4: `filter:` on the host would tint the focused
+    // button's text/icons by ±2.5°. Sub-JND but a real semantic
+    // regression — the ring should reply, host content stays
+    // reader-invariant. Pinned here belt-and-braces with the fence test.
+    expect(/(^|\s|;)\s*filter\s*:/.test(block!)).toBe(false);
   });
 });
 

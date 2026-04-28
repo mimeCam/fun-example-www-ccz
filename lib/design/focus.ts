@@ -17,14 +17,30 @@
  * this module names for the whole site):
  *
  *   1. Does NOT warm with engagement.     — step-function presence, not tween.
- *   2. Does NOT personalize by archetype. — one posture for every reader.
+ *   2. Does NOT personalize by archetype, — one posture for every reader,
+ *      EXCEPT via the reciprocal-lane       EXCEPT a static `hue-rotate` lean
+ *      carrier — and only on user gesture.  ≤ ±2.5° applied via the carrier
+ *                                           `THREAD_ACCENT_BIAS_FILTER` from
+ *                                           `lib/design/accent-bias.ts`,
+ *                                           painted into the ring's `::after`
+ *                                           pseudo so host content remains
+ *                                           reader-invariant. Stranger floor
+ *                                           preserved (three-layer zero —
+ *                                           see accent-bias.ts Two-Lane
+ *                                           Contract block). Pinned by
+ *                                           `focus-reciprocal-lane.fence.test.ts`.
  *   3. Does NOT fork with thermal state.  — dormant ≡ luminous, byte for byte.
  *   4. CLEARS WCAG SC 1.4.11 floor.       — α=0.8 × accent over surface ≥ 3:1
- *                                           at every thermal stop (enforced by
- *                                           `lib/utils/__tests__/contrast.test.ts`).
+ *                                           at every thermal stop AND at every
+ *                                           archetype lean (5-archetype sweep
+ *                                           in `focus-ring-contrast-audit.test.ts`).
  *   5. PAINTS under forced-colors: active — via system color keywords only
  *                                           (Canvas, CanvasText, LinkText,
  *                                           Highlight, HighlightText, ButtonText).
+ *                                           The reciprocal-lane lean is
+ *                                           dropped here by construction —
+ *                                           `outline: 2px solid Highlight`
+ *                                           does not consume `--thread-bias`.
  *                                           Enforced by
  *                                           `lib/design/__tests__/forced-colors-sync.test.ts`.
  *
@@ -128,6 +144,12 @@ export const FOCUS_CSS_PREFIX = '--sys-focus';
  * `FOCUS` stays `{ width, alpha, offset }` — the cardinality-3 guard in
  * `focus-sync.test.ts` is load-bearing. Sibling constants > field sprawl.
  */
+// reciprocal-lane — `FOCUS_INK` is the reader-invariant *base*; the painted
+// ring is leaned by `THREAD_ACCENT_BIAS_FILTER` (≤ ±2.5°) at the `::after`
+// pseudo only, never on the host. The base hex below stays archetype-blind;
+// the lean lives in `app/globals.css :focus-visible::after { filter: … }`.
+// See accent-bias.ts §"Two-Lane Contract" and the `focus-reciprocal-lane`
+// fence test for the single allow-listed call site.
 export const FOCUS_INK = '#c77dff' as const;
 
 /** CSS custom-property name of the ink token — the one authoring site. */

@@ -431,44 +431,77 @@
    Adoption guard: lib/design/__tests__/ambient-surfaces-adoption.test.ts. */
 
 /* Focus-visible ring — author-triggered (keyboard nav), not gesture-surface.
-   Stays here by design — Tanya §7 / Mike P9. Reader-invariant: the ring paints
-   the SAME colour at thermal score 0 and thermal score 100. Corner posture is
-   NOT declared here; the ring inherits whatever `border-radius` the host
-   already carries (cards/inputs → 8px, pill hosts → pill, text links → 6px).
+   Stays here by design — Tanya §7 / Mike P9. Reader-invariant base ink: the
+   ring paints from the SAME hex at thermal score 0 and thermal score 100.
+   Corner posture is NOT declared here; the ring inherits whatever
+   `border-radius` the host already carries (cards/inputs → 8px, pill hosts
+   → pill, text links → 6px).
    // reader-invariant — sources `--sys-focus-ink`, NEVER `--token-accent`.
    80% (was 70%): Tanya §4 prescribed mitigation — midpoints were dipping
    under WCAG 1.4.11 non-text (3:1). See lib/utils/__tests__/contrast.test.ts.
 
-   Posture: two-stop `box-shadow` (NOT `outline`). The first stop is the
-   transparent spacer (= old `outline-offset`); the second stop is the ring
-   itself (spacer + width). Order matters — do NOT collapse them; the sync
-   test pins the exact string. Corner honours the host by construction:
-   `box-shadow` follows the element's own `border-radius` without any focus-
-   side declaration. No `border-radius:` inside this rule — that was the
-   phantom that rewrote every pill host into an 8px square for one frame
-   (Mike K. napkin / Tanya D. UX #93 / Elon M. first-principles).
+   Posture: two-stop `box-shadow` (NOT `outline`) painted into a `::after`
+   pseudo-element so the reciprocal-lane `hue-rotate(var(--thread-bias, 0deg))`
+   filter can lean the ring without tinting host content. The first stop is
+   the transparent spacer (= old `outline-offset`); the second stop is the
+   ring itself (spacer + width). Order matters — do NOT collapse them; the
+   sync test pins the exact string. Corner honours the host by construction:
+   the pseudo's `border-radius: inherit` + `box-shadow` follow the element's
+   own `border-radius` without any focus-side declaration. No `border-radius`
+   on `:focus-visible` itself — that was the phantom that rewrote every pill
+   host into an 8px square for one frame (Mike napkin / Tanya UX #93 / Elon).
 
-   Clip note: `box-shadow` participates in paint order and can be clipped
-   by ancestor `overflow: hidden`. Audit 2026-04-23: the three suspects
-   (Threshold chamber, MirrorRevealCard, ThreadKeepsake preview) all have
-   ≥ 20px interior padding on focusable descendants — the 4px ring has
-   room to breathe. `z-index: 1` beats sibling dots by one stacking step
-   without a new z-ledger rung (Tanya #78 §2.3).
+   Reciprocal-lane lean (Tanya UIX #46 §3, Mike #54 §POI 4 — the architectural
+   axis the ::after pseudo earns):
+     • The lean IS the second consumer of `var(--thread-bias)` (the first is
+       GoldenThread spine fill — the AMBIENT lane, sealed). Together they
+       make the rule-of-three threshold visible to maintainers, invisible
+       to readers.
+     • The filter lives on the pseudo, NEVER on the host — host content
+       (text, icons, backgrounds) MUST stay reader-invariant. Pinned by
+       `focus-reciprocal-lane.fence.test.ts`.
+     • Stranger floor preserved by the `, 0deg` fallback — three-layer
+       zero (`:root` default ⇒ `var()` fallback ⇒ `hue-rotate(0deg)` no-op).
+       A stranger's painted ring is byte-identical to today.
+     • Forced-colors path drops the lean by construction — the @media
+       block below switches to `outline: 2px solid Highlight` on the host
+       (no pseudo, no filter, no `--thread-bias` consumption).
+
+   Clip note: `box-shadow` on the pseudo participates in paint order and
+   can be clipped by ancestor `overflow: hidden`. Audit 2026-04-23: the
+   three suspects (Threshold chamber, MirrorRevealCard, ThreadKeepsake
+   preview) all have ≥ 20px interior padding on focusable descendants —
+   the 4px ring has room to breathe. `z-index: 1` on the host beats
+   sibling dots by one stacking step without a new z-ledger rung
+   (Tanya #78 §2.3). The pseudo inherits the host's stacking context.
 
    // reader-invariant — the ring below is byte-identical at every thermal
-   // stop and passively honours each host's declared corner.
+   // stop. Archetype lean is sub-JND (≤ ±2.5°) and lives on the pseudo only.
+   // The host content remains reader-invariant by construction.
    TS mirror: lib/design/focus.ts. Sync guard: focus-sync.test.ts.
-   Physics gate: focus-ink-byte-identity.test.ts. */
+   Physics gate: focus-ink-byte-identity.test.ts.
+   Reciprocal lane: lib/design/__tests__/focus-reciprocal-lane.fence.test.ts. */
 :focus-visible {
+  position: relative;
+  z-index: 1;
+}
+:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
   box-shadow:
     0 0 0 2px transparent,
     0 0 0 4px color-mix(in srgb, var(--sys-focus-ink) 80%, transparent);
-  position: relative;
-  z-index: 1;
+  filter: hue-rotate(var(--thread-bias, 0deg));
 }
 :focus:not(:focus-visible) {
   outline: none;
   box-shadow: none;
+}
+:focus:not(:focus-visible)::after {
+  content: none;
 }
 
 /* ─── Forced-colors (Windows High Contrast) — reader-invariant witness ─────
