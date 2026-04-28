@@ -210,6 +210,87 @@ export const hyphensClassOf = (b: TypographyBeatName): string => {
   }
 };
 
+// ─── Hanging-punctuation adoption — Safari-only optical edge polish ────────
+
+/**
+ * The hanging-punctuation declaration: `first last allow-end`.
+ *
+ * Single load-bearing literal — the CSS rule reads it; the sync test pins
+ * it. `first` lets opening punctuation (`"`, `'`, `(`) hang into the left
+ * gutter so the first letter aligns optically with prose; `last` lets
+ * trailing punctuation (`.`, `,`, `"`, `'`) hang into the right margin so
+ * the column edge stops "wobbling" 4–8 px on dialogue blocks; `allow-end`
+ * permits last-line behavior even when the line ends with a hyphen-allowed
+ * break — the gentlest, widest-impact combo. No `force-end` (too aggressive,
+ * fights the wrap), no `first` alone (asymmetric).
+ */
+export const HANGING_PUNCTUATION = 'first last allow-end';
+
+/**
+ * The hanging-punctuation adoption handle. Returns the single CSS class
+ * that adds `hanging-punctuation: first last allow-end` to body-prose
+ * beats. Quotes, periods, and commas stop poking holes in the right edge;
+ * opening quotes nudge into the left gutter so the first letter aligns
+ * with prose. The whole point: **zero box change, optical-only tightening
+ * of the rag.** No layout reflow, no shift in line count, no thermal
+ * recalculation.
+ *
+ * Progressive enhancement — Safari-only paint surface (~30–35% of traffic).
+ * Chrome / Firefox / Edge readers see today's column unchanged. This is
+ * progressive enhancement done right; we do not chase Chrome parity with
+ * a JS canvas hack — the project vision forbids inventing motion (or in
+ * this case, paint) "out of the blue" (Tanya UX §3.1, Elon §1.2).
+ *
+ * Same compose-not-migrate shape as `wrapClassOf` (Mike #26) and
+ * `hyphensClassOf` (Mike #?): three body-prose carriers (article body,
+ * ReturnLetter opening + body, PortalHero excerpt) compose
+ * `hangPunctClassOf('passage')` onto the existing
+ * `thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS}` stack — disjoint
+ * properties (wrap vs hyphenate vs hanging-punctuation), safe sibling
+ * addition (Mike napkin §4 POI #3).
+ *
+ * Tailwind JIT contract: every literal `'typo-hang-<beat>'` appears
+ * verbatim in the switch below so the scanner emits each utility. Five
+ * non-`passage` arms are stubs in CSS this sprint (zero declarations,
+ * empty rule body) — symmetry > brevity at N=6, future call sites
+ * graduate without a ledger change. Headings and displays are NOT live
+ * arms this sprint: `text-wrap: balance` breaks by silhouette, not
+ * syllable; hanging punctuation on a balanced display line fights the
+ * silhouette (Tanya UX §2.1 carve-out).
+ *
+ * Adoption fences:
+ *   • `passage-hang-converges.fence.test.ts` — three carriers consume.
+ *   • `hang-progressive-enhancement.fence.test.ts` — the literal
+ *     `hanging-punctuation` lives in two homes only (this docblock +
+ *     `app/globals.css`), the Safari-only honesty receipt.
+ *
+ * Receipts: 320 px Safari + 1440 px Safari + 1440 px Chrome screenshot
+ * trio (`__tests__/screenshots/passage-hang-safari.md`).
+ *
+ * Credits: Mike Koch (architect napkin — the fifth-perimeter / same-kernel
+ * pattern, the refusal of the "Reading Frame" cosmology, the JIT-emission
+ * load-bearing call), Tanya Donska (UX spec — the "quotes, periods, and
+ * commas stop poking holes" felt-deliverable, the Safari-only honesty,
+ * the `first last allow-end` combo, the carve-out for headings/displays),
+ * Elon Musk (the browser-coverage asymmetry teardown, the category-error
+ * verdict on left/right symmetry with Golden Thread, the honest one-liner
+ * that this docblock and the AGENTS.md entry adopt), Krystle Clear (VP
+ * Product brief — the mechanical scope this helper commits to verbatim),
+ * Paul Kim (the "ship one thing, then hold the line" discipline, the
+ * carrier-list as the testable disjoint-property invariant), Sid (≤ 10
+ * LoC per helper, source-truthfulness doctrine, fence pattern lifted).
+ */
+export const hangPunctClassOf = (b: TypographyBeatName): string => {
+  switch (b) {
+    case 'caption': return 'typo-hang-caption';
+    case 'body':    return 'typo-hang-body';
+    case 'lede':    return 'typo-hang-lede';
+    case 'passage': return 'typo-hang-passage';
+    case 'heading': return 'typo-hang-heading';
+    case 'display': return 'typo-hang-display';
+  }
+};
+
 /** Track (letter-spacing, em) for a named beat. Pure. */
 export const trackOf = (b: TypographyBeatName): number =>
   TYPOGRAPHY[b].track;

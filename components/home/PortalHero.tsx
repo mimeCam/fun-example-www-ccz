@@ -25,7 +25,7 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import { stripMarkdownTokens, collapseWhitespace } from '@/lib/content/excerpt';
 import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
-import { wrapClassOf, hyphensClassOf } from '@/lib/design/typography';
+import { wrapClassOf, hyphensClassOf, hangPunctClassOf } from '@/lib/design/typography';
 
 /* ─── Wrap policy — `passage` break on the threshold excerpt (Tanya UX #85 §3) ─
    The hero's prose paragraphs ride `thermal-typography` (the marquee
@@ -49,6 +49,20 @@ const PASSAGE_WRAP = wrapClassOf('passage');
    `typo-hyphens-passage` lives in `hyphensClassOf` only; pinned by
    `lib/design/__tests__/passage-hyphens-converges.fence.test.ts`. */
 const PASSAGE_HYPHENS = hyphensClassOf('passage');
+
+/* ─── Hang policy — `passage` optical edge polish (Tanya UX §2.1) ──────────
+   Sibling handle to `PASSAGE_WRAP` + `PASSAGE_HYPHENS` — wrap, hyphens,
+   and hang declare disjoint CSS properties, so this composes as a silent
+   addition on the threshold excerpt. Center-axis hero paragraphs land
+   tighter on Safari: opening quotes hang into the left gutter, trailing
+   periods into the right margin. The h1 above is `display` beat
+   (`wrap: balance`) and is intentionally NOT hung — display beats break
+   by silhouette, and hang fights the silhouette (Tanya UX §2.1 carve-
+   out). Safari-only paint surface; Chrome / Firefox / Edge see today's
+   column unchanged. The class literal `typo-hang-passage` lives in
+   `hangPunctClassOf` only; pinned by
+   `lib/design/__tests__/passage-hang-converges.fence.test.ts`. */
+const PASSAGE_HANG = hangPunctClassOf('passage');
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -109,7 +123,7 @@ export default function PortalHero({ article }: { article: Article }) {
 
       {excerpts.map((para, i) => (
         <p key={i} className={`text-foreground/70 text-sys-lg
-          typo-passage ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} mb-sys-4 max-w-xl mx-auto thermal-typography`}>
+          typo-passage ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} ${PASSAGE_HANG} mb-sys-4 max-w-xl mx-auto thermal-typography`}>
           {para}
         </p>
       ))}

@@ -45,6 +45,8 @@ import {
   wrapClassOf,
   hyphensClassOf,
   HYPHENATE_LIMIT_CHARS,
+  hangPunctClassOf,
+  HANGING_PUNCTUATION,
 } from '../typography';
 
 const CSS = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf-8');
@@ -354,6 +356,57 @@ describe('hyphens-only adoption — .typo-hyphens-<beat> CSS ↔ TS sync', () =>
 
   it('HYPHENATE_LIMIT_CHARS is the canonical "8 4 4" load-bearing literal', () => {
     expect(HYPHENATE_LIMIT_CHARS).toBe('8 4 4');
+  });
+});
+
+describe('hang adoption — .typo-hang-<beat> CSS ↔ TS sync', () => {
+  /** Extract the body of a `.typo-hang-<beat> { … }` block. ≤ 10 LoC. */
+  function readHangBlock(beat: string): string | undefined {
+    const rx = new RegExp(`\\.typo-hang-${beat}\\s*\\{([^}]*)\\}`);
+    const match = CSS.match(rx);
+    return match ? match[1] : undefined;
+  }
+
+  TYPOGRAPHY_ORDER.forEach((beat) => {
+    it(`hangPunctClassOf('${beat}') returns 'typo-hang-${beat}'`, () => {
+      expect(hangPunctClassOf(beat)).toBe(`typo-hang-${beat}`);
+    });
+
+    it(`.typo-hang-${beat} exists in globals.css (JIT-emission symmetry)`, () => {
+      // Five non-`passage` blocks are empty stubs this sprint — `passage` is
+      // the only beat with a live declaration. The block must exist (so the
+      // JIT emits the utility) even when its body is empty.
+      expect(readHangBlock(beat)).toBeDefined();
+    });
+  });
+
+  it('.typo-hang-passage declares hanging-punctuation matching HANGING_PUNCTUATION', () => {
+    const block = readHangBlock('passage');
+    const decl = new RegExp(`hanging-punctuation:\\s*${HANGING_PUNCTUATION.replace(/ /g, '\\s+')}`);
+    expect(blockHas(block, decl)).toBe(true);
+  });
+
+  it('.typo-hang-passage carries ONLY hanging-punctuation (no leading, track, kern, wrap)', () => {
+    // Disjoint-property invariant: hang composes alongside wrap + hyphens
+    // by declaring NONE of their properties. If a future PR adds e.g.
+    // `text-wrap` here, the compose-not-migrate contract breaks silently —
+    // pin it loud (Mike napkin §3 POI #3, Tanya UX §2.2 box-unchanged).
+    const block = readHangBlock('passage');
+    expect(blockHas(block, /line-height:/)).toBe(false);
+    expect(blockHas(block, /letter-spacing:/)).toBe(false);
+    expect(blockHas(block, /font-feature-settings:/)).toBe(false);
+    expect(blockHas(block, /text-wrap:/)).toBe(false);
+    expect(blockHas(block, /hyphens:/)).toBe(false);
+  });
+
+  it('every .typo-hang-* in CSS is represented in TYPOGRAPHY', () => {
+    const cssBeats = Array.from(CSS.matchAll(/\.typo-hang-([a-z]+)\s*\{/g)).map((m) => m[1]);
+    const tsBeats = Object.keys(TYPOGRAPHY);
+    cssBeats.forEach((b) => expect(tsBeats).toContain(b));
+  });
+
+  it('HANGING_PUNCTUATION is the canonical "first last allow-end" load-bearing literal', () => {
+    expect(HANGING_PUNCTUATION).toBe('first last allow-end');
   });
 });
 

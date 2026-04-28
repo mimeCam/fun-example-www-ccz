@@ -32,7 +32,7 @@ import WhisperFooter from '@/components/shared/WhisperFooter';
 import { CollapsibleSlot } from '@/components/shared/CollapsibleSlot';
 import { Divider } from '@/components/shared/Divider';
 import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
-import { wrapClassOf, hyphensClassOf } from '@/lib/design/typography';
+import { wrapClassOf, hyphensClassOf, hangPunctClassOf } from '@/lib/design/typography';
 
 // ─── Wrap policy — `passage` break, thermal rhythm (Tanya UX #85 §3) ──────
 // The article body rides the `thermal-typography` carrier (line-height +
@@ -55,6 +55,21 @@ const PASSAGE_WRAP = wrapClassOf('passage');
 // The literal `typo-hyphens-passage` lives in `hyphensClassOf` only;
 // pinned by `lib/design/__tests__/passage-hyphens-converges.fence.test.ts`.
 const PASSAGE_HYPHENS = hyphensClassOf('passage');
+
+// ─── Hang policy — `passage` optical edge polish (Tanya UX §2.1) ──────────
+// Sibling handle to `PASSAGE_WRAP` + `PASSAGE_HYPHENS` — wrap, hyphens,
+// and hang declare disjoint CSS properties, so this composes as a silent
+// addition. Quotes, periods, and commas stop poking holes in the right
+// edge of the column; opening quotes nudge into the left gutter so the
+// first letter aligns optically with prose. Optical-only — zero box
+// change, no layout reflow, no thermal recalculation. Safari-only paint
+// surface (~30–35% of traffic); Chrome / Firefox / Edge see today's
+// column unchanged. The CSS property literal lives in `globals.css` +
+// `typography.ts` ONLY (pinned by
+// `lib/design/__tests__/hang-progressive-enhancement.fence.test.ts`);
+// the class literal `typo-hang-passage` lives in `hangPunctClassOf`
+// only (pinned by `passage-hang-converges.fence.test.ts`).
+const PASSAGE_HANG = hangPunctClassOf('passage');
 
 // Recognition-surface portal — gated by the shared selector so the
 // Whisper and the home-rail Letter can never paint at the same time
@@ -176,7 +191,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
           />
 
           <div
-            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
+            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} ${PASSAGE_HANG} text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
             style={entranceStyle(entrance.prose)}
           >
             {mergedBlocks.length > 0 ? (

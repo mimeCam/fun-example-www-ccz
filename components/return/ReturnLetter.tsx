@@ -37,7 +37,7 @@ import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { useActionPhase } from '@/lib/hooks/useActionPhase';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
-import { wrapClassOf, hyphensClassOf } from '@/lib/design/typography';
+import { wrapClassOf, hyphensClassOf, hangPunctClassOf } from '@/lib/design/typography';
 
 // ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
 //
@@ -92,6 +92,19 @@ const PASSAGE_WRAP    = wrapClassOf('passage');
    `typo-hyphens-passage` lives in `hyphensClassOf` only; pinned by
    `lib/design/__tests__/passage-hyphens-converges.fence.test.ts`. */
 const PASSAGE_HYPHENS = hyphensClassOf('passage');
+
+/* ─── Hang policy — `passage` optical edge polish (Tanya UX §2.1) ──────────
+   Sibling handle to `PASSAGE_WRAP` + `PASSAGE_HYPHENS` — wrap, hyphens,
+   and hang declare disjoint CSS properties, so this composes as a silent
+   addition. The center-aligned ragged silhouette becomes more
+   symmetrical when the closing quote on the opening salutation hangs
+   into the gutter and the trailing period on a body paragraph hangs
+   into the right margin. Optical-only — zero box change, no layout
+   reflow. Safari-only paint surface (~30–35% of traffic); Chrome / FF /
+   Edge see today's column unchanged (Elon §1.2, Tanya UX §3.1). The
+   class literal `typo-hang-passage` lives in `hangPunctClassOf` only;
+   pinned by `lib/design/__tests__/passage-hang-converges.fence.test.ts`. */
+const PASSAGE_HANG    = hangPunctClassOf('passage');
 
 // ─── Timing — owned by the Recognition Timeline (Mike napkin §"Module shape") ─
 //
@@ -369,12 +382,12 @@ function LetterCard({
         {letter.salutation}
       </p>
       {/* Opening — body of the letter is THE content; meet it head-on (default 1.00). */}
-      <p className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} mt-sys-5 text-center`}>
+      <p className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} ${PASSAGE_HANG} mt-sys-5 text-center`}>
         {letter.opening}
       </p>
       {/* Body — same register as the opening; the reader's destination. */}
       {letter.body.map((para, i) => (
-        <p key={i} className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} mt-sys-5 text-center`}>
+        <p key={i} className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} ${PASSAGE_HANG} mt-sys-5 text-center`}>
           {para}
         </p>
       ))}

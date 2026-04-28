@@ -730,6 +730,34 @@ body {
 .typo-hyphens-heading { /* stub — JIT symmetry */ }
 .typo-hyphens-display { /* stub — JIT symmetry */ }
 
+/* ─── Hanging-punctuation adoption — Safari-only optical edge polish ──
+   `.typo-hang-<beat>` adds `hanging-punctuation: first last allow-end`
+   to body-prose beats. Quotes, periods, and commas stop poking holes
+   in the right edge; opening quotes nudge into the left gutter so the
+   first letter aligns with prose. Optical-only — zero box change, no
+   layout reflow, no shift in line count.
+   Progressive enhancement — Safari-only paint surface (~30–35% of
+   traffic). Chrome / Firefox / Edge readers see today's column
+   unchanged; we do not chase Chrome parity with a JS canvas hack
+   (Elon §1.2, Tanya UX §3.1). The literal `hanging-punctuation` lives
+   in this CSS rule + the typography.ts docblock ONLY — pinned by
+   `hang-progressive-enhancement.fence.test.ts`.
+   `first last allow-end` mirrors `HANGING_PUNCTUATION` in
+   `lib/design/typography.ts`; the typography-sync test pins the byte.
+   Five non-`passage` arms are empty stubs this sprint — JIT-emission
+   symmetry with `hangPunctClassOf`'s six-case switch; no UA effect on
+   an empty rule body. Headings + displays carve out (Tanya UX §2.1):
+   `text-wrap: balance` breaks by silhouette; hang fights the silhouette.
+   Pinned by `passage-hang-converges.fence.test.ts`. */
+.typo-hang-passage {
+  hanging-punctuation: first last allow-end;
+}
+.typo-hang-caption { /* stub — JIT symmetry */ }
+.typo-hang-body    { /* stub — JIT symmetry */ }
+.typo-hang-lede    { /* stub — JIT symmetry */ }
+.typo-hang-heading { /* stub — JIT symmetry */ }
+.typo-hang-display { /* stub — JIT symmetry */ }
+
 /* Paragraph spacing via compositing — translateY instead of margin-bottom.
    The visual result is identical: paragraphs drift apart as the room warms.
    But transform is GPU-composited, so no layout recalculation per frame. */
