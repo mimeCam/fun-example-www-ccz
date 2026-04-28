@@ -300,6 +300,53 @@ export const PASSAGE_BODY_CARRIERS = [
   ['PortalHero',    'components/home/PortalHero.tsx'],
 ] as const satisfies ReadonlyArray<readonly [string, string]>;
 
+// ─── Caption-chrome carrier set — DOM register on `<CaptionMetric>` ───────
+//
+// The named ledger entry for the implicit register that
+// `components/shared/CaptionMetric.tsx` already enforces:
+//
+//   `tracking-sys-caption` + `tabular-nums` + `text-mist/70` + `text-sys-(micro|caption)`
+//
+// Why a ledger entry: the four-class dialect lived only in the primitive's
+// source — invisible to `lib/design/`. Naming it as a tuple of carriers
+// converts an implicit pattern into an explicit convergence: a third home
+// for the dialect (a fresh hand-rolled `tracking-sys-caption tabular-nums`
+// pair on a date/duration string) fails the adoption fence AND the
+// convergence fence. The body-prose perimeter (`PASSAGE_BODY_CARRIERS` +
+// three sister fences for wrap / hyphens / hang) is the precedent — same
+// shape, byte-for-byte.
+//
+// Carve-out — print / SVG / canvas register: surfaces that route their
+// numeric features through `numericFeatureStyle()` (print column, SVG
+// keepsake build, server-side canvas text) live in the SECOND, disjoint
+// register. Those surfaces are NOT carriers; the dialect they wear is
+// CSS-property-shaped, not Tailwind-class-shaped, and the
+// `numeric-features-adoption` fence pins their two legal homes
+// (`lib/design/typography.ts` + `lib/sharing/thread-render.ts`).
+// `ArticleProvenance` is the canonical example — its dated byline routes
+// through `lib/design/print-surface.css`, not the DOM utility cascade.
+//
+// New screen-side carriers update the tuple — no fence edit required.
+//
+// Credits: Tanya Donska (UIX spec — naming the implicit register, the
+// "AAA polish is invisibility" framing, the 320 px receipt that names what
+// the fence guards), Mike Koch (architect napkin — the one-tuple-one-
+// fence shape lifted byte-for-byte from `PASSAGE_BODY_CARRIERS`, the
+// print/SVG carve-out as a disjoint register, the discipline to ship 10%
+// and refuse the rest), Elon Musk (first-principles teardown — kill the
+// "Cold Rim" cosmology, name the CSS, defer `small-caps` until it has a
+// font-stack audit), Jason Fried (the original observation that the
+// register lives in a component, not in `lib/design/`), Paul Kim
+// (P0 = "timestamps stop dancing"; carriers must be enumerated; AAA
+// polish is invisibility).
+export const CAPTION_CHROME_CARRIERS = [
+  ['MirrorMetaLine',     'app/mirror/page.tsx'],
+  ['PortalHeroReadTime', 'components/home/PortalHero.tsx'],
+  ['ExploreCardDuration','components/explore/ExploreArticleCard.tsx'],
+  ['ReadProgressCaption','components/reading/ReadProgressCaption.tsx'],
+  ['ResonanceEntryMeta', 'app/resonances/ResonanceEntry.tsx'],
+] as const satisfies ReadonlyArray<readonly [string, string]>;
+
 /** Track (letter-spacing, em) for a named beat. Pure. */
 export const trackOf = (b: TypographyBeatName): number =>
   TYPOGRAPHY[b].track;

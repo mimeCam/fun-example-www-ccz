@@ -72,7 +72,6 @@ const {
   GEM_ALIVE,
   GEM_DIMMED,
   QUOTED_LINE_TEXT,
-  ARTICLE_META_TEXT,
   CLOSING_LINE_TEXT,
 } = __testing__;
 
@@ -151,11 +150,6 @@ describe('ResonanceEntry · §1 module handles point at the canonical rungs', ()
     expect(QUOTED_LINE_TEXT).toBe('text-foreground/70');
   });
 
-  it('ARTICLE_META_TEXT is text-mist/50 (= `recede` — the frame around the subject)', () => {
-    expect(ARTICLE_META_TEXT).toBe(alphaClassOf('mist', 'recede', 'text'));
-    expect(ARTICLE_META_TEXT).toBe('text-mist/50');
-  });
-
   it('CLOSING_LINE_TEXT is text-gold/50 (= `recede` — the room\'s small farewell)', () => {
     expect(CLOSING_LINE_TEXT).toBe(alphaClassOf('gold', 'recede', 'text'));
     expect(CLOSING_LINE_TEXT).toBe('text-gold/50');
@@ -227,6 +221,19 @@ describe('ResonanceEntry · §2 SSR paints the snapped chassis verbatim', () => 
   it('vitality track paints at fog/muted (= bg-fog/30) on both branches', () => {
     expect(renderAlive()).toContain(VITALITY_TRACK);
     expect(renderDimmed()).toContain(VITALITY_TRACK);
+  });
+
+  it('article-meta timestamp wears the caption-chrome register (text-mist/70 + tabular-nums)', () => {
+    // Caption-chrome adoption (Tanya UX §"What changes at the call site"):
+    // the migrated `<CaptionMetric>` lifts the timestamp's alpha from
+    // `recede` (text-mist/50) to the primitive's sealed `quiet` rung
+    // (text-mist/70) AND adds the `tabular-nums` digit-column lock so a
+    // /resonances list of "Saved N days ago" lines stops dancing between
+    // 1-digit and 2-digit advance widths. Pinned both branches.
+    const html = renderAlive() + renderDimmed();
+    expect(html).toContain('text-mist/70');
+    expect(html).toContain('tabular-nums');
+    expect(html).toContain('tracking-sys-caption');
   });
 });
 

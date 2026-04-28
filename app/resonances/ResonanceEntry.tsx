@@ -56,6 +56,7 @@ import { Pressable } from '@/components/shared/Pressable';
 import { GemIcon } from '@/components/shared/GemIcon';
 import { LeanArrow } from '@/components/shared/LeanArrow';
 import { Divider } from '@/components/shared/Divider';
+import { CaptionMetric } from '@/components/shared/CaptionMetric';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
 import { passageThermalClass, wrapClassOf } from '@/lib/design/typography';
@@ -130,9 +131,6 @@ const GEM_DIMMED = alphaClassOf('mist', 'quiet', 'text');
 
 /** Quoted-line text — `quiet` rung; the article speaking, not the reader. */
 const QUOTED_LINE_TEXT = alphaClassOf('foreground', 'quiet', 'text');
-
-/** Article-meta text — `recede` rung; the frame around the subject. */
-const ARTICLE_META_TEXT = alphaClassOf('mist', 'recede', 'text');
 
 /** Closing-line text — `recede` rung; the room's small farewell. */
 const CLOSING_LINE_TEXT = alphaClassOf('gold', 'recede', 'text');
@@ -259,6 +257,17 @@ function ReaderNote({ note }: { note: string }) {
   );
 }
 
+/**
+ * Caption-chrome adoption (Tanya UX §"What changes at the call site",
+ * Mike napkin §"Carrier enumeration"): the timestamp line wears the named
+ * register through `<CaptionMetric>` so eight Saved-N-days-ago lines down
+ * a /resonances list lock their digits in a column-stable gutter
+ * (`tabular-nums` advance-width). The hand-rolled `<p text-sys-micro>` +
+ * `text-mist/recede` literal has retired. One swap, one line, zero new
+ * chrome — the alpha rung crossing recede→quiet is the primitive's sealed
+ * contract (Mike #38 — two knobs, no `tone` prop). Pinned by
+ * `caption-chrome-adoption.fence.test.ts`.
+ */
 function ArticleMeta({ resonance, timeAgo }: { resonance: ResonanceWithArticle; timeAgo: string }) {
   return (
     <>
@@ -266,7 +275,7 @@ function ArticleMeta({ resonance, timeAgo }: { resonance: ResonanceWithArticle; 
         className="text-sys-caption font-sys-accent">
         {resonance.articleTitle}
       </TextLink>
-      <p className={`${ARTICLE_META_TEXT} text-sys-micro mt-sys-1`}>{timeAgo}</p>
+      <CaptionMetric as="p" className="mt-sys-1">{timeAgo}</CaptionMetric>
     </>
   );
 }
@@ -373,7 +382,6 @@ export const __testing__ = {
   GEM_ALIVE,
   GEM_DIMMED,
   QUOTED_LINE_TEXT,
-  ARTICLE_META_TEXT,
   CLOSING_LINE_TEXT,
   HEADING_WRAP,
 } as const;

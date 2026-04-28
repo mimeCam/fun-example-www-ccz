@@ -15,6 +15,7 @@ Design rules are enforced by fence tests (`*.fence.test.ts`) and sync tests. Sin
 - **Passage Body-Hang** *(WIP 2026-04-28)*. `hangPunctClassOf('passage')` → `hanging-punctuation: first last allow-end` on three body-prose carriers. Safari-only. Fences: `passage-hang-converges` + `hang-progressive-enhancement`.
 
 ## Live
+- **Caption-Chrome Register** *(2026-04-28)*. `CAPTION_CHROME_CARRIERS` (5) in `lib/design/typography.ts` names the implicit register `<CaptionMetric>` already enforces (`tracking-sys-caption + tabular-nums + text-mist/70 + text-sys-(micro|caption)`). `ResonanceEntry` timeAgo migrated; digits stop dancing on /resonances. Fence: `caption-chrome-adoption`. Print/SVG carve-out: surfaces routing through `numericFeatureStyle()` are NOT carriers (own register, pinned by `numeric-features-adoption`).
 - **Recognition Beacon accent-bias** *(2026-04-28)*. Two-lane contract via `THREAD_ACCENT_BIAS_FILTER`. Fence: `focus-reciprocal-lane`.
 - **Chassis Seam** *(2026-04-28)*. `pt-sys-9` (40 px) chrome→content bridge × 7 doors. Fence: `chrome-content-seam`.
 - **Passage Body-Wrap** *(2026-04-28)*. `wrapClassOf('passage')` → `text-wrap: pretty` × 3 carriers. Fence: `passage-wrap-converges`.
