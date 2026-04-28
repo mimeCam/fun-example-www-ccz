@@ -58,6 +58,10 @@
   /* NextRead recommendation card — dynamic, not content (Tanya §6.1). */
   [data-next-read] { display: none !important; }
 
+  /* WhisperFooter — site navigation chrome. Paper has no clickable links;
+     the parting bow lives in <ReadersMark>. */
+  [data-whisper-footer] { display: none !important; }
+
   /* Focus rings — irrelevant on paper. The 4px halo is screen affordance. */
   :focus,
   :focus-visible {

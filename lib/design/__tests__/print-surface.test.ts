@@ -110,6 +110,11 @@ describe('print-surface · structure', () => {
 // ─── 2 · subtraction kill-list (Mike §4 + Tanya §2) ──────────────────────
 
 describe('print-surface · §A subtraction (kill-list hides every chrome layer)', () => {
+  const WHISPER_FOOTER = readFileSync(
+    join(__dirname, '..', '..', '..', 'components/shared/WhisperFooter.tsx'),
+    'utf8',
+  );
+
   // Each entry: [selector, comment for failure messages]
   const KILL_LIST: Array<[string, string]> = [
     ['.z-sys-thread', 'Golden Thread spine (left-edge fixed)'],
@@ -135,6 +140,16 @@ describe('print-surface · §A subtraction (kill-list hides every chrome layer)'
 
   it('NextRead recommendation surface is hidden via [data-next-read]', () => {
     expect(hidesInPrint('[data-next-read]')).toBe(true);
+  });
+
+  it('WhisperFooter must hide in print — paper bow lives in <ReadersMark>', () => {
+    expect(hidesInPrint('[data-whisper-footer]')).toBe(true);
+  });
+
+  it('WhisperFooter.tsx emits the data-whisper-footer hook on its <footer> root', () => {
+    // `[^>]*` clamps the match to the single opening tag — a stray attribute
+    // on a sibling element won't satisfy the contract by accident.
+    expect(WHISPER_FOOTER).toMatch(/<footer\b[^>]*\bdata-whisper-footer\b/);
   });
 });
 

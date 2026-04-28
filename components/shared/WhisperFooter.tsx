@@ -51,7 +51,10 @@ export default function WhisperFooter() {
   // monumental beat — viewport-edge breathing, not the T3 seam (different
   // surface, one symbol per site).
   return (
-    <footer className={`text-center ${CHASSIS_SEAM_TOP_CLASS} pb-sys-12 space-y-sys-2 thermal-drift`}>
+    <footer
+      data-whisper-footer
+      className={`text-center ${CHASSIS_SEAM_TOP_CLASS} pb-sys-12 space-y-sys-2 thermal-drift`}
+    >
       <p className={`${TAGLINE_TEXT_CLASS} text-sys-caption`}>No algorithms. No feeds.</p>
       <nav className="flex justify-center items-center gap-sys-5 text-sys-micro"
            aria-label="Footer navigation">
