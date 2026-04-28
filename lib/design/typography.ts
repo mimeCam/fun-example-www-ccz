@@ -291,6 +291,15 @@ export const hangPunctClassOf = (b: TypographyBeatName): string => {
   }
 };
 
+// ─── Test-perimeter carrier set ───────────────────────────────────────────
+// Consumed by the three passage-body-prose fences (wrap / hyphens / hang).
+// New carriers update the tuple — no fence edit required.
+export const PASSAGE_BODY_CARRIERS = [
+  ['ArticlePage',   'app/article/[id]/page.tsx'],
+  ['ReturnLetter',  'components/return/ReturnLetter.tsx'],
+  ['PortalHero',    'components/home/PortalHero.tsx'],
+] as const satisfies ReadonlyArray<readonly [string, string]>;
+
 /** Track (letter-spacing, em) for a named beat. Pure. */
 export const trackOf = (b: TypographyBeatName): number =>
   TYPOGRAPHY[b].track;

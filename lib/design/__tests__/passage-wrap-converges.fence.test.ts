@@ -63,28 +63,25 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { TYPOGRAPHY_ORDER, wrapClassOf } from '@/lib/design/typography';
+import {
+  PASSAGE_BODY_CARRIERS as SITES,
+  TYPOGRAPHY_ORDER,
+  wrapClassOf,
+} from '@/lib/design/typography';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
 // ─── The three body-prose carriers ────────────────────────────────────────
 //
-// Each entry: [reviewer-friendly name, repo-relative path]. The names are
-// surface-named (the file the contributor opens), not concept-named — when
-// the fence reds, the name in the failure block IS the file the reviewer
-// will open. (Mike #38 §4 — failure-message-is-documentation.)
+// `SITES` is the named tuple `PASSAGE_BODY_CARRIERS` from the typography
+// ledger — shared with the hyphens + hang fences. A fourth carrier is one
+// diff in `lib/design/typography.ts`, no fence edit. Reviewer alias keeps
+// `it.each(SITES)` muscle memory below.
 //
 // `ReturnLetter.tsx` carries TWO `wrapClassOf` calls — `'heading'` for the
 // eyebrow label (pinned by `caption-heading-wrap-converges`) and `'passage'`
-// for the opening + body siblings (pinned HERE). One entry per file in
-// SITES — §1 / §2 are file-scoped, §3 pins the byte once. The two-calls-
-// per-file detail is documented in the module header.
-
-const SITES: ReadonlyArray<readonly [string, string]> = [
-  ['ArticlePage',   'app/article/[id]/page.tsx'],
-  ['ReturnLetter',  'components/return/ReturnLetter.tsx'],
-  ['PortalHero',    'components/home/PortalHero.tsx'],
-] as const;
+// for the opening + body siblings (pinned HERE). One entry per file; the
+// two-calls-per-file detail is documented in the module header.
 
 // ─── Tiny helpers — pure, ≤ 10 LOC each ────────────────────────────────────
 

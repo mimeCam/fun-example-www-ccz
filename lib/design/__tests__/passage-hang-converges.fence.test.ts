@@ -69,27 +69,20 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { TYPOGRAPHY_ORDER, hangPunctClassOf } from '@/lib/design/typography';
+import {
+  PASSAGE_BODY_CARRIERS as SITES,
+  TYPOGRAPHY_ORDER,
+  hangPunctClassOf,
+} from '@/lib/design/typography';
 
 const ROOT = join(__dirname, '..', '..', '..');
 
 // ─── The three body-prose carriers ────────────────────────────────────────
 //
-// Same SITES list as `passage-wrap-converges.fence.test.ts` and
-// `passage-hyphens-converges.fence.test.ts` — wrap, hyphens, and hang
-// are sibling handles on the same prose surfaces. If a future carrier
-// joins the wrap + hyphens fences, it joins this fence too (or a comment
-// here documents the carve-out).
-//
-// Each entry: [reviewer-friendly name, repo-relative path]. Surface-named
-// (the file the contributor opens), not concept-named — failure-message-
-// is-documentation (Mike #38 §4).
-
-const SITES: ReadonlyArray<readonly [string, string]> = [
-  ['ArticlePage',   'app/article/[id]/page.tsx'],
-  ['ReturnLetter',  'components/return/ReturnLetter.tsx'],
-  ['PortalHero',    'components/home/PortalHero.tsx'],
-] as const;
+// `SITES` is the named tuple `PASSAGE_BODY_CARRIERS` from the typography
+// ledger — shared with the wrap + hyphens fences. A fourth carrier is one
+// diff in `lib/design/typography.ts`, no fence edit. Reviewer alias keeps
+// `it.each(SITES)` muscle memory below.
 
 // ─── Tiny helpers — pure, ≤ 10 LOC each ────────────────────────────────────
 

@@ -19,6 +19,7 @@ Design rules are enforced by fence tests (`*.fence.test.ts`) and sync tests. Sin
 - **Chassis Seam** *(2026-04-28)*. `pt-sys-9` (40 px) chrome→content bridge × 7 doors. Fence: `chrome-content-seam`.
 - **Passage Body-Wrap** *(2026-04-28)*. `wrapClassOf('passage')` → `text-wrap: pretty` × 3 carriers. Fence: `passage-wrap-converges`.
 - **Passage Body-Hyphens** *(2026-04-28)*. `hyphensClassOf('passage')` × 3 carriers. Fences: `passage-hyphens-converges` + `html-lang-required-for-hyphenation`.
+- **Body-prose carriers named** *(2026-04-28)*. `PASSAGE_BODY_CARRIERS` (3) in `lib/design/typography.ts` — one tuple, three fences (wrap / hyphens / hang) consume.
 
 ## Deferred
 P3/True Tone, Slice 3, archetype-detection accuracy receipt, `quotes` / `'locl'` locale-aware sub-ledger. Body-prose typography ledger converged on three carriers (wrap, hyphens, hang) — new sub-ledgers must justify a fourth disjoint property.
