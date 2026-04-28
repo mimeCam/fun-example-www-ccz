@@ -1913,30 +1913,47 @@ body {
    to interpolate from). The single call-site invariant is enforced by
    `lib/design/__tests__/presence-pre-lit-allowlist.test.ts`.
 
-   --accent-bias is reserved for the next slice (archetype-tinted chrome
-   surfaces, e.g. `filter: hue-rotate(var(--accent-bias))`) — not yet
-   consumed by any surface; stranger ≡ today via the `0deg` default.
+   --accent-bias is the wheel-anchor (DIRECTION on the hue circle each
+   archetype's voice lives at — 280° = cool violet, 38° = warm orange,
+   …). Reserved as SSOT for any future surface that wants to "join the
+   bow" via its own surface-keyed clamped delta.
+
+   --thread-bias IS LIVE this slice: it's the *applied* hue tilt for the
+   Golden Thread fill (signed degrees, clamped to ±6° by spec — Paul §
+   "signature, not status"). Consumed by `GoldenThread.tsx` as
+   `style={{ filter: 'hue-rotate(var(--thread-bias, 0deg))' }}` via the
+   single ledger constant `THREAD_ACCENT_BIAS_FILTER` in
+   `lib/design/accent-bias.ts`. Single-call-site invariant pinned by
+   `lib/design/__tests__/accent-bias-allowlist.fence.test.ts`.
 
    No new alpha rungs, no new colours, no new animations — every value
    composes from the existing alpha ledger (`--sys-alpha-*`).
 
    Credits: Mike K. (architect, napkin §4 — additive attribute selectors,
-   stranger ≡ today invariant; napkin #35 — "the lit threshold" wire-up);
-   Tanya D. (UIX §4.1 — one-rung pre-warm; UIX #86 — F1–F5 motion contract).
+   stranger ≡ today invariant; napkin #35 — "the lit threshold" wire-up;
+   napkin #77 — `--accent-bias` LIVE on the spine, fence-pin shape);
+   Tanya D. (UIX §4.1 — one-rung pre-warm; UIX #86 — F1–F5 motion contract;
+   UIX #28 §3 — applied vs. anchor reconciliation that named `--thread-bias`).
 
    --thread-alpha-pre — paint-zero pre-warm rung for the Golden Thread.
                         Stranger: 0 (today's behaviour).
                         Returning: --sys-alpha-muted  (0.30).
                         Known:     --sys-alpha-recede (0.50).
-   --accent-bias      — degrees, the additive hue tilt per archetype.
+   --accent-bias      — wheel-anchor degrees, archetype voice direction.
                         Truth-table mirrors `archetypeAccentBias()` in
-                        `lib/return/recognition-beacon.ts`. */
+                        `lib/return/recognition-beacon.ts`. SSOT for
+                        future surface-keyed deltas ("join the bow").
+   --thread-bias      — applied hue tilt for the Golden Thread fill,
+                        clamped to ±6° (Tanya UIX #28 §3 magnitude
+                        table). Sign: + warmer, − cooler. Consumed via
+                        THREAD_ACCENT_BIAS_FILTER. */
 
 :root {
   /* alpha-ledger:exempt — paint-zero sentinel; the GoldenThread wrapper
      reads this via inline style at the `gone` rung. Stranger ≡ today. */
   --thread-alpha-pre: 0;
   --accent-bias: 0deg;
+  --thread-bias: 0deg;
 }
 
 /* Tier-keyed pre-warm sentinel. Same one-rung-step principle as the
@@ -1945,14 +1962,30 @@ body {
 [data-recognition-tier="returning"] { --thread-alpha-pre: var(--sys-alpha-muted); }
 [data-recognition-tier="known"]     { --thread-alpha-pre: var(--sys-alpha-recede); }
 
-/* Five archetypes, five accent biases. The truth table mirrors
+/* Five archetypes, five wheel-anchor biases. The truth table mirrors
    `archetypeAccentBias()` in `lib/return/recognition-beacon.ts` (a
-   fence test pins them as equal). Reserved for archetype-keyed surfaces
-   in a follow-up PR (e.g. `filter: hue-rotate(var(--accent-bias))`
-   on a future archetype-tinted chrome surface). */
+   fence test pins them as equal). These are the DIRECTION the
+   archetype voice lives — used by future surfaces that derive their
+   own clamped delta. The Golden Thread fill does NOT consume this
+   directly; it consumes `--thread-bias` (below) which is the
+   surface-specific applied lean. */
 [data-archetype="deep-diver"] { --accent-bias: 280deg; }
 [data-archetype="explorer"]   { --accent-bias:  38deg; }
 [data-archetype="faithful"]   { --accent-bias:  12deg; }
 [data-archetype="resonator"]  { --accent-bias: 320deg; }
 [data-archetype="collector"]  { --accent-bias: 200deg; }
+
+/* Five archetypes, five APPLIED Golden Thread leans. Each value is a
+   signed degree in [-6deg, +6deg] (Tanya UIX #28 §3 — sub-JND at the
+   lower end, on-the-edge-of-perception at the upper). Sign convention:
+     + warmer (toward gold/amber/rose)
+     − cooler (toward cyan/violet)
+   Consumed by `THREAD_ACCENT_BIAS_FILTER` on the Golden Thread fill
+   only. Mirrored by `__testing__.THREAD_BIAS_BY_ARCHETYPE` in
+   `lib/design/accent-bias.ts` (a fence test pins them as equal). */
+[data-archetype="deep-diver"] { --thread-bias: -6deg; }
+[data-archetype="explorer"]   { --thread-bias:  6deg; }
+[data-archetype="faithful"]   { --thread-bias:  3deg; }
+[data-archetype="resonator"]  { --thread-bias: -3deg; }
+[data-archetype="collector"]  { --thread-bias: -5deg; }
 

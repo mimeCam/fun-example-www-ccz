@@ -44,6 +44,16 @@
  *     the maxDepth across the gone state so the dried ink remembers where
  *     the reader was, even at α=0.
  *
+ * Accent-bias lean (Mike K. napkin #77 + Tanya UIX #28):
+ *   - Fill carries `filter: hue-rotate(var(--thread-bias, 0deg))` via
+ *     `THREAD_ACCENT_BIAS_FILTER` in `lib/design/accent-bias.ts`. The
+ *     CSS truth table sets `--thread-bias` to a signed value in
+ *     `[-6deg, +6deg]` per archetype (positive = warmer, negative =
+ *     cooler). Stranger ≡ today: no `data-archetype` ⇒ `:root` default
+ *     `0deg` ⇒ `hue-rotate(0deg)` is a no-op (byte-equivalent pixels).
+ *     Single-call-site invariant pinned by `accent-bias-allowlist`
+ *     fence; range cap pinned by `golden-thread-accent-bias` fence.
+ *
  * Pre-lit (Mike K. napkin #35 + Tanya UIX #86):
  *   - gone-state opacity reads `--thread-alpha-pre`; stranger ≡ today
  *     (CI-pinned via the headline fence + the allow-list fence).
@@ -79,6 +89,7 @@ import { useThreadDepth } from '@/lib/hooks/useThreadDepth';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { CEREMONY, MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { THREAD_ACCENT_BIAS_FILTER } from '@/lib/design/accent-bias';
 import { CROSSFADE_INLINE, gestureClassesForMotion } from '@/lib/design/gestures';
 import {
   presenceClassOf,
@@ -256,12 +267,17 @@ function ThreadSpine({ phase, crossingClass, tidePulseClass }: SpineProps) {
           crossingClass:      thermal threshold pulse.
           tidePulseClass:     new-max-depth pulse at 25/50/75/100% bands.
           fadeMotion:         Atlas-owned `thread-settle` curve on opacity+width.
+          filter:             archetype-keyed lean via THREAD_ACCENT_BIAS_FILTER.
+                              Stranger floor: --thread-bias defaults to 0deg
+                              ⇒ hue-rotate(0deg) is a no-op ⇒ today's pixels.
+                              Returner with archetype: ±6° lean toward voice.
           Breathing animation (tide-breathe) gated by data-thread-settled on <html>. */}
       <div
         className={`${fillClassName(phase)} ${crossingClass} ${tidePulseClass} transition-[opacity,width] ${fadeMotion}`}
         style={{
           height: 'calc(var(--thread-depth, 0) * 100%)',
           backgroundColor: 'var(--token-accent)',
+          filter: THREAD_ACCENT_BIAS_FILTER,
         }}
       />
     </div>
