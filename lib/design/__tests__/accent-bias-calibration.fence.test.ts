@@ -1,22 +1,20 @@
 /**
- * Accent-bias calibration — perceptual signature window.
+ * Accent-bias calibration — Recognition Whisper Budget.
  *
  *   Measured threshold:  ΔE2000 ∈ [0.8, 1.8] vs. the stranger baseline.
  *   JND class:           sub-conscious recognition (signature, not status).
  *   Failure mode fenced: signature → status drift, in either direction.
  *
- * --------------------------------------------------------------------------
- * CALIBRATION DEBT — slice landing receipt (Sid · 2026-04-28):
- *   `npx tsx scripts/measure-thread-bias-deltaE.ts` against the currently-
- *   shipped `THREAD_BIAS_BY_ARCHETYPE` values produces ΔE2000 in roughly
- *   [1.97, 3.96] — well above the spec ceiling of 1.8. The five per-
- *   archetype assertions below ship as `it.failing(...)` so CI stays green
- *   while the contract is asserted *literally* in source. When the team
- *   reconciles the values↔window mismatch (three paths in `_my/report.md`),
- *   Jest flips each block red as the assertion starts passing — that is
- *   the signal to rename `it.failing` → `it`. The math, the helper, and
- *   the structural pins (range cap; matrix sanity) are LIVE today.
- * --------------------------------------------------------------------------
+ * The window literal (`RECOGNITION_WHISPER_BUDGET = [0.8, 1.8]`) is the
+ * felt-experience contract: above 1.8 ΔE the lean becomes status (the
+ * returner *notices*, recognition collapses); below 0.8 ΔE the lean is
+ * indistinguishable from byte-noise — the room never leaned at all
+ * (Paul / Jason — #92; Tanya UIX #92 §1).
+ *
+ * Calibration receipt (#92 — `THREAD_BIAS_MAX_ABS_DEG: 6 → 3`, five
+ * magnitudes recalibrated from ±[3..6]° to ±[1.5..2.5]°): every archetype
+ * now lands inside the window with margin both sides; the five per-
+ * archetype assertions below are LIVE (`it`, not `it.failing`).
  *
  * Imports `measureDeltaE2000` from `scripts/...` — intentional per Elon
  * §6 (rule-of-three has not fired; the helper co-locates with its caller
@@ -30,11 +28,20 @@ import type { ArchetypeKey } from '@/types/content';
 
 const { THREAD_BIAS_BY_ARCHETYPE } = __testing__;
 
-// ─── Spec — the perceptual window literal (Krystle scope, Tanya §3.2) ───────
+// ─── Spec — the Recognition Whisper Budget (Tanya §6 / Jason / Paul #92) ────
 
 const BASELINE_HEX = BRAND.gold;                 // #f0c674 — the warm spine fill stop
-const FLOOR = 0.8;                                // sub-JND recognition floor
-const CEILING = 1.8;                              // sub-JND status visibility ceiling
+
+/**
+ * The perceptual whisper window: a returner's lean must measure inside
+ * `[0.8, 1.8]` ΔE2000 against the stranger baseline. Above 1.8 the lean
+ * becomes status (the room shouts); below 0.8 the lean is byte-noise
+ * (the room never leaned). One named constant — `[FLOOR, CEILING]` are
+ * its tuple positions, kept as locals so the failure prose stays
+ * literal-readable.
+ */
+const RECOGNITION_WHISPER_BUDGET: readonly [number, number] = [0.8, 1.8];
+const [FLOOR, CEILING] = RECOGNITION_WHISPER_BUDGET;
 
 // ─── Failure-message-is-documentation (Mike §4 POI 7) ───────────────────────
 
@@ -60,19 +67,17 @@ function assertWindow(arch: ArchetypeKey): void {
 
 // ─── §1 · Five named per-archetype window assertions (Mike §4 POI 5) ────────
 
-describe('accent-bias — perceptual signature window (ΔE2000 ∈ [0.8, 1.8])', () => {
-  // `it.failing` inverts: each test passes WHILE the assertion fails (calibration
-  // debt). When values↔window are reconciled, Jest flips it red — rename to `it()`.
-  it.failing('deep-diver renders inside the signature window', () => assertWindow('deep-diver'));
-  it.failing('explorer renders inside the signature window',   () => assertWindow('explorer'));
-  it.failing('faithful renders inside the signature window',   () => assertWindow('faithful'));
-  it.failing('resonator renders inside the signature window',  () => assertWindow('resonator'));
-  it.failing('collector renders inside the signature window',  () => assertWindow('collector'));
+describe('accent-bias — RECOGNITION_WHISPER_BUDGET (ΔE2000 ∈ [0.8, 1.8])', () => {
+  it('deep-diver renders inside the whisper budget', () => assertWindow('deep-diver'));
+  it('explorer renders inside the whisper budget',   () => assertWindow('explorer'));
+  it('faithful renders inside the whisper budget',   () => assertWindow('faithful'));
+  it('resonator renders inside the whisper budget',  () => assertWindow('resonator'));
+  it('collector renders inside the whisper budget',  () => assertWindow('collector'));
 });
 
 // ─── §2 · Range cap pins (Mike §4 POI 8 — closed-union exhaustiveness) ──────
 
-describe('accent-bias — range cap (±6° clamp; the signature-not-status ceiling)', () => {
+describe('accent-bias — range cap (±3° geometry guard; whisper-budget enforceable)', () => {
   it('every archetype value satisfies |°| ≤ THREAD_BIAS_MAX_ABS_DEG', () => {
     // Closed-union iteration: a sixth archetype trips the TS compile, not
     // just the runtime (the same shape as the accent-bias.ts SSOT mirror).
@@ -81,8 +86,11 @@ describe('accent-bias — range cap (±6° clamp; the signature-not-status ceili
     });
   });
 
-  it('THREAD_BIAS_MAX_ABS_DEG is 6 (literal pin so the cap cannot silently widen)', () => {
-    expect(THREAD_BIAS_MAX_ABS_DEG).toBe(6);
+  it('THREAD_BIAS_MAX_ABS_DEG is 3 (cap and whisper-budget agree at the gold stop)', () => {
+    // 3° × ΔE/° ≈ 0.66 ≈ 1.98 ΔE — the cap can no longer mechanically
+    // permit a value that violates the perceptual ceiling at the warmest
+    // baseline. One source of truth in degrees, mechanically enforced.
+    expect(THREAD_BIAS_MAX_ABS_DEG).toBe(3);
   });
 });
 

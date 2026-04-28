@@ -241,29 +241,49 @@ export function measureDeltaE2000(baselineHex: string, biasDeg: number): number 
  * CLI receipt has zero non-pure imports. The fence test imports the SSOT.
  */
 const THREAD_BIAS_TABLE: ReadonlyArray<readonly [string, number]> = [
-  ['deep-diver', -6], ['explorer', +6], ['faithful', +3],
-  ['resonator', -3], ['collector', -5],
+  ['deep-diver', -2.5], ['explorer', +2.5], ['faithful', +1.5],
+  ['resonator', -1.5], ['collector', -2.0],
+];
+
+/**
+ * Two-baseline witness: the warm spine fill stop (`BRAND.gold`) anchors
+ * the calibration; the cool spine fill stop (`BRAND.primary`) is the
+ * second witness across the violet→gold thermal gradient. Tanya UIX #92
+ * §11 / Elon §4 — the gradient is honored at both ends. Receipt-only;
+ * the fence test pins only the warm baseline today (Slice 3 lifts the
+ * cool baseline into a fence assertion when the second-surface rule-of-
+ * three fires).
+ */
+const BASELINES: ReadonlyArray<readonly [string, string]> = [
+  ['#f0c674', 'warm spine fill stop (BRAND.gold)'],
+  ['#7b2cbf', 'cool spine fill stop (BRAND.primary)'],
 ];
 
 /** Format a single archetype row as `archetype  ±N°  ΔE2000 = X.XXX`. */
 function formatRow(name: string, deg: number, dE: number, baseline: string): string {
   const sign = deg > 0 ? '+' : '';
-  const lean = `${sign}${deg}°`.padStart(4);
+  const lean = `${sign}${deg}°`.padStart(6);
   return `  ${name.padEnd(11)}  ${lean}   ΔE2000 = ${dE.toFixed(3)}   vs ${baseline}`;
 }
 
-/** Print the CLI receipt to stdout. Side-effect (console). */
-function printReceipt(baseline: string): void {
-  console.log(`\nGolden Thread accent-bias calibration · baseline ${baseline}`);
-  console.log(`signature window: ΔE2000 ∈ [0.8, 1.8]\n`);
+/** Print one baseline's calibration block — five rows of receipt prose. */
+function printBaselineBlock(baseline: string, label: string): void {
+  console.log(`\n· baseline ${baseline}  (${label})`);
   for (const [name, deg] of THREAD_BIAS_TABLE) {
     console.log(formatRow(name, deg, measureDeltaE2000(baseline, deg), baseline));
   }
+}
+
+/** Print the CLI receipt to stdout. Side-effect (console). */
+function printReceipt(): void {
+  console.log(`\nGolden Thread accent-bias calibration`);
+  console.log(`recognition whisper budget: ΔE2000 ∈ [0.8, 1.8]`);
+  for (const [hex, label] of BASELINES) printBaselineBlock(hex, label);
   console.log('');
 }
 
 // Run only when invoked directly (`tsx scripts/...`), never at import time —
 // the fence test imports `measureDeltaE2000` and must not see CLI output.
 if (require.main === module) {
-  printReceipt('#f0c674');
+  printReceipt();
 }

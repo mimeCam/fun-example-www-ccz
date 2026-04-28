@@ -144,11 +144,14 @@ describe('golden-thread-accent-bias · §3 css truth table', () => {
 
 // ─── §4 · Range cap — every applied lean lands inside ±MAX_ABS_DEG ────────
 
-describe('golden-thread-accent-bias · §4 range cap (±6° window)', () => {
-  it('THREAD_BIAS_MAX_ABS_DEG is exactly 6 (Paul §"sub-conscious")', () => {
-    // The window is a load-bearing spec — change this number AFTER the
-    // calibration pass (Tanya UIX #28 §11 open question 2), not before.
-    expect(THREAD_BIAS_MAX_ABS_DEG).toBe(6);
+describe('golden-thread-accent-bias · §4 range cap (±3° geometry guard)', () => {
+  it('THREAD_BIAS_MAX_ABS_DEG is exactly 3 (whisper-budget enforceable)', () => {
+    // The cap is the geometry guard that makes ΔE2000 ∈ [0.8, 1.8]
+    // mechanically enforceable at the warm spine fill stop (ΔE/° ≈ 0.66
+    // ⇒ 3° × 0.66 ≈ 1.98 ΔE, just under ceiling). Tanya UIX #92 §5;
+    // Mike #92 §2 calibration receipt. Change this number FIRST when
+    // re-calibrating; the fence then surfaces every CSS rule that drifts.
+    expect(THREAD_BIAS_MAX_ABS_DEG).toBe(3);
   });
 
   it.each(Object.entries(TS_TABLE) as ReadonlyArray<[ArchetypeKey, number]>)(
@@ -158,11 +161,14 @@ describe('golden-thread-accent-bias · §4 range cap (±6° window)', () => {
     },
   );
 
-  it('at least one archetype reaches the upper bound (the window is used)', () => {
-    // If every archetype caps at ±3, we paid for a ±6° spec we never
-    // reached. Tanya UIX #28 §3 calls for the window to be USED.
+  it('the cap leaves a hair of headroom (~0.5°) above the loudest lean', () => {
+    // Largest shipped magnitude is 2.5°; cap is 3°. The headroom absorbs
+    // ΔE/° drift at the cool baseline without re-opening this PR (Tanya
+    // UIX #92 §5 — sub-JND budget, sign carries identity not loudness).
+    // Inverts the prior "the window is used" pin: the window is now a
+    // *guard*, not a target — calibration sits inside it with margin.
     const maxAbs = Math.max(...Object.values(TS_TABLE).map(Math.abs));
-    expect(maxAbs).toBe(THREAD_BIAS_MAX_ABS_DEG);
+    expect(maxAbs).toBeLessThan(THREAD_BIAS_MAX_ABS_DEG);
   });
 });
 

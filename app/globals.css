@@ -1944,8 +1944,11 @@ body {
                         `lib/return/recognition-beacon.ts`. SSOT for
                         future surface-keyed deltas ("join the bow").
    --thread-bias      — applied hue tilt for the Golden Thread fill,
-                        clamped to ±6° (Tanya UIX #28 §3 magnitude
-                        table). Sign: + warmer, − cooler. Consumed via
+                        clamped to ±3° (Tanya UIX #92 §5 — the geometry
+                        guard that makes the perceptual whisper window
+                        ΔE2000 ∈ [0.8, 1.8] mechanically enforceable at
+                        the warm spine fill stop, ΔE/° ≈ 0.66 there).
+                        Sign: + warmer, − cooler. Consumed via
                         THREAD_ACCENT_BIAS_FILTER. */
 
 :root {
@@ -1976,16 +1979,23 @@ body {
 [data-archetype="collector"]  { --accent-bias: 200deg; }
 
 /* Five archetypes, five APPLIED Golden Thread leans. Each value is a
-   signed degree in [-6deg, +6deg] (Tanya UIX #28 §3 — sub-JND at the
-   lower end, on-the-edge-of-perception at the upper). Sign convention:
+   signed fractional degree calibrated against the warm spine fill
+   stop (BRAND.gold = #f0c674) so every archetype lands inside the
+   perceptual whisper window ΔE2000 ∈ [0.8, 1.8] — sub-JND, felt-not-
+   seen (Tanya UIX #92 §4 magnitude table; Mike #92 §2 calibration).
+   Sign convention:
      + warmer (toward gold/amber/rose)
      − cooler (toward cyan/violet)
-   Consumed by `THREAD_ACCENT_BIAS_FILTER` on the Golden Thread fill
-   only. Mirrored by `__testing__.THREAD_BIAS_BY_ARCHETYPE` in
+   Sign carries identity, magnitude carries depth; sub-JND ⇒ two
+   archetypes can share a magnitude (resonator/faithful at 1.5°)
+   without losing distinction — the direction does the work
+   (Tanya §4, §12). Consumed by `THREAD_ACCENT_BIAS_FILTER` on the
+   Golden Thread fill only. Mirrored by
+   `__testing__.THREAD_BIAS_BY_ARCHETYPE` in
    `lib/design/accent-bias.ts` (a fence test pins them as equal). */
-[data-archetype="deep-diver"] { --thread-bias: -6deg; }
-[data-archetype="explorer"]   { --thread-bias:  6deg; }
-[data-archetype="faithful"]   { --thread-bias:  3deg; }
-[data-archetype="resonator"]  { --thread-bias: -3deg; }
-[data-archetype="collector"]  { --thread-bias: -5deg; }
+[data-archetype="deep-diver"] { --thread-bias: -2.5deg; }
+[data-archetype="explorer"]   { --thread-bias:  2.5deg; }
+[data-archetype="faithful"]   { --thread-bias:  1.5deg; }
+[data-archetype="resonator"]  { --thread-bias: -1.5deg; }
+[data-archetype="collector"]  { --thread-bias: -2deg; }
 
