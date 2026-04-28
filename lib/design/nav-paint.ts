@@ -194,8 +194,18 @@ export function navBarChassis(): string {
   // glass carrier doing layout work), NOT a voice register. `void` is
   // not in ALPHA_COLOR_FAMILIES; `/80` is not a legal rung. The hairline
   // below IS voice (fog/muted) and routes through alphaClassOf.
+  //
+  // The chrome-rhythm sprint (Tanya UIX #46 §2.D2) lifted the prior
+  // `animate-fade-in` keyframe off this chassis: AmbientNav now stays
+  // mounted on hidden routes and cross-fades via `opacity-{0,100}` +
+  // `transition-opacity` instead of mount/unmount. Keeping `animate-
+  // fade-in` here would clash with the opacity gate on first paint
+  // (the keyframe would flash the bar in for 200ms before the class
+  // settled at `opacity-0`). The `crossfade-inline` verb (120ms,
+  // ease-out) lives at the consumer call site — the chassis owns
+  // geometry + scrim + hairline ONLY.
   const geom = 'fixed bottom-0 inset-x-0 z-sys-nav';
-  const scrim = 'bg-void/80 backdrop-blur-sm animate-fade-in';
+  const scrim = 'bg-void/80 backdrop-blur-sm';
   // chrome-paint kernel — the chassis hairline shares one register with
   // Toast / Threshold / KeepsakePlate / both Keepsakes (Mike napkin §1).
   const hairline = `border-t ${chromeMutedBorder()}`;

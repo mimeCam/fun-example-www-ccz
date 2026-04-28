@@ -26,7 +26,7 @@ exports[`nav-paint — (state, quiet) → className snapshot gemShadow (state, q
 }
 `;
 
-exports[`nav-paint — (state, quiet) → className snapshot navBarChassis() output is byte-pinned (chassis graduation) 1`] = `"fixed bottom-0 inset-x-0 z-sys-nav bg-void/80 backdrop-blur-sm animate-fade-in border-t border-fog/30"`;
+exports[`nav-paint — (state, quiet) → className snapshot navBarChassis() output is byte-pinned (chassis graduation) 1`] = `"fixed bottom-0 inset-x-0 z-sys-nav bg-void/80 backdrop-blur-sm border-t border-fog/30"`;
 
 exports[`nav-paint — (state, quiet) → className snapshot navItemPaint (route) map is byte-pinned 1`] = `
 {
