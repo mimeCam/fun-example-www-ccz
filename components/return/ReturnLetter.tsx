@@ -37,6 +37,7 @@ import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { useActionPhase } from '@/lib/hooks/useActionPhase';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
+import { wrapClassOf } from '@/lib/design/typography';
 
 // ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
 //
@@ -61,6 +62,14 @@ const LABEL_RECEDE    = alphaClassOf('accent',     'recede',   'text');   // tex
 const CLOSING_QUIET   = alphaClassOf('foreground', 'quiet',    'text');   // text-foreground/70
 const COMPACT_QUIET   = alphaClassOf('mist',       'quiet',    'text');   // text-mist/70
 const BORDER_HAIRLINE = alphaClassOf('accent',     'hairline', 'border'); // border-accent/10
+
+/* ─── Wrap policy — `caption` rhythm, `heading` break (Mike #122 §4) ────────
+   The Because-you-came-back eyebrow rides caption rhythm but heading break
+   policy so the felt sentence does not orphan a final word at 320 px.
+   Multi-word labels balance; single-word labels get a silent CSS no-op.
+   The literal `typo-wrap-heading` lives in `wrapClassOf` only; pinned by
+   `caption-heading-wrap-converges.fence.test.ts`. */
+const HEADING_WRAP    = wrapClassOf('heading');
 
 // ─── Timing — owned by the Recognition Timeline (Mike napkin §"Module shape") ─
 //
@@ -325,7 +334,7 @@ function LetterCard({
         <DismissButton.Absolute size="sm" onClose={onDismiss} />
       )}
       {/* Label — `recede` (0.50): the frame around the subject. */}
-      <p className={`text-sys-micro uppercase tracking-sys-caption ${LABEL_RECEDE} text-center`}>
+      <p className={`text-sys-micro uppercase tracking-sys-caption ${LABEL_RECEDE} ${HEADING_WRAP} text-center`}>
         Because you came back&hellip;
       </p>
       {/* Salutation */}

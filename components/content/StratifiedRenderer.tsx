@@ -20,7 +20,7 @@ import {
   getExtensionLabel,
   getExtensionBorderColor,
 } from '@/lib/content/content-layers';
-import { passageThermalClass } from '@/lib/design/typography';
+import { passageThermalClass, wrapClassOf } from '@/lib/design/typography';
 import { Divider } from '@/components/shared/Divider';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { NewContentBadge } from './NewContentBadge';
@@ -67,6 +67,15 @@ const RES_QUOTE_TEXT      = alphaClassOf('foreground', 'quiet',    'text');   //
 
 /** Resonance "Saved …" timestamp — the frame around the subject. */
 const RES_META_TEXT       = alphaClassOf('mist',       'recede',   'text');   // text-mist/50
+
+/* ─── Wrap policy — `caption` rhythm, `heading` break (Mike #122 §4) ────────
+   The two caption-rhythm eyebrows on this surface (extension label and the
+   resonance-marginalia Your-resonance label) ride caption rhythm but
+   heading break policy. Multi-word labels balance; single-word labels get
+   a silent CSS no-op. The literal `typo-wrap-heading` lives in
+   `wrapClassOf` only; pinned by
+   `caption-heading-wrap-converges.fence.test.ts`. */
+const HEADING_WRAP        = wrapClassOf('heading');
 
 interface StratifiedRendererProps {
   blocks: ContentBlock[];
@@ -138,7 +147,7 @@ function ExtensionBlock({ block }: { block: ContentBlock }) {
         ${EXT_SURFACE}`}
     >
       <div className="flex items-center gap-sys-3 mb-sys-3">
-        <span className="text-sys-micro uppercase tracking-sys-caption text-cyan font-sys-accent">
+        <span className={`text-sys-micro uppercase tracking-sys-caption text-cyan font-sys-accent ${HEADING_WRAP}`}>
           {label}
         </span>
         {block.isNew && <NewContentBadge label="Unlocked" />}
@@ -271,7 +280,7 @@ function ResonanceMarginaliaBlock({ block }: { block: ContentBlock }) {
       className={`my-sys-10 px-sys-6 py-sys-5 ${RES_SURFACE} border-l-4 border-rose rounded-sys-medium shadow-rose-glow
         ${block.isNew ? 'animate-resonance-remembered' : ''}`}
     >
-      <p className={`text-sys-micro uppercase tracking-sys-caption ${RES_LABEL_TEXT} mb-sys-4`}>
+      <p className={`text-sys-micro uppercase tracking-sys-caption ${RES_LABEL_TEXT} ${HEADING_WRAP} mb-sys-4`}>
         Your resonance
       </p>
       <p className={`text-sys-body ${RES_QUOTE_TEXT} italic ${passageThermalClass()}`}>

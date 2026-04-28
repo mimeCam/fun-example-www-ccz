@@ -46,6 +46,15 @@ const WHISPER_TEXT    = alphaClassOf('foreground', 'quiet', 'text'); // text-for
    Tanya UIX #22 §4.2: wrap is the orphan killer; leading stays at caption. */
 const WHISPER_WRAP = wrapClassOf('heading');
 
+/* ─── Reveal-label wrap policy (Mike #122 §4 / Tanya UIX "Indivisible Label") ──
+   Sister handle: the "Because you stayed…" eyebrow above the archetype name
+   is a caption-rhythm chapter label and consumes the same heading-balance
+   break policy. Multi-word eyebrows do not orphan at 320 px; single-word
+   eyebrows get a silent CSS no-op. Same literal as `WHISPER_WRAP`, named
+   for its own surface so a future copy edit cannot drift one without the
+   other. Pinned by `caption-heading-wrap-converges.fence.test.ts`. */
+const HEADING_WRAP = wrapClassOf('heading');
+
 /* ─── Radius-ledger handle — typed posture, JIT-safe ────────────────────
    Mike napkin #63 §5.1: hoist the resolved class string to module scope
    with UPPER_SNAKE provenance. Posture vocabulary (`ceremony`) is the
@@ -128,7 +137,7 @@ function RevealLabel({ visible, color, motion }: {
   // `style={…}` carries archetype-runtime values only (color, opacity rung) —
   // no motion timing tokens. Tanya UX §4e.
   return (
-    <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-2
+    <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-2 ${HEADING_WRAP}
       ${MIRROR_STAGGER_CLASS[1]} ${motion} ${fadeClass(visible)}`}
       style={{ color, opacity: visible ? 0.7 : 0 }}
       {...STAGGER_DATA_PROPS}>

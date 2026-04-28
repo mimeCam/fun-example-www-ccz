@@ -34,6 +34,7 @@
  */
 
 import { alphaClassOf, type AlphaRung } from '@/lib/design/alpha';
+import { wrapClassOf } from '@/lib/design/typography';
 
 interface Props {
   label: string;
@@ -56,10 +57,17 @@ const TONE_CLASS: Record<NonNullable<Props['tone']>, string> = {
   mist: MIST_TEXT,
 };
 
+/* ─── Wrap policy — `caption` rhythm, `heading` break (Mike #122 §4) ────────
+   Multi-word labels (`WHAT'S CARRYING YOU`) cannot orphan a final word at
+   320 px; single-word labels (`BLEND`) get a silent CSS no-op. The literal
+   `typo-wrap-heading` lives in `wrapClassOf` and `app/globals.css` only;
+   pinned by `caption-heading-wrap-converges.fence.test.ts`. */
+const HEADING_WRAP = wrapClassOf('heading');
+
 /** Section label — micro uppercase, token-mapped tone, no animation. */
 export function ResonanceSectionHeader({ label, tone = 'gold' }: Props) {
   return (
-    <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-7 ${TONE_CLASS[tone]}`}>
+    <p className={`text-sys-micro uppercase tracking-sys-caption mb-sys-7 ${TONE_CLASS[tone]} ${HEADING_WRAP}`}>
       {label}
     </p>
   );
@@ -77,4 +85,5 @@ export const __testing__ = {
   GOLD_TEXT,
   MIST_TEXT,
   TONE_CLASS,
+  HEADING_WRAP,
 } as const;

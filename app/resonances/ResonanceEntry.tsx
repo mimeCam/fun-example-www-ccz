@@ -58,7 +58,7 @@ import { LeanArrow } from '@/components/shared/LeanArrow';
 import { Divider } from '@/components/shared/Divider';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { gestureClassesForMotion } from '@/lib/design/gestures';
-import { passageThermalClass } from '@/lib/design/typography';
+import { passageThermalClass, wrapClassOf } from '@/lib/design/typography';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { useScrollRise } from '@/lib/hooks/useScrollRise';
 import { QuoteKeepsake } from '@/components/articles/QuoteKeepsake';
@@ -136,6 +136,14 @@ const ARTICLE_META_TEXT = alphaClassOf('mist', 'recede', 'text');
 
 /** Closing-line text — `recede` rung; the room's small farewell. */
 const CLOSING_LINE_TEXT = alphaClassOf('gold', 'recede', 'text');
+
+/* ─── Wrap policy — `caption` rhythm, `heading` break (Mike #122 §4) ────────
+   The `CardLabel` eyebrow is caption-rhythm chapter signage: multi-word
+   variants (Something that stayed with you) cannot orphan a final word at
+   320 px; single-word variants (Faded) get a silent CSS no-op. The literal
+   `typo-wrap-heading` lives in `wrapClassOf` only; pinned by
+   `caption-heading-wrap-converges.fence.test.ts`. */
+const HEADING_WRAP = wrapClassOf('heading');
 
 /** Small gem icon for the card label. Pure presentation, ≤ 5 LOC. */
 function CardGem({ faded }: { faded?: boolean }) {
@@ -228,7 +236,7 @@ function CardLabel({ faded }: { faded?: boolean }) {
   return (
     <div className="flex items-center gap-sys-3 mb-sys-4">
       <CardGem faded={faded} />
-      <span className="text-sys-micro uppercase tracking-sys-caption text-mist">
+      <span className={`text-sys-micro uppercase tracking-sys-caption text-mist ${HEADING_WRAP}`}>
         {faded ? 'Faded' : 'Something that stayed with you'}
       </span>
     </div>
@@ -367,4 +375,5 @@ export const __testing__ = {
   QUOTED_LINE_TEXT,
   ARTICLE_META_TEXT,
   CLOSING_LINE_TEXT,
+  HEADING_WRAP,
 } as const;

@@ -24,6 +24,15 @@ import {
   archetypeAccentGlyph,
   archetypeAccentGlyphClass,
 } from '@/lib/design/archetype-accents';
+import { wrapClassOf } from '@/lib/design/typography';
+
+/* ─── Wrap policy — `caption` rhythm, `heading` break (Mike #122 §4) ────────
+   The Up-Next eyebrow is a caption-rhythm chapter label. Single-word labels
+   (today's Up Next) get a silent CSS no-op; if a future copy edit hands
+   this site a multi-word label, the wrap saves it from orphaning at 320 px.
+   The literal `typo-wrap-heading` lives in `wrapClassOf` only; pinned by
+   `caption-heading-wrap-converges.fence.test.ts`. */
+const HEADING_WRAP = wrapClassOf('heading');
 
 interface NextReadProps {
   article: Article;
@@ -54,7 +63,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
     <div data-next-read className="py-sys-7 animate-fade-in">
       {/* "UP NEXT" label + archetype badge */}
       <div className="mb-sys-4 flex items-center gap-sys-4">
-        <span className="text-sys-micro tracking-sys-caption uppercase text-mist/50 font-sys-accent">
+        <span className={`text-sys-micro tracking-sys-caption uppercase text-mist/50 font-sys-accent ${HEADING_WRAP}`}>
           Up Next
         </span>
         {label && (
