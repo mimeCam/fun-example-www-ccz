@@ -55,6 +55,10 @@ import {
   navItemPaint,
   navItemActivePaint,
 } from '@/lib/design/nav-paint';
+import {
+  presenceClassOf,
+  presenceAriaHidden,
+} from '@/lib/design/presence';
 import { NavPulseDot } from './NavPulseDot';
 
 const NAV_ITEMS = [
@@ -77,20 +81,16 @@ const NAV_HOVER_GESTURE = gestureClassesOf('crossfade-inline');
 
 const HIDDEN_ROUTES = ['/', '/article'];
 
-/* ─── Visibility class fragments (motion fade endpoints) ───────────────────
-   The chrome-rhythm sprint (Tanya UIX #46 §2.D2) replaces the prior
+/* ─── Visibility — routed through the presence helper ──────────────────────
+   The chrome-rhythm sprint (Tanya UIX #46 §2.D2) replaced the prior
    `if (!visible) return null` unmount with an opacity-gated cross-fade.
-   `opacity-100` and `opacity-0` are Motion fade endpoints — owned by
-   `lib/utils/animation-phase.ts` per the Alpha Ledger; the inline exempt
-   token below licenses this single chrome surface to consume them too,
-   because the bar's appearance / disappearance IS a motion endpoint
-   (Tanya §2.D2 — "graceful arrival, abrupt departure" was the bug;
-   gating via opacity gives both). `pointer-events-none` keeps the
-   invisible bar unfocusable for mouse + keyboard. */
-// alpha-ledger:exempt — motion fade endpoint (chrome-rhythm D2)
-const PRESENCE_VISIBLE = 'opacity-100';
-// alpha-ledger:exempt — motion fade endpoint (chrome-rhythm D2)
-const PRESENCE_HIDDEN  = 'opacity-0 pointer-events-none';
+   The motion fade endpoint pair and the ARIA-hidden carrier now live in
+   `lib/design/presence.ts` — `presenceClassOf` / `presenceAriaHidden`,
+   three-member helper, one home for the chrome-rhythm continuity
+   contract. The path is licensed under `ALPHA_MOTION_ENDPOINT_PATHS`, so
+   this file no longer carries inline `// alpha-ledger:exempt` tokens for
+   the motion fade endpoints (Mike napkin #18 §2.2). `aria-hidden` keeps
+   the invisible bar unfocusable for keyboard and screen-reader users. */
 
 export function AmbientNav() {
   const pathname = usePathname();
@@ -105,14 +105,14 @@ export function AmbientNav() {
     setVisible(true);
   }, [shouldHide]);
 
-  // Always mount; gate via opacity. The chassis fade rides
+  // Always mount; gate via the presence helper. The chassis fade rides
   // `crossfade-inline` — the same verb the per-link hover swap rides.
-  const presence = visible ? PRESENCE_VISIBLE : PRESENCE_HIDDEN;
+  const presence = visible ? 'attentive' : 'gone';
   return (
     <nav
-      className={`${navBarChassis()} transition-opacity ${NAV_HOVER_GESTURE} ${presence}`}
+      className={`${navBarChassis()} transition-opacity ${NAV_HOVER_GESTURE} ${presenceClassOf(presence)}`}
       aria-label="Site navigation"
-      aria-hidden={visible ? undefined : 'true'}
+      aria-hidden={presenceAriaHidden(presence)}
     >
       <div className="flex items-center justify-center gap-sys-6 sm:gap-sys-8 h-14">
         {NAV_ITEMS.map(({ href, label }) => (

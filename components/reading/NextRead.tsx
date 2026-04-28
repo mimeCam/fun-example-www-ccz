@@ -60,6 +60,10 @@ import {
   archetypeAccentGlyph,
   archetypeAccentGlyphClass,
 } from '@/lib/design/archetype-accents';
+import {
+  presenceClassOf,
+  presenceAriaHidden,
+} from '@/lib/design/presence';
 import { wrapClassOf } from '@/lib/design/typography';
 
 /* ─── Wrap policy — `caption` rhythm, `heading` break (Mike #122 §4) ────────
@@ -79,18 +83,15 @@ const HEADING_WRAP = wrapClassOf('heading');
    the children compose downstream. */
 const NEXT_READ_GESTURE = gestureClassesOf('crossfade-inline');
 
-/* ─── Visibility class fragments — motion fade endpoints ───────────────────
-   Mirrors `AmbientNav.tsx:90,92`. `opacity-100` / `opacity-0` are Motion
-   endpoints owned by `lib/utils/animation-phase.ts` under the Alpha Ledger;
-   the inline exempt token below licenses this single content surface to
-   consume them too — its arrival/departure IS a motion endpoint, the
-   continuity-contract sibling of the chrome-rhythm D2 carve-out. The
-   `pointer-events-none` half of the hidden state keeps the unfocusable
-   wrapper from intercepting clicks during the breathing/warming windows. */
-// alpha-ledger:exempt — motion fade endpoint (continuity contract)
-const PRESENCE_VISIBLE = 'opacity-100';
-// alpha-ledger:exempt — motion fade endpoint (continuity contract)
-const PRESENCE_HIDDEN  = 'opacity-0 pointer-events-none';
+/* ─── Visibility — routed through the presence helper ─────────────────────
+   Mirrors AmbientNav and GoldenThread. The motion fade endpoint pair and
+   the ARIA-hidden carrier live in `lib/design/presence.ts` —
+   `presenceClassOf` / `presenceAriaHidden`, three-member helper, one home
+   for the chrome-rhythm continuity contract (Mike napkin #18 §2.2).
+   Visible phases (`gifting`/`settled`) map to `attentive`; hidden phases
+   map to `gone`. The `pointer-events-none` half of `gone` keeps the
+   unfocusable wrapper from intercepting clicks during the breathing /
+   warming windows. */
 
 /* ─── Stagger — one `hover` beat after the Plate (Tanya UX #93 §4) ─────────
    The Plate fades up at gifting+0; this surface waits one `hover` beat
@@ -116,6 +117,7 @@ interface NextReadProps {
 export function NextRead({ article, context, archetype }: NextReadProps) {
   const { phase } = useCeremony();
   const visible = phase === 'gifting' || phase === 'settled';
+  const presence = visible ? 'attentive' : 'gone';
 
   // Tanya UX #22 §5 #5 — fallback is silent: the chip suppresses entirely
   // when no archetype has been resolved yet. The empty-string from
@@ -125,8 +127,8 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
   return (
     <div
       data-next-read
-      className={wrapperClass(visible)}
-      aria-hidden={visible ? undefined : 'true'}
+      className={wrapperClass(presence)}
+      aria-hidden={presenceAriaHidden(presence)}
     >
       <UpNextHeader archetype={archetype} label={label} />
       <h3 className="text-sys-xl font-sys-heading text-foreground mb-sys-2 typo-heading">
@@ -142,15 +144,15 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
  * Wrapper class composer — geometry + the four motion fragments.
  * `transition-opacity` is the property; `crossfade-inline` carries the
  * (duration, ease) pair; the delay is the per-call comma-pause; the
- * presence fragment is the endpoint pair. Pure, ≤ 10 LoC.
+ * presence fragment is the endpoint pair routed through the helper
+ * (Mike #18 §2.2). Pure, ≤ 10 LoC.
  */
-function wrapperClass(visible: boolean): string {
-  const presence = visible ? PRESENCE_VISIBLE : PRESENCE_HIDDEN;
+function wrapperClass(presence: 'attentive' | 'gone'): string {
   return [
     'py-sys-7 transition-opacity',
     NEXT_READ_GESTURE,
     NEXT_READ_DELAY,
-    presence,
+    presenceClassOf(presence),
   ].join(' ');
 }
 

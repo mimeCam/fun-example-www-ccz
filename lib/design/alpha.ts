@@ -129,14 +129,24 @@ export function alphaInvariantHolds(): boolean {
 export const ALPHA_LEDGER_EXEMPT_TOKEN = 'alpha-ledger:exempt';
 
 /**
- * Path-allow-list for Motion's endpoint-owning module. This file is the ONE
- * home for `opacity-0` / `opacity-100` without per-line exemption comments.
- * Any other file using those classes must earn an inline exempt token.
+ * Path-allow-list for Motion's endpoint-owning modules. These files are the
+ * ONLY homes for `opacity-0` / `opacity-100` without per-line exemption
+ * comments. Any other file using those classes must earn an inline exempt
+ * token.
+ *
+ *   • `lib/utils/animation-phase.ts` — phase-driven motion fade endpoints
+ *     (the original carve-out, Mike napkin #24 §7).
+ *   • `lib/design/presence.ts`        — chrome-rhythm continuity helper
+ *     (Mike napkin #18 §2.2 + Tanya UIX #44 §10). Three sibling chrome
+ *     surfaces (`AmbientNav`, `NextRead`, `GoldenThread`) route through
+ *     `presenceClassOf` instead of carrying inline `// alpha-ledger:exempt`
+ *     tokens themselves; the contract has one home, three thin call sites.
  *
  * The adoption test reads this; change it here and the test updates.
  */
 export const ALPHA_MOTION_ENDPOINT_PATHS: readonly string[] = [
   'lib/utils/animation-phase.ts',
+  'lib/design/presence.ts',
 ] as const;
 
 // ─── Color-alpha shorthand (Phase II) ─────────────────────────────────────

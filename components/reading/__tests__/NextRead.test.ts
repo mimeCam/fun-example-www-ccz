@@ -172,13 +172,22 @@ describe('NextRead · continuity-contract source pins (Mike #67 four fixes)', ()
     expect(SRC).toContain("from '@/lib/design/gestures'");
   });
 
-  // The two `// alpha-ledger:exempt` tokens at the call site — the
-  // motion-fade-endpoint license. Mirrors AmbientNav.tsx:90,92. The
-  // tokens MUST live in source comments (the strip above would erase
-  // them otherwise), so this assertion reads the raw bytes.
-  it('carries the `// alpha-ledger:exempt` motion-endpoint tokens (×2)', () => {
-    const matches = RAW.match(/\/\/\s*alpha-ledger:exempt/g) ?? [];
-    expect(matches.length).toBeGreaterThanOrEqual(2);
+  // The motion-fade-endpoint license is now carried by the helper file
+  // (`lib/design/presence.ts`, path-allow-listed in
+  // `ALPHA_MOTION_ENDPOINT_PATHS`) — Mike napkin #18 §2.2 lifted the two
+  // inline `// alpha-ledger:exempt` tokens onto the helper. The call site
+  // proves continuity-contract adoption by routing through `presenceClassOf`
+  // / `presenceAriaHidden` instead.
+  it('routes through `presenceClassOf` from `@/lib/design/presence`', () => {
+    expect(SRC).toContain("from '@/lib/design/presence'");
+    expect(SRC).toContain('presenceClassOf');
+    expect(SRC).toContain('presenceAriaHidden');
+  });
+
+  it('does NOT carry the raw `opacity-0 pointer-events-none` literal', () => {
+    // The endpoint pair lives in the helper, not the call site. One home,
+    // three thin call sites (AmbientNav, NextRead, GoldenThread).
+    expect(SRC).not.toContain('opacity-0 pointer-events-none');
   });
 
   // Bug D — single motion channel.

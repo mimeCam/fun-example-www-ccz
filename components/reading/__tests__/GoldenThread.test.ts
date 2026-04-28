@@ -10,8 +10,17 @@
  * reintroduce `T_LINGER = 2000` or `opacity: 0.3` into the flagship, this
  * test fails with a file-specific error before the adoption guards do.
  *
- * Credits: Mike K. (4d spec), Tanya D. (UX spec — the "feel we're
- * preserving" items this test locks down as invariants).
+ * Continuity-contract lock (Mike K. napkin #18 + Tanya UIX #44 §4):
+ * the spine must be **always mounted** — no `if (phase === 'hidden')
+ * return null` path. Visibility is opacity-gated via `presenceClassOf`
+ * from `lib/design/presence.ts`; the dormant spine carries
+ * `aria-hidden` (via `presenceAriaHidden`) instead of unmounting, so
+ * the dried-ink metaphor stays legible across α=0.
+ *
+ * Credits: Mike K. (4d spec; #18 — three-member presence helper, the
+ * always-mounted source pin), Tanya D. (UX spec — the "feel we're
+ * preserving" items this test locks down as invariants; UIX #44 — the
+ * chrome-rhythm continuity contract).
  */
 
 const fs = require('fs');
@@ -75,5 +84,44 @@ describe('GoldenThread — shape and adoption', () => {
   it('has no inline var(--sys-time-*) / var(--sys-ease-*) substring on the fill', () => {
     expect(src).not.toMatch(/var\(--sys-time-/);
     expect(src).not.toMatch(/var\(--sys-ease-/);
+  });
+
+  /**
+   * Continuity-contract pins (Mike #18 + Tanya UIX #44 §4):
+   *
+   * The spine is **always mounted**; the previous `if (phase === 'hidden')
+   * return null` path violated the chrome-rhythm continuity contract (the
+   * dried ink would vanish mid-glance — the very metaphor it carries). The
+   * new path: opacity-gate via `presenceClassOf`, ride `crossfade-inline`
+   * (120 ms ease-out — the same verb AmbientNav and NextRead share), and
+   * carry `aria-hidden` (via `presenceAriaHidden`) so the dormant spine
+   * is off the accessibility tree without unmounting the role/valuenow
+   * pair. If a future PR re-introduces the unmount path, these source
+   * pins go red BEFORE the presence-adoption fence does.
+   */
+  it('does NOT carry an `if (phase === \'hidden\') return null` unmount path', () => {
+    // Bug retired: the killer feature now honors its own metaphor.
+    expect(src).not.toMatch(/if\s*\(\s*phase\s*===\s*['"]hidden['"]\s*\)\s*return\s+null/);
+  });
+
+  it('imports `presenceClassOf` and `presenceAriaHidden` from the helper', () => {
+    expect(src).toContain("from '@/lib/design/presence'");
+    expect(src).toContain('presenceClassOf');
+    expect(src).toContain('presenceAriaHidden');
+  });
+
+  it("rides the `crossfade-inline` gesture verb on the wrapper presence fade", () => {
+    // Sibling to AmbientNav and NextRead — same baton, three call sites.
+    expect(src).toMatch(/gestureClassesOf\(\s*['"]crossfade-inline['"]/);
+  });
+
+  it('the wrapper composes `transition-opacity` (the gate property)', () => {
+    expect(src).toContain('transition-opacity');
+  });
+
+  it('does NOT carry the raw `opacity-0 pointer-events-none` literal', () => {
+    // The endpoint pair lives in the helper. The component composes via
+    // `presenceClassOf('gone')` — not the literal substring.
+    expect(src).not.toContain('opacity-0 pointer-events-none');
   });
 });
