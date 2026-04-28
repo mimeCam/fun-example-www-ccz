@@ -108,17 +108,60 @@ export const THREAD_ACCENT_BIAS_FILTER = 'hue-rotate(var(--thread-bias, 0deg))';
  * the actual values in `globals.css`.
  *
  * ±3° is the *geometry guard* that makes the perceptual whisper window
- * `ΔE2000 ∈ [0.8, 1.8]` mechanically enforceable at the warm spine fill
- * stop (`BRAND.gold = #f0c674`, where `ΔE/° ≈ 0.66`). At ±3°, the cap
- * cannot permit a value whose ΔE2000 exceeds ~1.98 — one number, one
- * source of truth, in degrees, mechanically pinned (Tanya UIX #92 §5;
- * Mike #92 §2 calibration receipt).
+ * mechanically enforceable at BOTH spine fill stops:
+ *   • warm `BRAND.gold = #f0c674`, ΔE/° ≈ 0.66 → cap pegs ceiling at ~1.98
+ *   • cool `BRAND.primary = #7b2cbf`, ΔE/° ≈ 0.51 → cap pegs ceiling at ~1.53
+ * Both inside `[…, 1.8]`. One number, one source of truth, in degrees,
+ * mechanically pinned (Tanya UIX #92 §5; Mike #92 §2 / #56 §POI 6).
  *
  * If a future archetype calibration wants a wider window, change THIS
  * number first — the fence will then surface every CSS rule that drifts
- * outside the new bound.
+ * outside the new bound. *Do not* introduce a per-stop cap; one geometry
+ * guard covers both ends with margin.
  */
 export const THREAD_BIAS_MAX_ABS_DEG = 3;
+
+// ─── Recognition Whisper Budgets — per-baseline ΔE2000 windows ──────────────
+
+/**
+ * The perceptual whisper window at the **warm** spine fill stop
+ * (`BRAND.gold = #f0c674`). A returner's lean must measure inside
+ * `[0.8, 1.8]` ΔE2000 against the stranger baseline. Above 1.8 the lean
+ * becomes status (the room shouts); below 0.8 the lean is byte-noise (the
+ * room never leaned). Tuple positions: `[FLOOR, CEILING]`.
+ *
+ * Imported by `accent-bias-calibration.fence.test.ts §1`. SSOT lives here
+ * — the carrier module owns the budget; the fence consumes it (Mike #56
+ * §POI 1 — "begin from shared code", AGENTS.md §16).
+ */
+export const RECOGNITION_WHISPER_BUDGET_WARM: readonly [number, number] = [0.8, 1.8];
+
+/**
+ * The perceptual whisper window at the **cool** spine fill stop
+ * (`BRAND.primary = #7b2cbf`). Same ceiling (1.8 — the lean still becomes
+ * status above it), lower floor (0.7 — see honesty paragraph below).
+ *
+ * Honesty about the metric noise floor (Elon §1.5, Sharma/Wu/Dalal 2005):
+ *   The cool stop measures ΔE/° ≈ 0.51 (vs. 0.66 at the warm stop), so
+ *   the smallest archetype magnitudes (±1.5°) sit at ~0.76 ΔE2000 —
+ *   0.04 ΔE under the warm floor of 0.8. That 0.04 gap is *below ΔE2000's
+ *   own inter-observer noise floor* (~0.5–1.0 ΔE per Sharma/Wu/Dalal), so
+ *   "0.76 vs 0.80" is a distinction the metric itself cannot reliably
+ *   make. We honor the math by lowering the cool floor to 0.7 — the felt
+ *   experience is identical at the warm peak (Tanya UIX #78 §3a "felt-
+ *   equivalent, not numerically equivalent"), and the contract becomes
+ *   honestly enforceable at the cool stop instead of aspirational.
+ *
+ * Why two literals and not `whisperBudgetAt(stop)` (Mike #56 TL;DR / Elon
+ * §6 / Tanya #78 §6): N=2 baselines is one short of the rule-of-three
+ * trigger this repo enforces (`accent-bias.ts:96-99`,
+ * `measure-thread-bias-deltaE.ts:22-27`). When calibration #2 fires
+ * (Slice 3's second surface, or motion-JND on crossfades), *that PR*
+ * mints `whisperBudgetAt(...)` and earns the move into a perceptual
+ * ledger directory. Until then: name the surface, don't generalize the
+ * math. The asymmetry (0.8 warm vs. 0.7 cool) is the math; honor it.
+ */
+export const RECOGNITION_WHISPER_BUDGET_COOL: readonly [number, number] = [0.7, 1.8];
 
 // ─── Test-only mirrors of the CSS truth table — SSOT for the fences ──────────
 
