@@ -59,7 +59,7 @@ import { useThreadDepth } from '@/lib/hooks/useThreadDepth';
 import { useReducedMotion } from '@/lib/hooks/useReducedMotion';
 import { CEREMONY, MOTION } from '@/lib/design/motion';
 import { alphaClassOf } from '@/lib/design/alpha';
-import { gestureClassesForMotion, gestureClassesOf } from '@/lib/design/gestures';
+import { CROSSFADE_INLINE, gestureClassesForMotion } from '@/lib/design/gestures';
 import {
   presenceClassOf,
   presenceAriaHidden,
@@ -77,11 +77,11 @@ const SETTLED_PHASES = new Set(['warming', 'gifting', 'settled']);
 
 /* ─── Wrapper crossfade verb — same baton AmbientNav rides on its chassis ──
    `crossfade-inline` (120 ms, ease-out): "one label replacing another —
-   instant enough that I don't see the seam." Module-scope binding so the
-   gesture-call-site fence reads the literal at the source level. The
-   chrome-rhythm continuity contract (Tanya UIX #44 §3 F5) names this verb
-   for the spine's `gone → attentive` first scroll cross-fade. */
-const PRESENCE_GESTURE = gestureClassesOf('crossfade-inline');
+   instant enough that I don't see the seam." Imported from the verb-named
+   home in `lib/design/gestures.ts` (Mike napkin #22, Krystle rule-of-three
+   lift) so the four consumers share one source of truth. The chrome-rhythm
+   continuity contract (Tanya UIX #44 §3 F5) names this verb for the
+   spine's `gone → attentive` first scroll cross-fade. */
 
 /**
  * Map a Phase to the wrapper-level Presence rung. Pure, ≤ 10 LOC.
@@ -256,7 +256,7 @@ function wrapperClass(presence: Presence): string {
   return [
     'fixed top-0 bottom-0 left-[var(--sys-thread-offset)] z-sys-thread',
     'pointer-events-none transition-opacity',
-    PRESENCE_GESTURE,
+    CROSSFADE_INLINE,
     presenceClassOf(presence),
   ].join(' ');
 }

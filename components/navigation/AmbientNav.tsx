@@ -49,7 +49,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { gestureClassesOf } from '@/lib/design/gestures';
+import { CROSSFADE_INLINE } from '@/lib/design/gestures';
 import {
   navBarChassis,
   navItemPaint,
@@ -71,13 +71,12 @@ const NAV_ITEMS = [
 /* ─── Gesture-Atlas handle (verb-routed transition class) ──────────────────
    `crossfade-inline` verb (Tanya UX #78 §2.3): "One label replacing another
    — instant enough that I don't see the seam." duration-crossfade (120ms),
-   ease-out. Module-scope binding so the call is greppable at the source
-   level (the `gesture-call-site-fence` reads it through the kernel walker,
-   which blanks template-literal bodies). Used twice in this file: once on
-   the chassis presence cross-fade (chrome-rhythm D2), once on the hover
-   color swap of every link. Same verb, two registers — both are *one
-   thing replacing another, instant enough not to see the seam*. */
-const NAV_HOVER_GESTURE = gestureClassesOf('crossfade-inline');
+   ease-out. Imported from the verb-named home in `lib/design/gestures.ts`
+   (Mike napkin #22, Krystle rule-of-three lift) so the four consumers
+   share one source of truth. Used twice in this file: once on the chassis
+   presence cross-fade (chrome-rhythm D2), once on the hover color swap of
+   every link. Same verb, two registers — both are *one thing replacing
+   another, instant enough not to see the seam*. */
 
 const HIDDEN_ROUTES = ['/', '/article'];
 
@@ -110,7 +109,7 @@ export function AmbientNav() {
   const presence = visible ? 'attentive' : 'gone';
   return (
     <nav
-      className={`${navBarChassis()} transition-opacity ${NAV_HOVER_GESTURE} ${presenceClassOf(presence)}`}
+      className={`${navBarChassis()} transition-opacity ${CROSSFADE_INLINE} ${presenceClassOf(presence)}`}
       aria-label="Site navigation"
       aria-hidden={presenceAriaHidden(presence)}
     >
@@ -137,7 +136,7 @@ function NavItem({
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`rounded-sys-soft px-sys-1 py-sys-1 text-sys-caption tracking-sys-caption transition-colors ${NAV_HOVER_GESTURE} ${paint}`}
+      className={`rounded-sys-soft px-sys-1 py-sys-1 text-sys-caption tracking-sys-caption transition-colors ${CROSSFADE_INLINE} ${paint}`}
     >
       {active && <NavPulseDot />}
       {label}

@@ -223,6 +223,43 @@ export function gestureClassesOf(verb: GestureVerb): string {
 }
 
 /**
+ * Pre-resolved `crossfade-inline` carrier — the Tailwind fragment
+ * `'duration-crossfade ease-out'` (120 ms, ease-out). One named home for
+ * the verb the chrome-rhythm continuity contract names: AmbientNav
+ * (chassis fade + per-link hover), NextRead (coda wrapper fade),
+ * GoldenThread (spine wrapper fade). Four call sites, three files, one
+ * source of truth.
+ *
+ * Why module-scope (Mike napkin #22 §6, Krystle rule-of-three lift):
+ *
+ *   • Three identical literal-string assignments under three local
+ *     names (`NAV_HOVER_GESTURE`, `NEXT_READ_GESTURE`, `PRESENCE_GESTURE`)
+ *     could drift independently. Lifting collapses the carrier to one
+ *     export; the four consumers import the same identifier.
+ *
+ *   • The verb's name is the constant's name (not `CHROME_CROSSFADE`,
+ *     not `WRAPPER_FADE`). The fourth consumer — AmbientNav's per-link
+ *     hover — is NOT a chrome-rhythm surface (it rides
+ *     `transition-colors`, not the presence-rung lattice). Naming the
+ *     constant after the mechanism keeps every call site reading
+ *     neutrally.
+ *
+ *   • JIT-safe. The right-hand side resolves at module load to a string
+ *     literal Tailwind's compile-time scanner sees through
+ *     `gestureClassesOf`'s expansion table — same pattern as
+ *     `alphaClassOf` and the rest of `VERB_CLASSES`. **Do not** template-
+ *     interpolate or wrap in a lazy getter; the surface loses its
+ *     transition at runtime.
+ *
+ * Use as `transition-opacity ${CROSSFADE_INLINE} ${presenceClassOf(rung)}`
+ * (chrome-rhythm presence carrier) or `transition-colors ${CROSSFADE_INLINE}
+ * ${paint}` (per-link hover swap). The verb is the same; the call site
+ * supplies the property and the meaning. Pinned by
+ * `crossfade-inline-adoption.test.ts` (positive pin + outside-fence ban).
+ */
+export const CROSSFADE_INLINE: string = gestureClassesOf('crossfade-inline');
+
+/**
  * The reduced-motion class fragment for a verb — `'perform'` returns the
  * classes as authored, `'shorten'` returns the same beat at the floor
  * crossfade-shortened (10ms = `MOTION_REDUCED_MS`, the universal floor),

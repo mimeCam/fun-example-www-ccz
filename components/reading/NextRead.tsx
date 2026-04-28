@@ -53,7 +53,7 @@ import type { ArchetypeKey } from '@/types/content';
 import { useCeremony } from './CeremonySequencer';
 import { LeanArrow } from '@/components/shared/LeanArrow';
 import { TextLink } from '@/components/shared/TextLink';
-import { gestureClassesOf } from '@/lib/design/gestures';
+import { CROSSFADE_INLINE } from '@/lib/design/gestures';
 import {
   archetypeAccentClass,
   archetypeLabel,
@@ -76,12 +76,9 @@ const HEADING_WRAP = wrapClassOf('heading');
 
 /* ─── Crossfade verb — same baton AmbientNav rides on its chassis fade ─────
    `crossfade-inline` (120ms, ease-out): "one label replacing another —
-   instant enough that I don't see the seam." Module-scope binding so the
-   gesture-call-site fence reads the literal at the source level (the
-   kernel walker blanks template-literal bodies). One verb, two registers
-   on this surface — the wrapper opacity gate AND the per-link transitions
-   the children compose downstream. */
-const NEXT_READ_GESTURE = gestureClassesOf('crossfade-inline');
+   instant enough that I don't see the seam." Imported from the verb-named
+   home in `lib/design/gestures.ts` (Mike napkin #22, Krystle rule-of-three
+   lift) so the four consumers share one source of truth. */
 
 /* ─── Visibility — routed through the presence helper ─────────────────────
    Mirrors AmbientNav and GoldenThread. The motion fade endpoint pair and
@@ -150,7 +147,7 @@ export function NextRead({ article, context, archetype }: NextReadProps) {
 function wrapperClass(presence: 'attentive' | 'gone'): string {
   return [
     'py-sys-7 transition-opacity',
-    NEXT_READ_GESTURE,
+    CROSSFADE_INLINE,
     NEXT_READ_DELAY,
     presenceClassOf(presence),
   ].join(' ');

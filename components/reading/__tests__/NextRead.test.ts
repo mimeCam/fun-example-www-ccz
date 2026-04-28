@@ -165,11 +165,17 @@ describe('NextRead · continuity-contract source pins (Mike #67 four fixes)', ()
   });
 
   it('rides the `crossfade-inline` gesture verb (sibling to AmbientNav)', () => {
-    expect(SRC).toContain("gestureClassesOf('crossfade-inline')");
+    // The verb is now imported as the named carrier `CROSSFADE_INLINE` from
+    // `lib/design/gestures.ts` (Mike napkin #22 / Krystle rule-of-three lift);
+    // the runtime value is byte-equal to `gestureClassesOf('crossfade-inline')`,
+    // pinned by `lib/design/__tests__/crossfade-inline-adoption.test.ts`.
+    expect(SRC).toMatch(/\bCROSSFADE_INLINE\b/);
   });
 
-  it('imports `gestureClassesOf` from the canonical seam', () => {
-    expect(SRC).toContain("from '@/lib/design/gestures'");
+  it('imports `CROSSFADE_INLINE` from the canonical seam', () => {
+    expect(SRC).toMatch(
+      /import\s*\{[^}]*\bCROSSFADE_INLINE\b[^}]*\}\s*from\s*['"]@\/lib\/design\/gestures['"]/,
+    );
   });
 
   // The motion-fade-endpoint license is now carried by the helper file

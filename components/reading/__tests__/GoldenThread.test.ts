@@ -112,7 +112,14 @@ describe('GoldenThread — shape and adoption', () => {
 
   it("rides the `crossfade-inline` gesture verb on the wrapper presence fade", () => {
     // Sibling to AmbientNav and NextRead — same baton, three call sites.
-    expect(src).toMatch(/gestureClassesOf\(\s*['"]crossfade-inline['"]/);
+    // The verb is now imported as the named carrier `CROSSFADE_INLINE` from
+    // `lib/design/gestures.ts` (Mike napkin #22 / Krystle rule-of-three lift);
+    // the structural invariant is byte-equal to `gestureClassesOf('crossfade-inline')`,
+    // pinned by `lib/design/__tests__/crossfade-inline-adoption.test.ts`.
+    expect(src).toMatch(
+      /import\s*\{[^}]*\bCROSSFADE_INLINE\b[^}]*\}\s*from\s*['"]@\/lib\/design\/gestures['"]/,
+    );
+    expect(src).toMatch(/\bCROSSFADE_INLINE\b/);
   });
 
   it('the wrapper composes `transition-opacity` (the gate property)', () => {
