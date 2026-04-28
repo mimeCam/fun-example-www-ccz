@@ -25,6 +25,19 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import { stripMarkdownTokens, collapseWhitespace } from '@/lib/content/excerpt';
 import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
+import { wrapClassOf } from '@/lib/design/typography';
+
+/* ─── Wrap policy — `passage` break on the threshold excerpt (Tanya UX #85 §3) ─
+   The hero's prose paragraphs ride `thermal-typography` (the marquee
+   surface's line-height + font-weight + halo). The static `typo-passage`
+   beat carries leading + tracking; `wrapClassOf('passage')` adds the
+   wrap-only break policy (`text-wrap: pretty`) so a final word never
+   strands at 320 px. The literal `typo-wrap-passage` lives in
+   `wrapClassOf` only; pinned by
+   `lib/design/__tests__/passage-wrap-converges.fence.test.ts`.
+   The h1 above is `display` beat — `wrap: balance` — out of scope
+   this slot (Mike #26 §3, "do not graze it now"). */
+const PASSAGE_WRAP = wrapClassOf('passage');
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -84,8 +97,8 @@ export default function PortalHero({ article }: { article: Article }) {
       <div className="border-t border-fog mt-sys-8 mb-sys-8 mx-auto max-w-xs" />
 
       {excerpts.map((para, i) => (
-        <p key={i} className="text-foreground/70 text-sys-lg
-          typo-passage mb-sys-4 max-w-xl mx-auto thermal-typography">
+        <p key={i} className={`text-foreground/70 text-sys-lg
+          typo-passage ${PASSAGE_WRAP} mb-sys-4 max-w-xl mx-auto thermal-typography`}>
           {para}
         </p>
       ))}

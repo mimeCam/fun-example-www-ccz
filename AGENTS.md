@@ -26,6 +26,8 @@ All design rules enforced by fence tests (`*.fence.test.ts`). Key primitives at 
 
 **Chassis Seam (T1/T3)** *(LIVE 2026-04-28, 7-door coverage)*. Mirror-equal chrome→content bridge — `pt-sys-9` (40px) at the top of every reader-facing body wrapper. Seven call sites pinned: `/`, `/articles`, `/article/[id]`, `/trust`, `/mirror`, `/resonances`, plus `WhisperFooter` (universal T3). Receipt: `chrome-content-seam.fence.test.ts` (`ALLOWED_CALL_SITES.length === 7`). `/trust` reader-invariant — `liftVar(9)` resolves to its `0px` SSR fallback (no `ThermalProvider` carve-out on that route).
 
+**Passage Body-Wrap Converges — third perimeter on the wrap kernel** *(LIVE 2026-04-28)*. `wrapClassOf('passage')` (→ `typo-wrap-passage`, `text-wrap: pretty`) composes onto the `thermal-typography` carrier at three body-prose call sites — `app/article/[id]/page.tsx`, `components/return/ReturnLetter.tsx` (opening + body siblings), `components/home/PortalHero.tsx`. Compose, NOT migrate (Mike #26, Tanya UX #85): the thermal contract (line-height + font-weight + text-shadow halo + paragraph translateY rhythm + print-pin) stays intact on the marquee surface; the widow goes. Fence: `lib/design/__tests__/passage-wrap-converges.fence.test.ts` (mirrors `caption-heading-wrap-converges` byte-for-byte; §1 every site imports `wrapClassOf` + calls it with literal `'passage'`, §2 no site inlines `text-wrap-*` or `typo-wrap-<beat>`, §3 the resolved-byte pin). One byte (`'typo-wrap-passage'`), three perimeters (caption labels, whisper carriers, body prose), one home (`wrapClassOf` switch in `lib/design/typography.ts`).
+
 **Deferred:** P3/True Tone, Slice 3 (→ `lib/design/perceptual/`), archetype-detection accuracy receipt.
 
 ## Deployment

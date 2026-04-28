@@ -32,6 +32,17 @@ import WhisperFooter from '@/components/shared/WhisperFooter';
 import { CollapsibleSlot } from '@/components/shared/CollapsibleSlot';
 import { Divider } from '@/components/shared/Divider';
 import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
+import { wrapClassOf } from '@/lib/design/typography';
+
+// ─── Wrap policy — `passage` break, thermal rhythm (Tanya UX #85 §3) ──────
+// The article body rides the `thermal-typography` carrier (line-height +
+// font-weight + text-shadow + paragraph rhythm + print-pin). It carried no
+// `text-wrap` policy, so 320 px columns stranded a final word per long
+// paragraph. Compose `wrapClassOf('passage')` (wrap-only handle, `text-
+// wrap: pretty`) onto the existing carrier — the breath stays; the widow
+// goes. The literal `typo-wrap-passage` lives in `wrapClassOf` only;
+// pinned by `lib/design/__tests__/passage-wrap-converges.fence.test.ts`.
+const PASSAGE_WRAP = wrapClassOf('passage');
 
 // Recognition-surface portal — gated by the shared selector so the
 // Whisper and the home-rail Letter can never paint at the same time
@@ -153,7 +164,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
           />
 
           <div
-            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
+            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography ${PASSAGE_WRAP} text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
             style={entranceStyle(entrance.prose)}
           >
             {mergedBlocks.length > 0 ? (

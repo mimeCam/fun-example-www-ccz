@@ -71,6 +71,16 @@ const BORDER_HAIRLINE = alphaClassOf('accent',     'hairline', 'border'); // bor
    `caption-heading-wrap-converges.fence.test.ts`. */
 const HEADING_WRAP    = wrapClassOf('heading');
 
+/* ─── Wrap policy — `passage` break on the letter body (Tanya UX #85 §3) ───
+   The opening + body siblings ride `thermal-typography` (line-height +
+   font-weight + text-shadow + paragraph rhythm + print-pin). The carrier
+   declares no `text-wrap` policy — at 320 px a final word stranded once
+   per dense paragraph. Compose `wrapClassOf('passage')` (wrap-only,
+   `text-wrap: pretty`) onto both siblings: keep the breath, lose the
+   widow. The literal `typo-wrap-passage` lives in `wrapClassOf` only;
+   pinned by `lib/design/__tests__/passage-wrap-converges.fence.test.ts`. */
+const PASSAGE_WRAP    = wrapClassOf('passage');
+
 // ─── Timing — owned by the Recognition Timeline (Mike napkin §"Module shape") ─
 //
 // `RETURN_LETTER_SEED_MS` (50ms) and `RETURN_LETTER_SETTLE_MS` (1200ms)
@@ -347,12 +357,12 @@ function LetterCard({
         {letter.salutation}
       </p>
       {/* Opening — body of the letter is THE content; meet it head-on (default 1.00). */}
-      <p className="text-foreground text-sys-md thermal-typography mt-sys-5 text-center">
+      <p className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} mt-sys-5 text-center`}>
         {letter.opening}
       </p>
       {/* Body — same register as the opening; the reader's destination. */}
       {letter.body.map((para, i) => (
-        <p key={i} className="text-foreground text-sys-md thermal-typography mt-sys-5 text-center">
+        <p key={i} className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} mt-sys-5 text-center`}>
           {para}
         </p>
       ))}
