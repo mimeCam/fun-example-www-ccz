@@ -38,6 +38,7 @@ import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
 import { phaseOpacityClass } from '@/lib/return/recognition-paint';
+import { wrapClassOf } from '@/lib/design/typography';
 
 /* ─── Alpha-ledger handle (JIT-safe literal via alphaClassOf) ──────────────
    The arrival whisper paints at the `quiet` rung — same address as the
@@ -47,6 +48,15 @@ import { phaseOpacityClass } from '@/lib/return/recognition-paint';
    `MirrorRevealCard.BORDER_HAIRLINE` shape — module-scope constant,
    surfaced via `__testing__` for the per-file SSR pin. */
 const WHISPER_TEXT = alphaClassOf('gold', 'quiet', 'text'); // text-gold/70
+
+/* ─── Whisper wrap policy (Mike #122 §4) ────────────────────────────────
+   Sister-surface parity with `RecognitionWhisper` and `MirrorRevealCard
+   .WhisperQuote`: the deep-link arrival whisper breaks ragged-balanced
+   regardless of viewport — no orphan word at 320px. The literal
+   `typo-wrap-heading` lives once in the typography ledger; this surface
+   consumes it. The convergence fence enforces "three sites, one literal,
+   zero local `text-wrap-*` spellings." */
+const WHISPER_WRAP = wrapClassOf('heading');
 
 interface Props {
   via: ArchetypeKey;
@@ -67,7 +77,7 @@ export default function ViaWhisper({ via }: Props) {
   const text = friendWhisperText(via);
 
   return (
-    <p className={`text-center text-sys-caption transition-opacity ${gestureClassesOf('whisper-linger')} mb-sys-4 ${phaseOpacityClass(phase)}`}>
+    <p className={`text-center text-sys-caption transition-opacity ${gestureClassesOf('whisper-linger')} mb-sys-4 ${WHISPER_WRAP} ${phaseOpacityClass(phase)}`}>
       <span className={`${WHISPER_TEXT} italic`}>{text}</span>
     </p>
   );
@@ -80,4 +90,4 @@ export default function ViaWhisper({ via }: Props) {
  * `MirrorRevealCard`, and `ResonanceEntry` (Mike napkin #19 §5; #111 §4.1;
  * #113 §6 PoI #3).
  */
-export const __testing__ = { WHISPER_TEXT } as const;
+export const __testing__ = { WHISPER_TEXT, WHISPER_WRAP } as const;

@@ -117,6 +117,37 @@ export const classesOf = (b: TypographyBeatName): string => `typo-${b}`;
 export const leadingClassOf = (b: TypographyBeatName): string =>
   `leading-sys-${b}`;
 
+/**
+ * The wrap-only adoption handle. Returns the single CSS class that carries
+ * a beat's `text-wrap` policy *without* its leading or kerning. The use
+ * case is the whisper carriers — small italic `caption` text whose break
+ * policy must be `heading`-balanced so a final word does not orphan at
+ * 320px. The asymmetry (rhythm of one beat, wrap of another) is exactly
+ * why this helper exists separately from `classesOf`.
+ *
+ * Each `.typo-wrap-<beat>` class declares ONLY `text-wrap: <wrap>`; it
+ * does not touch line-height, letter-spacing, or font-feature-settings.
+ * Composing `typo-caption` + `typo-wrap-heading` is therefore safe:
+ * leading + track + kern stay caption; wrap is heading.
+ *
+ * Mike #122 §4 (the "Whisper Wrap" napkin): one literal, one home, one
+ * grep-fence. Three whisper carriers consume `wrapClassOf('heading')`
+ * without spelling `text-wrap-*` at the call site.
+ *
+ * Tailwind JIT contract: every literal `'typo-wrap-<beat>'` appears
+ * verbatim in the switch below so the scanner emits each utility.
+ */
+export const wrapClassOf = (b: TypographyBeatName): string => {
+  switch (b) {
+    case 'caption': return 'typo-wrap-caption';
+    case 'body':    return 'typo-wrap-body';
+    case 'lede':    return 'typo-wrap-lede';
+    case 'passage': return 'typo-wrap-passage';
+    case 'heading': return 'typo-wrap-heading';
+    case 'display': return 'typo-wrap-display';
+  }
+};
+
 /** Track (letter-spacing, em) for a named beat. Pure. */
 export const trackOf = (b: TypographyBeatName): number =>
   TYPOGRAPHY[b].track;

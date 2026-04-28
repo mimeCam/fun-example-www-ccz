@@ -33,6 +33,16 @@ import { useRecognitionPhase } from '@/lib/hooks/useRecognitionPhase';
 import { useThermal } from '@/components/thermal/ThermalProvider';
 import { resolveRecognitionTimeline } from '@/lib/return/recognition-timeline';
 import { phaseOpacityClass } from '@/lib/return/recognition-paint';
+import { wrapClassOf } from '@/lib/design/typography';
+
+/* ─── Whisper wrap policy (Mike #122 §4) ────────────────────────────────
+   Sister-surface parity with `MirrorRevealCard.WhisperQuote` and
+   `ViaWhisper`: the felt sentence breaks ragged-balanced regardless of
+   viewport. The literal `typo-wrap-heading` lives once in the typography
+   ledger; this surface consumes it. `whisper-typography-converges.fence
+   .test.ts` enforces that no whisper carrier spells `text-wrap-*` at the
+   call site. */
+const WHISPER_WRAP = wrapClassOf('heading');
 
 interface Props {
   recognition: ReturnRecognitionState;
@@ -56,7 +66,7 @@ export function RecognitionWhisper({ recognition }: Props) {
 
   return (
     <p
-      className={`text-sys-caption italic font-display transition-opacity ${gestureClassesOf('whisper-linger')} thermal-drift ${phaseOpacityClass(phase)}`}
+      className={`text-sys-caption italic font-display transition-opacity ${gestureClassesOf('whisper-linger')} thermal-drift ${WHISPER_WRAP} ${phaseOpacityClass(phase)}`}
       style={{ color: 'var(--mist)' }}
     >
       <span className="text-gold/50">{archetypeLabel}</span>
@@ -65,6 +75,13 @@ export function RecognitionWhisper({ recognition }: Props) {
     </p>
   );
 }
+
+/**
+ * Test seam — exposes the resolved wrap class so the convergence fence
+ * (`lib/return/__tests__/whisper-typography-converges.fence.test.ts`) and
+ * any per-file SSR pin can read the same byte without spinning up React.
+ */
+export const __testing__ = { WHISPER_WRAP } as const;
 
 function formatArchetype(key: string | null): string {
   if (!key) return '';

@@ -28,6 +28,7 @@ import {
   STAGGER_DATA_PROPS,
   type StaggerRung,
 } from '@/lib/design/stagger';
+import { wrapClassOf } from '@/lib/design/typography';
 
 /* ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ──────────
    Pinned at module scope so the `phaseClass` map below stays a plain
@@ -36,6 +37,14 @@ import {
 const BORDER_HAIRLINE = alphaClassOf('gold', 'hairline', 'border'); // border-gold/10
 const BORDER_MUTED    = alphaClassOf('gold', 'muted',    'border'); // border-gold/30
 const WHISPER_TEXT    = alphaClassOf('foreground', 'quiet', 'text'); // text-foreground/70
+
+/* ─── Whisper wrap policy (Mike #122 §4) ────────────────────────────────
+   The whisper line is `caption` rhythm but `heading` break policy —
+   ragged, balanced, no orphans at 320px. The asymmetry routes through
+   the typography ledger's `wrapClassOf` so the contract is one literal,
+   one home, one grep-fence (`whisper-typography-converges.fence.test.ts`).
+   Tanya UIX #22 §4.2: wrap is the orphan killer; leading stays at caption. */
+const WHISPER_WRAP = wrapClassOf('heading');
 
 /* ─── Radius-ledger handle — typed posture, JIT-safe ────────────────────
    Mike napkin #63 §5.1: hoist the resolved class string to module scope
@@ -150,9 +159,11 @@ function WhisperQuote({ text, visible, motion }: {
 }) {
   // Alpha ledger: `quiet` (0.70) — "content, but not THE content."
   // The whisper is a quote; archetype name above is THE content. /80 was drift.
+  // Wrap policy: heading-balanced via `WHISPER_WRAP` so the felt sentence
+  // never orphans a final word at 320px (Mike #122 §4 / Tanya UIX #22 §2).
   return (
     <p className={`mt-sys-3 text-sys-caption ${WHISPER_TEXT} italic max-w-card-body
-      mx-auto typo-caption ${MIRROR_STAGGER_CLASS[3]} ${motion} ${fadeClass(visible)}`}
+      mx-auto typo-caption ${WHISPER_WRAP} ${MIRROR_STAGGER_CLASS[3]} ${motion} ${fadeClass(visible)}`}
       {...STAGGER_DATA_PROPS}>
       &ldquo;{text}&rdquo;
     </p>
@@ -227,6 +238,7 @@ export const __testing__ = {
   FADE_GESTURE,
   MIRROR_STAGGER_CLASS,
   WHISPER_TEXT,
+  WHISPER_WRAP,
   BORDER_HAIRLINE,
   BORDER_MUTED,
 } as const;

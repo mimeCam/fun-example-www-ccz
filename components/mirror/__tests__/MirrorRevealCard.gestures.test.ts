@@ -53,6 +53,7 @@ const {
   phaseClass, shimmerStyle,
   REVEAL_GESTURE, FADE_GESTURE,
   MIRROR_STAGGER_CLASS,
+  WHISPER_WRAP,
 } = __testing__;
 
 const SOURCE_PATH = join(__dirname, '..', 'MirrorRevealCard.tsx');
@@ -178,6 +179,32 @@ describe('MirrorRevealCard — phaseClass is unchanged by the migration', () => 
 });
 
 // ─── Source-level grep — "five surfaces" as one assertion (Mike #88 §4.2) ─
+
+// ─── Whisper wrap policy — Mike #122 §4 third-fence convergence ──────────
+
+describe('MirrorRevealCard — whisper consumes the typography wrap helper', () => {
+  it('exposes WHISPER_WRAP on the seam (= typo-wrap-heading, the orphan killer)', () => {
+    // Mike #122 §6 PoI #1: the whisper's wrap policy is heading-class
+    // (ragged, balanced, no orphans), even though its rhythm stays at
+    // caption. The seam exposes the resolved literal so the per-file
+    // SSR pin and the convergence fence read the same byte.
+    expect(WHISPER_WRAP).toBe('typo-wrap-heading');
+  });
+
+  it('imports wrapClassOf from the canonical typography ledger', () => {
+    expect(SOURCE).toMatch(
+      /import\s*\{[^}]*\bwrapClassOf\b[^}]*\}\s*from\s*['"]@\/lib\/design\/typography['"]/,
+    );
+  });
+
+  it('calls wrapClassOf(\'heading\') verbatim (greppable)', () => {
+    expect(SOURCE).toMatch(/wrapClassOf\(\s*['"]heading['"]\s*\)/);
+  });
+
+  it('does NOT spell `text-wrap-*` locally (drift carrier)', () => {
+    expect(SOURCE).not.toMatch(/\btext-wrap-(auto|pretty|balance)\b/);
+  });
+});
 
 describe('MirrorRevealCard — both verbs are greppable in source', () => {
   it("'reveal-keepsake' appears as a quoted literal", () => {

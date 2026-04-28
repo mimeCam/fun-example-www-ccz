@@ -42,6 +42,7 @@ import {
   isBalanced,
   passageThermalClass,
   typographyInvariantHolds,
+  wrapClassOf,
 } from '../typography';
 
 const CSS = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf-8');
@@ -261,6 +262,45 @@ describe('thermal carve-out — .typo-passage-thermal CSS ↔ TS sync', () => {
     const idxThermal = CSS.indexOf('.typo-passage-thermal');
     expect(idxStatic).toBeGreaterThan(0);
     expect(idxThermal).toBeGreaterThan(idxStatic);
+  });
+});
+
+describe('wrap-only adoption — .typo-wrap-<beat> CSS ↔ TS sync', () => {
+  /** Extract the body of a `.typo-wrap-<beat> { … }` block. */
+  function readWrapBlock(beat: string): string | undefined {
+    const rx = new RegExp(`\\.typo-wrap-${beat}\\s*\\{([^}]*)\\}`);
+    const match = CSS.match(rx);
+    return match ? match[1] : undefined;
+  }
+
+  TYPOGRAPHY_ORDER.forEach((beat) => {
+    it(`wrapClassOf('${beat}') returns 'typo-wrap-${beat}'`, () => {
+      expect(wrapClassOf(beat)).toBe(`typo-wrap-${beat}`);
+    });
+
+    it(`.typo-wrap-${beat} exists in globals.css`, () => {
+      expect(readWrapBlock(beat)).toBeDefined();
+    });
+
+    it(`.typo-wrap-${beat} declares the TS-specified text-wrap`, () => {
+      const block = readWrapBlock(beat);
+      const wrap = TYPOGRAPHY[beat as TypographyBeatName].wrap;
+      const decl = new RegExp(`text-wrap:\\s*${wrap}`);
+      expect(blockHas(block, decl)).toBe(true);
+    });
+
+    it(`.typo-wrap-${beat} carries ONLY text-wrap (no leading, no track, no kern)`, () => {
+      const block = readWrapBlock(beat);
+      expect(blockHas(block, /line-height:/)).toBe(false);
+      expect(blockHas(block, /letter-spacing:/)).toBe(false);
+      expect(blockHas(block, /font-feature-settings:/)).toBe(false);
+    });
+  });
+
+  it('every .typo-wrap-* in CSS is represented in TYPOGRAPHY', () => {
+    const cssBeats = Array.from(CSS.matchAll(/\.typo-wrap-([a-z]+)\s*\{/g)).map((m) => m[1]);
+    const tsBeats = Object.keys(TYPOGRAPHY);
+    cssBeats.forEach((b) => expect(tsBeats).toContain(b));
   });
 });
 

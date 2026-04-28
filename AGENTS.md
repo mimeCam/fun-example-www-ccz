@@ -19,7 +19,7 @@ Next.js 14 (App Router) · React 18 · TypeScript · Tailwind CSS · SQLite (bet
 "The blog that reads you back." Same URL, different words per archetype. Thermal system warms the site as engagement deepens. Golden Thread (left edge) makes warmth visible.
 
 ## Design System Conventions
-All design rules are enforced by fence tests (`*.fence.test.ts`, `*-fence.test.ts`). Key primitives: `ActionPressable`, `alphaClassOf()`, `swapWidthClassOf()`, `DismissButton`, `OverlayHeader`, `Divider`, `chromeMutedBorder()`. Voice ledger in `lib/design/`. Gesture atlas at `lib/design/gestures.ts`. Fence walker kernel at `lib/design/__tests__/_fence.ts` is the single import surface for every fence test (two APIs: `runLinePatterns` for grep-shape line fences, `runJsxBlocks` for JSX `style={…}` block fences). The two prior shims (`_adoption-fence`, `_jsx-fence-walker`) have been retired.
+All design rules are enforced by fence tests (`*.fence.test.ts`, `*-fence.test.ts`). Key primitives: `ActionPressable`, `alphaClassOf()`, `swapWidthClassOf()`, `DismissButton`, `OverlayHeader`, `Divider`, `chromeMutedBorder()`. Voice ledger in `lib/design/`. Gesture atlas at `lib/design/gestures.ts`. Fence walker kernel at `lib/design/__tests__/_fence.ts` is the single import surface for every fence test (two APIs: `runLinePatterns` for grep-shape line fences, `runJsxBlocks` for JSX `style={…}` block fences). The two prior shims (`_adoption-fence`, `_jsx-fence-walker`) have been retired. Whisper carriers consume the typography ledger's `wrapClassOf` for break policy; never spell `text-wrap-*` at the call site.
 
 ## WIP
 _(none — the fence-kernel sweep landed; future fences extend `_fence.ts` directly.)_

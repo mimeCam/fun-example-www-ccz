@@ -654,6 +654,22 @@ body {
   letter-spacing: var(--sys-track-display);
 }
 
+/* ─── Wrap-only adoption handles — break policy without rhythm ──
+   `.typo-wrap-<beat>` declares ONLY `text-wrap: <wrap>` — no leading,
+   no letter-spacing, no kerning. The whisper carriers (small italic
+   caption text whose break policy must be heading-balanced to kill the
+   320px orphan) compose `typo-caption` + `typo-wrap-heading` safely:
+   leading + track + kern stay caption; wrap is heading.
+   wrapClassOf(beat) in lib/design/typography.ts returns one of these.
+   The sync test extends to assert that each `.typo-wrap-<beat>`'s
+   `text-wrap` matches the per-beat `wrap` field exactly. */
+.typo-wrap-caption { text-wrap: auto; }
+.typo-wrap-body    { text-wrap: pretty; }
+.typo-wrap-lede    { text-wrap: pretty; }
+.typo-wrap-passage { text-wrap: pretty; }
+.typo-wrap-heading { text-wrap: balance; }
+.typo-wrap-display { text-wrap: balance; }
+
 /* Paragraph spacing via compositing — translateY instead of margin-bottom.
    The visual result is identical: paragraphs drift apart as the room warms.
    But transform is GPU-composited, so no layout recalculation per frame. */
