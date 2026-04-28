@@ -316,12 +316,17 @@ function LetterCard({
   // Posture-first corner: the helper resolves to the canonical thermal-radius
   // class. The literal lives in `lib/design/radius.ts` only — this surface
   // speaks one posture word (`held`) in one voice (Mike #40 §6.1, Tanya UX
-  // #73 §2.1). Off the grandfather list with this PR.
+  // #73 §2.1). Off the grandfather list, AND now off the redundant
+  // `rounded-sys-medium` companion that used to compose with it (Tanya UIX
+  // #30 §4.1 T2 — two radius declarations on one element = one too many,
+  // visible at 4× zoom as a faint asymmetric kink on the bottom-right).
+  // `thermal-radius` already sets `border-radius: calc(var(--sys-radius-
+  // medium) + var(--token-radius-soft))` — it fully owns the corner.
   return (
     <div className={`relative max-w-[32rem] mx-auto my-sys-10 p-sys-8 md:p-sys-9
       max-h-[40vh] overflow-y-auto
       bg-gradient-to-b from-surface to-background
-      rounded-sys-medium ${thermalRadiusClassByPosture('held')} border transition-all ${REVEAL_GESTURE(reduce)}
+      ${thermalRadiusClassByPosture('held')} border transition-all ${REVEAL_GESTURE(reduce)}
       ${phaseStyles(phase, settled)}`}>
       {/* Dismiss — Universal Exit kernel (Mike #90, Tanya UIX #33): the
           same hand closes every overlay. The historical &times; carve-out

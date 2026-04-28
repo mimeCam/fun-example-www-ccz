@@ -6,12 +6,16 @@
  *   Failure mode fenced: signature → status drift, in either direction.
  *
  * Three private helpers (CSS Filter Effects 1 §13.2 hue-rotate matrix in
- * gamma-encoded sRGB → CIE Lab via D65/D50 Bradford adaptation → CIE 2000
- * ΔE) compose into one public surface, `measureDeltaE2000(baselineHex,
- * biasDeg)`. The CLI tail prints the five archetype ΔEs as a hand-runnable
- * receipt for designers — the script does nothing surprising at import
- * time (no top-level side effects); the CLI gate is the standard
- * `require.main === module` shape.
+ * gamma-encoded sRGB → CIE Lab via parametric D65→`refWhite` Bradford
+ * adaptation → CIE 2000 ΔE) compose into one public surface,
+ * `measureDeltaE2000(baselineHex, biasDeg, refWhite?)`. `refWhite` defaults
+ * to `D50_WHITE` (existing call sites stay byte-identical); `D55_WHITE` and
+ * `D75_WHITE` are the panel-white-point sensitivity targets that ask the
+ * one falsifiable question Mike #7 keeps from Elon's pass: does the ±3°
+ * geometry guard hold under ±1000K of panel calibration drift? The CLI
+ * tail prints all three columns as a hand-runnable receipt for designers
+ * — the script does nothing surprising at import time (no top-level side
+ * effects); the CLI gate is the standard `require.main === module` shape.
  *
  * Usage (designer receipt):
  *   $ npx tsx scripts/measure-thread-bias-deltaE.ts
@@ -31,11 +35,15 @@
  * formula stays auditable in isolation.
  *
  * Credits:
- *   • Mike Koch (architect, _reports/from-michael-koch-project-architect-35.md)
- *     — the napkin §1, module map §3, the ten POIs §4: CSS-spec hue-rotate
- *     matrix (POI 2), D65→D50 Bradford adaptation (POI 3), `BRAND.gold`
- *     baseline (POI 4); the rule-of-three discipline that keeps the helper
- *     in `scripts/` rather than minting `lib/design/perceptual/` on N=1.
+ *   • Mike Koch (architect, _reports/from-michael-koch-project-architect-7.md
+ *     — White-Point Sensitivity slice; prior #35) — the napkin §1, module
+ *     map §3, the ten POIs §4: CSS-spec hue-rotate matrix (POI 2),
+ *     parametric Bradford adaptation (POI 2 — rule-of-three has fired
+ *     *inside the helper* now that D50, D55, D75 are three calibration
+ *     targets), `BRAND.gold` baseline (POI 4); CSS-spec hue-rotate stays
+ *     in gamma-encoded sRGB regardless of refWhite (POI 4); the rule-of-
+ *     three discipline that keeps the helper in `scripts/` rather than
+ *     minting `lib/design/perceptual/` on N=1 perceptual measure today.
  *   • Tanya Donska (UIX #88) — the felt-experience contract this fence
  *     guards: §3.2 the [0.8, 1.8] perceptual window literal, §3.3 the
  *     thermal × lean composition, §4 the "no shadow / no border / no
@@ -112,22 +120,56 @@ function linearRgbToXyzD65(rgb: RGB): XYZ {
   ] as const;
 }
 
-/**
- * Bradford chromatic adaptation, CIE XYZ from D65 → D50 (Mike §4 POI 3 —
- * skipping the adaptation disagrees by ~0.05 ΔE, small but inside the
- * [0.8, 1.8] window).
- */
-function adaptD65toD50(xyz: XYZ): XYZ {
-  const [x, y, z] = xyz;
+// ─── Bradford / von Kries chromatic adaptation — D65 → arbitrary refWhite ───
+//
+// One parametric helper instead of three hard-coded matrices. Rule-of-three
+// has fired *inside the helper*: D50, D55, D75 are now three calibration
+// targets, so the math earns generalisation (Mike #7 §4 POI 2). The forward
+// matrix `BFD` is the CIE 159:2004 Bradford cone-response matrix; `BFD_INV`
+// is its analytic inverse. Source white is fixed at D65 (sRGB authoring).
+
+const BFD: ReadonlyArray<XYZ> = [
+  [ 0.8951,  0.2664, -0.1614],
+  [-0.7502,  1.7135,  0.0367],
+  [ 0.0389, -0.0685,  1.0296],
+];
+const BFD_INV: ReadonlyArray<XYZ> = [
+  [ 0.9869929, -0.1470543,  0.1599627],
+  [ 0.4323053,  0.5183603,  0.0492912],
+  [-0.0085287,  0.0400428,  0.9684867],
+];
+
+/** sRGB authoring white-point — D65 tristimulus (IEC 61966-2-1). */
+const D65_WHITE: XYZ = [0.95047, 1.0, 1.08883] as const;
+
+/** D50 reference white (CIE 1964 supplementary observer). Default ref. */
+export const D50_WHITE: XYZ = [0.96422, 1.0, 0.82521] as const;
+/** D55 — warm panel (~5500K). One of three white-point sensitivity targets. */
+export const D55_WHITE: XYZ = [0.95682, 1.0, 0.92149] as const;
+/** D75 — cool panel (~7500K). One of three white-point sensitivity targets. */
+export const D75_WHITE: XYZ = [0.94972, 1.0, 1.22638] as const;
+
+/** 3×3 matrix · 3-vector multiply. */
+function mul3(M: ReadonlyArray<XYZ>, v: XYZ): XYZ {
   return [
-     1.0478112 * x + 0.0228866 * y - 0.0501270 * z,
-     0.0295424 * x + 0.9904844 * y - 0.0170491 * z,
-    -0.0092345 * x + 0.0150436 * y + 0.7521316 * z,
+    M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2],
+    M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2],
+    M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2],
   ] as const;
 }
 
-/** D50 reference white tristimulus (CIE — `0.96422, 1.0, 0.82521`). */
-const D50_WHITE: XYZ = [0.96422, 1.0, 0.82521] as const;
+/**
+ * Bradford / von Kries chromatic adaptation: CIE XYZ from D65 → `dstWhite`.
+ * One parametric helper — von Kries scaling in cone space, inverse Bradford
+ * back to XYZ. Stranger floor preserved: identical inputs produce identical
+ * outputs at any `dstWhite`, so 0° lean ⇒ ΔE2000 = 0 by construction.
+ */
+function adaptD65to(xyz: XYZ, dstWhite: XYZ): XYZ {
+  const [Ls, Ms, Ss] = mul3(BFD, D65_WHITE);
+  const [Ld, Md, Sd] = mul3(BFD, dstWhite);
+  const [L,  M,  S ] = mul3(BFD, xyz);
+  return mul3(BFD_INV, [L * Ld / Ls, M * Md / Ms, S * Sd / Ss]);
+}
 
 /** Lab piecewise non-linearity `f(t)` — cube root above the (6/29)³ knee. */
 function fLab(t: number): number {
@@ -135,18 +177,23 @@ function fLab(t: number): number {
   return t > KNEE ? Math.cbrt(t) : (24389 / 27 * t + 16) / 116;
 }
 
-/** CIE XYZ (D50-adapted) → CIE Lab. */
-function xyzD50ToLab(xyz: XYZ): Lab {
-  const fx = fLab(xyz[0] / D50_WHITE[0]);
-  const fy = fLab(xyz[1] / D50_WHITE[1]);
-  const fz = fLab(xyz[2] / D50_WHITE[2]);
+/** CIE XYZ (adapted to `refWhite`) → CIE Lab. */
+function xyzToLab(xyz: XYZ, refWhite: XYZ): Lab {
+  const fx = fLab(xyz[0] / refWhite[0]);
+  const fy = fLab(xyz[1] / refWhite[1]);
+  const fz = fLab(xyz[2] / refWhite[2]);
   return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)] as const;
 }
 
-/** Compose: gamma-encoded sRGB → CIE Lab (D50). */
-function srgbToLab(rgb: RGB): Lab {
+/**
+ * Compose: gamma-encoded sRGB → CIE Lab (adapted to `refWhite`).
+ * Default `refWhite = D50_WHITE` keeps every existing call site byte-
+ * identical (the original D65→D50 → Lab pipeline). D55 / D75 are the
+ * panel-white-point sensitivity targets; the math is the same shape.
+ */
+function srgbToLab(rgb: RGB, refWhite: XYZ = D50_WHITE): Lab {
   const lin: RGB = [srgbToLinear(rgb[0]), srgbToLinear(rgb[1]), srgbToLinear(rgb[2])];
-  return xyzD50ToLab(adaptD65toD50(linearRgbToXyzD65(lin)));
+  return xyzToLab(adaptD65to(linearRgbToXyzD65(lin), refWhite), refWhite);
 }
 
 // ─── ΔE2000 — split across ≤10-LoC helpers ──────────────────────────────────
@@ -219,18 +266,24 @@ function deltaE2000Sum(L1: number, L2: number, C1p: number, C2p: number, h1: num
  * Measure CIE 2000 ΔE between a baseline color and the same color rendered
  * under `filter: hue-rotate(<biasDeg>)` per the CSS Filter Effects 1 spec.
  *
- *   measureDeltaE2000('#f0c674', +6) → ~1.5  (warm explorer lean)
- *   measureDeltaE2000('#f0c674',  0) →  0    (stranger ≡ today, byte-equal)
+ *   measureDeltaE2000('#f0c674', +6)              → ~1.5  (warm explorer lean)
+ *   measureDeltaE2000('#f0c674',  0)              →  0    (stranger ≡ today)
+ *   measureDeltaE2000('#f0c674', +2.5, D55_WHITE) → warm-panel sensitivity
  *
  * The single public composition: hex → CSS-spec hue-rotate (gamma-encoded
- * sRGB) → linear sRGB → CIE XYZ (D65) → Bradford D65→D50 → CIE Lab → ΔE2000.
- * Internal helpers stay non-exported until rule-of-three demands them
- * (Mike §4 POI 1 — *one entry point, one test contract*).
+ * sRGB) → linear sRGB → CIE XYZ (D65) → Bradford D65→`refWhite` → CIE Lab →
+ * ΔE2000. `refWhite` defaults to `D50_WHITE` — every existing call site
+ * stays byte-identical. D55 / D75 are panel-white-point sensitivity targets
+ * (Mike #7 §3 — does the ±3° geometry guard hold under ±1000K of drift?).
  */
-export function measureDeltaE2000(baselineHex: string, biasDeg: number): number {
+export function measureDeltaE2000(
+  baselineHex: string,
+  biasDeg: number,
+  refWhite: XYZ = D50_WHITE,
+): number {
   const base = hexToRgb(baselineHex);
   const bent = hueRotate(base, biasDeg);
-  return deltaE2000(srgbToLab(base), srgbToLab(bent));
+  return deltaE2000(srgbToLab(base, refWhite), srgbToLab(bent, refWhite));
 }
 
 // ─── CLI tail — hand-runnable receipt; no top-level side effects ────────────
@@ -259,25 +312,39 @@ const BASELINES: ReadonlyArray<readonly [string, string]> = [
   ['#7b2cbf', 'cool spine fill stop (BRAND.primary)'],
 ];
 
-/** Format a single archetype row as `archetype  ±N°  ΔE2000 = X.XXX`. */
-function formatRow(name: string, deg: number, dE: number, baseline: string): string {
+/**
+ * The three panel-white-point columns the receipt now prints. D50 is the
+ * baseline (today's behavior, unchanged); D55 is the warm-panel sensitivity
+ * (~5500K — D55-ish evening lamp); D75 is the cool-panel sensitivity
+ * (~7500K — D75-ish daylight monitor). Same Whisper Budget across all three.
+ */
+const REF_WHITE_COLS: ReadonlyArray<readonly [string, XYZ]> = [
+  ['D50', D50_WHITE], ['D55', D55_WHITE], ['D75', D75_WHITE],
+];
+
+/** Format a single archetype row as `archetype  ±N°  D50: X.XXX  D55: …  D75: …`. */
+function formatRow(name: string, deg: number, baseline: string): string {
   const sign = deg > 0 ? '+' : '';
   const lean = `${sign}${deg}°`.padStart(6);
-  return `  ${name.padEnd(11)}  ${lean}   ΔE2000 = ${dE.toFixed(3)}   vs ${baseline}`;
+  const cols = REF_WHITE_COLS
+    .map(([k, w]) => `${k}: ${measureDeltaE2000(baseline, deg, w).toFixed(3)}`)
+    .join('  ');
+  return `  ${name.padEnd(11)}  ${lean}   ${cols}`;
 }
 
-/** Print one baseline's calibration block — five rows of receipt prose. */
+/** Print one baseline's calibration block — five rows × three columns. */
 function printBaselineBlock(baseline: string, label: string): void {
   console.log(`\n· baseline ${baseline}  (${label})`);
   for (const [name, deg] of THREAD_BIAS_TABLE) {
-    console.log(formatRow(name, deg, measureDeltaE2000(baseline, deg), baseline));
+    console.log(formatRow(name, deg, baseline));
   }
 }
 
 /** Print the CLI receipt to stdout. Side-effect (console). */
 function printReceipt(): void {
   console.log(`\nGolden Thread accent-bias calibration`);
-  console.log(`recognition whisper budget: ΔE2000 ∈ [0.8, 1.8]`);
+  console.log(`recognition whisper budget: ΔE2000 ∈ [0.8, 1.8]   (warm)  /  [0.7, 1.8]   (cool)`);
+  console.log(`panel white-point sensitivity: D50 (today)  ·  D55 (~5500K, warm)  ·  D75 (~7500K, cool)`);
   for (const [hex, label] of BASELINES) printBaselineBlock(hex, label);
   console.log('');
 }
