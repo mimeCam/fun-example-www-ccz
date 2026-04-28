@@ -38,7 +38,7 @@ import {
   resolveDestinationAccent, isExternalHref,
 } from '@/lib/utils/link-phase';
 import { useLinkPhase } from '@/lib/hooks/useLinkPhase';
-import { EXTERNAL_GLYPH_BASELINE_NUDGE_STYLE } from '@/lib/design/typography';
+import { BASELINE_NUDGE_BY_GLYPH } from '@/lib/design/typography';
 
 // ─── Public API ────────────────────────────────────────────────────────────
 
@@ -155,7 +155,7 @@ function ExternalGlyph(): JSX.Element {
       stroke="currentColor"
       strokeWidth="1.5"
       className="inline-block align-baseline ml-[0.2em] opacity-quiet"
-      style={EXTERNAL_GLYPH_BASELINE_NUDGE_STYLE}
+      style={BASELINE_NUDGE_BY_GLYPH.externalGlyph}
     >
       <path d="M3.5 6.5 L7 3 M4.25 3 H7 V5.75" strokeLinecap="round" strokeLinejoin="round" />
     </svg>

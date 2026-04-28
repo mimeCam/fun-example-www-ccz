@@ -27,6 +27,7 @@
 import { TextLink } from '@/components/shared/TextLink';
 import { alphaClassOf } from '@/lib/design/alpha';
 import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
+import { BASELINE_NUDGE_BY_GLYPH } from '@/lib/design/typography';
 
 /** Tagline rung — quiet (0.70). Pinned via alphaClassOf for grep-honesty. */
 const TAGLINE_TEXT_CLASS = alphaClassOf('mist', 'quiet', 'text');
@@ -62,10 +63,20 @@ export default function WhisperFooter() {
   );
 }
 
-/** Middle-dot floors at the muted rung (mist/30) — ambient chrome between labels. */
+/**
+ * Middle-dot floors at the muted rung (mist/30) — ambient chrome between
+ * labels. The `verticalAlign` nudge lifts U+00B7's centroid from the
+ * em-box centre onto the labels' x-line so the footer line reads as a
+ * single horizontal beam (Tanya UX #24 §1.2; Mike napkin §3.3). See the
+ * typography ledger for centroid/em-box physics.
+ */
 function FooterDot() {
   return (
-    <span aria-hidden="true" className={DOT_TEXT_CLASS}>
+    <span
+      aria-hidden="true"
+      className={DOT_TEXT_CLASS}
+      style={BASELINE_NUDGE_BY_GLYPH.middleDot}
+    >
       &middot;
     </span>
   );

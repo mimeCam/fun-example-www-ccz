@@ -373,26 +373,33 @@ export const numericFeatureStyle = (): string => NUMERIC_FEATURE_SETTINGS;
  */
 export const FILLED_GLYPH_OPTICAL_LIFT_CLASS = 'relative -top-[0.5px]';
 
-// ─── External-glyph baseline nudge — inline-style sibling of the lift ──────
+// ─── Baseline nudge by glyph — typed map keyed by glyph name (N=2) ─────────
 
 /**
- * Frozen `CSSProperties` literal that lifts the inline 10×10 SVG external-
- * link arrow by 0.08em above its `vertical-align: baseline` rest, so the
- * glyph's centroid lines up with the surrounding line of prose's x-height.
+ * Frozen `CSSProperties` literals keyed by glyph name. Each member lifts
+ * an inline glyph by `verticalAlign: 0.08em` so its centroid lands on the
+ * surrounding x-height instead of the em-box centre.
  *
- * **Why 0.08em is real, not taste.** A 10×10 viewBox SVG glyph does NOT
- * share a baseline with the surrounding line of prose; the centroid drifts
- * UP. `0.08em` corrects that drift. Without naming the nudge, a future
- * refactor will "simplify" it to zero and the arrow will read as floating.
+ * **Why 0.08em is physics, not taste.** Two distinct glyphs share the same
+ * symptom: their centroid sits below the surrounding line's x-height by
+ * ~1.5–2px at micro text. (1) `externalGlyph` — the 10×10 viewBox SVG
+ * external-link arrow inside `<TextLink>`'s `<ExternalGlyph>`. (2)
+ * `middleDot` — the U+00B7 separator inside `<WhisperFooter>`'s `<FooterDot>`,
+ * whose centroid rests on the em-box centre rather than the labels' x-line.
+ * Without naming the nudge, a future refactor will "simplify" it to zero
+ * and the glyphs will read as floating low.
  *
- * **Single legal consumer.** `<ExternalGlyph>` inside
- * `components/shared/TextLink.tsx`. Adoption guard at
- * `lib/design/__tests__/external-glyph-baseline-nudge-adoption.test.ts`
- * traps any other module that spells `verticalAlign: '0.08em'`.
+ * **Two legal consumers.** `<ExternalGlyph>` in `components/shared/TextLink.tsx`
+ * (key `externalGlyph`); `<FooterDot>` in `components/shared/WhisperFooter.tsx`
+ * (key `middleDot`). Adoption guard at
+ * `lib/design/__tests__/baseline-nudge-adoption.test.ts` traps any other
+ * module that spells `verticalAlign: '0.08em'`.
  *
- * **Frozen by reference.** The `as const` literal is byte-stable across
- * renders, so React inlines it without per-render allocation. No JIT
- * coupling — `vertical-align` is an inline style, not a Tailwind class.
+ * **Frozen by reference.** Each member is byte-stable across renders, so
+ * React inlines `BASELINE_NUDGE_BY_GLYPH.middleDot` without per-render
+ * allocation. Do NOT unwrap into a literal at the call site — that's the
+ * whole point of the map. No JIT coupling — `vertical-align` is an inline
+ * style, not a Tailwind class.
  *
  * **Why not Tailwind.** `align-[0.08em]` maps to `align-items`, not to
  * `vertical-align`. There is no first-class Tailwind utility for arbitrary
@@ -400,20 +407,20 @@ export const FILLED_GLYPH_OPTICAL_LIFT_CLASS = 'relative -top-[0.5px]';
  * be a heavier JIT-coupled detour. A frozen `CSSProperties` literal is the
  * smaller, honest shape.
  *
- * **Sub-pixel caveat.** At 14–16px body sizes, 0.08em is just over 1px.
- * On reduced-DPI displays it may quantize to 1px exactly; the lift remains
- * a *correction*, not a flourish. If it quantized away, the chip is no
- * worse than today (Mike #100 §4.5 / Tanya §4.3 — source-token vs paint-
- * receipt is a category split).
+ * **Sub-pixel caveat.** At `text-sys-micro` (11px), 0.08em ≈ 0.88px. On a
+ * 1× display with subpixel anti-aliasing disabled, the lift may quantize
+ * to 0; the glyph is no worse than today in that case (Mike #100 §4.5 /
+ * Tanya §4.3 — source-token vs paint-receipt is a category split).
  *
- * **N=1 is not a category.** No `_NUDGE_MAP`. The day a *second* glyph
- * needs a different baseline nudge we promote to a map; not before. Shape
- * follows data, not data shape.
- *
- * Mike's napkin: *one literal, one home, one fence — name the physics,
- * not the cosmology.* Tanya UX §2: the centroid is the physics; the arrow
- * stays still. The pixel diff after promotion is, by construction, zero.
+ * **N=2 is a typed table, not a taxonomy.** Adding a third key requires a
+ * real third use-site, not a placeholder. Shape follows data, not data
+ * shape — Mike's napkin: *one literal, one home, one fence — name the
+ * physics, not the cosmology.*
  */
-export const EXTERNAL_GLYPH_BASELINE_NUDGE_STYLE = {
-  verticalAlign: '0.08em',
-} as const satisfies Readonly<CSSProperties>;
+export const BASELINE_NUDGE_BY_GLYPH = {
+  externalGlyph: { verticalAlign: '0.08em' },
+  middleDot:     { verticalAlign: '0.08em' },
+} as const satisfies Readonly<Record<string, Readonly<CSSProperties>>>;
+
+/** Glyph names with a registered baseline nudge. */
+export type BaselineNudgeGlyph = keyof typeof BASELINE_NUDGE_BY_GLYPH;
