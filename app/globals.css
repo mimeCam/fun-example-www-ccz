@@ -1901,21 +1901,28 @@ body {
    Stranger ≡ today. The declarations below are ADDITIVE custom-property
    contracts: when no `data-recognition-tier` / `data-archetype` are
    present (stranger, or JS disabled), the page renders byte-identical
-   to the pre-beacon snapshot — none of the CSS variables introduced
-   here have any consumers in today's stylesheet. They reserve the
-   contract that future surfaces (Tanya UIX §4.1 pre-warm fill,
-   §4.2 hearth-glow, §4.4 archetype hue tilt) will read from. Wiring
-   those consumers is deliberately out of scope this PR (Mike napkin §8
-   "Out of scope") — this PR ships the BEACON; the subsequent polish PRs
-   ship the surfaces that consume it. // TODO: wire `--thread-alpha-pre`
-   into the GoldenThread wrapper's gone-state opacity so the dried-ink
-   metaphor warms one rung for returners pre-scroll (Tanya UX §4.1).
+   to the pre-beacon snapshot — `--thread-alpha-pre` resolves to `0`
+   (today's behaviour) and `--accent-bias` resolves to `0deg` (no tilt).
+   The fence in `lib/return/__tests__/recognition-beacon.fence.test.ts`
+   pins this invariant.
+
+   --thread-alpha-pre IS LIVE: consumed by `GoldenThread.tsx` at the
+   `gone` presence rung as `style={{ opacity: 'var(--thread-alpha-pre, 0)' }}`
+   so returning readers paint pre-lit at frame zero (no entrance fade —
+   a CSS custom property set inline before first paint has no prior frame
+   to interpolate from). The single call-site invariant is enforced by
+   `lib/design/__tests__/presence-pre-lit-allowlist.test.ts`.
+
+   --accent-bias is reserved for the next slice (archetype-tinted chrome
+   surfaces, e.g. `filter: hue-rotate(var(--accent-bias))`) — not yet
+   consumed by any surface; stranger ≡ today via the `0deg` default.
 
    No new alpha rungs, no new colours, no new animations — every value
    composes from the existing alpha ledger (`--sys-alpha-*`).
 
    Credits: Mike K. (architect, napkin §4 — additive attribute selectors,
-   stranger ≡ today invariant); Tanya D. (UIX §4.1 — one-rung pre-warm).
+   stranger ≡ today invariant; napkin #35 — "the lit threshold" wire-up);
+   Tanya D. (UIX §4.1 — one-rung pre-warm; UIX #86 — F1–F5 motion contract).
 
    --thread-alpha-pre — paint-zero pre-warm rung for the Golden Thread.
                         Stranger: 0 (today's behaviour).
@@ -1926,8 +1933,8 @@ body {
                         `lib/return/recognition-beacon.ts`. */
 
 :root {
-  /* alpha-ledger:exempt — paint-zero sentinel; consumer lands in a
-     follow-up PR. Until then the variable is dormant; stranger ≡ today. */
+  /* alpha-ledger:exempt — paint-zero sentinel; the GoldenThread wrapper
+     reads this via inline style at the `gone` rung. Stranger ≡ today. */
   --thread-alpha-pre: 0;
   --accent-bias: 0deg;
 }

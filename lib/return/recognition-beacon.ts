@@ -14,6 +14,19 @@
  * alpha, the accent-bias degrees on the existing hue ring, the data-attrs
  * the new CSS selectors in `app/globals.css` consume.
  *
+ * Cross-page transitions are governed by `crossfade-inline` (120 ms
+ * ease-out), not by the no-motion rule. The "no entrance animation"
+ * rule applies only at cold paint zero — when a reader navigates within
+ * the same session and the tier flips, the wrapper transitions through
+ * the existing chrome-rhythm baton. (Mike napkin #35 §6 POI 7.)
+ *
+ * Budget. The IIFE rides `INLINE_RESTORE_SCRIPT` on the LCP critical
+ * path; today's emission is < 1 KB (the fence test pins the cap at
+ * 2 KB). A measured-p95 throttled-mobile profile lands in a follow-up
+ * sprint; until then the cap is the line in the sand. // TODO: write
+ * the measured p95/p99 budget for `beaconScriptFragment()` into this
+ * header once a throttled-Moto-G profile is captured (Mike #35 §6 POI 6).
+ *
  * Pure, stateless, SSR-safe. No React, no `window`, no `document`. The
  * inline IIFE fragment emitted by `beaconScriptFragment()` is the *only*
  * piece of this module that touches the browser — it is a STRING the

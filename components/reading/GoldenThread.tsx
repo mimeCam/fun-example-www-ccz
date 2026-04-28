@@ -44,11 +44,31 @@
  *     the maxDepth across the gone state so the dried ink remembers where
  *     the reader was, even at α=0.
  *
+ * Pre-lit (Mike K. napkin #35 + Tanya UIX #86):
+ *   - gone-state opacity reads `--thread-alpha-pre`; stranger ≡ today
+ *     (CI-pinned via the headline fence + the allow-list fence).
+ *   - The Recognition Beacon writes `--thread-alpha-pre` on `<html>` < 5 ms
+ *     before paint (see `lib/return/recognition-beacon.ts`); for strangers
+ *     the var resolves to `0` (today's behaviour, byte-equivalent), for
+ *     returners to `var(--sys-alpha-muted)`, for known archetypes to
+ *     `var(--sys-alpha-recede)`.
+ *   - The "missing fade-in" is physics: a CSS custom property set inline
+ *     before first paint has no prior frame to interpolate from, so the
+ *     wrapper paints at the resolved value with no entrance transition.
+ *     Same-session navigation still rides `crossfade-inline` (120 ms) —
+ *     the no-motion rule applies only at cold paint zero.
+ *   - The `, 0` fallback in `var(--thread-alpha-pre, 0)` keeps the
+ *     stranger path safe when the inline IIFE fails (CSP, future minifier
+ *     bug). One call site, one home: the `presence-pre-lit-allowlist`
+ *     fence forecloses copycats.
+ *
  * Credits: Mike K. (napkin — tide mark semantics, crossing event pattern;
- *          #18 — three-member presence helper, ALPHA carve-out path),
+ *          #18 — three-member presence helper, ALPHA carve-out path;
+ *          #35 — paint-zero contract wired through this wrapper),
  *          Tanya D. (UIX spec §1 — tide mark identity, breathing spec;
  *          UIX #44 — chrome-rhythm continuity contract, six-frame story-
- *          board for the still-there moment).
+ *          board for the still-there moment; UIX #86 — F1–F5 motion
+ *          contract for the gone-rung pre-warm).
  */
 
 'use client';
@@ -200,6 +220,16 @@ interface SpineProps {
  *   presence) keep the dormant spine off the accessibility tree and out
  *   of click-target geometry without unmounting the role/valuenow pair —
  *   the dried ink remembers across α=0.
+ *
+ * Pre-lit contract (Mike #35, Tanya UIX #86 §4 F1):
+ *   At the `gone` rung the wrapper carries an inline `style.opacity` that
+ *   reads `var(--thread-alpha-pre, 0)`. The inline declaration's higher
+ *   specificity overrides the gone-rung motion-α-0 endpoint that ships
+ *   from `presenceClassOf('gone')` — `pointer-events-none` and
+ *   `aria-hidden` keep doing their job. At visible rungs the inline style
+ *   is `undefined` so the visible-rung motion-α-1 class wins and
+ *   `crossfade-inline` continues to animate gone → attentive on first
+ *   scroll.
  */
 function ThreadSpine({ phase, crossingClass, tidePulseClass }: SpineProps) {
   const reduce = useReducedMotion();
@@ -209,6 +239,7 @@ function ThreadSpine({ phase, crossingClass, tidePulseClass }: SpineProps) {
   return (
     <div
       className={wrapperClass(presence)}
+      style={wrapperPreLitStyle(presence)}
       role="progressbar"
       aria-label="Furthest reading depth"
       aria-valuemin={0}
@@ -259,6 +290,38 @@ function wrapperClass(presence: Presence): string {
     CROSSFADE_INLINE,
     presenceClassOf(presence),
   ].join(' ');
+}
+
+/**
+ * The carrier expression the wrapper reads at the `gone` rung. Lives as
+ * a module-scope constant so a future `console.log(THREAD_PRE_LIT_OPACITY)`
+ * (or grep) finds the only authoring site. The CSS custom property
+ * `--thread-alpha-pre` is written on `<html>` by the Recognition Beacon
+ * IIFE < 5 ms before paint (`lib/return/recognition-beacon.ts`); the
+ * `, 0` fallback is the safety net if the IIFE ever throws (CSP, future
+ * minifier bug). Stranger ≡ today: when no signal is present, both the
+ * IIFE and the `:root` default leave the variable at `0`.
+ *
+ * Pinned by the `presence-pre-lit-allowlist` fence — only this one file
+ * may carry the literal in a JSX `style={…}` block.
+ */
+const THREAD_PRE_LIT_OPACITY = 'var(--thread-alpha-pre, 0)';
+
+/**
+ * Inline style for the wrapper at the `gone` rung — `undefined` for any
+ * visible rung so the motion-α-1 class from `presenceClassOf` wins. Pure,
+ * ≤ 10 LOC. The inline declaration's specificity is higher than the
+ * Tailwind motion-α-0 class shipped by `presenceClassOf('gone')`, so the
+ * wrapper paints at the resolved `--thread-alpha-pre` value at frame zero
+ * — with no prior frame to interpolate from, no entrance fade fires.
+ *
+ *   gone      → { opacity: 'var(--thread-alpha-pre, 0)' }
+ *   attentive → undefined  (visible-rung class wins)
+ *   gifted    → undefined  (visible-rung class wins)
+ */
+function wrapperPreLitStyle(presence: Presence): { opacity: string } | undefined {
+  if (presence !== 'gone') return undefined;
+  return { opacity: THREAD_PRE_LIT_OPACITY };
 }
 
 /**
