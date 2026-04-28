@@ -7,6 +7,8 @@ import { useSlotStatus } from '@/lib/hooks/useSlotStatus';
 import { computePopoverPosition } from '@/lib/hooks/usePopoverPosition';
 import type { PopoverPosition } from '@/lib/hooks/usePopoverPosition';
 import { SelectionPopoverTrigger } from './SelectionPopoverTrigger';
+import { SelectionPopoverShell } from './SelectionPopoverShell';
+import { SelectionShareTrigger } from './SelectionShareTrigger';
 import { ResonanceDrawer } from './ResonanceDrawer';
 import { MOTION, MOTION_REDUCED_MS } from '@/lib/design/motion';
 import { useCeremonyQuiet } from '@/lib/hooks/useCeremonyQuiet';
@@ -32,6 +34,10 @@ interface PortalProps {
   isFull: boolean;
   onMouseDown: () => void;
   onClick: () => void;
+  /** Snapshot accessor for the share trigger (captured at mousedown). */
+  getQuote: () => string;
+  /** Called after a successful share-link copy so the popover can dismiss. */
+  onShareSettled: (ok: boolean) => void;
 }
 
 // ─── Utilities ──────────────────────────────────────────────────────────────
@@ -93,7 +99,9 @@ function useDrawerState() {
 
 // ─── Portal Sub-component ───────────────────────────────────────────────────
 
-function PopoverPortal({ position, phase, isFull, onMouseDown, onClick }: PortalProps) {
+function PopoverPortal({
+  position, phase, isFull, onMouseDown, onClick, getQuote, onShareSettled,
+}: PortalProps) {
   const style: React.CSSProperties = {
     position: 'fixed',
     top: position.y,
@@ -101,13 +109,20 @@ function PopoverPortal({ position, phase, isFull, onMouseDown, onClick }: Portal
     transformOrigin: originStyle(position.placement),
   };
 
+  // The shell paints once (depth + accent halo); siblings live inside.
+  // Press-down on either action calls `onMouseDown` so the parent's
+  // `capturedQuoteRef` snapshots the selection before `useTextSelection`
+  // clears state (see ResonanceDrawer race-condition note below).
   return createPortal(
-    <div style={style} className={`z-sys-popover ${phaseClass(phase)}`}>
-      <SelectionPopoverTrigger
-        isFull={isFull}
-        onMouseDown={onMouseDown}
-        onClick={onClick}
-      />
+    <div style={style} className={`z-sys-popover ${phaseClass(phase)}`} onMouseDown={onMouseDown}>
+      <SelectionPopoverShell>
+        <SelectionPopoverTrigger
+          isFull={isFull}
+          onMouseDown={onMouseDown}
+          onClick={onClick}
+        />
+        <SelectionShareTrigger getQuote={getQuote} onAfterCopy={onShareSettled} />
+      </SelectionPopoverShell>
     </div>,
     document.body,
   );
@@ -153,6 +168,22 @@ export function SelectionPopover({ articleId, articleTitle }: Props) {
     capturedQuoteRef.current = selection?.text ?? '';
   }, [selection]);
 
+  // Share-trigger seam: the share button consults the captured quote at
+  // click time (the press-down already fired and snapshotted the text).
+  // Wrapping the ref in a stable getter keeps the trigger pure.
+  const getCapturedQuote = useCallback(() => capturedQuoteRef.current, []);
+
+  // After a successful copy, drop the popover by collapsing the native
+  // selection — the existing `useTextSelection` watches `selectionchange`
+  // and clears, which runs `usePopoverPhase` through `exiting → gone`.
+  // Failure stays on-screen so the reader can retry. (Tanya UIX —
+  // success-quiet, failure-recoverable.)
+  const handleShareSettled = useCallback((ok: boolean) => {
+    if (!ok) return;
+    if (typeof window === 'undefined') return;
+    window.getSelection()?.removeAllRanges();
+  }, []);
+
   const handleClose = useCallback(() => { close(); refresh(); }, [close, refresh]);
 
   // ── Render ──────────────────────────────────────────────────────────────
@@ -168,6 +199,8 @@ export function SelectionPopover({ articleId, articleTitle }: Props) {
           isFull={isFull}
           onMouseDown={handleMouseDown}
           onClick={open}
+          getQuote={getCapturedQuote}
+          onShareSettled={handleShareSettled}
         />
       )}
       <ResonanceDrawer

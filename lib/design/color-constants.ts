@@ -138,9 +138,10 @@ export const COLOR_LEDGER_EXEMPT_TOKEN = 'color-ledger:exempt';
  * migration is deferred). A PR that re-adds a grandfather path should
  * fail review on the invariant "list shrinks only."
  */
-export const COLOR_GRANDFATHERED_PATHS: readonly string[] = [
-  // Temporary in-page highlight tint. Gold rgba literal (`#f0c674` @ 15%).
-  // Migrate to `color-mix(in srgb, var(--gold) 10%, transparent)` (hairline)
-  // so it warms with the thermal engine. Tracked: follow-up sprint.
-  'lib/sharing/highlight-finder.ts',
-] as const;
+// Empty list = ledger-clean. The previous entry
+// (`lib/sharing/highlight-finder.ts`) graduated when the orphan got its
+// first caller (Sid, Mike #39 §3) — the rgba literal migrated to
+// `color-mix(in srgb, var(--gold) 10%, transparent)` so the temporary
+// highlight wash now warms with the thermal engine. The constant survives
+// (typed `readonly string[]`) so a future regression has a named home.
+export const COLOR_GRANDFATHERED_PATHS: readonly string[] = [] as const;

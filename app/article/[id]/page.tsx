@@ -20,6 +20,7 @@ import { bestRecommendation } from '@/lib/content/archetype-recommendations';
 import { ScrollDepthProvider } from '@/lib/hooks/useScrollDepth';
 import { useStratifiedContent } from '@/lib/hooks/useStratifiedContent';
 import { useMirror } from '@/lib/hooks/useMirror';
+import { useSharedHighlightOnLand } from '@/lib/hooks/useSharedHighlightOnLand';
 import { useResonanceMarginalia, extractCoreParagraphs } from '@/lib/hooks/useResonanceMarginalia';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import { useEntranceChoreography } from '@/lib/hooks/useEntranceChoreography';
@@ -136,6 +137,14 @@ function ArticleContent({ params }: { params: { id: string } }) {
   // session checkpoint without threading params down. Invisible to
   // the reader; one row per session in `loop_funnel`. (Mike §6.)
   useLoopFunnel(params.id, archetype);
+
+  // Shared-highlight landing — if the URL arrived with
+  // `#highlight=HASH&text=…` (a sentence-share permalink emitted by
+  // `SelectionShareTrigger`), center the matching paragraph in viewport
+  // and fire a one-shot pulse, then clean the fragment off the URL so a
+  // subsequent share starts blank. SSR-safe; no-ops without a fragment.
+  // (Mike #39 §"the recipient-side contract.")
+  useSharedHighlightOnLand();
 
   const { maxDepth } = useScrollDepth();
   const startTime = useRef(Date.now());

@@ -15,13 +15,14 @@ Design rules are enforced by fence tests (`*.fence.test.ts`) and sync tests. Sin
 _None._
 
 ## Live
-- **Passage Body-Hang** *(2026-04-28)*. `hangPunctClassOf('passage')` → `hanging-punctuation: first last allow-end` on three body-prose carriers. Safari-only paint surface (~30–35 % traffic); other UAs silently no-op. Fences: `passage-hang-converges` + `hang-progressive-enhancement` + `passage-trinity-disjoint` (CSS-side disjointness on the trinity rule bodies in `app/globals.css`; sister-paired with `passage-wrap-converges` + `passage-hyphens-converges`).
-- **Caption-Chrome Register** *(2026-04-28)*. `CAPTION_CHROME_CARRIERS` (5) in `lib/design/typography.ts` names the implicit register `<CaptionMetric>` already enforces (`tracking-sys-caption + tabular-nums + text-mist/70 + text-sys-(micro|caption)`). `ResonanceEntry` timeAgo migrated; digits stop dancing on /resonances. Fence: `caption-chrome-adoption`. Print/SVG carve-out: surfaces routing through `numericFeatureStyle()` are NOT carriers (own register, pinned by `numeric-features-adoption`).
-- **Recognition Beacon accent-bias** *(2026-04-28)*. Two-lane contract via `THREAD_ACCENT_BIAS_FILTER`. Fence: `focus-reciprocal-lane`.
-- **Chassis Seam** *(2026-04-28)*. `pt-sys-9` (40 px) chrome→content bridge × 7 doors. Fence: `chrome-content-seam`.
-- **Passage Body-Wrap** *(2026-04-28)*. `wrapClassOf('passage')` → `text-wrap: pretty` × 3 carriers. Fence: `passage-wrap-converges`.
+- **Selection Share** *(2026-04-28)*. Select a sentence → press the link icon → `#highlight=HASH&text=ENC` hits the clipboard. Recipient lands centered on that paragraph with a one-shot pulse. Orphan graduation (`share-links` + `highlight-finder` get their first non-test callers). Shell extracted from `SelectionPopoverTrigger` → `SelectionPopoverShell` (one paint, many actions). Hook: `useSharedHighlightOnLand`. Fences: `orphan-graduates`, `share-links-roundtrip`, source-pin tests.
+- **Passage Body-Hang** *(2026-04-28)*. `hangPunctClassOf('passage')` → `hanging-punctuation: first last allow-end` × 3 carriers. Safari-only. Fences: `passage-hang-converges` + `hang-progressive-enhancement` + `passage-trinity-disjoint`.
+- **Caption-Chrome Register** *(2026-04-28)*. `CAPTION_CHROME_CARRIERS` (5). Fence: `caption-chrome-adoption`.
+- **Recognition Beacon accent-bias** *(2026-04-28)*. Two-lane contract. Fence: `focus-reciprocal-lane`.
+- **Chassis Seam** *(2026-04-28)*. `pt-sys-9` (40 px) × 7 doors. Fence: `chrome-content-seam`.
+- **Passage Body-Wrap** *(2026-04-28)*. `wrapClassOf('passage')` × 3 carriers. Fence: `passage-wrap-converges`.
 - **Passage Body-Hyphens** *(2026-04-28)*. `hyphensClassOf('passage')` × 3 carriers. Fences: `passage-hyphens-converges` + `html-lang-required-for-hyphenation`.
-- **Body-prose carriers named** *(2026-04-28)*. `PASSAGE_BODY_CARRIERS` (3) in `lib/design/typography.ts` — one tuple, three fences (wrap / hyphens / hang) consume.
+- **Body-prose carriers named** *(2026-04-28)*. `PASSAGE_BODY_CARRIERS` (3) — one tuple, three fences.
 
 ## Deferred
 P3/True Tone, Slice 3, archetype-detection accuracy receipt, `quotes` / `'locl'` locale-aware sub-ledger. Body-prose typography ledger converged on three carriers (wrap, hyphens, hang) — new sub-ledgers must justify a fourth disjoint property.

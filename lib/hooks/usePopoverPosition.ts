@@ -1,7 +1,14 @@
 'use client';
 
 // Popover geometry constants (px)
-const POPOVER_W = 120;
+//
+// `POPOVER_W` widened from 120 → 156 when the share gesture joined the
+// row (Mike #39 §3 — gem + link siblings inside one shell). The two
+// icon-buttons + `gap-sys-2` + shell padding still fit inside the
+// horizontal clamp at 320 px (smallest viewport on the receipt). The
+// height stayed put — both buttons are `size="sm"` (44 px square is the
+// tap-target floor).
+const POPOVER_W = 156;
 const POPOVER_H = 44;
 const GAP = 8;        // gap between selection edge and popover edge
 const PADDING = 12;   // minimum distance from viewport edge
