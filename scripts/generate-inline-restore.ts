@@ -23,6 +23,8 @@ import {
 
 import { DIMENSIONS, STATE_THRESHOLDS } from '../lib/thermal/thermal-score';
 
+import { beaconScriptFragment } from '../lib/return/recognition-beacon';
+
 // ─── Helpers ─────────────────────────────────────────────
 
 function hexToRgb(hex: string): [number, number, number] {
@@ -68,8 +70,21 @@ function generate(): string {
   const spacingMax = SPACING_LIFT_MAX;
   const spacingRef = SPACING_SCALE_REF;
 
-  // Build the IIFE string
+  // Build the IIFE string.
+  //
+  // Two concerns, two try-blocks:
+  //   1. Beacon (archetype/tier) — runs FIRST so a stranger with no
+  //      `thermal-history` but a `quick-mirror-result` still gets the
+  //      pre-warm. Independent failure: a parse error in beacon does
+  //      NOT short-circuit thermal restore (Mike napkin §6 POI 1).
+  //   2. Thermal restore — runs SECOND, the existing block, unchanged.
+  //
+  // Both blocks are sub-IIFEs so a `return` in one does not affect the
+  // other. (The previous flat layout used a `return` to bail early on
+  // missing thermal-history; the beacon must NOT be skipped by that.)
   return `(function(){`
+  + `(function(){try{${beaconScriptFragment()}}catch(_e){}})();`
+  + `(function(){`
   + `try{`
   + `var raw=localStorage.getItem('thermal-history');`
   + `if(!raw)return;`
@@ -127,6 +142,7 @@ function generate(): string {
   + `document.documentElement.setAttribute('data-thermal-score',sc);`
   + `document.documentElement.setAttribute('data-returning',h.visitDays&&h.visitDays.length>1?'true':'false');`
   + `}catch(e){}`
+  + `})();`
   + `})()`;
 }
 

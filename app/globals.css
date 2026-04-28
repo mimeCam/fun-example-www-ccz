@@ -1892,3 +1892,60 @@ body {
   from { opacity: 1; transform: translateY(0); }
   to   { opacity: 0; transform: translateY(-4px); }
 }
+
+/* ─── Recognition Beacon — paint-zero archetype primer ───────────────────
+   Consumed from `<html>` data-attrs written by the inline-restore script
+   (auto-generated; see `scripts/generate-inline-restore.ts` and
+   `lib/return/recognition-beacon.ts`).
+
+   Stranger ≡ today. The declarations below are ADDITIVE custom-property
+   contracts: when no `data-recognition-tier` / `data-archetype` are
+   present (stranger, or JS disabled), the page renders byte-identical
+   to the pre-beacon snapshot — none of the CSS variables introduced
+   here have any consumers in today's stylesheet. They reserve the
+   contract that future surfaces (Tanya UIX §4.1 pre-warm fill,
+   §4.2 hearth-glow, §4.4 archetype hue tilt) will read from. Wiring
+   those consumers is deliberately out of scope this PR (Mike napkin §8
+   "Out of scope") — this PR ships the BEACON; the subsequent polish PRs
+   ship the surfaces that consume it. // TODO: wire `--thread-alpha-pre`
+   into the GoldenThread wrapper's gone-state opacity so the dried-ink
+   metaphor warms one rung for returners pre-scroll (Tanya UX §4.1).
+
+   No new alpha rungs, no new colours, no new animations — every value
+   composes from the existing alpha ledger (`--sys-alpha-*`).
+
+   Credits: Mike K. (architect, napkin §4 — additive attribute selectors,
+   stranger ≡ today invariant); Tanya D. (UIX §4.1 — one-rung pre-warm).
+
+   --thread-alpha-pre — paint-zero pre-warm rung for the Golden Thread.
+                        Stranger: 0 (today's behaviour).
+                        Returning: --sys-alpha-muted  (0.30).
+                        Known:     --sys-alpha-recede (0.50).
+   --accent-bias      — degrees, the additive hue tilt per archetype.
+                        Truth-table mirrors `archetypeAccentBias()` in
+                        `lib/return/recognition-beacon.ts`. */
+
+:root {
+  /* alpha-ledger:exempt — paint-zero sentinel; consumer lands in a
+     follow-up PR. Until then the variable is dormant; stranger ≡ today. */
+  --thread-alpha-pre: 0;
+  --accent-bias: 0deg;
+}
+
+/* Tier-keyed pre-warm sentinel. Same one-rung-step principle as the
+   inline-restore beacon writes inline; restated here for the no-script
+   / hydration paths so the source-of-truth is not split. */
+[data-recognition-tier="returning"] { --thread-alpha-pre: var(--sys-alpha-muted); }
+[data-recognition-tier="known"]     { --thread-alpha-pre: var(--sys-alpha-recede); }
+
+/* Five archetypes, five accent biases. The truth table mirrors
+   `archetypeAccentBias()` in `lib/return/recognition-beacon.ts` (a
+   fence test pins them as equal). Reserved for archetype-keyed surfaces
+   in a follow-up PR (e.g. `filter: hue-rotate(var(--accent-bias))`
+   on a future archetype-tinted chrome surface). */
+[data-archetype="deep-diver"] { --accent-bias: 280deg; }
+[data-archetype="explorer"]   { --accent-bias:  38deg; }
+[data-archetype="faithful"]   { --accent-bias:  12deg; }
+[data-archetype="resonator"]  { --accent-bias: 320deg; }
+[data-archetype="collector"]  { --accent-bias: 200deg; }
+

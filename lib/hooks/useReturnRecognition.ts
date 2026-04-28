@@ -15,6 +15,10 @@ import type { ArchetypeKey } from '@/types/content';
 import type { SeasonKey } from '@/types/book-narration';
 import { synthesizeReturnWhisper } from '@/lib/mirror/return-whisper-engine';
 import { getSeason } from '@/lib/mirror/season-engine';
+import {
+  archetypeAccentBias,
+  threadAlphaForTier,
+} from '@/lib/return/recognition-beacon';
 
 export type RecognitionTier = 'stranger' | 'returning' | 'known';
 
@@ -106,7 +110,34 @@ export function useReturnRecognition(): ReturnRecognitionState {
     }
 
     setState({ isReturning, archetype, daysSinceLastVisit: daysSince, visitCount, recognitionTier: tier, lastWhisper });
+    writeBeaconAttrs(tier, archetype);
   }, []);
 
   return state;
+}
+
+// ─── Post-hydration reconciliation ───────────────────────
+//
+// React is the single source of truth post-hydration. The inline-restore
+// script wrote the beacon attrs at < 5 ms before paint; this effect
+// re-writes them from React state on mount so a stale localStorage read
+// (e.g. the user signed out in another tab) is reconciled on the second
+// tick. (Mike napkin §6 POI 6 — "React wins on the second tick".)
+//
+// SSR-safe: the hook gates window access; this helper is only ever
+// called from inside the mount effect.
+
+/** Write `data-recognition-tier`, `data-archetype`, and the matching
+ *  CSS custom-properties on `<html>`. Pure side-effect, ≤ 10 LOC.
+ *  Stranger ≡ today: only the data-attr is written; the CSS variables
+ *  stay at their `:root` defaults (Mike napkin §6 POI 2). */
+function writeBeaconAttrs(tier: RecognitionTier, archetype: ArchetypeKey | null): void {
+  if (typeof document === 'undefined') return;
+  const de = document.documentElement;
+  de.setAttribute('data-recognition-tier', tier);
+  if (archetype) de.setAttribute('data-archetype', archetype);
+  if (tier !== 'stranger') {
+    de.style.setProperty('--thread-alpha-pre', `var(--sys-alpha-${threadAlphaForTier(tier)})`);
+  }
+  if (archetype) de.style.setProperty('--accent-bias', `${archetypeAccentBias(archetype)}deg`);
 }
