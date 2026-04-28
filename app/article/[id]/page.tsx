@@ -32,7 +32,7 @@ import WhisperFooter from '@/components/shared/WhisperFooter';
 import { CollapsibleSlot } from '@/components/shared/CollapsibleSlot';
 import { Divider } from '@/components/shared/Divider';
 import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
-import { wrapClassOf } from '@/lib/design/typography';
+import { wrapClassOf, hyphensClassOf } from '@/lib/design/typography';
 
 // ─── Wrap policy — `passage` break, thermal rhythm (Tanya UX #85 §3) ──────
 // The article body rides the `thermal-typography` carrier (line-height +
@@ -43,6 +43,18 @@ import { wrapClassOf } from '@/lib/design/typography';
 // goes. The literal `typo-wrap-passage` lives in `wrapClassOf` only;
 // pinned by `lib/design/__tests__/passage-wrap-converges.fence.test.ts`.
 const PASSAGE_WRAP = wrapClassOf('passage');
+
+// ─── Hyphens policy — `passage` widow killer at 320 px (Tanya UX §3.1) ────
+// Sibling handle to `PASSAGE_WRAP` — wrap and hyphens are disjoint
+// properties, so this composes as a silent addition. Adds `hyphens: auto`
+// + `hyphenate-limit-chars: 8 4 4` + `overflow-wrap: break-word` so long
+// words like *"extraordinarily"* break with a polite hyphen at narrow
+// viewports instead of stranding against the right edge of the column.
+// Lang-bound — requires `<html lang="en">` on the root document; pinned
+// by `lib/design/__tests__/html-lang-required-for-hyphenation.fence.test.ts`.
+// The literal `typo-hyphens-passage` lives in `hyphensClassOf` only;
+// pinned by `lib/design/__tests__/passage-hyphens-converges.fence.test.ts`.
+const PASSAGE_HYPHENS = hyphensClassOf('passage');
 
 // Recognition-surface portal — gated by the shared selector so the
 // Whisper and the home-rail Letter can never paint at the same time
@@ -164,7 +176,7 @@ function ArticleContent({ params }: { params: { id: string } }) {
           />
 
           <div
-            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography ${PASSAGE_WRAP} text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
+            className={`prose prose-invert max-w-none mb-sys-10 text-[length:var(--sys-text-prose)] thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} text-foreground${entrance.disabled ? '' : ' entrance-fade-up'}`}
             style={entranceStyle(entrance.prose)}
           >
             {mergedBlocks.length > 0 ? (

@@ -703,6 +703,33 @@ body {
 .typo-wrap-heading { text-wrap: balance; }
 .typo-wrap-display { text-wrap: balance; }
 
+/* ─── Hyphens-only adoption — narrow-viewport widow killer ──
+   `.typo-hyphens-<beat>` adds `hyphens: auto` + `hyphenate-limit-chars`
+   + `overflow-wrap: break-word` to body-prose beats. Lang-bound:
+   `hyphens: auto` requires `<html lang>` on the root document —
+   pinned by `html-lang-required-for-hyphenation.fence.test.ts`.
+   Print already ships `hyphens: auto` (print-surface.css:137); this
+   is the first **screen-side** locale-bound rule (Elon §1.6).
+   `overflow-wrap: break-word` (NOT `anywhere`) — gentler floor that
+   does not mid-break URLs / ALL-CAPS acronyms (Elon §3).
+   `hyphenate-limit-chars: 8 4 4` mirrors `HYPHENATE_LIMIT_CHARS` in
+   `lib/design/typography.ts`; the typography-sync test pins the byte.
+   Five non-`passage` arms are empty stubs this sprint — JIT-emission
+   symmetry with `hyphensClassOf`'s six-case switch; no UA effect on
+   an empty rule body. Future call sites graduate without a ledger
+   change (Mike napkin §4 POI #3).
+   Pinned by `passage-hyphens-converges.fence.test.ts`. */
+.typo-hyphens-passage {
+  hyphens: auto;
+  hyphenate-limit-chars: 8 4 4;
+  overflow-wrap: break-word;
+}
+.typo-hyphens-caption { /* stub — JIT symmetry */ }
+.typo-hyphens-body    { /* stub — JIT symmetry */ }
+.typo-hyphens-lede    { /* stub — JIT symmetry */ }
+.typo-hyphens-heading { /* stub — JIT symmetry */ }
+.typo-hyphens-display { /* stub — JIT symmetry */ }
+
 /* Paragraph spacing via compositing — translateY instead of margin-bottom.
    The visual result is identical: paragraphs drift apart as the room warms.
    But transform is GPU-composited, so no layout recalculation per frame. */

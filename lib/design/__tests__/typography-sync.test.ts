@@ -43,6 +43,8 @@ import {
   passageThermalClass,
   typographyInvariantHolds,
   wrapClassOf,
+  hyphensClassOf,
+  HYPHENATE_LIMIT_CHARS,
 } from '../typography';
 
 const CSS = readFileSync(resolve(__dirname, '../../../app/globals.css'), 'utf-8');
@@ -301,6 +303,57 @@ describe('wrap-only adoption — .typo-wrap-<beat> CSS ↔ TS sync', () => {
     const cssBeats = Array.from(CSS.matchAll(/\.typo-wrap-([a-z]+)\s*\{/g)).map((m) => m[1]);
     const tsBeats = Object.keys(TYPOGRAPHY);
     cssBeats.forEach((b) => expect(tsBeats).toContain(b));
+  });
+});
+
+describe('hyphens-only adoption — .typo-hyphens-<beat> CSS ↔ TS sync', () => {
+  /** Extract the body of a `.typo-hyphens-<beat> { … }` block. ≤ 10 LoC. */
+  function readHyphensBlock(beat: string): string | undefined {
+    const rx = new RegExp(`\\.typo-hyphens-${beat}\\s*\\{([^}]*)\\}`);
+    const match = CSS.match(rx);
+    return match ? match[1] : undefined;
+  }
+
+  TYPOGRAPHY_ORDER.forEach((beat) => {
+    it(`hyphensClassOf('${beat}') returns 'typo-hyphens-${beat}'`, () => {
+      expect(hyphensClassOf(beat)).toBe(`typo-hyphens-${beat}`);
+    });
+
+    it(`.typo-hyphens-${beat} exists in globals.css (JIT-emission symmetry)`, () => {
+      // Five non-`passage` blocks are empty stubs this sprint — `passage` is
+      // the only beat with declarations. The block must exist (so the JIT
+      // emits the utility) even when its body is empty.
+      expect(readHyphensBlock(beat)).toBeDefined();
+    });
+  });
+
+  it('.typo-hyphens-passage declares hyphens: auto (the lang-bound switch)', () => {
+    const block = readHyphensBlock('passage');
+    expect(blockHas(block, /hyphens:\s*auto/)).toBe(true);
+  });
+
+  it('.typo-hyphens-passage declares hyphenate-limit-chars matching HYPHENATE_LIMIT_CHARS', () => {
+    const block = readHyphensBlock('passage');
+    const decl = new RegExp(`hyphenate-limit-chars:\\s*${HYPHENATE_LIMIT_CHARS.replace(/ /g, '\\s+')}`);
+    expect(blockHas(block, decl)).toBe(true);
+  });
+
+  it('.typo-hyphens-passage declares overflow-wrap: break-word (NOT anywhere — Elon §3)', () => {
+    // `anywhere` mid-breaks URLs and ALL-CAPS acronyms; `break-word` is the
+    // gentler floor that still kills the worst body-prose orphans.
+    const block = readHyphensBlock('passage');
+    expect(blockHas(block, /overflow-wrap:\s*break-word/)).toBe(true);
+    expect(blockHas(block, /overflow-wrap:\s*anywhere/)).toBe(false);
+  });
+
+  it('every .typo-hyphens-* in CSS is represented in TYPOGRAPHY', () => {
+    const cssBeats = Array.from(CSS.matchAll(/\.typo-hyphens-([a-z]+)\s*\{/g)).map((m) => m[1]);
+    const tsBeats = Object.keys(TYPOGRAPHY);
+    cssBeats.forEach((b) => expect(tsBeats).toContain(b));
+  });
+
+  it('HYPHENATE_LIMIT_CHARS is the canonical "8 4 4" load-bearing literal', () => {
+    expect(HYPHENATE_LIMIT_CHARS).toBe('8 4 4');
   });
 });
 

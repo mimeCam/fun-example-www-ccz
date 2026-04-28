@@ -25,7 +25,7 @@ import { estimateReadingTime } from '@/lib/content/ContentTagger';
 import { stripMarkdownTokens, collapseWhitespace } from '@/lib/content/excerpt';
 import { formatReadingTime } from '@/lib/utils/reading-time';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
-import { wrapClassOf } from '@/lib/design/typography';
+import { wrapClassOf, hyphensClassOf } from '@/lib/design/typography';
 
 /* ─── Wrap policy — `passage` break on the threshold excerpt (Tanya UX #85 §3) ─
    The hero's prose paragraphs ride `thermal-typography` (the marquee
@@ -38,6 +38,17 @@ import { wrapClassOf } from '@/lib/design/typography';
    The h1 above is `display` beat — `wrap: balance` — out of scope
    this slot (Mike #26 §3, "do not graze it now"). */
 const PASSAGE_WRAP = wrapClassOf('passage');
+
+/* ─── Hyphens policy — `passage` widow killer at 320 px (Tanya UX §3.3) ────
+   Sibling handle to `PASSAGE_WRAP` — wrap and hyphens are disjoint
+   properties, so this composes as a silent addition on the threshold
+   excerpt. The h1 above is `display` beat (`wrap: balance`) and is
+   intentionally NOT hyphenated — display beats break by silhouette, not
+   by syllable (Tanya UX §4 carve-out). Lang-bound — pinned by
+   `html-lang-required-for-hyphenation.fence.test.ts`. The literal
+   `typo-hyphens-passage` lives in `hyphensClassOf` only; pinned by
+   `lib/design/__tests__/passage-hyphens-converges.fence.test.ts`. */
+const PASSAGE_HYPHENS = hyphensClassOf('passage');
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -98,7 +109,7 @@ export default function PortalHero({ article }: { article: Article }) {
 
       {excerpts.map((para, i) => (
         <p key={i} className={`text-foreground/70 text-sys-lg
-          typo-passage ${PASSAGE_WRAP} mb-sys-4 max-w-xl mx-auto thermal-typography`}>
+          typo-passage ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} mb-sys-4 max-w-xl mx-auto thermal-typography`}>
           {para}
         </p>
       ))}

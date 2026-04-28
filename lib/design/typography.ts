@@ -150,6 +150,66 @@ export const wrapClassOf = (b: TypographyBeatName): string => {
   }
 };
 
+// ─── Hyphens-only adoption — narrow-viewport widow killer ──────────────────
+
+/**
+ * The hyphenation soft-floor: `hyphenate-limit-chars: <total> <before> <after>`.
+ *
+ * Single load-bearing literal — the CSS rule reads it; the sync test pins
+ * it. `8 4 4` means the UA is allowed to hyphenate words of ≥8 characters,
+ * keeping at least 4 characters on the line before the break and at least
+ * 4 on the next line. Tighter than browser defaults so short words like
+ * "running" stay whole and only the genuine widow-makers
+ * (*"extraordinarily"*, *"indistinguishable"*) break — Krystle brief #12,
+ * Tanya UX §1, Mike napkin §2.
+ */
+export const HYPHENATE_LIMIT_CHARS = '8 4 4';
+
+/**
+ * The hyphens-only adoption handle. Returns the single CSS class that
+ * adds `hyphens: auto` + `hyphenate-limit-chars: 8 4 4` + `overflow-wrap:
+ * break-word` to body-prose beats. Targets narrow viewports (~320 px)
+ * where `text-wrap: pretty` alone leaves long words stranded at the right
+ * edge of the column.
+ *
+ * Lang-bound: `hyphens: auto` requires `<html lang>` set on the root
+ * document — a UA without a hyphenation dictionary for the document
+ * language silently no-ops. Pinned by
+ * `lib/design/__tests__/html-lang-required-for-hyphenation.fence.test.ts`.
+ *
+ * Same compose-not-migrate shape as `wrapClassOf` (Mike #26): three body-
+ * prose carriers (article body, ReturnLetter opening + body, PortalHero
+ * excerpt) compose `hyphensClassOf('passage')` onto the existing
+ * `thermal-typography ${PASSAGE_WRAP}` stack — disjoint properties (wrap
+ * vs hyphenate), safe sibling addition. Print already ships
+ * `hyphens: auto` for `@media print` (`lib/design/print-surface.css:137`)
+ * — this is the first **screen-side** locale-bound handle, not the first
+ * full stop (Elon §1.6 honesty note).
+ *
+ * `overflow-wrap: break-word` (NOT `anywhere`) is the chosen floor —
+ * `anywhere` mid-breaks URLs and ALL-CAPS acronyms; `break-word` is the
+ * gentler floor that still kills the worst body-prose orphans (Elon §3).
+ *
+ * Tailwind JIT contract: every literal `'typo-hyphens-<beat>'` appears
+ * verbatim in the switch below so the scanner emits each utility. Five
+ * non-`passage` arms are stubs in CSS this sprint (zero declarations,
+ * empty rule body) — symmetry > brevity at N=6, future call sites
+ * graduate without a ledger change (Mike napkin §4 POI #3).
+ *
+ * Receipts: 320 px + wide-viewport screenshot pair on the article body
+ * (`__tests__/screenshots/passage-hyphens-320px.md`).
+ */
+export const hyphensClassOf = (b: TypographyBeatName): string => {
+  switch (b) {
+    case 'caption': return 'typo-hyphens-caption';
+    case 'body':    return 'typo-hyphens-body';
+    case 'lede':    return 'typo-hyphens-lede';
+    case 'passage': return 'typo-hyphens-passage';
+    case 'heading': return 'typo-hyphens-heading';
+    case 'display': return 'typo-hyphens-display';
+  }
+};
+
 /** Track (letter-spacing, em) for a named beat. Pure. */
 export const trackOf = (b: TypographyBeatName): number =>
   TYPOGRAPHY[b].track;

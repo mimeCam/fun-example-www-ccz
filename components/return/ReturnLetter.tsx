@@ -37,7 +37,7 @@ import { thermalRadiusClassByPosture } from '@/lib/design/radius';
 import { copyToClipboard } from '@/lib/sharing/clipboard-utils';
 import { useActionPhase } from '@/lib/hooks/useActionPhase';
 import { swapWidthClassOf } from '@/lib/design/swap-width';
-import { wrapClassOf } from '@/lib/design/typography';
+import { wrapClassOf, hyphensClassOf } from '@/lib/design/typography';
 
 // ─── Alpha-ledger handles (JIT-safe literals via alphaClassOf) ─────────────
 //
@@ -80,6 +80,18 @@ const HEADING_WRAP    = wrapClassOf('heading');
    widow. The literal `typo-wrap-passage` lives in `wrapClassOf` only;
    pinned by `lib/design/__tests__/passage-wrap-converges.fence.test.ts`. */
 const PASSAGE_WRAP    = wrapClassOf('passage');
+
+/* ─── Hyphens policy — `passage` widow killer at 320 px (Tanya UX §3.2) ────
+   Sibling handle to `PASSAGE_WRAP` — wrap and hyphens are disjoint
+   properties, so this composes as a silent addition. A hand-written letter
+   on real paper hyphenates its long words; so should ours. The center-
+   aligned ragged silhouette becomes more symmetrical when long compound
+   words (*"reverberation"*, *"transformation"*) break instead of stranding.
+   Lang-bound — requires `<html lang="en">` on the root document; pinned
+   by `html-lang-required-for-hyphenation.fence.test.ts`. The literal
+   `typo-hyphens-passage` lives in `hyphensClassOf` only; pinned by
+   `lib/design/__tests__/passage-hyphens-converges.fence.test.ts`. */
+const PASSAGE_HYPHENS = hyphensClassOf('passage');
 
 // ─── Timing — owned by the Recognition Timeline (Mike napkin §"Module shape") ─
 //
@@ -357,12 +369,12 @@ function LetterCard({
         {letter.salutation}
       </p>
       {/* Opening — body of the letter is THE content; meet it head-on (default 1.00). */}
-      <p className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} mt-sys-5 text-center`}>
+      <p className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} mt-sys-5 text-center`}>
         {letter.opening}
       </p>
       {/* Body — same register as the opening; the reader's destination. */}
       {letter.body.map((para, i) => (
-        <p key={i} className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} mt-sys-5 text-center`}>
+        <p key={i} className={`text-foreground text-sys-md thermal-typography ${PASSAGE_WRAP} ${PASSAGE_HYPHENS} mt-sys-5 text-center`}>
           {para}
         </p>
       ))}
