@@ -31,6 +31,7 @@ import type { ContentBlock } from '@/lib/content/content-layers';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { CollapsibleSlot } from '@/components/shared/CollapsibleSlot';
 import { Divider } from '@/components/shared/Divider';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 
 // Recognition-surface portal — gated by the shared selector so the
 // Whisper and the home-rail Letter can never paint at the same time
@@ -128,7 +129,14 @@ function ArticleContent({ params }: { params: { id: string } }) {
       {/* Selection popover — gem blooms above highlighted text (pointer devices only) */}
       <SelectionPopover articleId={params.id} articleTitle={article.title} />
       <article id="main-content" className="min-h-screen">
-        <div className="max-w-prose mx-auto px-sys-7">
+        {/* T1 chassis seam — Mike #4 napkin §4 (wrap-and-strip). The
+            article-detail T1 is from nav-bottom to ArticleHeader's h1
+            cap-height, NOT to TopBar's resonance-button row. The seam
+            container owns the breath; TopBar's old `pt-sys-7` collapses
+            to utility rhythm (`pb-sys-3` only). T3 is owned by the
+            universal `WhisperFooter` (Mike #4 §3 — footer is the single
+            T3 site), so this file does not pad bottom-side. */}
+        <div className={`max-w-prose mx-auto px-sys-7 ${CHASSIS_SEAM_TOP_CLASS}`}>
           {/* Paper-only greeting bow — hidden on screen, lands inline at the
               top of the printed page. Pairs with ReadersMark (parting bow)
               to bracket the printed article. Tanya UX #8 §3, Mike #20 §3. */}
@@ -216,8 +224,12 @@ function entranceStyle(step: EntranceStep): React.CSSProperties {
 }
 
 function TopBar({ articleId, title }: { articleId: string; title: string }) {
+  // Wrap-and-strip — the chassis seam container above owns the T1 breath.
+  // TopBar's old `pt-sys-7` would double-pad against `CHASSIS_SEAM_TOP_CLASS`;
+  // its `pb-sys-3` stays as intra-cluster rhythm to ArticleHeader (Mike #4
+  // napkin §POI 2 — not chassis seam, utility row spacing).
   return (
-    <div className="flex items-center justify-end pt-sys-7 pb-sys-3">
+    <div className="flex items-center justify-end pb-sys-3">
       <ResonanceButton articleId={articleId} articleTitle={title} />
     </div>
   );

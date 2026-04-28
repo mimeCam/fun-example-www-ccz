@@ -25,20 +25,23 @@
  * numerically equivalent); the contract becomes honestly enforceable at
  * the cool stop instead of aspirational.
  *
- * Panel white-point sensitivity (Mike #7 — White-Point Sensitivity slice):
- * the §1c / §1e mirrored columns ask the falsifiable question — does the
- * ±3° geometry guard hold under ±1000K of panel white-point drift, on the
- * warm baseline? Yes: all five archetypes stay inside `[0.8, 1.8]` at D55
- * (~5500K, warm panel) and D75 (~7500K, cool panel). The cool-baseline
- * mirrors (would-be §1d / §1f) are *deliberately deferred* per Mike #7 §4
- * decision gate — under D55 the resonator (-1.5°) lands at ~0.698 ΔE
- * (0.002 below the 0.7 cool floor, inside Sharma/Wu/Dalal noise), and
- * under D75 the ±1.5° pair falls to ~0.55 (visibly below floor). Recovery
- * by single-° tweak conflicts with Tanya UIX #28's pair invariant
- * (faithful/resonator share magnitude by design); the cool-side drift
- * earns its own re-scope, not a preemptive cap tightening (Elon §4-4).
- * Receipt (`scripts/measure-thread-bias-deltaE.ts`) prints all six
- * combinations so the cool drift is visible to designers running the CLI.
+ * Panel white-point sensitivity (Mike #7 — White-Point Sensitivity slice;
+ * Mike #9 — cool-side closure): the §1c / §1e mirrored columns ask the
+ * falsifiable question — does the ±3° geometry guard hold under ±1000K
+ * of panel white-point drift, on the warm baseline? Yes: all five
+ * archetypes stay inside `[0.8, 1.8]` at D55 (~5500K, warm panel) and
+ * D75 (~7500K, cool panel). The cool-baseline mirrors (§1d / §1f) close
+ * the ladder with a ceiling-only window: under D55 the resonator (-1.5°)
+ * lands at ~0.698 (0.002 below the on-panel 0.7 cool floor), and under
+ * D75 the ±1.5° pair falls to ~0.55 — both inside Sharma/Wu/Dalal 2005's
+ * ~0.5–1.0 inter-observer noise floor. Promising a floor the metric
+ * cannot resolve is aspirational, not falsifiable; the off-panel cool
+ * cells therefore promise the **ceiling** (≤ 1.8 — `RECOGNITION_WHISPER_
+ * CEILING_COOL_OFF_PANEL`) and concede the floor mechanically. Tanya
+ * UIX #28's pair invariant (faithful/resonator share magnitude by design)
+ * is preserved — the budget shape changes, not the magnitudes. Receipt
+ * (`scripts/measure-thread-bias-deltaE.ts`) prints all six combinations
+ * with a designer-facing pass/fail glyph at the tail.
  *
  * Imports `measureDeltaE2000` (and `D55_WHITE`, `D75_WHITE` for the
  * sensitivity columns) from `scripts/...` — intentional per Elon §6 (rule-
@@ -53,6 +56,7 @@ import {
   THREAD_BIAS_MAX_ABS_DEG,
   RECOGNITION_WHISPER_BUDGET_WARM,
   RECOGNITION_WHISPER_BUDGET_COOL,
+  RECOGNITION_WHISPER_CEILING_COOL_OFF_PANEL,
 } from '@/lib/design/accent-bias';
 import { BRAND } from '@/lib/design/color-constants';
 import {
@@ -69,6 +73,24 @@ const { THREAD_BIAS_BY_ARCHETYPE } = __testing__;
 const WARM_BASELINE_HEX = BRAND.gold;     // #f0c674 — warm spine fill stop
 const COOL_BASELINE_HEX = BRAND.primary;  // #7b2cbf — cool spine fill stop
 
+/**
+ * Two window shapes — `[floor, ceiling]` for on-panel cells, `{ ceiling }`
+ * for the off-panel cool cells (cool × {D55, D75}). The asymmetry is the
+ * honesty: `{ ceiling: 1.8 }` is the smallest one-sided shape the metric
+ * can witness without over-promising on a sub-noise floor (Mike #9 §1).
+ *
+ * Polymorphism is a killer (Mike #9 §7 POI 9): no `whisperBudgetAt(stop)`
+ * primitive at N=2 baselines × {tuple, ceiling-only} window shapes.
+ * Calibration #2 (motion-JND on crossfades, or Slice 3's second surface)
+ * earns the lift into `lib/design/perceptual/whisper-budgets.ts`.
+ */
+type Window = readonly [number, number] | { readonly ceiling: number };
+
+/** True when the window is the on-panel `[floor, ceiling]` tuple shape. */
+function hasFloor(w: Window): w is readonly [number, number] {
+  return Array.isArray(w);
+}
+
 // ─── Failure-message-is-documentation (Mike §4 POI 7) ───────────────────────
 
 /** Format the ref-white tag printed in fail messages (`D50`, `D55`, `D75`). */
@@ -79,27 +101,36 @@ function refWhiteLabel(refWhite?: readonly [number, number, number]): string {
   return `XYZ(${refWhite.join(',')})`;
 }
 
+/** Render a `Window` as `[floor, ceiling]` or `(−∞, ceiling]` for diagnostics. */
+function windowLabel(w: Window): string {
+  return hasFloor(w) ? `[${w[0]}, ${w[1]}]` : `(−∞, ${w.ceiling}]`;
+}
+
+/** True when `dE` lies inside `w` — both shapes share the same upper bound. */
+function dEInside(dE: number, w: Window): boolean {
+  return hasFloor(w) ? (dE >= w[0] && dE <= w[1]) : (dE <= w.ceiling);
+}
+
 /**
  * Compose the diagnostic prose printed when an archetype falls outside a
- * window. The baseline + window + ref-white tag are part of the message
- * so a future drift names *which* (baseline, refWhite) tuple failed
- * (Mike #56 §POI 3 / Mike #7 §POI 5 — the diagnostic prints its own
- * context, including panel white-point when relevant).
+ * window. Accepts both window shapes — the printed form names the shape
+ * that failed (`[floor, ceiling]` on-panel, `(−∞, ceiling]` off-panel
+ * cool) so a future drift sees *which* contract broke (Mike #9 §7 POI 4
+ * — failure-message-is-documentation, sub-noise floor honesty).
  */
 function failMessage(
   arch: ArchetypeKey,
   bias: number,
   dE: number,
   baselineHex: string,
-  window: readonly [number, number],
+  window: Window,
   refWhite?: readonly [number, number, number],
 ): string {
   const sign = bias > 0 ? '+' : '';
-  const [floor, ceiling] = window;
   return `\n  archetype:        ${arch}` +
          `\n  --thread-bias:    ${sign}${bias}°` +
          `\n  measured ΔE2000:  ${dE.toFixed(3)}  vs ${baselineHex}  (refWhite: ${refWhiteLabel(refWhite)})` +
-         `\n  expected window:  [${floor}, ${ceiling}]  (sub-JND; signature, not status)` +
+         `\n  expected window:  ${windowLabel(window)}  (sub-JND; signature, not status)` +
          `\n  fix: re-calibrate the ° value in app/globals.css (the SSOT truth table)` +
          `\n       and the mirror in lib/design/accent-bias.ts THREAD_BIAS_BY_ARCHETYPE.`;
 }
@@ -107,25 +138,25 @@ function failMessage(
 /**
  * Assert one archetype's lean lands inside the perceptual signature
  * window for the given baseline. Parametric over `(arch, baselineHex,
- * window, refWhite?)` — `refWhite` defaults to D50 (today's behavior),
- * D55/D75 invocations witness panel white-point sensitivity (Mike #7).
+ * window, refWhite?)` — the window may be a `[floor, ceiling]` tuple
+ * (on-panel cells) or a `{ ceiling }` shape (off-panel cool cells where
+ * the floor is honestly conceded sub-JND, Mike #9 §1 / §6).
  */
 function assertWindow(
   arch: ArchetypeKey,
   baselineHex: string,
-  window: readonly [number, number],
+  window: Window,
   refWhite?: readonly [number, number, number],
 ): void {
   const bias = THREAD_BIAS_BY_ARCHETYPE[arch];
   const dE = refWhite
     ? measureDeltaE2000(baselineHex, bias, refWhite)
     : measureDeltaE2000(baselineHex, bias);
-  const [floor, ceiling] = window;
-  if (dE < floor || dE > ceiling) {
+  if (!dEInside(dE, window)) {
     throw new Error(failMessage(arch, bias, dE, baselineHex, window, refWhite));
   }
-  expect(dE).toBeGreaterThanOrEqual(floor);
-  expect(dE).toBeLessThanOrEqual(ceiling);
+  expect(dE).toBeLessThanOrEqual(hasFloor(window) ? window[1] : window.ceiling);
+  if (hasFloor(window)) expect(dE).toBeGreaterThanOrEqual(window[0]);
 }
 
 // ─── §1 · Five named per-archetype window assertions, WARM baseline ─────────
@@ -180,6 +211,40 @@ describe('accent-bias — WARM × D75 panel sensitivity (~7500K)', () => {
   it('faithful holds whisper budget on a cool-calibrated panel',   () => assertWindow('faithful',   WARM_BASELINE_HEX, W, D75_WHITE));
   it('resonator holds whisper budget on a cool-calibrated panel',  () => assertWindow('resonator',  WARM_BASELINE_HEX, W, D75_WHITE));
   it('collector holds whisper budget on a cool-calibrated panel',  () => assertWindow('collector',  WARM_BASELINE_HEX, W, D75_WHITE));
+});
+
+// ─── §1d · Cool baseline × D55 panel — ceiling-only off-panel window ────────
+//
+// Closing slice (Mike #9). The cool baseline at D55 lifts the smallest
+// magnitudes (±1.5°) to ~0.698 ΔE — 0.002 below the on-panel 0.7 floor,
+// inside Sharma/Wu/Dalal 2005's ~0.5–1.0 inter-observer noise. We promise
+// the ceiling (≤ 1.8) and concede the floor mechanically.
+
+describe('accent-bias — COOL × D55 panel sensitivity (off-panel ceiling)', () => {
+  const W: Window = { ceiling: RECOGNITION_WHISPER_CEILING_COOL_OFF_PANEL };
+  it('deep-diver holds the cool ceiling on a warm-calibrated panel', () => assertWindow('deep-diver', COOL_BASELINE_HEX, W, D55_WHITE));
+  it('explorer holds the cool ceiling on a warm-calibrated panel',   () => assertWindow('explorer',   COOL_BASELINE_HEX, W, D55_WHITE));
+  it('faithful holds the cool ceiling on a warm-calibrated panel',   () => assertWindow('faithful',   COOL_BASELINE_HEX, W, D55_WHITE));
+  it('resonator holds the cool ceiling on a warm-calibrated panel',  () => assertWindow('resonator',  COOL_BASELINE_HEX, W, D55_WHITE));
+  it('collector holds the cool ceiling on a warm-calibrated panel',  () => assertWindow('collector',  COOL_BASELINE_HEX, W, D55_WHITE));
+});
+
+// ─── §1f · Cool baseline × D75 panel — ceiling-only off-panel window ────────
+//
+// Closing slice (Mike #9). The cool baseline at D75 falls further: ±1.5°
+// pair lands at ~0.55 ΔE — visibly sub-JND. The ceiling (≤ 1.8) still
+// pins "the room never shouts" at the deepest cool-leaning OLED panel a
+// stranger could plausibly own. The pair invariant (faithful/resonator
+// share magnitude by design — Tanya UIX #28) is preserved by changing
+// the budget shape, not the magnitudes.
+
+describe('accent-bias — COOL × D75 panel sensitivity (off-panel ceiling)', () => {
+  const W: Window = { ceiling: RECOGNITION_WHISPER_CEILING_COOL_OFF_PANEL };
+  it('deep-diver holds the cool ceiling on a cool-calibrated panel', () => assertWindow('deep-diver', COOL_BASELINE_HEX, W, D75_WHITE));
+  it('explorer holds the cool ceiling on a cool-calibrated panel',   () => assertWindow('explorer',   COOL_BASELINE_HEX, W, D75_WHITE));
+  it('faithful holds the cool ceiling on a cool-calibrated panel',   () => assertWindow('faithful',   COOL_BASELINE_HEX, W, D75_WHITE));
+  it('resonator holds the cool ceiling on a cool-calibrated panel',  () => assertWindow('resonator',  COOL_BASELINE_HEX, W, D75_WHITE));
+  it('collector holds the cool ceiling on a cool-calibrated panel',  () => assertWindow('collector',  COOL_BASELINE_HEX, W, D75_WHITE));
 });
 
 // ─── §2 · Range cap pins (Mike §4 POI 8 — closed-union exhaustiveness) ──────
@@ -244,5 +309,13 @@ describe('accent-bias — measureDeltaE2000 helper sanity', () => {
     // BFD_INV, this pin catches it before any window assertion blames the
     // CSS truth table (Mike #7 §POI 6 — cheap insurance).
     expect(measureDeltaE2000(WARM_BASELINE_HEX, 360, D55_WHITE)).toBeCloseTo(0, 6);
+  });
+
+  it('stranger floor under D75 (cool baseline): 0° lean ⇒ ΔE2000 = 0', () => {
+    // Cool-side closure (Mike #9 §6) — pin the stranger floor at the
+    // deepest cool-leaning OLED panel a stranger could plausibly own.
+    // Three-layer zero in the carrier expression guarantees this by
+    // construction; the test makes the construction falsifiable.
+    expect(measureDeltaE2000(COOL_BASELINE_HEX, 0, D75_WHITE)).toBe(0);
   });
 });

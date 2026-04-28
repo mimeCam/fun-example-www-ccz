@@ -26,6 +26,7 @@
 
 import { TextLink } from '@/components/shared/TextLink';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 
 /** Tagline rung — quiet (0.70). Pinned via alphaClassOf for grep-honesty. */
 const TAGLINE_TEXT_CLASS = alphaClassOf('mist', 'quiet', 'text');
@@ -40,8 +41,16 @@ const FOOTER_LINKS = [
 ] as const;
 
 export default function WhisperFooter() {
+  // T3 chassis seam — Mike #4 napkin §3 (universal). The footer's top
+  // edge is the content→chrome seam for every reader-facing route (one
+  // edit pins the bottom seam of `/`, `/articles`, `/article/[id]`).
+  // The handle is `CHASSIS_SEAM_TOP_CLASS` because the seam SITS AT THE
+  // TOP of the footer element — same rung as T1 (route-body top), one
+  // symbol, one rung, mirror-equal. `pb-sys-12` stays as the page-end
+  // monumental beat — viewport-edge breathing, not the T3 seam (different
+  // surface, one symbol per site).
   return (
-    <footer className="text-center py-sys-10 pb-sys-12 space-y-sys-2 thermal-drift">
+    <footer className={`text-center ${CHASSIS_SEAM_TOP_CLASS} pb-sys-12 space-y-sys-2 thermal-drift`}>
       <p className={`${TAGLINE_TEXT_CLASS} text-sys-caption`}>No algorithms. No feeds.</p>
       <nav className="flex justify-center items-center gap-sys-5 text-sys-micro"
            aria-label="Footer navigation">

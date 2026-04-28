@@ -340,12 +340,59 @@ function printBaselineBlock(baseline: string, label: string): void {
   }
 }
 
+// ─── PACT_HOLDS — designer-runnable single boolean (Mike #9 §6, Tanya #74 §4.2) ──
+
+/**
+ * Window literals — hand-mirrored from `lib/design/accent-bias.ts` so the
+ * CLI keeps zero non-pure imports (same policy as `THREAD_BIAS_TABLE`).
+ * The fence test imports the SSOT and pins drift between this file and
+ * the SSOT before it can ship.
+ */
+const WARM_WINDOW: readonly [number, number] = [0.8, 1.8];
+const COOL_ON_PANEL_WINDOW: readonly [number, number] = [0.7, 1.8];
+const COOL_OFF_PANEL_CEILING = 1.8;
+
+/** Pick the window for a (baseline, refWhite-key) cell — the asymmetric truth. */
+function windowFor(baselineHex: string, refKey: string): readonly [number, number] | { ceiling: number } {
+  if (baselineHex !== '#7b2cbf') return WARM_WINDOW;
+  return refKey === 'D50' ? COOL_ON_PANEL_WINDOW : { ceiling: COOL_OFF_PANEL_CEILING };
+}
+
+/** True when `dE` lies inside `w` — both shapes share the same upper bound. */
+function holdsInside(dE: number, w: readonly [number, number] | { ceiling: number }): boolean {
+  if ('ceiling' in w) return dE <= w.ceiling;
+  return dE >= w[0] && dE <= w[1];
+}
+
+/** Walk all (archetype × baseline × refWhite) cells and count pact-respecting cells. */
+function countPactHoldingCells(): { passed: number; total: number } {
+  let passed = 0, total = 0;
+  for (const [baselineHex] of BASELINES)
+    for (const [, deg] of THREAD_BIAS_TABLE)
+      for (const [refKey, refWhite] of REF_WHITE_COLS) {
+        total += 1;
+        if (holdsInside(measureDeltaE2000(baselineHex, deg, refWhite), windowFor(baselineHex, refKey))) passed += 1;
+      }
+  return { passed, total };
+}
+
+/** Format the trailing pass/fail glyph per Tanya UIX #74 §4.2 — designer eye-line. */
+function formatPactGlyph(): string {
+  const { passed, total } = countPactHoldingCells();
+  const verdict = passed === total ? 'true' : 'false';
+  const tail = passed === total ? `(${passed}/${total} cells inside whisper budget)` : `(${total - passed}/${total} cells outside budget — see rows above)`;
+  return `\nPACT_HOLDS = ${verdict}   ${tail}`;
+}
+
 /** Print the CLI receipt to stdout. Side-effect (console). */
 function printReceipt(): void {
-  console.log(`\nGolden Thread accent-bias calibration`);
-  console.log(`recognition whisper budget: ΔE2000 ∈ [0.8, 1.8]   (warm)  /  [0.7, 1.8]   (cool)`);
+  // The Stranger's Pact appears here — once, on a designer surface. JSDoc
+  // and AGENTS.md stay mechanical (Mike #9 §1; Elon §4 row 5; Tanya #74 §4.1).
+  console.log(`\nThe Stranger's Pact — warm × cool × D50/D55/D75. Stranger ≡ today.`);
+  console.log(`recognition whisper budget: ΔE2000 ∈ [0.8, 1.8]   (warm)  /  [0.7, 1.8]   (cool on-panel D50)  /  ≤ 1.8   (cool off-panel D55/D75)`);
   console.log(`panel white-point sensitivity: D50 (today)  ·  D55 (~5500K, warm)  ·  D75 (~7500K, cool)`);
   for (const [hex, label] of BASELINES) printBaselineBlock(hex, label);
+  console.log(formatPactGlyph());
   console.log('');
 }
 

@@ -170,3 +170,68 @@ export const SPACING_LEDGER_EXEMPT_TOKEN = 'spacing-ledger:exempt';
  * `p-4`, `m-[16px]`, `style={{ padding: '1rem' }}` — fails the guard.
  */
 export const THERMAL_LIFT_VAR_PREFIX = '--token-space-lift-';
+
+// ─── Chassis seam — the chrome→content / content→chrome bridge ─────────────
+
+/**
+ * Canonical rung for the T1 / T3 chassis seam. One numeric rung, applied
+ * symmetrically at the chrome→content (T1) and content→chrome (T3)
+ * boundaries of every reader-facing route, so the first heading lands at
+ * the same pixel row across `/`, `/articles`, `/article/[id]` — and the
+ * last content element exhales the same air before `WhisperFooter`.
+ * Mirror at top and bottom; one symbol, one rung.
+ *
+ * **Pick: rung 9 (40px+).** Justification:
+ *
+ *   1. *Tightens uniformly.* Today's seams sit at 24–96 px depending on
+ *      route (`/` `py-sys-11 md:py-sys-12`, `/articles` `py-sys-10`,
+ *      `/article/[id]` layered TopBar / ArticleHeader / divider). Rung 9
+ *      brings every per-route seam at-or-below today's value — the change
+ *      reads as "less air," never "where did this gap come from?". A
+ *      loosening seam is the felt-jank we are removing (Mike #4 napkin
+ *      §POI 1).
+ *   2. *Sits between nav-bar height and the display beat lead-stack.*
+ *      Calibrated against typography's display beat leading. The
+ *      cross-ledger relationship is JSDoc only — never compiled coupling
+ *      (the `--sys-tick` non-link rule, lines 27–29 above).
+ *   3. *Existing surface support.* `--token-space-lift-9` already resolves
+ *      via `liftVar(9)`; thermal warmth deepens the seam by the documented
+ *      increment, no new motion verb required.
+ *
+ * **One rung, one named handle, four call sites.** The seam is always
+ * applied at the *top edge* of the receiving element — the chrome→content
+ * boundary lives at the top of each route body, and the content→chrome
+ * boundary lives at the top of the universal `WhisperFooter`. So one
+ * `pt-sys-N` handle covers all four sites; the route-body bottom is
+ * collapsed into footer-owned T3 (Mike #4 napkin §3 — *"not both" is the
+ * rule*; one site per seam, footer is universal so it wins T3).
+ *
+ * Naming is the rung-handle (`CHASSIS_SEAM_TOP_CLASS`) — *intent* (chrome
+ * → content bridge) is grep-able, the rung is integer, the CSS var stays
+ * `--sys-space-9`. No new var, no thirteenth rung, no `breathline` token.
+ * Spacing-ledger naming rule (lines 17–23) holds. Vocabulary in docs,
+ * integers in code (Elon M., Mike K. via Tanya UIX #4 §3.3).
+ *
+ * Call sites pinned by `lib/design/__tests__/chrome-content-seam.fence.test.ts`:
+ *   • `app/page.tsx`                                (T1, `/`)
+ *   • `components/articles/ArticlesPageClient.tsx`  (T1, `/articles`)
+ *   • `app/article/[id]/page.tsx`                   (T1, with TopBar wrap-and-strip)
+ *   • `components/shared/WhisperFooter.tsx`         (T3 — universal)
+ *
+ * Credits: Mike K. (architect — napkin #4, the rung-9 pick, the
+ * tightening principle, the wrap-and-strip pattern for article-detail,
+ * the "polymorphism is a killer" no-named-token rule), Tanya D. (UIX #4
+ * — the cap-height anchor framing, the T1 = T3 mirror rule, the layer-
+ * cleanup recommendations), Krystle C. (kernel — the original T1/T3
+ * chassis-polish brief), Elon M. (the "no breathline name in tokens"
+ * verdict that survives in the ledger), Sid (this implementation).
+ */
+export const CHASSIS_SEAM_RUNG: SysSpaceIndex = 9;
+
+/**
+ * Chassis-seam class — applied at the *top edge* of the element receiving
+ * the seam. T1 (route-body top) and T3 (footer top) share this handle; the
+ * rung lift travels with `--token-space-lift-9` for warmth. `pt-sys-9`.
+ */
+export const CHASSIS_SEAM_TOP_CLASS: string =
+  spaceClassOf('pt', CHASSIS_SEAM_RUNG);

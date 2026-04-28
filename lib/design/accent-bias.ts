@@ -163,6 +163,37 @@ export const RECOGNITION_WHISPER_BUDGET_WARM: readonly [number, number] = [0.8, 
  */
 export const RECOGNITION_WHISPER_BUDGET_COOL: readonly [number, number] = [0.7, 1.8];
 
+/**
+ * Cool-stop ΔE2000 ceiling for the OFF-panel cells (cool × {D55, D75}).
+ * Single number, not a tuple — the shape carries the honesty: an
+ * asymmetric, ceiling-only window for the two cells the metric cannot
+ * resolve a floor on.
+ *
+ * Why no floor here. Under D55 the resonator (-1.5°) lands at ~0.698
+ * (0.002 below the on-panel 0.7 cool floor). Under D75 the ±1.5° pair
+ * falls to ~0.55. Both are below ΔE2000's own ~0.5–1.0 inter-observer
+ * noise floor (Sharma/Wu/Dalal 2005), so a floor promise on these cells
+ * is aspirational, not falsifiable. We promise the ceiling — the loud-
+ * floor at which a lean would become status — and concede the floor
+ * mechanically. The on-panel cool tuple `[0.7, 1.8]` keeps its floor;
+ * this constant is *additive*, not a replacement.
+ *
+ * Stranger floor (0° lean ⇒ ΔE = 0) holds at every cell by construction
+ * (three-layer zero in the carrier expression). Cool-side closure is
+ * pinned across tri-illuminant; the floor is honestly conceded sub-JND
+ * on cool × {D55, D75}.
+ *
+ * Imported by `accent-bias-calibration.fence.test.ts §1d / §1f`. No
+ * sibling constant for "warm × off-panel" — the warm baseline keeps a
+ * full `[floor, ceiling]` window across all three illuminants because
+ * its ΔE/° (≈0.66) lifts every magnitude above the noise floor at every
+ * white point. *Polymorphism is a killer* (Mike #9 §7 POI 9): one shape
+ * per stop, no preemptive `whisperCeilingAt(stop)` lift until rule-of-
+ * three fires. The asymmetric `[floor, ceiling] ∪ { ceiling }` pair is
+ * the smallest honest change.
+ */
+export const RECOGNITION_WHISPER_CEILING_COOL_OFF_PANEL: number = 1.8;
+
 // ─── Test-only mirrors of the CSS truth table — SSOT for the fences ──────────
 
 // Trinity loudness ladder (un-formalised, unit-mixed):

@@ -14,6 +14,7 @@ import WhisperFooter from '@/components/shared/WhisperFooter';
 import { Skeleton } from '@/components/shared/Skeleton';
 import { SuspenseFade } from '@/components/shared/SuspenseFade';
 import { decodeDeepLink } from '@/lib/sharing/deep-link';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 
 const ReturningPortal = dynamic(
   () => import('@/components/home/ReturningPortal'),
@@ -41,8 +42,16 @@ export default function Home({
   return (
     <main id="main-content" className="min-h-screen flex flex-col">
       <GemHome />
-      <div className="flex-1 flex flex-col justify-center max-w-3xl
-        mx-auto px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">
+      {/* T1 chassis seam — Mike #4 napkin / Tanya UIX #4. The top pad is
+          the chrome→content bridge: rung 9, mirror-equal across `/`,
+          `/articles`, `/article/[id]`. Bottom seam (T3) is collapsed
+          into footer-owned spacing — `WhisperFooter` carries the rung
+          on its top edge for every reader-facing route ("not both" is
+          the rule; footer is universal so it wins T3). The previous
+          `py-sys-11 md:py-sys-12` step-up was the per-route theatrics
+          we are removing — cross-route consistency > per-route. */}
+      <div className={`flex-1 flex flex-col justify-center max-w-3xl
+        mx-auto px-sys-4 md:px-sys-6 ${CHASSIS_SEAM_TOP_CLASS}`}>
 
         {/* Finding A (Tanya §3.2): a `?via=` reader gets the whisper
             INSTEAD of the returning-letter — never both.  Rendering the

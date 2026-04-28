@@ -19,6 +19,7 @@ import { getExtensionLabel } from '@/lib/content/content-layers';
 import { useReturnRecognition } from '@/lib/hooks/useReturnRecognition';
 import ExploreArticleCard from '@/components/explore/ExploreArticleCard';
 import { alphaClassOf } from '@/lib/design/alpha';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 
 // ─── Alpha-ledger handles (Mike napkin #116, Tanya UIX #3 §2.1) ───────────
 //
@@ -60,7 +61,14 @@ export default function ArticlesPageClient({ articles }: Props) {
     : [];
 
   return (
-    <div className="max-w-[48rem] mx-auto px-sys-7 py-sys-10">
+    // T1 chassis seam — Mike #4 / Tanya UIX #4. Rung 9 at top, mirror-
+    // equal with `/` and `/article/[id]`. The h1 is hosted inside this
+    // client component (Mike #4 §POI 3), so the seam attaches here.
+    // T3 is owned by `WhisperFooter` (universal). The previous
+    // `py-sys-10` carried both top and bottom — now top only.
+    // TODO: max-w-[48rem] is a pre-existing arbitrary length — move to a
+    // tokenised reading-width when the prose-width ledger lands.
+    <div className={`max-w-[48rem] mx-auto px-sys-7 ${CHASSIS_SEAM_TOP_CLASS}`}>
       <header className="mb-sys-9">
         <h1 className="font-display text-foreground text-sys-h3 md:text-sys-h2 font-sys-display">
           Articles
