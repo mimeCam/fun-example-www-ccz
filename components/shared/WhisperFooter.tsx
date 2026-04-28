@@ -6,16 +6,17 @@
  * Plus the tagline "No algorithms. No feeds."
  *
  * Links speak through `<TextLink variant="quiet">` — the attribution
- * register. The middle-dot separator floors at mist/35 so the comma
- * stays legible even when the room is warm (Tanya §6.3).
+ * register. The middle-dot separator floors at the muted rung (mist/30)
+ * via `alphaClassOf` — ambient chrome, one full rung below the labels it
+ * separates (Tanya §6.3, UX spec #88 §2).
  *
  * The third link (`Trust` → `/trust`) is the ONLY sitewide entry to the
  * reader-invariant `/trust` room. No homepage banner, no modal, no tooltip,
  * no "new" badge. Readers who ask the question find the answer in under
  * three seconds (footer scroll → click). Readers who don't ask, don't find
  * — intentional (Tanya #76 §3). Still a single centered line at mobile
- * width (`text-sys-micro`, 11px); the dot floors at mist/35 — balanced for
- * three labels by construction (Tanya #76 §8.1).
+ * width (`text-sys-micro`, 11px); the dot floors at the muted rung (mist/30)
+ * — balanced for three labels by construction (Tanya #76 §8.1, #88 §2).
  *
  * Tagline routes through the alpha-ledger `quiet` rung (mist/70) so the
  * "No algorithms. No feeds." line speaks at the same register as the
@@ -28,6 +29,9 @@ import { alphaClassOf } from '@/lib/design/alpha';
 
 /** Tagline rung — quiet (0.70). Pinned via alphaClassOf for grep-honesty. */
 const TAGLINE_TEXT_CLASS = alphaClassOf('mist', 'quiet', 'text');
+
+/** Dot rung — muted (0.30). One full rung below the labels (quiet=0.70). */
+const DOT_TEXT_CLASS = alphaClassOf('mist', 'muted', 'text');
 
 const FOOTER_LINKS = [
   { href: '/mirror', label: 'Mirror' },
@@ -49,13 +53,10 @@ export default function WhisperFooter() {
   );
 }
 
-/** Middle-dot floors at mist/35 — visible even when the room warms. */
+/** Middle-dot floors at the muted rung (mist/30) — ambient chrome between labels. */
 function FooterDot() {
   return (
-    <span
-      aria-hidden="true"
-      style={{ color: 'color-mix(in srgb, var(--mist) 35%, transparent)' }}
-    >
+    <span aria-hidden="true" className={DOT_TEXT_CLASS}>
       &middot;
     </span>
   );

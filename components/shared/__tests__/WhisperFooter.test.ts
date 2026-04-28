@@ -13,17 +13,23 @@
  *   2. Link variant — every footer link is `<TextLink variant="quiet">`.
  *      The footer is one register; mixing variants would split the voice.
  *
- *   3. Middle-dot floor — separators floor at `mist 35%` via `color-mix`.
- *      The dot stays legible even as the room warms (Tanya §6.3).
+ *   3. Middle-dot rung — separators ride the `muted` rung (mist/30) via
+ *      `alphaClassOf('mist','muted','text')`. One full alpha-ledger rung
+ *      below the `quiet` labels — ambient chrome, not punctuation that
+ *      asks to be read (Tanya UX spec #88 §2, Mike napkin #39).
+ *      No inline `style={…}` and no `color-mix(...)` literal: the dot
+ *      lives entirely on the ledger, JIT-visible to Tailwind.
  *
  * Mirrors the SuspenseFade.test.ts node-only SSR pattern so no jsdom
  * dependency is added; `React.createElement` is used so the existing
  * ts-jest preset (jsx: preserve) needs no per-test override.
  *
- * Credits: Tanya D. (UX spec #47 §3.4 — the quiet-rung pin), Mike K.
- * (napkin #19 §4.5 — pin the className contains `text-mist/70` not /60,
- * pin TextLink variant=quiet, pin the dot floor unchanged), Paul K.
- * (the "the lint test enforces forever" discipline this test joins).
+ * Credits: Tanya D. (UX spec #47 §3.4 — the quiet-rung pin; UX spec #88
+ * §2 — the snap to the muted rung for the middle dot), Mike K. (napkin
+ * #19 §4.5 — pin tagline class; napkin #39 — retire the last `color-mix`
+ * in components/**, snap to ledger), Paul K. (the "the lint test enforces
+ * forever" discipline this test joins), Krystle C. (the surgical snap-
+ * target the napkin endorses verbatim).
  */
 
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -82,9 +88,9 @@ describe('WhisperFooter — every link speaks the `quiet` register', () => {
   });
 });
 
-// ─── Middle-dot floor — color-mix(in srgb, var(--mist) 35%, transparent) ─
+// ─── Middle-dot rung — muted (mist/30), one rung below the labels ──────
 
-describe('WhisperFooter — middle-dot floor is unchanged at mist/35', () => {
+describe('WhisperFooter — middle-dot speaks the `muted` rung (mist/30)', () => {
   const html = renderFooter();
 
   it('two dots between the three links (n − 1 separators)', () => {
@@ -92,8 +98,24 @@ describe('WhisperFooter — middle-dot floor is unchanged at mist/35', () => {
     expect(countOccurrences(html, '·')).toBe(2);
   });
 
-  it('dot floor uses color-mix at 35% — legible under thermal warming', () => {
-    expect(html).toContain('color-mix(in srgb, var(--mist) 35%, transparent)');
+  it('dot uses text-mist/30 (the `muted` rung wire format)', () => {
+    expect(html).toContain('text-mist/30');
+  });
+
+  it('dot rung matches alphaClassOf(mist, muted, text)', () => {
+    expect(html).toContain(alphaClassOf('mist', 'muted', 'text'));
+  });
+
+  it('dot carries no inline style="…" prop (lives entirely on the ledger)', () => {
+    // Two aria-hidden dots, both rendered through Tailwind classes only.
+    // Inline style="color: …" would mean the color-mix carve-out crept back.
+    const dotMatch = html.match(/<span[^>]*aria-hidden="true"[^>]*>·<\/span>/g) ?? [];
+    expect(dotMatch.length).toBe(2);
+    dotMatch.forEach((span) => expect(span).not.toContain('style='));
+  });
+
+  it('no `color-mix(...)` literal in the rendered footer markup', () => {
+    expect(html).not.toContain('color-mix(');
   });
 
   it('dots are aria-hidden (decoration, not content)', () => {
@@ -108,11 +130,9 @@ describe('WhisperFooter — sealed register, no off-ledger drift', () => {
 
   it('does not introduce a stray /N color-alpha shorthand outside the ledger', () => {
     // Legal rungs: /10 /30 /50 /70 (+ /100 motion endpoint, not used here).
-    // /35 is permitted ONLY inside the inline color-mix style for the dot,
-    // not as a Tailwind class — the regex below would chew that too, so
-    // we strip the inline style block before scanning.
-    const stripped = html.replace(/style="[^"]*"/g, '');
-    const offLedger = stripped.match(/\b(?:bg|text|border|shadow)-[a-z]+\/(\d+)\b/g) ?? [];
+    // No inline `style="…"` carve-out remains — the dot now lives on the
+    // ledger via `alphaClassOf('mist','muted','text')` → text-mist/30.
+    const offLedger = html.match(/\b(?:bg|text|border|shadow)-[a-z]+\/(\d+)\b/g) ?? [];
     const drifters = offLedger.filter((c) => {
       const pct = Number(c.split('/')[1]);
       return ![10, 30, 50, 70, 100].includes(pct);

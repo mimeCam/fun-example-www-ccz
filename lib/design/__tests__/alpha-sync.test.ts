@@ -191,8 +191,16 @@ describe('Motion endpoint carve-out is documented', () => {
     expect(ALPHA_MOTION_ENDPOINT_PATHS).toContain('lib/utils/animation-phase.ts');
   });
 
-  it('exactly one path is allow-listed — more is drift', () => {
-    expect(ALPHA_MOTION_ENDPOINT_PATHS.length).toBe(1);
+  it('lib/design/presence.ts is the allow-listed path (chrome-rhythm continuity)', () => {
+    // Mike napkin #18 §2.2 + Tanya UIX #44 §10 — three sibling chrome
+    // surfaces (`AmbientNav`, `NextRead`, `GoldenThread`) route through
+    // `presenceClassOf` instead of carrying inline `// alpha-ledger:exempt`
+    // tokens themselves; the contract has one home, three thin call sites.
+    expect(ALPHA_MOTION_ENDPOINT_PATHS).toContain('lib/design/presence.ts');
+  });
+
+  it('exactly the two named paths are allow-listed — more is drift', () => {
+    expect(ALPHA_MOTION_ENDPOINT_PATHS.length).toBe(2);
   });
 });
 
