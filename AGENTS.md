@@ -12,9 +12,10 @@ Next.js 14 · React 18 · TypeScript · Tailwind · SQLite (better-sqlite3) · Z
 Design rules are enforced by fence tests (`*.fence.test.ts`) and sync tests. Single source of truth lives in CSS or one TS switch — every literal has one home, one grep-fence. Compose, don't migrate. **Chrome before content**: highest-visit surfaces polished first.
 
 ## WIP
-- **Passage Body-Hang** *(WIP 2026-04-28)*. `hangPunctClassOf('passage')` → `hanging-punctuation: first last allow-end` on three body-prose carriers. Safari-only. Fences: `passage-hang-converges` + `hang-progressive-enhancement`.
+_None._
 
 ## Live
+- **Passage Body-Hang** *(2026-04-28)*. `hangPunctClassOf('passage')` → `hanging-punctuation: first last allow-end` on three body-prose carriers. Safari-only paint surface (~30–35 % traffic); other UAs silently no-op. Fences: `passage-hang-converges` + `hang-progressive-enhancement` + `passage-trinity-disjoint` (CSS-side disjointness on the trinity rule bodies in `app/globals.css`; sister-paired with `passage-wrap-converges` + `passage-hyphens-converges`).
 - **Caption-Chrome Register** *(2026-04-28)*. `CAPTION_CHROME_CARRIERS` (5) in `lib/design/typography.ts` names the implicit register `<CaptionMetric>` already enforces (`tracking-sys-caption + tabular-nums + text-mist/70 + text-sys-(micro|caption)`). `ResonanceEntry` timeAgo migrated; digits stop dancing on /resonances. Fence: `caption-chrome-adoption`. Print/SVG carve-out: surfaces routing through `numericFeatureStyle()` are NOT carriers (own register, pinned by `numeric-features-adoption`).
 - **Recognition Beacon accent-bias** *(2026-04-28)*. Two-lane contract via `THREAD_ACCENT_BIAS_FILTER`. Fence: `focus-reciprocal-lane`.
 - **Chassis Seam** *(2026-04-28)*. `pt-sys-9` (40 px) chrome→content bridge × 7 doors. Fence: `chrome-content-seam`.
