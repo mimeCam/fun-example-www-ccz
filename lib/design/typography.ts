@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 /**
  * Typography Ledger — single source of truth for leading / wrap / kerning / track.
  *
@@ -370,3 +372,48 @@ export const numericFeatureStyle = (): string => NUMERIC_FEATURE_SETTINGS;
  * baseline` chip-rest fix, §4.1 — the `▲`-as-aesthetic-veto admission).
  */
 export const FILLED_GLYPH_OPTICAL_LIFT_CLASS = 'relative -top-[0.5px]';
+
+// ─── External-glyph baseline nudge — inline-style sibling of the lift ──────
+
+/**
+ * Frozen `CSSProperties` literal that lifts the inline 10×10 SVG external-
+ * link arrow by 0.08em above its `vertical-align: baseline` rest, so the
+ * glyph's centroid lines up with the surrounding line of prose's x-height.
+ *
+ * **Why 0.08em is real, not taste.** A 10×10 viewBox SVG glyph does NOT
+ * share a baseline with the surrounding line of prose; the centroid drifts
+ * UP. `0.08em` corrects that drift. Without naming the nudge, a future
+ * refactor will "simplify" it to zero and the arrow will read as floating.
+ *
+ * **Single legal consumer.** `<ExternalGlyph>` inside
+ * `components/shared/TextLink.tsx`. Adoption guard at
+ * `lib/design/__tests__/external-glyph-baseline-nudge-adoption.test.ts`
+ * traps any other module that spells `verticalAlign: '0.08em'`.
+ *
+ * **Frozen by reference.** The `as const` literal is byte-stable across
+ * renders, so React inlines it without per-render allocation. No JIT
+ * coupling — `vertical-align` is an inline style, not a Tailwind class.
+ *
+ * **Why not Tailwind.** `align-[0.08em]` maps to `align-items`, not to
+ * `vertical-align`. There is no first-class Tailwind utility for arbitrary
+ * `vertical-align` values, and inventing one for a single call site would
+ * be a heavier JIT-coupled detour. A frozen `CSSProperties` literal is the
+ * smaller, honest shape.
+ *
+ * **Sub-pixel caveat.** At 14–16px body sizes, 0.08em is just over 1px.
+ * On reduced-DPI displays it may quantize to 1px exactly; the lift remains
+ * a *correction*, not a flourish. If it quantized away, the chip is no
+ * worse than today (Mike #100 §4.5 / Tanya §4.3 — source-token vs paint-
+ * receipt is a category split).
+ *
+ * **N=1 is not a category.** No `_NUDGE_MAP`. The day a *second* glyph
+ * needs a different baseline nudge we promote to a map; not before. Shape
+ * follows data, not data shape.
+ *
+ * Mike's napkin: *one literal, one home, one fence — name the physics,
+ * not the cosmology.* Tanya UX §2: the centroid is the physics; the arrow
+ * stays still. The pixel diff after promotion is, by construction, zero.
+ */
+export const EXTERNAL_GLYPH_BASELINE_NUDGE_STYLE = {
+  verticalAlign: '0.08em',
+} as const satisfies Readonly<CSSProperties>;
