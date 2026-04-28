@@ -41,6 +41,7 @@ import { LeanArrow } from '@/components/shared/LeanArrow';
 import { TextLink } from '@/components/shared/TextLink';
 import { Skeleton } from '@/components/shared/Skeleton';
 import WhisperFooter from '@/components/shared/WhisperFooter';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 
 const ANON_KEY = 'anon-reader-id';
 const MIRROR_KEY = 'quick-mirror-result';
@@ -196,9 +197,19 @@ export default function ResonancesClient() {
   // Empty state — no resonances captured yet. Frame + voice via EmptySurface.
   if (isEmpty) return <EmptyResonances />;
 
-  // Active state — render the Book of You
+  // Active state — render the Book of You.
+  //
+  // Chassis-seam call-site (Mike #5 §3c, Tanya UIX 2026-04-28 §3.3): T1
+  // lives on this `max-w-2xl mx-auto` body wrapper (the canonical-precedent
+  // body-wrapper-owns-max-width-plus-seam pattern from `app/page.tsx`,
+  // `ArticlesPageClient.tsx`, `app/article/[id]/page.tsx`). The legacy
+  // `pt-sys-8` (32px) became `${CHASSIS_SEAM_TOP_CLASS}` (rung 9 → 40px)
+  // so the "the book of you" H1 cap-height lands on the same y as `/`,
+  // `/articles`, `/article/[id]`, `/trust`, `/mirror`. The shell
+  // (`app/resonances/page.tsx`) was stripped of `py-sys-8` to avoid
+  // double-counting (wrap-and-strip; not both).
   return (
-    <div className="max-w-2xl mx-auto pt-sys-8">
+    <div className={`max-w-2xl mx-auto ${CHASSIS_SEAM_TOP_CLASS}`}>
       <GemHome />
       {/* Header — the "Your Mirror" forward door. The `<LeanArrow />` kernel
           replaces the raw glyph so this surface joins the other three

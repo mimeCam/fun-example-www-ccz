@@ -198,11 +198,11 @@ export const THERMAL_LIFT_VAR_PREFIX = '--token-space-lift-';
  *      via `liftVar(9)`; thermal warmth deepens the seam by the documented
  *      increment, no new motion verb required.
  *
- * **One rung, one named handle, four call sites.** The seam is always
+ * **One rung, one named handle, seven call sites.** The seam is always
  * applied at the *top edge* of the receiving element — the chrome→content
  * boundary lives at the top of each route body, and the content→chrome
  * boundary lives at the top of the universal `WhisperFooter`. So one
- * `pt-sys-N` handle covers all four sites; the route-body bottom is
+ * `pt-sys-N` handle covers all seven sites; the route-body bottom is
  * collapsed into footer-owned T3 (Mike #4 napkin §3 — *"not both" is the
  * rule*; one site per seam, footer is universal so it wins T3).
  *
@@ -217,14 +217,23 @@ export const THERMAL_LIFT_VAR_PREFIX = '--token-space-lift-';
  *   • `components/articles/ArticlesPageClient.tsx`  (T1, `/articles`)
  *   • `app/article/[id]/page.tsx`                   (T1, with TopBar wrap-and-strip)
  *   • `components/shared/WhisperFooter.tsx`         (T3 — universal)
+ *   • `app/trust/page.tsx`                          (T1, `/trust` — reader-invariant; lift = 0)
+ *   • `app/mirror/page.tsx`                         (T1, `/mirror` data + loading branches)
+ *   • `app/resonances/ResonancesClient.tsx`         (T1, `/resonances` active branch)
  *
  * Credits: Mike K. (architect — napkin #4, the rung-9 pick, the
  * tightening principle, the wrap-and-strip pattern for article-detail,
- * the "polymorphism is a killer" no-named-token rule), Tanya D. (UIX #4
- * — the cap-height anchor framing, the T1 = T3 mirror rule, the layer-
- * cleanup recommendations), Krystle C. (kernel — the original T1/T3
- * chassis-polish brief), Elon M. (the "no breathline name in tokens"
- * verdict that survives in the ledger), Sid (this implementation).
+ * the "polymorphism is a killer" no-named-token rule; napkin #5, the
+ * 4 → 7 scope-extension that brings `/trust`, `/mirror`, `/resonances`
+ * onto the same horizon), Tanya D. (UIX #4 — the cap-height anchor
+ * framing, the T1 = T3 mirror rule, the layer-cleanup recommendations;
+ * UIX 2026-04-28 — the per-route layer-cleanups for the three doors of
+ * self-recognition, the explicit refusal of new motion / translucency
+ * during the seam pass), Krystle C. (kernel — the original T1/T3
+ * chassis-polish brief, the 4 → 7 fence-delta), Elon M. (the "no
+ * breathline name in tokens" verdict that survives in the ledger; the
+ * reader-invariant pin on `/trust` honored mechanically by the `0px`
+ * SSR fallback in `liftVar()`), Sid (this implementation, both passes).
  */
 export const CHASSIS_SEAM_RUNG: SysSpaceIndex = 9;
 

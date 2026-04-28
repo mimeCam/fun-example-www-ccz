@@ -1,11 +1,14 @@
 /**
- * Chrome→Content Seam — single-rung, four-call-site fence.
+ * Chrome→Content Seam — single-rung, seven-call-site fence.
  *
  * Pins the T1 / T3 chassis-seam contract introduced by Mike #4 napkin
- * §4 (Tanya UIX #4 §4): one numeric rung (`CHASSIS_SEAM_RUNG = 9`)
- * applied at the chrome→content boundary of every reader-facing route,
- * and at the universal `WhisperFooter`'s top edge for the symmetric
- * content→chrome boundary. *One symbol, one rung, four call sites.*
+ * §4 (Tanya UIX #4 §4) and extended by Mike #5 napkin §3 + Tanya UIX
+ * 2026-04-28 §3 to cover the three "doors of self-recognition"
+ * (`/trust`, `/mirror`, `/resonances`): one numeric rung
+ * (`CHASSIS_SEAM_RUNG = 9`) applied at the chrome→content boundary of
+ * every reader-facing route, and at the universal `WhisperFooter`'s top
+ * edge for the symmetric content→chrome boundary. *One symbol, one
+ * rung, seven call sites.*
  *
  * Why a fence, not a code-review checklist (Mike #4 §POI 5):
  *
@@ -27,8 +30,8 @@
  *
  * Allow-list shape:
  *
- *   • Inside `app/` and `components/`, exactly four files import
- *     `CHASSIS_SEAM_TOP_CLASS` — the four call sites. Anyone else
+ *   • Inside `app/` and `components/`, exactly seven files import
+ *     `CHASSIS_SEAM_TOP_CLASS` — the seven call sites. Anyone else
  *     reaching for the handle is a copy-paste; the answer is "open a
  *     separate brief; chassis seam is not your seam."
  *   • The export site `lib/design/spacing.ts` is the canonical home;
@@ -67,12 +70,15 @@ const ROOT = join(__dirname, '..', '..', '..');
 /** Directories scanned for the chassis-seam handle. */
 const SCAN_DIRS: readonly string[] = ['app', 'components'];
 
-/** The four legal call sites — exactly the seam-owning surfaces. */
+/** The seven legal call sites — exactly the seam-owning surfaces. */
 const ALLOWED_CALL_SITES: readonly string[] = [
   'app/page.tsx',
   'app/article/[id]/page.tsx',
   'components/articles/ArticlesPageClient.tsx',
   'components/shared/WhisperFooter.tsx',
+  'app/trust/page.tsx',                     // Mike #5 §3a
+  'app/mirror/page.tsx',                    // Mike #5 §3b
+  'app/resonances/ResonancesClient.tsx',    // Mike #5 §3c
 ];
 const ALLOW_SET: ReadonlySet<string> = new Set<string>(ALLOWED_CALL_SITES);
 
@@ -80,7 +86,7 @@ const ALLOW_SET: ReadonlySet<string> = new Set<string>(ALLOWED_CALL_SITES);
 
 /**
  * Any file under `app/` or `components/` that imports
- * `CHASSIS_SEAM_TOP_CLASS` outside the four allow-listed sites is a
+ * `CHASSIS_SEAM_TOP_CLASS` outside the seven allow-listed sites is a
  * copy-paste. The fence carries `kind: 'copycat'` so a regression
  * surfaces with the right name.
  */
@@ -120,7 +126,7 @@ const NAMED_TOKEN_FENCE: FenceDecl = {
 function formatCopycat(v: Violation): string {
   return (
     `  ${v.file}:${v.line} — imports CHASSIS_SEAM_TOP_CLASS\n` +
-    `    → only the four allow-listed call sites may carry the chassis seam:\n` +
+    `    → only the seven allow-listed call sites may carry the chassis seam:\n` +
     `      ${ALLOWED_CALL_SITES.join(', ')}.\n` +
     `      A new seam-bearing surface is a different brief — not a copy-paste.`
   );
@@ -136,8 +142,8 @@ function formatNamedToken(v: Violation): string {
 
 // ─── Tests ────────────────────────────────────────────────────────────────
 
-describe('chassis seam — four call sites, one rung handle', () => {
-  it('exactly the four allow-listed files import CHASSIS_SEAM_TOP_CLASS', () => {
+describe('chassis seam — seven call sites, one rung handle', () => {
+  it('exactly the seven allow-listed files import CHASSIS_SEAM_TOP_CLASS', () => {
     const offenders = runLinePatterns(COPYCAT_FENCE);
     if (offenders.length > 0) {
       throw new Error('\n' + offenders.map(formatCopycat).join('\n'));
@@ -145,7 +151,8 @@ describe('chassis seam — four call sites, one rung handle', () => {
     expect(offenders.map((v) => v.file)).toEqual([]);
   });
 
-  it('the allow-list contains exactly four entries', () => {
+  it('the allow-list contains exactly seven entries', () => {
+    expect(ALLOW_SET.size).toBe(7);
     expect([...ALLOW_SET].sort()).toEqual([...ALLOWED_CALL_SITES].sort());
   });
 

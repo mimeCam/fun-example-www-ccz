@@ -33,6 +33,7 @@ import type { Metadata } from 'next';
 import { GemHome } from '@/components/navigation/GemHome';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { SuspenseFade } from '@/components/shared/SuspenseFade';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 import {
   TRUST_HEADLINE,
   TRUST_PARAGRAPH,
@@ -63,17 +64,30 @@ export default function TrustPage(): JSX.Element {
 
 // ─── Sub-components — each ≤ 10 LOC ───────────────────────────────────────
 
-/** The single-column layout. `max-w-3xl` matches the homepage shell verbatim. */
+/**
+ * The single-column layout. `max-w-3xl` matches the homepage shell verbatim.
+ *
+ * Chassis-seam call-site (Mike #5 §3a, Tanya UIX #2026-04-28 §3.1): the
+ * `${CHASSIS_SEAM_TOP_CLASS}` (rung 9 → `pt-sys-9` → 40px) is the *only*
+ * top-edge contributor on this surface. The legacy `py-sys-11 md:py-sys-12`
+ * column wrapper and the inner `mt-sys-12` block were both stripped so the
+ * H1 cap-height lands on the same pixel row as `/`, `/articles`,
+ * `/article/[id]`, `/mirror`, `/resonances`. Bottom is owned by
+ * `WhisperFooter` (universal T3 — *"not both" is the rule*, Mike #4 §3).
+ *
+ * Reader-invariant: `liftVar(9)` resolves to its `0px` SSR fallback because
+ * `/trust` lives outside `ThermalProvider`'s carve-out — the seam stays
+ * exactly 40px regardless of thermal state on the rest of the site
+ * (verified mechanically by `liftVar()`'s fallback in spacing.ts:111).
+ */
 function TrustColumn(): JSX.Element {
   return (
-    <div className="flex-1 max-w-3xl mx-auto
-                    px-sys-4 md:px-sys-6 py-sys-11 md:py-sys-12">
-      <div className="mt-sys-12">
-        <TrustTitle />
-        <TrustHairline />
-        <TrustParagraph />
-        <TrustInvariantList />
-      </div>
+    <div className={`flex-1 max-w-3xl mx-auto
+                    px-sys-4 md:px-sys-6 ${CHASSIS_SEAM_TOP_CLASS}`}>
+      <TrustTitle />
+      <TrustHairline />
+      <TrustParagraph />
+      <TrustInvariantList />
     </div>
   );
 }

@@ -24,7 +24,7 @@ All design rules enforced by fence tests (`*.fence.test.ts`). Key primitives at 
 ## WIP
 **Recognition Beacon — accent-bias two-lane contract** *(AMBIENT sealed + RECIPROCAL live 2026-04-28)*. Per-archetype hue lean ±1.5°–2.5° via `THREAD_ACCENT_BIAS_FILTER` (`lib/design/accent-bias.ts`). AMBIENT lane: Golden Thread spine fill (sealed, one JSX consumer). RECIPROCAL lane: `:focus-visible::after` ring paint via `::after` pseudo (open by invitation). Fence: `focus-reciprocal-lane.fence.test.ts`. WCAG sweep: `focus-ring-contrast-audit.test.ts §SWEEP`. Receipt: `scripts/measure-thread-bias-deltaE.ts`.
 
-**Chassis Seam (T1/T3)** *(LIVE 2026-04-28)*. Mirror-equal chrome→content bridge across `/`, `/articles`, `/article/[id]`.
+**Chassis Seam (T1/T3)** *(LIVE 2026-04-28, 7-door coverage)*. Mirror-equal chrome→content bridge — `pt-sys-9` (40px) at the top of every reader-facing body wrapper. Seven call sites pinned: `/`, `/articles`, `/article/[id]`, `/trust`, `/mirror`, `/resonances`, plus `WhisperFooter` (universal T3). Receipt: `chrome-content-seam.fence.test.ts` (`ALLOWED_CALL_SITES.length === 7`). `/trust` reader-invariant — `liftVar(9)` resolves to its `0px` SSR fallback (no `ThermalProvider` carve-out on that route).
 
 **Deferred:** P3/True Tone, Slice 3 (→ `lib/design/perceptual/`), archetype-detection accuracy receipt.
 

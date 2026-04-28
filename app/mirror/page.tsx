@@ -16,6 +16,7 @@ import MirrorLoadingSurface from '@/components/mirror/MirrorLoadingSurface';
 import WhisperFooter from '@/components/shared/WhisperFooter';
 import { EmptySurface } from '@/components/shared/EmptySurface';
 import { CaptionMetric } from '@/components/shared/CaptionMetric';
+import { CHASSIS_SEAM_TOP_CLASS } from '@/lib/design/spacing';
 import { emptyPhrase } from '@/lib/sharing/empty-phrase';
 import { formatReaderShortDate } from '@/lib/utils/reader-locale';
 import type { QuickMirrorResult } from '@/lib/mirror/quick-synthesize';
@@ -65,7 +66,10 @@ export default function MirrorPage() {
 
   const data = mirror ?? quickMirror;
   if (data) return (
-    <div id="main-content" className="min-h-screen p-sys-8">
+    <div
+      id="main-content"
+      className={`min-h-screen px-sys-8 ${CHASSIS_SEAM_TOP_CLASS}`}
+    >
       <GemHome />
       <div className="flex flex-col items-center justify-center min-h-[85vh]">
         {mirror
@@ -81,7 +85,10 @@ export default function MirrorPage() {
   );
 
   if (loading) return (
-    <div id="main-content" className="min-h-screen p-sys-8">
+    <div
+      id="main-content"
+      className={`min-h-screen px-sys-8 ${CHASSIS_SEAM_TOP_CLASS}`}
+    >
       <GemHome />
       {/* Loading surface — routed through <Skeleton variant="card"> with
           geometry pinned to MirrorRevealCard (max-w-md, ceremony posture
